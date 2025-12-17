@@ -1,0 +1,90 @@
+<script>
+    const API_BASE = 'https://dcc-router.denverairportpickup.workers.dev/api';
+
+    // Get cartId from URL param (preferred) or fallback to localStorage
+    const urlParams = new URLSearchParams(window.location.search);
+    const cartId = urlParams.get('cartId') || localStorage.getItem('dcc_cart_id'); // Ensure cartId is used, not cart_id
+
+    const statusEl = document.getElementById('cart-status');
+    const itemsEl = document.getElementById('cart-items');
+    const ctaEl = document.getElementById('checkout-cta');
+    const linkEl = document.getElementById('checkout-link');
+    const emptyEl = document.getElementById('empty-state');
+
+    // --- Helper to render the cart items ---
+    function renderCart(items, bookingLinks) {
+        itemsEl.innerHTML = '';
+        let subtotal = 0;
+        
+        items.forEach((tour, i) => {
+            const price = tour.base_price || 0;
+            subtotal += price;
+
+            const item = document.createElement('div');
+            item.className = 'bg-white/5 backdrop-blur rounded-2xl p-6 md:p-8 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8';
+            
+            item.innerHTML = `
+                <img src="${tour.hero_image_url || 'https://images.unsplash.com/photo-1579737151121-657159c86129'}" 
+                     class="w-full h-40 md:w-32 md:h-32 object-cover rounded-xl flex-shrink-0" 
+                     alt="${tour.name}">
+                <div class="flex-grow text-center md:text-left">
+                    <p class="text-sm font-semibold opacity-70">Adventure #${i + 1}</p>
+                    <h3 class="text-3xl font-bold mb-1">${tour.name}</h3>
+                    <p class="text-xl text-[#7FD6FF]">$${price.toFixed(2)}</p>
+                </div>
+            `;
+            itemsEl.appendChild(item);
+        });
+
+        // Update totals (Taxes/Fees are 0.00 for this v1)
+        const fees = 0.00;
+        document.getElementById('subtotal-price').textContent = `$${subtotal.toFixed(2)}`;
+        document.getElementById('fees-price').textContent = `$${fees.toFixed(2)}`;
+        document.getElementById('total-price').textContent = `$${(subtotal + fees).toFixed(2)}`;
+
+        // Set the final redirect link
+        linkEl.href = bookingLinks[0]; // Redirect to the first link (v1 simplicity)
+        ctaEl.classList.remove('hidden');
+    }
+
+    // --- Core Fetcher ---
+    async function fetchCartAndRender() {
+        if (!cartId) {
+            statusEl.style.display = 'none';
+            emptyEl.classList.remove('hidden');
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE}/cart/checkout?cartId=${cartId}`);
+            
+            if (!response.ok) {
+                // Cart is empty, expired, or not found (404)
+                statusEl.style.display = 'none';
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+
+            const data = await response.json();
+            
+            statusEl.style.display = 'none';
+
+            if (!data.items || data.items.length === 0) {
+                emptyEl.classList.remove('hidden');
+                return;
+            }
+
+            // Render items and totals
+            renderCart(data.items, data.bookingLinks);
+            
+        } catch (error) {
+            console.error("Checkout Fetch Error:", error);
+            statusEl.textContent = 'A network error occurred. Please try again.';
+            statusEl.className += ' text-red-400';
+            emptyEl.classList.add('hidden');
+        }
+    }
+
+    // Initialize checkout flow
+    fetchCartAndRender();
+</script>
