@@ -1,0 +1,204 @@
+<script>
+    const API_BASE_URL = 'https://dcc-router.denverairportpickup.workers.dev/api/';
+    const tourGrid = document.getElementById('tour-grid');
+    
+    // State to hold data and active filters
+    const state = {
+        activePort: 'all',
+        activeCategory: 'all',
+        cartId: null,
+        toursData: [], // Stores all fetched tours from KV
+    };
+
+    // --- 1. Initialization and Cart State ---
+    function initCart() {
+        // Retrieve or generate a persistent Cart ID
+        state.cartId = localStorage.getItem('dcc_cart_id');
+        if (!state.cartId) {
+            state.cartId = 'cart-' + Date.now() + Math.floor(Math.random() * 9999);
+            localStorage.setItem('dcc_cart_id', state.cartId);
+        }
+        
+        // Ensure the checkout link is correct
+        document.getElementById('checkout-link').href = `${API_BASE_URL}cart/checkout?cartId=${state.cartId}`;
+        
+        // Update cart display from stored count
+        updateCartDisplay(parseInt(localStorage.getItem('dcc_cart_count') || 0));
+    }
+
+    function updateCartDisplay(count) {
+        const cartText = (count === 1) ? '1 epic adventure' : `${count} total experiences`;
+        document.getElementById('mini-cart-text').innerHTML = `Your Alaska Adventure: <b>${cartText}</b>`;
+        
+        const miniCart = document.getElementById('mini-cart');
+        miniCart.style.display = (count > 0) ? 'block' : 'none';
+    }
+
+    // --- 2. Cart API Handler ---
+    async function addToCart(tourId) {
+        if (!state.cartId) return console.error("Cart ID not initialized.");
+
+        try {
+            const response = await fetch(`${API_BASE_URL}cart/add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    tour_id: tourId,
+                    cart_id: state.cartId,
+                }),
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                localStorage.setItem('dcc_cart_count', result.total_items);
+                updateCartDisplay(result.total_items);
+                console.log(`Added tour ${tourId}. Total: ${result.total_items}`);
+            } else {
+                console.error("Cart error:", result.error);
+            }
+
+        } catch (error) {
+            console.error("Cart API Error:", error);
+        }
+    }
+
+    // --- 3. Tour Card Renderer (Builds from real data) ---
+    function createTourCard(tour) {
+        const getBadges = () => {
+            let badges = '';
+            // Basic badge logic based on price and assumed categories
+            if (tour.base_price >= 500) badges += '<span class="badge">💎 Premium</span>';
+            if (tour.port_slugs && tour.port_slugs.includes('skagway')) badges += '<span class="badge">🚂 Railway Port</span>';
+            if (tour.status === 'active') badges += '<span class="badge">✅ Bookable</span>';
+            if (tour.base_price < 200) badges += '<span class="badge">💰 Budget</span>';
+            
+            return badges;
+        };
+
+        const imageURL = tour.hero_image_url || 'https://images.unsplash.com/photo-1579737151121-657159c86129';
+        
+        return `
+            <div class="tour-card w-full max-w-md bg-[#0B1C26]/80 backdrop-blur rounded-2xl overflow-hidden shadow-2xl" 
+                 data-port-slug="${tour.port_slugs[0] || 'unknown'}">
+                <img src="${imageURL}" alt="${tour.name}" class="w-full h-96 object-cover">
+                <div class="p-10">
+                    <h3 class="text-4xl font-bold mb-3">${tour.name}</h3>
+                    <p class="text-lg opacity-90 mb-8">${tour.description || 'Experience the best of Alaska.'}</p>
+                    <div class="flex flex-wrap gap-3 mb-8">
+                        ${getBadges()}
+                    </div>
+                    <div class="flex justify-between items-end">
+                        <p class="text-3xl font-bold text-[#7FD6FF]">$${tour.base_price}</p>
+                        <button 
+                            data-tour-id="${tour.tour_id}" 
+                            class="add-to-cart-btn px-10 py-5 bg-[#7FD6FF] text-[#0B1C26] font-bold rounded-full hover:bg-white transition text-lg">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- 4. Filtering Logic (Central Function) ---
+    function filterAndRenderTours() {
+        tourGrid.innerHTML = '';
+        
+        const filteredTours = state.toursData.filter(tour => {
+            const portMatch = state.activePort === 'all' || tour.port_slugs.includes(state.activePort);
+            
+            // Category Check (If the category button is active, it must match one of the tour's inferred tags)
+            const categoryMatch = state.activeCategory === 'all' || 
+                                  (tour.tags && tour.tags.includes(state.activeCategory));
+
+            return portMatch && categoryMatch;
+        });
+
+        if (filteredTours.length === 0) {
+            tourGrid.innerHTML = `<div class="text-xl text-red-400">No active tours found matching the selected port and categories.</div>`;
+            return;
+        }
+
+        const html = filteredTours.map(createTourCard).join('');
+        tourGrid.innerHTML = html;
+        
+        // Re-attach cart listeners to newly rendered buttons
+        document.querySelectorAll('.add-to-cart-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                addToCart(e.target.getAttribute('data-tour-id'));
+            });
+        });
+    }
+
+    // --- 5. Core Data Fetcher (Fetches ALL data ONCE from Worker) ---
+    async function fetchAllTours() {
+        tourGrid.innerHTML = `<div class="text-xl text-[#7FD6FF]">Fetching all Alaskan adventures from KV cache...</div>`;
+
+        try {
+            // NOTE: Assuming your Worker's /api/ports/denver/tours returns ALL tours, or you need to update the Worker to include a /api/all-tours endpoint.
+            const response = await fetch(`${API_BASE_URL}ports/denver/tours`); 
+            
+            if (!response.ok) throw new Error(`Worker API Error: ${response.status}`);
+
+            const result = await response.json();
+            state.toursData = result.data; 
+            
+            // Render the filtered list (defaults to all)
+            filterAndRenderTours();
+
+        } catch (error) {
+            console.error("Fetch Error:", error);
+            tourGrid.innerHTML = `<div class="text-xl text-red-400">Error connecting to the tour service.</div>`;
+        }
+    }
+
+
+    // --- 6. Event Listener Logic ---
+    
+    // Port Selector Listener
+    document.querySelectorAll('.port-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const newPort = e.target.getAttribute('data-port');
+            state.activePort = newPort;
+
+            // Update styling
+            document.querySelectorAll('.port-btn').forEach(btn => btn.classList.remove('active', 'bg-[#7FD6FF]/60', 'text-[#0B1C26]'));
+            button.classList.add('active', 'bg-[#7FD6FF]/60', 'text-[#0B1C26]');
+            
+            // Filter instantly using the data already stored in state
+            filterAndRenderTours();
+
+            document.getElementById('tour-grid').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    });
+
+    // Category Filter Listener
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const newCategory = e.target.getAttribute('data-filter');
+            state.activeCategory = newCategory;
+
+            // Update styling
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active', 'bg-[#7FD6FF]', 'text-[#0B1C26]');
+                btn.classList.add('bg-[#0B1C26]', 'text-[#7FD6FF]', 'border');
+            });
+            if (newCategory !== 'all') {
+                button.classList.add('active', 'bg-[#7FD6FF]', 'text-[#0B1C26]');
+                button.classList.remove('bg-[#0B1C26]', 'text-[#7FD6FF]', 'border');
+            } else {
+                 document.querySelector('.filter-btn[data-filter="all"]').classList.add('active', 'bg-[#7FD6FF]', 'text-[#0B1C26]');
+            }
+
+
+            filterAndRenderTours();
+        });
+    });
+
+
+    // Initial setup on page load
+    initCart();
+    // Kick off the initial data fetch 
+    fetchAllTours();
+</script>
