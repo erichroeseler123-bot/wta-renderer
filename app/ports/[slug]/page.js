@@ -1,25 +1,25 @@
-import DCCRotatingMap from '../../components/DCCRotatingMap';
+import DCCPortMap from '../../components/DCCPortMap';
+
 export default async function Page({ params }) {
   const { slug } = await params;
 
   return (
     <main style={styles.page}>
-      {/* HERO */}
-      <section style={styles.hero}>
-        <div style={styles.heroOverlay} />
-        <div style={styles.heroContent}>
-          <span style={styles.badge}>DCC Destination</span>
+      {/* MAP HERO */}
+      <section style={styles.mapHero}>
+        <DCCPortMap slug={slug} />
+        <div style={styles.mapOverlay}>
+          <span style={styles.badge}>DCC Port View</span>
           <h1 style={styles.title}>
             {slug.charAt(0).toUpperCase() + slug.slice(1)}
           </h1>
           <p style={styles.meta}>
-            Tours • Helicopters • Port Intelligence
+            Live spatial overview • Tours • Air • Sea
           </p>
         </div>
       </section>
-      <DCCRotatingMap slug={slug} />
 
-      {/* BODY */}
+      {/* ACTION GRID */}
       <section style={styles.body}>
         <div style={styles.grid}>
           <a href={`/ports/${slug}/tours`} style={styles.card}>
@@ -33,51 +33,58 @@ export default async function Page({ params }) {
           </a>
 
           <div style={styles.card}>
-            <h3>Port Info</h3>
-            <p>Logistics, docks, timing (coming soon)</p>
+            <h3>Port Intelligence</h3>
+            <p>Docks, timing, logistics (coming soon)</p>
           </div>
         </div>
       </section>
-      <DCCRotatingMap slug={slug} />
     </main>
   );
 }
 
 const styles = {
-  page: { background: '#0b0e14', color: '#e6e9ef', minHeight: '100vh' },
+  page: {
+    background: '#0b0e14',
+    color: '#e6e9ef',
+    minHeight: '100vh',
+  },
 
-  hero: {
+  /* MAP HERO */
+  mapHero: {
     position: 'relative',
-    height: '55vh',
-    minHeight: 420,
-    backgroundImage:
-      'url(https://images.unsplash.com/photo-1549880338-65ddcdfd017b)',
-    backgroundSize: 'cover',
-    backgroundPosition: 'center',
+    height: '70vh',
+    minHeight: 480,
+    position: 'relative',
+    height: '70vh',
+    minHeight: 480,
   },
-  heroOverlay: {
+  mapOverlay: {
     position: 'absolute',
-    inset: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    padding: '40px',
     background:
-      'linear-gradient(to bottom, rgba(11,14,20,0.25), rgba(11,14,20,0.95))',
-  },
-  heroContent: {
-    position: 'relative',
-    zIndex: 1,
-    padding: '80px 40px',
-    maxWidth: 900,
+      'linear-gradient(to top, rgba(11,14,20,0.95), rgba(11,14,20,0.2))',
   },
   badge: {
     display: 'inline-block',
-    background: 'rgba(0,0,0,0.5)',
+    background: 'rgba(0,0,0,0.6)',
     padding: '6px 12px',
     borderRadius: 20,
     fontSize: 12,
-    marginBottom: 12,
+    marginBottom: 10,
   },
-  title: { fontSize: 44, margin: '10px 0' },
-  meta: { color: '#c9d1ff', fontSize: 16 },
+  title: {
+    fontSize: 42,
+    margin: '6px 0',
+  },
+  meta: {
+    color: '#c9d1ff',
+    fontSize: 15,
+  },
 
+  /* BODY */
   body: {
     padding: 40,
     maxWidth: 1200,
