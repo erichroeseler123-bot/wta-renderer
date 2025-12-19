@@ -1,13 +1,19 @@
+import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
-type Tour = {
+interface Tour {
   id: string;
   title: string;
   operator: string;
   price_from: number;
   duration: string;
-  image: string;
-};
+  image?: string;
+}
+
+interface PortData {
+  portName: string;
+  tours: Tour[];
+}
 
 export default async function PortPage({
   params,
@@ -23,44 +29,46 @@ export default async function PortPage({
     return notFound();
   }
 
-  const data: { portName: string; tours: Tour[] } = await res.json();
+  const data: PortData = await res.json();
+
+  if (!data || !data.tours || data.tours.length === 0) {
+    return notFound();
+  }
 
   return (
-    <main style={{ maxWidth: 1100, margin: '0 auto', padding: '3rem' }}>
-      <h1 style={{ fontSize: '2.5rem', marginBottom: '2rem' }}>
-        {data.portName}
-      </h1>
+    <main style={{ padding: '4rem', maxWidth: 1100, margin: '0 auto' }}>
+      <header style={{ marginBottom: '2rem' }}>
+        <h1 style={{ fontSize: '2.5rem' }}>{data.portName}</h1>
+        <p>{data.tours.length} tours available</p>
+      </header>
 
       <section
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-          gap: '2rem',
+          gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+          gap: '1.5rem',
         }}
       >
         {data.tours.map((tour) => (
-          <a
+          <Link
             key={tour.id}
             href={`/ports/${params.slug}/${tour.id}`}
-            style={{
-              textDecoration: 'none',
-              color: 'inherit',
-              border: '1px solid #ddd',
-              borderRadius: 12,
-              overflow: 'hidden',
-            }}
+            style={{ textDecoration: 'none', color: 'inherit' }}
           >
-            <img
-              src={tour.image}
-              alt={tour.title}
-              style={{ width: '100%', height: 200, objectFit: 'cover' }}
-            />
-            <div style={{ padding: '1rem' }}>
+            <div
+              style={{
+                border: '1px solid #ddd',
+                borderRadius: 12,
+                padding: '1.5rem',
+              }}
+            >
               <h3>{tour.title}</h3>
-              <p>{tour.operator}</p>
-              <strong>${tour.price_from}</strong>
+              <p>By {tour.operator}</p>
+              <p>
+                <strong>${tour.price_from}</strong> · {tour.duration}
+              </p>
             </div>
-          </a>
+          </Link>
         ))}
       </section>
     </main>
