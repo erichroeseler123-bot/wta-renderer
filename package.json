@@ -22,6 +22,6 @@
   },
   "description": "",
   "engines": {
-    "node": ">=20 <21"
+    "node": "20.x"
   }
 }
