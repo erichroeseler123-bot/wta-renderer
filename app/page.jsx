@@ -76,22 +76,22 @@ const styles = {
     minHeight: "100vh",
     fontFamily: "system-ui, -apple-system, Segoe UI, Roboto",
   },
-  hero: {
-    padding: "120px 24px 100px",
-    textAlign: "center",
-  },
-  heroInner: { maxWidth: 900, margin: "0 auto" },
-  h1: { fontSize: 48, marginBottom: 16 },
-  heroSub: { fontSize: 20, opacity: 0.9 },
-  heroActions: { marginTop: 32, display: "flex", gap: 16, justifyContent: "center" },
-  primaryBtn: {
-    background: "#1ea7ff",
-    color: "#000",
-    padding: "14px 22px",
-    borderRadius: 10,
-    fontWeight: 700,
-    textDecoration: "none",
-  },
+hero: {
+  padding: "160px 24px 160px",
+  textAlign: "center",
+  backgroundImage:
+    "linear-gradient(rgba(2,11,26,0.55), rgba(2,11,26,0.85)), url('/images/home-hero.jpg')",
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  backgroundRepeat: "no-repeat",
+},
+
+heroInner: {
+  maxWidth: 900,
+  margin: "0 auto",
+  padding: "48px",
+},
+
   secondaryBtn: {
     border: "1px solid #1ea7ff",
     color: "#1ea7ff",
