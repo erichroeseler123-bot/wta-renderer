@@ -1,0 +1,70 @@
+/* Juneau Port Overlay — LIVE MAP MODE
+   - scenic photo behind map @ 10%
+   - map canvas visible on top
+   - HUD overlay on top @ 12%
+   - glass layer is subtle (not blackout)
+*/
+
+.holoMapFrame{
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #050a0f;
+}
+
+/* scenic background BEHIND the map */
+.holoMapFrame::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: url("/media/juneau-aerial.png") center/cover no-repeat;
+  opacity: .10;
+  filter: saturate(1.12) contrast(1.06) brightness(.85);
+  pointer-events:none;
+  z-index: 0;
+}
+
+/* HUD overlay ON TOP */
+.holoMapFrame::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background: url("/media/hud-overlay.png") center/cover no-repeat;
+  opacity: .12;
+  mix-blend-mode: screen;
+  pointer-events:none;
+  z-index: 50;
+}
+
+/* make the "glass" subtle instead of blackout */
+.holoMapFrame .holoGlass.holoBg{
+  position:absolute;
+  inset:0;
+  z-index: 1;
+  background: radial-gradient(1200px 800px at 30% 20%, rgba(0,255,255,.06), transparent 60%),
+              linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.55));
+  opacity: .35;
+  mix-blend-mode: soft-light;
+  pointer-events:none;
+}
+
+/* MAP MUST BE ABOVE bg + glass */
+.holoMapFrame canvas,
+.holoMapFrame .maplibregl-map,
+.holoMapFrame .maplibregl-canvas-container,
+.holoMapFrame .maplibregl-canvas{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index: 10 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  filter: brightness(1.15) contrast(1.12) saturate(1.05);
+}
+
+/* scanlines between map and HUD */
+.holoMapFrame .holoScanlines{ position:absolute; inset:0; z-index: 40; opacity:.10; pointer-events:none; }
+
+/* frame chrome top-most */
+.holoMapFrame .holoFrameEdge{ position:absolute; inset:0; z-index: 60; pointer-events:none; }

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Juneau Holographic 3D</title>
+  <script src="https://cesium.com/downloads/cesiumjs/releases/1.124/Build/Cesium/Cesium.js"></script>
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.124/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <style>
+    html, body, #cesiumContainer { width:100%; height:100%; margin:0; padding:0; overflow:hidden; background:#000; }
+    #hud{
+      position:absolute; top:14px; left:14px;
+      color:#00ffff; font:12px/1.35 "Courier New", monospace;
+      background:rgba(0, 20, 40, 0.55);
+      padding:10px 12px;
+      border:1px solid rgba(0,255,255,0.65);
+      border-radius:8px;
+      box-shadow:0 0 18px rgba(0,255,255,0.35);
+      z-index:10;
+      text-shadow:0 0 8px rgba(0,255,255,0.55);
+    }
+    #scanlines{
+      pointer-events:none;
+      position:absolute; inset:0;
+      background:repeating-linear-gradient(0deg, rgba(0,255,255,0.05), rgba(0,255,255,0.05) 2px, transparent 2px, transparent 5px);
+      opacity:0.18;
+      z-index:9;
+      animation:scan 10s linear infinite;
+    }
+    @keyframes scan { from { transform:translateY(0); } to { transform:translateY(100%); } }
+
+    #msg{
+      position:absolute; inset:0;
+      display:flex; align-items:center; justify-content:center;
+      color:#7ff; font:14px/1.4 "Courier New", monospace;
+      z-index:20;
+      text-shadow:0 0 10px rgba(0,255,255,0.6);
+      background:radial-gradient(ellipse at center, rgba(0,20,40,0.35), rgba(0,0,0,0.85));
+    }
+    #msg code{ color:#fff; }
+  </style>
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <div id="scanlines"></div>
+
+  <div id="hud">
+    <div><b>JUNEAU, ALASKA</b></div>
+    <div>SPEED: <span id="speed">0</span> km/h</div>
+    <div>LON: <span id="lon">0</span> | LAT: <span id="lat">0</span></div>
+    <div>ALT: <span id="alt">0</span> m</div>
+    <div style="margin-top:6px; opacity:.85">Press <b>V</b> to print camera params</div>
+  </div>
+
+  <div id="msg" style="display:none;">
+    Missing Cesium token.<br><br>
+    Add <code>?token=YOUR_ION_TOKEN</code> to the URL.
+  </div>
+
+  <script>
+    const qs = new URLSearchParams(location.search);
+
+    const token = qs.get("token") || "";
+    if (!token) {
+      document.getElementById("msg").style.display = "flex";
+      throw new Error("Missing Cesium ion token");
+    }
+    Cesium.Ion.defaultAccessToken = token;
+
+    // Defaults (Juneau-ish) — overridden by query params if provided
+    const cam = {
+      lon: parseFloat(qs.get("lon") || "-134.4197"),
+      lat: parseFloat(qs.get("lat") || "58.3019"),
+      alt: parseFloat(qs.get("alt") || "3000"),
+      heading: parseFloat(qs.get("heading") || "0"),
+      pitch: parseFloat(qs.get("pitch") || "-45"),
+      roll: parseFloat(qs.get("roll") || "0"),
+    };
+
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      terrain: Cesium.Terrain.fromWorldTerrain(),
+      baseLayerPicker: false,
+      geocoder: false,
+      homeButton: false,
+      sceneModePicker: false,
+      navigationHelpButton: false,
+      animation: false,
+      timeline: false,
+      fullscreenButton: false,
+    });
+
+    Cesium.createOsmBuildingsAsync().then(b => viewer.scene.primitives.add(b));
+
+    // Holo vibe
+    viewer.scene.postProcessStages.add(
+      Cesium.PostProcessStageLibrary.createBloomEffectStage({
+        glowOnly: false, intensity: 1.3, delta: 1.0, sigma: 3.0
+      })
+    );
+    viewer.scene.skyAtmosphere.hueShift = 0.65;
+    viewer.scene.skyAtmosphere.saturationShift = -0.35;
+
+    // Apply your desired start camera
+    viewer.camera.flyTo({
+      destination: Cesium.Cartesian3.fromDegrees(cam.lon, cam.lat, cam.alt),
+      orientation: {
+        heading: Cesium.Math.toRadians(cam.heading),
+        pitch: Cesium.Math.toRadians(cam.pitch),
+        roll: Cesium.Math.toRadians(cam.roll),
+      },
+      duration: 0.0
+    });
+
+    // HUD updates
+    const hud = {
+      speed: document.getElementById("speed"),
+      lon: document.getElementById("lon"),
+      lat: document.getElementById("lat"),
+      alt: document.getElementById("alt")
+    };
+
+    let prevPos = viewer.camera.position.clone();
+    let prevT = performance.now();
+
+    viewer.scene.camera.changed.addEventListener(() => {
+      const pos = viewer.camera.positionCartographic;
+      hud.lon.textContent = Cesium.Math.toDegrees(pos.longitude).toFixed(5);
+      hud.lat.textContent = Cesium.Math.toDegrees(pos.latitude).toFixed(5);
+      hud.alt.textContent = Math.round(pos.height);
+
+      const t = performance.now();
+      const dt = (t - prevT) / 1000;
+      if (dt > 0) {
+        const dist = Cesium.Cartesian3.distance(prevPos, viewer.camera.position);
+        hud.speed.textContent = Math.round((dist / dt) * 3.6);
+      }
+      prevPos = viewer.camera.position.clone();
+      prevT = t;
+    });
+
+    // Press V to print camera params
+    window.addEventListener("keydown", (e) => {
+      if (e.key.toLowerCase() !== "v") return;
+      const pos = viewer.camera.positionCartographic;
+      const out = {
+        lon: +Cesium.Math.toDegrees(pos.longitude).toFixed(5),
+        lat: +Cesium.Math.toDegrees(pos.latitude).toFixed(5),
+        alt: Math.round(pos.height),
+        heading: +Cesium.Math.toDegrees(viewer.camera.heading).toFixed(1),
+        pitch: +Cesium.Math.toDegrees(viewer.camera.pitch).toFixed(1),
+        roll: +Cesium.Math.toDegrees(viewer.camera.roll).toFixed(1),
+      };
+      console.log("CAM =", out);
+      alert("CAM printed to console as CAM = {...}");
+    });
+  </script>
+</body>
+</html>

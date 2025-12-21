@@ -1,0 +1,67 @@
+/* Juneau: HARD-SAFE picture backdrop inside the map frame */
+
+.holoMapFrame{
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #050a0f;
+}
+
+/* The actual image element (RELIABLE) */
+.holoMapFrame .holoBackdrop{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  /* This is your "10% opacity background" */
+  opacity: 0.10;
+
+  /* Make it look cinematic + sci-fi */
+  filter: saturate(1.15) contrast(1.10) brightness(0.95);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Keep your glass from blacking everything out */
+.holoMapFrame .holoGlass.holoBg{
+  position: absolute;
+  inset: 0;
+  opacity: 0.10 !important;          /* was too dark */
+  background: rgba(5,10,15,0.20) !important;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* Canvas (if/when it exists) should be visible */
+.holoMapFrame canvas{
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  z-index: 1 !important;
+}
+
+/* Scanlines above everything */
+.holoMapFrame .holoScanlines{
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+/* Optional: HUD overlay PNG if you want it */
+.holoMapFrame .holoHudOverlay{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.10;
+  mix-blend-mode: screen;
+  pointer-events: none;
+  z-index: 6;
+}

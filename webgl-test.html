@@ -1,0 +1,11 @@
+<!doctype html>
+<html>
+<body>
+<script>
+const c = document.createElement("canvas");
+const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+document.body.innerHTML =
+  gl ? "WEBGL OK" : "WEBGL NULL";
+</script>
+</body>
+</html>

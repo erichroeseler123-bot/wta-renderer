@@ -1,0 +1,32 @@
+{
+  "slug": "juneau",
+  "label": "JUNEAU TERMINAL",
+  "coord": "58.3019° N, 134.4197° W",
+  "plate": "/plates/juneau.jpg",
+
+  "poi": [
+    {
+      "id": "cruise_docks",
+      "label": "Cruise Ship Docks",
+      "type": "dock",
+      "screen": { "x": 62, "y": 48 }
+    },
+    {
+      "id": "pickup_a",
+      "label": "Tour Pickup Zone A",
+      "type": "pickup",
+      "screen": { "x": 55, "y": 62 }
+    },
+    {
+      "id": "downtown",
+      "label": "Downtown Juneau",
+      "type": "landmark",
+      "screen": { "x": 48, "y": 54 }
+    }
+  ],
+
+  "recommendation": {
+    "headline": "Top Recommended Transport",
+    "body": "DCC Verified Shuttles"
+  }
+}

@@ -1,0 +1,50 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+import maplibregl from "maplibre-gl";
+import "maplibre-gl/dist/maplibre-gl.css";
+
+export default function JuneauLiveMap({ className = "" }) {
+  const elRef = useRef(null);
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    if (!elRef.current || mapRef.current) return;
+
+    const map = new maplibregl.Map({
+      container: elRef.current,
+      // Free, no API key, always works:
+      style: "https://demotiles.maplibre.org/style.json",
+      center: [-134.4197, 58.3019], // Juneau
+      zoom: 13.6,
+      pitch: 58,
+      bearing: -35,
+      antialias: true,
+    });
+
+    mapRef.current = map;
+
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
+
+    // subtle motion (optional)
+    let raf = 0;
+    const animate = () => {
+      const b = map.getBearing();
+      map.setBearing(b + 0.06);
+      raf = requestAnimationFrame(animate);
+    };
+
+    map.on("load", () => {
+      // Start slow rotation after style loads
+      raf = requestAnimationFrame(animate);
+    });
+
+    return () => {
+      cancelAnimationFrame(raf);
+      map.remove();
+      mapRef.current = null;
+    };
+  }, []);
+
+  return <div ref={elRef} className={className} style={{ position: "absolute", inset: 0 }} />;
+}
