@@ -98,3 +98,7 @@ export default function PortHUDStatic() {
     </div>
   );
 }
+
+export const dynamic = "force-dynamic";
+export const dynamicParams = true;
+
