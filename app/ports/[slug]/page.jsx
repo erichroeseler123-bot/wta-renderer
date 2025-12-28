@@ -67,45 +67,15 @@ export default function PortPage() {
       </section>
 
       {/* ================= TOURS SECTION ================= */}
-      <section className="relative z-10 w-full bg-black py-12">
-        <div className="max-w-5xl mx-auto px-6">
-
-          <h2 className="text-2xl font-bold mb-8">
-            Available Tours
-          </h2>
-
-          {tours.length === 0 && (
-            <p className="opacity-70">
-              No tours configured for this port yet.
-            </p>
-          )}
-
-          {tours.map((tour) => (
-            <div
-              key={tour.id}
-              className="border border-cyan-700 rounded-lg p-6 mb-6 hover:border-cyan-400 transition"
-            >
-              <h3 className="text-xl font-semibold mb-2">
-                {tour.title}
-              </h3>
-
-              <p className="opacity-80 mb-4">
-                {tour.description}
-              </p>
-
-              <a
-                href={tour.booking_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block px-6 py-3 bg-cyan-700 text-black font-bold rounded hover:bg-cyan-500 transition"
-              >
-                Book Tour →
-              </a>
-            </div>
-          ))}
-        </div>
-      </section>
-
-    </main>
-  );
-}
+const TOURS = {
+  juneau: [
+    {
+      id: "coastal-helicopters-glacier",
+      title: "Juneau Helicopter Glacier Landing",
+      description:
+        "Helicopter flight over the Juneau Icefield with a guided landing and time on the glacier. Coastal Helicopters is the top-rated operator in Juneau.",
+      booking_url:
+        "https://fareharbor.com/embeds/book/coastalhelicopters/items/?full-items=yes"
+    }
+  ]
+};
