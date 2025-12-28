@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DCC Sovereign Terminal</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link href="https://cesium.com/downloads/cesiumjs/releases/1.136/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+  <style>
+    html, body, #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      background: black;
+      overflow: hidden;
+    }
+    h1 {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      z-index: 10;
+      color: cyan;
+      font-family: monospace;
+      font-size: 18px;
+      text-shadow: 0 0 10px cyan;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Destination Command Center: Authoritative 3D Spatial Interface</h1>
+<div id="cesiumContainer"></div>
+
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.136/Build/Cesium/Cesium.js"></script>
+
+<script>
+(async () => {
+  if (!window.Cesium) return;
+
+  const viewer = new Cesium.Viewer('cesiumContainer', {
+    terrainProvider: Cesium.Terrain.fromWorldTerrain(),
+    imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+      url: 'https://a.tile.openstreetmap.org/'
+    }),
+    baseLayerPicker: false,
+    requestRenderMode: true,
+    maximumRenderTimeChange: Infinity
+  });
+
+  window.DCC_VIEWER = viewer;
+
+  viewer.scene.skyBox.show = false;
+  viewer.scene.backgroundColor = Cesium.Color.BLACK;
+
+  viewer.camera.setView({
+    destination: Cesium.Cartesian3.fromDegrees(-105.282, 39.665, 8000)
+  });
+
+  try {
+    const buildings = await Cesium.createOsmBuildingsAsync();
+    viewer.scene.primitives.add(buildings);
+  } catch (e) {
+    console.warn("OSM buildings unavailable");
+  }
+
+  try {
+    const googleTiles = await Cesium.createGooglePhotorealistic3DTileset();
+    viewer.scene.primitives.add(googleTiles);
+    console.log("Photorealistic 3D ACTIVE");
+  } catch (e) {
+    console.log("Photorealistic unavailable — sovereign open stack active");
+  }
+})();
+</script>
+
+</body>
+</html>

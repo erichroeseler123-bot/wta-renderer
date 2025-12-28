@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DCC Sovereign Terminal</title>
+
+  <!-- CESIUM 1.136 (DEFERRED — REQUIRED FOR VITE) -->
+  <script defer src="https://cesium.com/downloads/cesiumjs/releases/1.136/Build/Cesium/Cesium.js"></script>
+  <link
+    href="https://cesium.com/downloads/cesiumjs/releases/1.136/Build/Cesium/Widgets/widgets.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    html, body, #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #05070d;
+    }
+
+    #dcc-flash-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    #dcc-scan-line {
+      position: fixed;
+      top: -120%;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      z-index: 9998;
+      pointer-events: none;
+      background: linear-gradient(
+        transparent,
+        rgba(0,255,255,0.7),
+        transparent
+      );
+      box-shadow: 0 0 25px 8px cyan;
+    }
+
+    .hud-panel {
+      position: absolute;
+      background: rgba(10,15,30,0.6);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(0,255,255,0.35);
+      color: cyan;
+      padding: 14px;
+      border-radius: 8px;
+      box-shadow: 0 0 22px rgba(0,255,255,0.25);
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+    }
+
+    .hud-left { top: 16px; left: 16px; }
+    .hud-right { top: 16px; right: 16px; }
+  </style>
+</head>
+
+<body>
+<h1 style="position:absolute;top:16px;left:16px;z-index:10;color:cyan;font-size:18px;">Destination Command Center: Authoritative 3D Spatial Interface</h1>
+  <div id="cesiumContainer"></div>
+  <div id="dcc-flash-overlay"></div>
+  <div id="dcc-scan-line"></div>
+
+  <div class="hud-panel hud-left">DCC STATUS: LOCKED</div>
+  <div class="hud-panel hud-right">NODE: RED ROCKS</div>
+
+  <script>
+    window.addEventListener("load", () => {
+
+      /* === CESIUM CORE (1.136 SAFE) === */
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+
+// GLOBAL VIEWER HANDLE
+window.DCC_VIEWER = viewer;
+
+// OSM BUILDINGS (ASYNC — 1.136 CORRECT)
+(async () => {
+  try {
+    const buildings = await Cesium.createOsmBuildingsAsync();
+    viewer.scene.primitives.add(buildings);
+  } catch (e) {
+    console.warn("OSM Buildings unavailable");
+  }
+})();
+
+        terrainProvider: Cesium.Terrain.fromWorldTerrain(),
+        imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+          url: "https://a.tile.openstreetmap.org/"
+        }),
+        baseLayerPicker: false,
+        requestRenderMode: false
+      });
+
+      /* CAMERA BOOT (FORCE EARTH) */
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(-105, 40, 2.5e7)
+      });
+
+      /* SKY + EXPOSURE */
+      viewer.scene.skyBox.show = false;
+      viewer.scene.skyAtmosphere.show = true;
+      viewer.scene.backgroundColor = Cesium.Color.BLACK;
+
+      viewer.scene.highDynamicRange = false;
+      viewer.scene.postProcessStages.fxaa.enabled = true;
+
+      /* GLOBE */
+      viewer.scene.globe.enableLighting = false;
+      viewer.scene.globe.baseColor =
+        Cesium.Color.fromCssColorString("#05070d");
+
+      /* OSM BUILDINGS */
+      viewer.scene.primitives.add(
+      );
+
+      /* OPTIONAL GAUSSIAN SPLAT (SAFE) */
+      let splat;
+      try {
+        splat = viewer.scene.primitives.add(
+          new Cesium.Cesium3DTileset({
+            url: "/splats/redrocks/tileset.json"
+          })
+        );
+        splat.show = false;
+      } catch (err) {
+        console.warn("Gaussian splat not loaded");
+      }
+
+      /* FORCE FIRST FRAME */
+      viewer.scene.requestRender();
+
+      /* EXPOSE FOR NEXT STEPS */
+      window.DCC_VIEWER = viewer;
+      window.DCC_SPLAT = splat;
+
+    });
+  </script>
+</body>
+</html>
+<script>
+window.addEventListener("load", () => {
+  const viewer = window.DCC_VIEWER;
+  const splat = window.DCC_SPLAT;
+  if (!viewer) return;
+
+  /* === NEON GLOW POST-PROCESS (WEBGL2 SAFE) === */
+  const neonGlow = new Cesium.PostProcessStage({
+    name: "dcc-neon-glow",
+    fragmentShader: `
+      uniform sampler2D colorTexture;
+      in vec2 v_textureCoordinates;
+      out vec4 fragColor;
+      void main() {
+        vec4 c = texture(colorTexture, v_textureCoordinates);
+        float g = max(c.r, max(c.g, c.b));
+        vec3 neon = vec3(0.0, 0.9, 1.0) * smoothstep(0.6, 1.0, g);
+        fragColor = vec4(c.rgb + neon * 0.30, c.a);
+      }
+    `
+  });
+  viewer.scene.postProcessStages.add(neonGlow);
+
+  /* === SCAN-LINE IMAGERY SWITCH (OSM -> TOPO) === */
+  const osm = viewer.imageryLayers.get(0);
+  const topo = viewer.imageryLayers.addImageryProvider(
+    new Cesium.UrlTemplateImageryProvider({
+      url: "https://tile.opentopomap.org/{z}/{x}/{y}.png",
+      credit: "OpenTopoMap"
+    })
+  );
+  topo.alpha = 0.0;
+
+  const scanEl = document.getElementById("dcc-scan-line");
+  scanEl.style.animation = "scanDown 2s linear forwards";
+
+  let a = 0.0;
+  const fade = setInterval(() => {
+    a += 0.05;
+    topo.alpha = Math.min(a, 1.0);
+    osm.alpha = 1.0 - topo.alpha;
+    if (a >= 1.0) clearInterval(fade);
+  }, 60);
+
+  /* === GAUSSIAN SPLAT ASSEMBLY (SCAN STYLE) === */
+  if (splat) {
+    let o = 0.0;
+    splat.show = true;
+    splat.style = new Cesium.Cesium3DTileStyle({
+      color: "color('white', 0.0)"
+    });
+    const assemble = setInterval(() => {
+      o += 0.04;
+      splat.style = new Cesium.Cesium3DTileStyle({
+        color: `color('white', ${Math.min(o,1.0)})`
+      });
+      if (o >= 1.0) clearInterval(assemble);
+    }, 50);
+  }
+
+  /* === HUD DEPLOY === */
+  const left = document.querySelector(".hud-left");
+  const right = document.querySelector(".hud-right");
+  if (left && right) {
+    left.style.transform = "translateX(-30px)";
+    right.style.transform = "translateX(30px)";
+    left.style.opacity = right.style.opacity = 0;
+    setTimeout(() => {
+      left.style.transition = right.style.transition =
+        "transform .6s cubic-bezier(.2,.8,.2,1), opacity .6s";
+      left.style.transform = right.style.transform = "translateX(0)";
+      left.style.opacity = right.style.opacity = 1;
+    }, 600);
+  }
+
+  /* === PHYSICAL SNAP TUNE (MICRO OVERSHOOT) === */
+  const cam = viewer.camera;
+  const pos = cam.positionCartographic;
+  cam.flyTo({
+    destination: Cesium.Cartesian3.fromRadians(
+      pos.longitude, pos.latitude, pos.height * 0.92
+    ),
+    duration: 0.25,
+    complete: () => {
+      cam.flyTo({
+        destination: Cesium.Cartesian3.fromRadians(
+          pos.longitude, pos.latitude, pos.height
+        ),
+        duration: 0.15
+      });
+      navigator.vibrate && navigator.vibrate([8,12,8]);
+    }
+  });
+
+});
+</script>
+<script>
+window.addEventListener("load", () => {
+  const v = window.DCC_VIEWER;
+  if (!v) return;
+
+  v.scene.highDynamicRange = false;
+  v.scene.postProcessStages.fxaa.enabled = true;
+
+  // Prevent black crush / space glitter
+  v.scene.globe.enableLighting = false;
+  v.scene.globe.baseColor = Cesium.Color.fromCssColorString("#05070d");
+
+  v.scene.requestRender();
+});
+</script>
+<script>
+window.addEventListener("load", async () => {
+  const viewer = window.DCC_VIEWER;
+  if (!viewer) return;
+
+  // Assume Google Maps key is already injected by platform (Cloudflare / Vercel)
+  try {
+    const googleTileset =
+      await Cesium.createGooglePhotorealistic3DTileset();
+    viewer.scene.primitives.add(googleTileset);
+<script>
+(function () {
+  if (!window.DCC_VIEWER || !window.Cesium) return;
+
+  async function activatePhotoreal() {
+    try {
+      const tileset = await Cesium.createGooglePhotorealistic3DTileset();
+      window.DCC_VIEWER.scene.primitives.add(tileset);
+      console.log("Photorealistic 3D ACTIVE");
+    } catch (e) {
+      console.log("Photorealistic unavailable — sovereign stack active");
+    }
+  }
+
+  // Call only after initial render
+  setTimeout(activatePhotoreal, 1500);
+})();
+</script>

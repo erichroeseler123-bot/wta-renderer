@@ -2,31 +2,39 @@
 
 import { useEffect, useState } from "react";
 
-export default function HoloIntro({ onDone }) {
-  const [phase, setPhase] = useState(0);
+export default function HoloIntro({ onComplete }) {
+  const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const t1 = setTimeout(() => setPhase(1), 450);
-    const t2 = setTimeout(() => setPhase(2), 1200);
-    const t3 = setTimeout(() => {
-      setPhase(3);
-      onDone?.();
-    }, 1900);
-    return () => [t1, t2, t3].forEach(clearTimeout);
-  }, [onDone]);
+    const t = setTimeout(() => {
+      setVisible(false);
+      onComplete?.();
+    }, 3500); // 3.5s intro
+
+    return () => clearTimeout(t);
+  }, [onComplete]);
+
+  if (!visible) return null;
 
   return (
-    <div className={`holoIntro ${phase >= 3 ? "off" : ""}`}>
-      <div className="holoIntroGrid" />
-      <div className="holoIntroScan" />
-      <div className="holoIntroCenter">
-        <div className={`holoIntroKicker ${phase >= 1 ? "on" : ""}`}>DCC NODE / ALASKA</div>
-        <h1 className={`holoIntroTitle ${phase >= 1 ? "on" : ""}`}>Welcome to Alaska Tours</h1>
-        <div className={`holoIntroSub ${phase >= 2 ? "on" : ""}`}>
-          INITIALIZING HOLOGRAPHIC DISPLAY • SYNCING PORT LAYERS • LOCKING JUNEAU
-        </div>
-        <div className={`holoIntroBar ${phase >= 2 ? "on" : ""}`}>
-          <div className="holoIntroFill" />
+    <div
+      style={{
+        position: "fixed",
+        inset: 0,
+        background: "radial-gradient(circle at center, #0ff2, #000 70%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 9999,
+        color: "#0ff",
+        fontFamily: "monospace",
+        letterSpacing: 2,
+      }}
+    >
+      <div style={{ textAlign: "center", animation: "pulse 1.8s infinite" }}>
+        <div style={{ fontSize: 32 }}>EARTHOS</div>
+        <div style={{ fontSize: 14, opacity: 0.7, marginTop: 8 }}>
+          INITIALIZING GEO HUD
         </div>
       </div>
     </div>

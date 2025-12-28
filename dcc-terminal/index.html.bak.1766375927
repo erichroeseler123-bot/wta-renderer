@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>DCC Sovereign Terminal</title>
+
+  <!-- CESIUM 1.136 (DEFERRED — REQUIRED FOR VITE) -->
+  <script defer src="https://cesium.com/downloads/cesiumjs/releases/1.136/Build/Cesium/Cesium.js"></script>
+  <link
+    href="https://cesium.com/downloads/cesiumjs/releases/1.136/Build/Cesium/Widgets/widgets.css"
+    rel="stylesheet"
+  />
+
+  <style>
+    html, body, #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #05070d;
+    }
+
+    #dcc-flash-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      pointer-events: none;
+    }
+
+    #dcc-scan-line {
+      position: fixed;
+      top: -120%;
+      left: 0;
+      width: 100%;
+      height: 10px;
+      z-index: 9998;
+      pointer-events: none;
+      background: linear-gradient(
+        transparent,
+        rgba(0,255,255,0.7),
+        transparent
+      );
+      box-shadow: 0 0 25px 8px cyan;
+    }
+
+    .hud-panel {
+      position: absolute;
+      background: rgba(10,15,30,0.6);
+      backdrop-filter: blur(14px);
+      border: 1px solid rgba(0,255,255,0.35);
+      color: cyan;
+      padding: 14px;
+      border-radius: 8px;
+      box-shadow: 0 0 22px rgba(0,255,255,0.25);
+      font-family: system-ui, sans-serif;
+      font-size: 13px;
+    }
+
+    .hud-left { top: 16px; left: 16px; }
+    .hud-right { top: 16px; right: 16px; }
+  </style>
+</head>
+
+<body>
+  <div id="cesiumContainer"></div>
+  <div id="dcc-flash-overlay"></div>
+  <div id="dcc-scan-line"></div>
+
+  <div class="hud-panel hud-left">DCC STATUS: LOCKED</div>
+  <div class="hud-panel hud-right">NODE: RED ROCKS</div>
+
+  <script>
+    window.addEventListener("load", () => {
+
+      /* === CESIUM CORE (1.136 SAFE) === */
+      const viewer = new Cesium.Viewer("cesiumContainer", {
+        terrainProvider: Cesium.Terrain.fromWorldTerrain(),
+        imageryProvider: new Cesium.OpenStreetMapImageryProvider({
+          url: "https://a.tile.openstreetmap.org/"
+        }),
+        baseLayerPicker: false,
+        requestRenderMode: false
+      });
+
+      /* CAMERA BOOT (FORCE EARTH) */
+      viewer.camera.setView({
+        destination: Cesium.Cartesian3.fromDegrees(-105, 40, 2.5e7)
+      });
+
+      /* SKY + EXPOSURE */
+      viewer.scene.skyBox.show = false;
+      viewer.scene.skyAtmosphere.show = true;
+      viewer.scene.backgroundColor = Cesium.Color.BLACK;
+
+      viewer.scene.highDynamicRange = false;
+      viewer.scene.toneMapping = Cesium.ToneMapping.REINHARD;
+      viewer.scene.postProcessStages.fxaa.enabled = true;
+
+      /* GLOBE */
+      viewer.scene.globe.enableLighting = false;
+      viewer.scene.globe.baseColor =
+        Cesium.Color.fromCssColorString("#05070d");
+
+      /* OSM BUILDINGS */
+      viewer.scene.primitives.add(
+        Cesium.createOsmBuildings()
+      );
+
+      /* OPTIONAL GAUSSIAN SPLAT (SAFE) */
+      let splat;
+      try {
+        splat = viewer.scene.primitives.add(
+          new Cesium.Cesium3DTileset({
+            url: "/splats/redrocks/tileset.json"
+          })
+        );
+        splat.show = false;
+      } catch (err) {
+        console.warn("Gaussian splat not loaded");
+      }
+
+      /* FORCE FIRST FRAME */
+      viewer.scene.requestRender();
+
+      /* EXPOSE FOR NEXT STEPS */
+      window.DCC_VIEWER = viewer;
+      window.DCC_SPLAT = splat;
+
+    });
+  </script>
+</body>
+</html>
