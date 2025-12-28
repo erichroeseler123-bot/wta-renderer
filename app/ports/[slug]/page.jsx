@@ -5,8 +5,8 @@ import dynamic from "next/dynamic";
 
 /**
  * IMPORTANT:
- * PortMap MUST be defined at module scope.
- * dynamic() still requires a symbol.
+ * PortMap MUST exist at module scope
+ * and must be client-only.
  */
 const PortMap = dynamic(
   () => import("../../components/PortMap.client.jsx"),
@@ -15,6 +15,7 @@ const PortMap = dynamic(
 
 /**
  * TEMP Juneau MVP tour data
+ * (deterministic — no async yet)
  */
 const TOURS = {
   juneau: [
@@ -37,16 +38,18 @@ export default function PortPage() {
   const tours = TOURS[port] || [];
 
   return (
-    <main className="w-full bg-black text-cyan-300 font-mono flex flex-col">
+    <main className="w-full min-h-screen bg-black text-cyan-300 font-mono flex flex-col">
 
       {/* ================= MAP SECTION ================= */}
-      <section className="relative w-full h-[40vh] flex-none overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
+      <section className="relative w-full h-[40vh] flex-none overflow-hidden border-b border-cyan-800">
+
+        {/* Map layer — DOES NOT BLOCK SCROLL */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
           <PortMap slug={port} />
         </div>
 
-        {/* HUD */}
-        <div className="absolute top-4 left-4 pointer-events-auto bg-black/80 border border-cyan-500 p-4 rounded">
+        {/* HUD overlay — clickable only where needed */}
+        <div className="absolute top-4 left-4 z-10 pointer-events-auto bg-black/80 border border-cyan-500 p-4 rounded">
           <h1 className="text-lg font-bold uppercase">
             {port} Terminal
           </h1>
@@ -59,12 +62,19 @@ export default function PortPage() {
         </div>
       </section>
 
-      {/* ================= TOURS ================= */}
-      <section className="relative z-10 w-full bg-black py-12">
+      {/* ================= TOURS SECTION ================= */}
+      <section className="relative z-20 w-full bg-black py-16">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl font-bold mb-8">
+
+          <h2 className="text-2xl font-bold mb-10">
             Available Tours
           </h2>
+
+          {tours.length === 0 && (
+            <div className="opacity-60">
+              No tours available for this port yet.
+            </div>
+          )}
 
           {tours.map((tour) => (
             <div
