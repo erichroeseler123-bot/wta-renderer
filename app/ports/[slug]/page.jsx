@@ -5,8 +5,8 @@ import dynamic from "next/dynamic";
 
 /**
  * IMPORTANT:
- * PortMap MUST exist at module scope
- * and must be client-only.
+ * PortMap MUST be defined at module scope.
+ * SSR is disabled so it cannot force fullscreen.
  */
 const PortMap = dynamic(
   () => import("../../components/PortMap.client.jsx"),
@@ -15,19 +15,23 @@ const PortMap = dynamic(
 
 /**
  * TEMP Juneau MVP tour data
- * (deterministic — no async yet)
+ * (External booking for stability)
  */
 const TOURS = {
   juneau: [
     {
       id: "juneau-whale",
       title: "Juneau Whale Watching",
-      description: "Half-day wildlife cruise with guaranteed whale sightings."
+      description: "Half-day wildlife cruise with guaranteed whale sightings.",
+      booking_url:
+        "https://fareharbor.com/embeds/book/harvandmarvs/items/?full-items=yes"
     },
     {
       id: "mendenhall-glacier",
       title: "Mendenhall Glacier Tour",
-      description: "Guided visit to Alaska’s most famous glacier."
+      description: "Guided visit to Alaska’s most famous glacier.",
+      booking_url:
+        "https://fareharbor.com/embeds/book/juneautours/items/?full-items=yes"
     }
   ]
 };
@@ -38,18 +42,18 @@ export default function PortPage() {
   const tours = TOURS[port] || [];
 
   return (
-    <main className="w-full min-h-screen bg-black text-cyan-300 font-mono flex flex-col">
+    <main className="w-full bg-black text-cyan-300 font-mono flex flex-col">
 
-      {/* ================= MAP SECTION ================= */}
+      {/* ================= MAP SECTION (LOCKED HEIGHT) ================= */}
       <section className="relative w-full h-[40vh] flex-none overflow-hidden border-b border-cyan-800">
 
-        {/* Map layer — DOES NOT BLOCK SCROLL */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
+        {/* Map canvas */}
+        <div className="absolute inset-0">
           <PortMap slug={port} />
         </div>
 
-        {/* HUD overlay — clickable only where needed */}
-        <div className="absolute top-4 left-4 z-10 pointer-events-auto bg-black/80 border border-cyan-500 p-4 rounded">
+        {/* HUD overlay */}
+        <div className="absolute top-4 left-4 z-10 bg-black/80 border border-cyan-500 p-4 rounded pointer-events-auto">
           <h1 className="text-lg font-bold uppercase">
             {port} Terminal
           </h1>
@@ -63,17 +67,17 @@ export default function PortPage() {
       </section>
 
       {/* ================= TOURS SECTION ================= */}
-      <section className="relative z-20 w-full bg-black py-16">
+      <section className="relative z-10 w-full bg-black py-12">
         <div className="max-w-5xl mx-auto px-6">
 
-          <h2 className="text-2xl font-bold mb-10">
+          <h2 className="text-2xl font-bold mb-8">
             Available Tours
           </h2>
 
           {tours.length === 0 && (
-            <div className="opacity-60">
-              No tours available for this port yet.
-            </div>
+            <p className="opacity-70">
+              No tours configured for this port yet.
+            </p>
           )}
 
           {tours.map((tour) => (
@@ -89,12 +93,14 @@ export default function PortPage() {
                 {tour.description}
               </p>
 
-              <button
-                className="px-6 py-3 bg-cyan-700 text-black font-bold rounded hover:bg-cyan-500 transition"
-                onClick={() => alert("Booking wiring comes next")}
+              <a
+                href={tour.booking_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block px-6 py-3 bg-cyan-700 text-black font-bold rounded hover:bg-cyan-500 transition"
               >
                 Book Tour →
-              </button>
+              </a>
             </div>
           ))}
         </div>
