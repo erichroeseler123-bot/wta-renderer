@@ -1,0 +1,28 @@
+{
+  "port_id": "juneau",
+  "category": "helicopter",
+  "category_name": "Helicopter & Flightseeing Tours",
+  "category_slug": "helicopter",
+  "seo": {
+    "meta_title": "Juneau Helicopter Tours (2026) — Glacier Landings, Dog Sledding, Treks",
+    "meta_description": "A structured directory of Juneau helicopter tours: glacier walkabouts, Mendenhall landings, dog sledding, treks, and airboat combos—organized for cruise port-day feasibility."
+  },
+  "tour_ids": [
+    "juneau-icefield-helicopter-tour",
+    "mendenhall-helicopter-guided-walk",
+    "helicopter-glacier-walkabout",
+    "private-glacier-helicopter-tour",
+    "glacier-dog-sledding-helicopter-tour",
+    "glacier-dogsled-adventure-variant",
+    "dog-sled-plus-added-glacier-landing",
+    "dogsledding-mendenhall-variant",
+    "extended-dogsledding-variant",
+    "helicopter-to-dogsledding-experience-variant",
+    "helicopter-glacier-trek",
+    "small-group-helicopter-glacier-trek-variant",
+    "taku-glacier-helicopter-airboat",
+    "helicopter-glacier-ice-climbing",
+    "juneau-icefield-short-excursion-variant"
+  ],
+  "update_date": "2026-02-02"
+}

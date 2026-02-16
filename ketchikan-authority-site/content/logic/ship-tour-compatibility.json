@@ -1,0 +1,49 @@
+{
+  "legend": {
+    "safe": "High confidence fit",
+    "conditional": "Depends on timing or weather",
+    "not_recommended": "High risk of missed departure"
+  },
+  "matrix": [
+    {
+      "arrival_window": "06:00–08:00",
+      "call_length": "8–10h",
+      "flightseeing": "safe",
+      "wildlife": "safe",
+      "rail": "safe",
+      "short_ground": "safe"
+    },
+    {
+      "arrival_window": "06:00–08:00",
+      "call_length": "4–6h",
+      "flightseeing": "conditional",
+      "wildlife": "conditional",
+      "rail": "not_recommended",
+      "short_ground": "safe"
+    },
+    {
+      "arrival_window": "09:00–11:00",
+      "call_length": "8–10h",
+      "flightseeing": "conditional",
+      "wildlife": "safe",
+      "rail": "conditional",
+      "short_ground": "safe"
+    },
+    {
+      "arrival_window": "09:00–11:00",
+      "call_length": "4–6h",
+      "flightseeing": "not_recommended",
+      "wildlife": "conditional",
+      "rail": "not_recommended",
+      "short_ground": "conditional"
+    },
+    {
+      "arrival_window": "12:00+",
+      "call_length": "any",
+      "flightseeing": "not_recommended",
+      "wildlife": "not_recommended",
+      "rail": "not_recommended",
+      "short_ground": "conditional"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "tour_id": "juneau-mendenhall-glacier-express",
+  "port_id": "juneau",
+  "tour_name": "Mendenhall Glacier Express (Shuttle + Time at Glacier)",
+  "operator": "Local shuttle operators (varies)",
+  "category": "Glacier",
+  "duration_hours": 3.0,
+  "price_usd": {
+    "adult": 83,
+    "child": 59,
+    "notes": "Example pricing; varies by operator."
+  },
+  "description_short": "Transfer to Mendenhall Glacier area with independent time for viewpoints and short walks.",
+  "description_long": "A dependable option when you want glacier views without helicopter risk. Your real variable is traffic and crowds; the core advantage is predictability versus weather cancellations.",
+  "inclusions": [
+    "Round-trip ground transfer",
+    "Set amount of free time at the glacier area"
+  ],
+  "requirements": [
+    "Light walking if you want trails/views",
+    "Expect crowds during peak cruise days"
+  ],
+  "links": {
+    "booking": "https://www.traveljuneau.com/"
+  }
+}

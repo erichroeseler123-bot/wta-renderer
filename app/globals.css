@@ -1,26 +1,96 @@
 @import "tailwindcss";
 
+/* ---------- base theme ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: 9 9 11; /* zinc-950-ish */
+  --panel: 24 24 27; /* zinc-900-ish */
+  --muted: 161 161 170; /* zinc-400-ish */
+  --text: 244 244 245; /* zinc-100-ish */
+  --ring: 59 130 246; /* blue-500-ish */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html,
+body {
+  height: 100%;
+}
+body {
+  background: rgb(var(--bg));
+  color: rgb(var(--text));
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ---------- app primitives ---------- */
+@layer components {
+  .container-pad {
+    @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+  }
+
+  .card {
+    @apply rounded-2xl border border-white/10 bg-white/5 shadow-sm;
+  }
+  .card-pad {
+    @apply p-4 sm:p-6;
+  }
+
+  .h1 {
+    @apply text-3xl sm:text-5xl font-semibold tracking-tight;
+  }
+  .h2 {
+    @apply text-xl sm:text-2xl font-semibold tracking-tight;
+  }
+  .p {
+    @apply text-sm sm:text-base text-white/80 leading-relaxed;
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 text-sm
+           border border-white/10 bg-white/5 hover:bg-white/10
+           transition focus:outline-none focus:ring-2 focus:ring-blue-500/60;
+  }
+  .btn-primary {
+    @apply bg-blue-500/20 border-blue-400/30 hover:bg-blue-500/30;
+  }
+  .chip {
+    @apply inline-flex items-center rounded-full border border-white/10 bg-white/5
+           px-2 py-1 text-xs text-white/80;
+  }
+  .link {
+    @apply text-blue-300 hover:text-blue-200 underline decoration-white/20 hover:decoration-white/40;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* --- WTA UI tokens (safe to append) --- */
+.container-pad {
+  @apply mx-auto max-w-6xl px-5 sm:px-8;
+}
+
+.h1 {
+  @apply text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.03] text-white;
+}
+.h2 {
+  @apply text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight text-white;
+}
+.p {
+  @apply text-sm sm:text-base text-white/70 leading-relaxed;
+}
+
+.chip {
+  @apply inline-flex items-center rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/80;
+}
+
+.card {
+  @apply rounded-3xl border border-white/10 bg-white/[0.05] backdrop-blur;
+}
+.card-pad {
+  @apply p-6 sm:p-7 shadow-[0_1px_0_0_rgba(255,255,255,0.06)];
+}
+
+.btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-5 py-3 text-sm font-semibold text-white/85 hover:bg-white/10 hover:text-white transition;
+}
+.btn-primary {
+  @apply border-transparent bg-[#4CC9F0] text-black hover:opacity-90;
+}
+
+.link {
+  @apply text-white/80 hover:text-white underline decoration-white/20 hover:decoration-white/40;
 }

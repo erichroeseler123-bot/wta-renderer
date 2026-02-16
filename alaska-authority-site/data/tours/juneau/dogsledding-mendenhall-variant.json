@@ -1,0 +1,24 @@
+{
+  "tour_id": "dogsledding-mendenhall-variant",
+  "port_id": "juneau",
+  "tour_name": "Dogsledding on Mendenhall Glacier via Helicopter (Variant)",
+  "category": "helicopter",
+  "sub_category": "dog-sledding",
+  "operator": null,
+  "duration_hours": 2.75,
+  "price_usd": {
+    "adult": 699,
+    "child": null,
+    "pricing_notes": "Your notes list this as TEMSCO / NCL variant pricing."
+  },
+  "highlights": ["Helicopter flight to camp", "Dogsled ride + meet the dogs"],
+  "inclusions": ["Flight + dog camp experience (as described)"],
+  "exclusions": [],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy",
+    "notes": "Marking as a variant because sold through multiple channels/brands in your text."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide; needs operator normalization.",
+  "update_date": "2026-02-02"
+}

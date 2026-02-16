@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /logic/
+Disallow: /data/
+
+Sitemap: https://alaskacruiseauthority.com/sitemap.xml

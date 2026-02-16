@@ -1,0 +1,22 @@
+{
+  "images": [
+    {
+      "file": "/images/ketchikan/ketchikan-whale-watching.jpg",
+      "photographer": "Fr. Daniel Ciucci",
+      "profile": "https://unsplash.com/@dannyboy4125",
+      "source": "Unsplash"
+    },
+    {
+      "file": "/images/ketchikan/ketchikan-misty-fjords.jpg",
+      "photographer": "Artak Petrosyan",
+      "profile": "https://unsplash.com/@artakpetrosyan",
+      "source": "Unsplash"
+    },
+    {
+      "file": "/images/ketchikan/ketchikan-cruise-port.jpg",
+      "photographer": "Joseph Corl",
+      "profile": "https://unsplash.com/@jcorl",
+      "source": "Unsplash"
+    }
+  ]
+}

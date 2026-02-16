@@ -1,0 +1,32 @@
+{
+  "tour_id": "glacier-dog-sledding-helicopter-tour",
+  "port_id": "juneau",
+  "tour_name": "Juneau Glacier Dog Sledding & Helicopter Tour",
+  "category": "helicopter",
+  "sub_category": "dog-sledding",
+  "operator": "Coastal Helicopters",
+  "duration_hours": 3.0,
+  "price_usd": {
+    "adult": 709,
+    "child": 659,
+    "pricing_notes": "Your notes mention +50% surcharge over 250 lbs."
+  },
+  "highlights": [
+    "Helicopter flight to glacier dog camp (Herbert or similar per your notes)",
+    "Meet mushers and huskies; learn mushing",
+    "Dogsled ride with photo opportunities"
+  ],
+  "inclusions": [
+    "Gear (as described)",
+    "Transport (as described)",
+    "Hands-on dog camp experience (as described)"
+  ],
+  "exclusions": ["Tips"],
+  "requirements": {
+    "min_age": 2,
+    "fitness_level": "easy",
+    "notes": "Family-oriented; weather-dependent."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (Dog Sledding Tour entry).",
+  "update_date": "2026-02-02"
+}

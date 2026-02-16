@@ -1,0 +1,30 @@
+{
+  "tour_id": "taku-glacier-helicopter-airboat",
+  "port_id": "juneau",
+  "tour_name": "Taku Glacier Helicopter & Airboat Exploration",
+  "category": "helicopter",
+  "sub_category": "airboat-combo",
+  "operator": "NorthStar Trekking",
+  "duration_hours": 3.25,
+  "price_usd": {
+    "adult": 688,
+    "child": null,
+    "pricing_notes": "Your notes mention min age 7 and higher price for guests over 250 lbs."
+  },
+  "highlights": [
+    "Helicopter flight to remote base near Taku Glacier (as described)",
+    "Airboat ride for close-up glacier/wildlife perspective (as described)"
+  ],
+  "inclusions": [
+    "Safety gear (life vests/ponchos/hearing protection mentioned in your notes)",
+    "Snacks (as described)"
+  ],
+  "exclusions": ["Tips"],
+  "requirements": {
+    "min_age": 7,
+    "fitness_level": "easy",
+    "notes": "Weather-dependent; glacier access varies."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (Taku + Airboat entry).",
+  "update_date": "2026-02-02"
+}

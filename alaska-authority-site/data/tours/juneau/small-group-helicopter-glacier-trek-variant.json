@@ -1,0 +1,24 @@
+{
+  "tour_id": "small-group-helicopter-glacier-trek-variant",
+  "port_id": "juneau",
+  "tour_name": "Small Group Helicopter Glacier Trek (Variant)",
+  "category": "helicopter",
+  "sub_category": "trek",
+  "operator": null,
+  "duration_hours": 4.0,
+  "price_usd": {
+    "adult": 550,
+    "child": null,
+    "pricing_notes": "Your notes describe this as a cruise-line timed variant (Celebrity)."
+  },
+  "highlights": ["Flight + 2-hour hike format (as described)"],
+  "inclusions": [],
+  "exclusions": [],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "strenuous",
+    "notes": "Variant record; operator and exact duration can be normalized later."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide; explicitly a cruise variant.",
+  "update_date": "2026-02-02"
+}

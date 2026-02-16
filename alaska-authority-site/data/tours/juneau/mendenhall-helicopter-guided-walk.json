@@ -1,0 +1,33 @@
+{
+  "tour_id": "mendenhall-helicopter-guided-walk",
+  "port_id": "juneau",
+  "tour_name": "Mendenhall Glacier Helicopter Tour & Guided Walk",
+  "category": "helicopter",
+  "sub_category": "mendenhall-landing-walk",
+  "operator": "TEMSCO Helicopters",
+  "duration_hours": 2.5,
+  "price_usd": {
+    "adult": 409,
+    "child": 359,
+    "pricing_notes": "Your notes mention a 1.5x rate for guests over 250 lbs."
+  },
+  "highlights": [
+    "Turbine helicopter flight to Mendenhall Glacier landing",
+    "Guided interpretive walk on glacier ice",
+    "Focus on glacier formation/retreat education"
+  ],
+  "inclusions": [
+    "Transport (as described)",
+    "Flight",
+    "Glacier gear (boots/pants/vest as described)",
+    "Guide"
+  ],
+  "exclusions": ["Food", "Tips"],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy-moderate",
+    "notes": "Walking on ice required; weather-dependent."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (TEMSCO tour entry).",
+  "update_date": "2026-02-02"
+}

@@ -1,0 +1,267 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =========================
+   THEME
+   ========================= */
+:root {
+  --bg: #0b0e13;
+  --surface: rgba(255,255,255,0.03);
+  --border: rgba(255,255,255,0.10);
+
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255,255,255,0.70);
+  --text-muted: rgba(255,255,255,0.55);
+
+  --accent: #4CC9F0;
+}
+
+/* =========================
+   BASE
+   ========================= */
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* =========================
+   LAYOUT HELPERS
+   ========================= */
+.page-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+@media (min-width: 768px) {
+  .page-container { padding: 0 32px; }
+}
+
+/* =========================
+   PREMIUM SURFACES
+   ========================= */
+.glass {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.glass-soft {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+/* =========================
+   LEGACY CLASS COMPAT
+   (for any old components still using these)
+   No Tailwind @apply here (Tailwind v4-safe)
+   ========================= */
+.section {
+  padding: 56px 0;
+}
+@media (min-width: 768px) {
+  .section { padding: 64px 0; }
+}
+
+.section-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+@media (min-width: 768px) {
+  .section-inner { padding: 0 32px; }
+}
+
+.card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.06);
+  backdrop-filter: blur(10px);
+}
+
+.divider {
+  border-top: 1px solid rgba(255,255,255,0.10);
+}
+
+.muted {
+  color: rgba(255,255,255,0.60);
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.80);
+  font-size: 12px;
+}
+
+.btn-primary {
+  border-radius: 16px;
+  background: var(--accent);
+  color: #000;
+  font-weight: 700;
+  transition: opacity 150ms ease, transform 150ms ease;
+}
+.btn-primary:hover { opacity: 0.92; }
+.btn-primary:active { transform: translateY(1px); }
+
+.btn-ghost {
+  border-radius: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.85);
+  transition: background 150ms ease;
+}
+.btn-ghost:hover { background: rgba(255,255,255,0.10); }
+
+/* =========================
+   BASE POLISH (kills wireframe vibe)
+   ========================= */
+
+/* Softer default borders (prevents random 1px white boxes) */
+* {
+  border-color: rgba(255,255,255,0.10);
+}
+
+/* Make focus rings intentional (not stark) */
+:focus-visible {
+  outline: 2px solid rgba(76,201,240,0.35);
+  outline-offset: 2px;
+}
+
+/* Buttons/inputs should inherit typography + not look “HTML default” */
+button, input, textarea, select {
+  font: inherit;
+  color: inherit;
+}
+
+/* Selection should match accent */
+::selection {
+  background: rgba(76,201,240,0.22);
+}
+
+/* Links should look like the UI system, not raw anchors */
+a:hover {
+  color: rgba(255,255,255,0.95);
+}
+
+/* Prevent sticky header overlap */
+main { padding-top: 8px; }
+
+/* =========================
+   ANTI-WIREFRAME PASS
+   ========================= */
+
+/* Any <hr> becomes subtle */
+hr {
+  border: none;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  opacity: 0.7;
+}
+
+/* If anything is using plain border-top/bottom, soften perception */
+.soft-divider {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* Subtle vignette to add depth */
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(76,201,240,0.10), rgba(0,0,0,0)),
+    radial-gradient(60% 50% at 80% 40%, rgba(255,255,255,0.06), rgba(0,0,0,0));
+  opacity: 1;
+  z-index: 0;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* =========================
+   ANTI-WIREFRAME SKIN
+   Makes border-heavy layouts feel premium
+   ========================= */
+
+/* Soften the most common Tailwind border token */
+[class*="border-white/10"] {
+  border-color: rgba(255,255,255,0.06) !important;
+}
+
+/* Slightly soften 15% borders too */
+[class*="border-white/15"] {
+  border-color: rgba(255,255,255,0.08) !important;
+}
+
+/* Any “panel-ish” surface gets depth */
+[class*="bg-white/[0.03]"],
+[class*="bg-white/[0.04]"],
+[class*="bg-white/[0.05]"],
+[class*="bg-white/[0.06]"] {
+  box-shadow:
+    0 18px 45px rgba(0,0,0,0.35),
+    0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* Convert border-row sections into soft cards automatically (huge impact) */
+[class*="border-t"][class*="border-white/10"] {
+  border-top-color: rgba(255,255,255,0.06) !important;
+}
+
+/* This targets your “stacked rows” look: give them a faint surface */
+[class*="border-t"][class*="border-white/10"],
+[class*="border-b"][class*="border-white/10"] {
+  background: rgba(255,255,255,0.015);
+}
+
+/* Links inside content: less “raw HTML”, more UI */
+a {
+  text-decoration: none;
+}
+a:hover {
+  color: rgba(255,255,255,0.95);
+}
+
+/* Small typographic upgrade: headings feel less boxed */
+h1, h2, h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Subtle film grain (premium) */
+body:after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.10'/%3E%3C/svg%3E");
+  opacity: 0.08;
+  mix-blend-mode: overlay;
+  z-index: 1;
+}

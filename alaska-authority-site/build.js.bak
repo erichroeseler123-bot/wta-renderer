@@ -1,0 +1,606 @@
+/**
+ * Authority Site Builder (v1 – Cleaned & Final)
+ * - Input: data/*.json
+ * - Output: dist/ static HTML with SEO + JSON-LD + sitemap
+ * - Pages:
+ *   /ports/<port>/
+ *   /ports/<port>/tours/
+ *   /ports/<port>/tours/<category>/
+ *   /ports/<port>/tours/<tour>/
+ *   /ports/<port>/cruise-ships-2026/
+ *   /ports/<port>/ships/<ship>/
+ */
+import fs from "fs";
+import path from "path";
+import slugify from "slugify";
+
+const SITE = {
+  origin: process.env.SITE_ORIGIN || "https://alaska-cruise-port-authority.pages.dev",
+  name: "Alaska Cruise Port Authority",
+};
+
+const ROOT = process.cwd();
+const DIST = path.join(ROOT, "dist");
+
+function readJSON(p) {
+  try {
+    return JSON.parse(fs.readFileSync(p, "utf8"));
+  } catch (err) {
+    console.error(`Error reading JSON: ${p}`);
+    console.error(err.message);
+    process.exit(1);
+  }
+}
+
+function ensureDir(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+function writeFile(filePath, contents) {
+  try {
+    ensureDir(path.dirname(filePath));
+    fs.writeFileSync(filePath, contents, "utf8");
+  } catch (err) {
+    console.error(`Error writing file: ${filePath}`);
+    console.error(err.message);
+    process.exit(1);
+  }
+}
+
+function copyDir(src, dest) {
+  ensureDir(dest);
+  for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
+    const s = path.join(src, entry.name);
+    const d = path.join(dest, entry.name);
+    if (entry.isDirectory()) {
+      copyDir(s, d);
+    } else {
+      fs.copyFileSync(s, d);
+    }
+  }
+}
+
+function cleanDist() {
+  if (fs.existsSync(DIST)) {
+    fs.rmSync(DIST, { recursive: true, force: true });
+  }
+  ensureDir(DIST);
+}
+
+function loadTemplates() {
+  const base = fs.readFileSync(path.join(ROOT, "templates/base.html"), "utf8");
+  const port = fs.readFileSync(path.join(ROOT, "templates/port.html"), "utf8");
+  const toursIndex = fs.readFileSync(path.join(ROOT, "templates/tours-index.html"), "utf8");
+  const toursCategory = fs.readFileSync(path.join(ROOT, "templates/tours-category.html"), "utf8");
+  const tour = fs.readFileSync(path.join(ROOT, "templates/tour.html"), "utf8");
+  const shipsIndex = fs.readFileSync(path.join(ROOT, "templates/ships-index.html"), "utf8");
+  const ship = fs.readFileSync(path.join(ROOT, "templates/ship.html"), "utf8");
+  return { base, port, toursIndex, toursCategory, tour, shipsIndex, ship };
+}
+
+function renderBase(tpl, vars) {
+  let out = tpl;
+  for (const [k, v] of Object.entries(vars)) {
+    out = out.replaceAll(`{{${k}}}`, v ?? "");
+  }
+  return out;
+}
+
+function escHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+function toSlug(s) {
+  return slugify(String(s || ""), { lower: true, strict: true, trim: true });
+}
+
+/**
+ * D-logic: compute net available hours
+ * gross = (dep - arr) in hours
+ * net = gross - buffers
+ */
+function hoursDiff(arrivalHHMM, departHHMM) {
+  const [ah, am] = arrivalHHMM.split(":").map(Number);
+  const [dh, dm] = departHHMM.split(":").map(Number);
+  const a = ah * 60 + am;
+  const d = dh * 60 + dm;
+  return Math.max(0, (d - a) / 60);
+}
+
+function netAvailableHours(portCall) {
+  const gross = hoursDiff(portCall.arrival, portCall.departure);
+  const totalBuffer =
+    (portCall.buffers?.disembark ?? 0.75) +
+    (portCall.buffers?.reboard ?? 1.0) +
+    (portCall.buffers?.transit ?? 0.75);
+  const net = Math.max(0, gross - totalBuffer);
+  return { gross, net, totalBuffer };
+}
+
+function fitTier(netHours, tourDurationHours) {
+  const needComfort = tourDurationHours + 2.0;
+  const needTight = tourDurationHours + 1.0;
+  const needMarg = tourDurationHours + 0.5;
+  if (netHours >= needComfort) return { tier: "GREEN", label: "Comfortable fit", need: needComfort };
+  if (netHours >= needTight) return { tier: "YELLOW", label: "Tight but feasible", need: needTight };
+  if (netHours >= needMarg) return { tier: "ORANGE", label: "Marginal / higher risk", need: needMarg };
+  return { tier: "RED", label: "Not feasible", need: needMarg };
+}
+
+function badge(tier) {
+  const map = {
+    GREEN: `<span class="badge b-green">GREEN</span>`,
+    YELLOW: `<span class="badge b-yellow">YELLOW</span>`,
+    ORANGE: `<span class="badge b-orange">ORANGE</span>`,
+    RED: `<span class="badge b-red">RED</span>`,
+  };
+  return map[tier] ?? "";
+}
+
+function canonical(urlPath) {
+  const u = new URL(urlPath, SITE.origin);
+  return u.toString();
+}
+
+function jsonLD_Port(port) {
+  return JSON.stringify(
+    {
+      "@context": "https://schema.org",
+      "@type": "TouristDestination",
+      name: port.port_name,
+      description: port.meta_description,
+      url: canonical(`/ports/${port.port_id}/`),
+    },
+    null,
+    2
+  );
+}
+
+function jsonLD_Tour(port, tour) {
+  return JSON.stringify(
+    {
+      "@context": "https://schema.org",
+      "@type": "TouristTrip",
+      name: tour.tour_name,
+      description: tour.description_short,
+      url: canonical(`/ports/${port.port_id}/tours/${tour.tour_id}/`),
+      touristType: "Cruise passengers",
+      provider: tour.operator ? { "@type": "Organization", name: tour.operator } : undefined,
+      offers: tour.price_usd?.adult
+        ? {
+            "@type": "Offer",
+            priceCurrency: "USD",
+            price: String(tour.price_usd.adult),
+          }
+        : undefined,
+    },
+    null,
+    2
+  );
+}
+
+function jsonLD_Ship(port, ship) {
+  return JSON.stringify(
+    {
+      "@context": "https://schema.org",
+      "@type": "Vehicle",
+      name: ship.ship_name,
+      description: ship.notes_history,
+      url: canonical(`/ports/${port.port_id}/ships/${ship.ship_id}/`),
+      vehicleConfiguration: ship.class,
+      manufacturer: ship.cruise_line,
+    },
+    null,
+    2
+  );
+}
+
+function loadData() {
+  const portsDir = path.join(ROOT, "data/ports");
+  const toursDir = path.join(ROOT, "data/tours");
+  const shipsDir = path.join(ROOT, "data/ships");
+
+  const ports = fs.readdirSync(portsDir).filter(f => f.endsWith(".json")).map(f => readJSON(path.join(portsDir, f)));
+  const tours = fs.readdirSync(toursDir).filter(f => f.endsWith(".json")).map(f => readJSON(path.join(toursDir, f)));
+  const ships = fs.readdirSync(shipsDir).filter(f => f.endsWith(".json")).map(f => readJSON(path.join(shipsDir, f)));
+
+  const portsById = new Map(ports.map(p => [p.port_id, p]));
+  const toursById = new Map(tours.map(t => [t.tour_id, t]));
+  const shipsById = new Map(ships.map(s => [s.ship_id, s]));
+
+  return { ports, tours, ships, portsById, toursById, shipsById };
+}
+
+function buildSitemap(urls) {
+  const body = urls
+    .map(u => `<url><loc>${escHtml(u)}</loc></url>`)
+    .join("");
+  return `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${body}</urlset>`;
+}
+
+function buildRobots() {
+  return `User-agent: *\nAllow: /\nSitemap: ${SITE.origin}/sitemap.xml\n`;
+}
+
+function navLinks(port) {
+  return `
+    <a href="/">Home</a>
+    <a href="/ports/${port.port_id}/">${escHtml(port.port_name)}</a>
+    <a href="/ports/${port.port_id}/tours/">Tours</a>
+    <a href="/ports/${port.port_id}/cruise-ships-2026/">Cruise Ships 2026</a>
+  `.trim();
+}
+
+function build() {
+  cleanDist();
+
+  // Copy public assets
+  if (fs.existsSync(path.join(ROOT, "public"))) {
+    copyDir(path.join(ROOT, "public"), DIST);
+  }
+
+  const tpl = loadTemplates();
+  const { ports, tours, ships } = loadData();
+  const urls = [];
+
+  // Homepage
+  const homeTitle = `${SITE.name}`;
+  const homeDesc = "Independent feasibility guidance for Alaska cruise ports. Port guides, tours, ships, and port-day planning.";
+  const homeHtml = renderBase(tpl.base, {
+    PAGE_TITLE: escHtml(homeTitle),
+    META_DESC: escHtml(homeDesc),
+    CANONICAL: canonical(`/`),
+    OG_TITLE: escHtml(homeTitle),
+    OG_DESC: escHtml(homeDesc),
+    BODY_CLASS: "home",
+    NAV: `<a href="/">Home</a> <a href="/ports/">Ports</a>`,
+    JSON_LD: "",
+    CONTENT: `
+      <div class="container">
+        <h1>${escHtml(SITE.name)}</h1>
+        <p class="lede">${escHtml(homeDesc)}</p>
+        <div class="grid">
+          ${ports.map(p => `
+            <a class="card" href="/ports/${p.port_id}/">
+              <h2>${escHtml(p.port_name)}</h2>
+              <p>${escHtml(p.meta_description)}</p>
+            </a>
+          `).join("")}
+        </div>
+        <div class="note">
+          <strong>How this site works:</strong> structured port data + ship time windows → tour feasibility tiers.
+        </div>
+      </div>
+    `,
+  });
+  writeFile(path.join(DIST, "index.html"), homeHtml);
+  urls.push(canonical(`/`));
+
+  // Ports index
+  const portsIndexHtml = renderBase(tpl.base, {
+    PAGE_TITLE: escHtml(`Ports | ${SITE.name}`),
+    META_DESC: escHtml("Port guides for Juneau, Skagway, and Ketchikan: tours, ships, logistics, and what fits your schedule."),
+    CANONICAL: canonical(`/ports/`),
+    OG_TITLE: escHtml(`Ports | ${SITE.name}`),
+    OG_DESC: escHtml("Port guides for Alaska cruise ports."),
+    BODY_CLASS: "ports",
+    NAV: `<a href="/">Home</a> <a href="/ports/">Ports</a>`,
+    JSON_LD: "",
+    CONTENT: `
+      <div class="container">
+        <h1>Ports</h1>
+        <div class="grid">
+          ${ports.map(p => `
+            <a class="card" href="/ports/${p.port_id}/">
+              <h2>${escHtml(p.port_name)}</h2>
+              <p>${escHtml(p.meta_description)}</p>
+            </a>
+          `).join("")}
+        </div>
+      </div>
+    `,
+  });
+  writeFile(path.join(DIST, "ports", "index.html"), portsIndexHtml);
+  urls.push(canonical(`/ports/`));
+
+  // All per-port logic (tours, categories, ships, etc.)
+  for (const port of ports) {
+    const portTours = tours.filter(t => t.port_id === port.port_id);
+    const portShips = ships.filter(s => (s.port_calls || []).some(pc => pc.port_id === port.port_id));
+
+    // Port hub page
+    const portHubContent = renderBase(tpl.port, {
+      PORT_NAME: escHtml(port.port_name),
+      INTRO: escHtml(port.intro),
+      PRACTICAL: `
+        <ul>
+          ${(port.practical_info?.tips || []).map(x => `<li>${escHtml(x)}</li>`).join("")}
+        </ul>
+      `,
+      ATTRACTIONS: `
+        <ul>
+          ${(port.key_attractions || []).map(a => `<li><strong>${escHtml(a.name)}:</strong> ${escHtml(a.description)}</li>`).join("")}
+        </ul>
+      `,
+      LINKS: `
+        <div class="grid">
+          <a class="card" href="/ports/${port.port_id}/tours/"><h3>Tours</h3><p>Categories + tour pages.</p></a>
+          <a class="card" href="/ports/${port.port_id}/cruise-ships-2026/"><h3>Cruise Ships 2026</h3><p>Ships calling this port + time windows.</p></a>
+        </div>
+      `,
+    });
+
+    const portHubHtml = renderBase(tpl.base, {
+      PAGE_TITLE: escHtml(port.meta_title),
+      META_DESC: escHtml(port.meta_description),
+      CANONICAL: canonical(`/ports/${port.port_id}/`),
+      OG_TITLE: escHtml(port.meta_title),
+      OG_DESC: escHtml(port.meta_description),
+      BODY_CLASS: "port",
+      NAV: navLinks(port),
+      JSON_LD: `<script type="application/ld+json">${jsonLD_Port(port)}</script>`,
+      CONTENT: `<div class="container">${portHubContent}</div>`,
+    });
+    writeFile(path.join(DIST, "ports", port.port_id, "index.html"), portHubHtml);
+    urls.push(canonical(`/ports/${port.port_id}/`));
+
+    // Tours index
+    const categories = [...new Set(portTours.map(t => t.category))].sort();
+    const toursIndexContent = renderBase(tpl.toursIndex, {
+      PORT_NAME: escHtml(port.port_name),
+      CATEGORIES: categories.map(c => `
+        <a class="card" href="/ports/${port.port_id}/tours/${toSlug(c)}/">
+          <h3>${escHtml(c)}</h3>
+          <p>${portTours.filter(t => t.category === c).length} tours</p>
+        </a>
+      `).join(""),
+      ALL_TOURS: portTours.map(t => `
+        <div class="row">
+          <div>
+            <a href="/ports/${port.port_id}/tours/${t.tour_id}/"><strong>${escHtml(t.tour_name)}</strong></a>
+            <div class="muted">${escHtml(t.operator || "")} · ${escHtml(t.duration_hours)}h</div>
+          </div>
+          <div class="right muted">${t.price_usd?.adult ? `$${escHtml(t.price_usd.adult)}` : ""}</div>
+        </div>
+      `).join(""),
+    });
+
+    const toursIndexHtml = renderBase(tpl.base, {
+      PAGE_TITLE: escHtml(`${port.port_name} Tours | ${SITE.name}`),
+      META_DESC: escHtml(`Tours in ${port.port_name}: helicopter, whale watching, glacier, and more. Filtered for cruise passenger feasibility.`),
+      CANONICAL: canonical(`/ports/${port.port_id}/tours/`),
+      OG_TITLE: escHtml(`${port.port_name} Tours`),
+      OG_DESC: escHtml(port.meta_description),
+      BODY_CLASS: "tours",
+      NAV: navLinks(port),
+      JSON_LD: "",
+      CONTENT: `<div class="container">${toursIndexContent}</div>`,
+    });
+    writeFile(path.join(DIST, "ports", port.port_id, "tours", "index.html"), toursIndexHtml);
+    urls.push(canonical(`/ports/${port.port_id}/tours/`));
+
+    // Category pages
+    for (const cat of categories) {
+      const catSlug = toSlug(cat);
+      const catTours = portTours.filter(t => t.category === cat);
+
+      const toursRows = catTours.map(t => {
+        const sampleFits = portShips
+          .map(s => {
+            const pc = (s.port_calls || []).find(x => x.port_id === port.port_id) || null;
+            if (!pc) return null;
+            const { net } = netAvailableHours(pc);
+            const fit = fitTier(net, t.duration_hours);
+            return { ship: s, fit, net };
+          })
+          .filter(Boolean)
+          .sort((a, b) => {
+            const order = { GREEN: 0, YELLOW: 1, ORANGE: 2, RED: 3 };
+            return order[a.fit.tier] - order[b.fit.tier];
+          })
+          .slice(0, 3);
+
+        return `
+          <div class="card">
+            <h3><a href="/ports/${port.port_id}/tours/${t.tour_id}/">${escHtml(t.tour_name)}</a></h3>
+            <div class="muted">${escHtml(t.operator || "")} · ${escHtml(t.duration_hours)}h ${t.price_usd?.adult ? `· $${escHtml(t.price_usd.adult)}` : ""}</div>
+            <p>${escHtml(t.description_short)}</p>
+            <div class="fit">
+              <div class="muted">Sample ship fit (time-window logic):</div>
+              ${sampleFits.map(x => `
+                <div class="row">
+                  <div>${badge(x.fit.tier)} <a href="/ports/${port.port_id}/ships/${x.ship.ship_id}/">${escHtml(x.ship.ship_name)}</a></div>
+                  <div class="right muted">net ~${x.net.toFixed(1)}h</div>
+                </div>
+              `).join("")}
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      const catContent = renderBase(tpl.toursCategory, {
+        PORT_NAME: escHtml(port.port_name),
+        CATEGORY: escHtml(cat),
+        TOURS: toursRows || `<p>No tours in this category yet.</p>`,
+      });
+
+      const catHtml = renderBase(tpl.base, {
+        PAGE_TITLE: escHtml(`${cat} Tours in ${port.port_name} | ${SITE.name}`),
+        META_DESC: escHtml(`${cat} tours in ${port.port_name}, filtered by cruise port-day feasibility using time-window constraints.`),
+        CANONICAL: canonical(`/ports/${port.port_id}/tours/${catSlug}/`),
+        OG_TITLE: escHtml(`${cat} Tours in ${port.port_name}`),
+        OG_DESC: escHtml(port.meta_description),
+        BODY_CLASS: "category",
+        NAV: navLinks(port),
+        JSON_LD: "",
+        CONTENT: `<div class="container">${catContent}</div>`,
+      });
+      writeFile(path.join(DIST, "ports", port.port_id, "tours", catSlug, "index.html"), catHtml);
+      urls.push(canonical(`/ports/${port.port_id}/tours/${catSlug}/`));
+    }
+
+    // Individual tour pages
+    for (const tour of portTours) {
+      const compatibilityTable = portShips.map(s => {
+        const pc = (s.port_calls || []).find(x => x.port_id === port.port_id);
+        if (!pc) return null;
+        const { gross, net, totalBuffer } = netAvailableHours(pc);
+        const fit = fitTier(net, tour.duration_hours);
+        return { ship: s, pc, gross, net, buffer: totalBuffer, fit };
+      }).filter(Boolean);
+
+      const compatRows = compatibilityTable
+        .sort((a, b) => {
+          const order = { GREEN: 0, YELLOW: 1, ORANGE: 2, RED: 3 };
+          return order[a.fit.tier] - order[b.fit.tier];
+        })
+        .map(x => `
+          <tr>
+            <td>${badge(x.fit.tier)} <a href="/ports/${port.port_id}/ships/${x.ship.ship_id}/">${escHtml(x.ship.ship_name)}</a></td>
+            <td class="muted">${escHtml(x.pc.arrival)}–${escHtml(x.pc.departure)}</td>
+            <td class="muted">${x.net.toFixed(1)}h</td>
+            <td class="muted">${tour.duration_hours.toFixed(1)}h</td>
+            <td class="muted">${escHtml(x.fit.label)}</td>
+          </tr>
+        `).join("");
+
+      const tourContent = renderBase(tpl.tour, {
+        TOUR_NAME: escHtml(tour.tour_name),
+        OPERATOR: escHtml(tour.operator || ""),
+        CATEGORY: escHtml(tour.category),
+        DURATION: escHtml(tour.duration_hours),
+        PRICE: tour.price_usd?.adult ? `$${escHtml(tour.price_usd.adult)}` : "",
+        SHORT: escHtml(tour.description_short),
+        LONG: `<p>${escHtml(tour.description_long)}</p>`,
+        INCLUSIONS: `<ul>${(tour.inclusions || []).map(x => `<li>${escHtml(x)}</li>`).join("")}</ul>`,
+        REQUIREMENTS: `<ul>${(tour.requirements || []).map(x => `<li>${escHtml(x)}</li>`).join("")}</ul>`,
+        COMPAT_TABLE: `
+          <table>
+            <thead>
+              <tr><th>Ship</th><th>Port Call</th><th>Net Hours</th><th>Tour</th><th>Notes</th></tr>
+            </thead>
+            <tbody>${compatRows || ""}</tbody>
+          </table>
+          <div class="note">
+            <strong>How “Net Hours” is calculated:</strong>
+            gross port time minus buffers (disembark + reboard + transit). Conservative by design.
+          </div>
+        `,
+        BOOKING: tour.links?.booking
+          ? `<a class="btn" href="${escHtml(tour.links.booking)}" rel="nofollow noopener" target="_blank">Operator / Booking</a>`
+          : `<span class="muted">Booking link not set yet.</span>`,
+      });
+
+      const tourHtml = renderBase(tpl.base, {
+        PAGE_TITLE: escHtml(`${tour.tour_name} | ${port.port_name}`),
+        META_DESC: escHtml(tour.meta_description || tour.description_short),
+        CANONICAL: canonical(`/ports/${port.port_id}/tours/${tour.tour_id}/`),
+        OG_TITLE: escHtml(tour.tour_name),
+        OG_DESC: escHtml(tour.description_short),
+        BODY_CLASS: "tour",
+        NAV: navLinks(port),
+        JSON_LD: `<script type="application/ld+json">${jsonLD_Tour(port, tour)}</script>`,
+        CONTENT: `<div class="container">${tourContent}</div>`,
+      });
+      writeFile(path.join(DIST, "ports", port.port_id, "tours", tour.tour_id, "index.html"), tourHtml);
+      urls.push(canonical(`/ports/${port.port_id}/tours/${tour.tour_id}/`));
+    }
+
+    // Ships index page ("Cruise ships 2026")
+    const shipsIndexContent = renderBase(tpl.shipsIndex, {
+      PORT_NAME: escHtml(port.port_name),
+      SHIPS: portShips.map(s => {
+        const pc = (s.port_calls || []).find(x => x.port_id === port.port_id);
+        const window = pc ? `${pc.arrival}–${pc.departure}` : "";
+        const { net } = pc ? netAvailableHours(pc) : { net: 0 };
+        return `
+          <div class="row">
+            <div>
+              <a href="/ports/${port.port_id}/ships/${s.ship_id}/"><strong>${escHtml(s.ship_name)}</strong></a>
+              <div class="muted">${escHtml(s.cruise_line)} · ${escHtml(s.class || "")}</div>
+            </div>
+            <div class="right muted">${escHtml(window)} · net ~${net.toFixed(1)}h</div>
+          </div>
+        `;
+      }).join(""),
+    });
+
+    const shipsIndexHtml = renderBase(tpl.base, {
+      PAGE_TITLE: escHtml(`Cruise Ships Visiting ${port.port_name} in 2026 | ${SITE.name}`),
+      META_DESC: escHtml(`Cruise ships visiting ${port.port_name} in 2026, with port-call windows and net available hours for excursion feasibility.`),
+      CANONICAL: canonical(`/ports/${port.port_id}/cruise-ships-2026/`),
+      OG_TITLE: escHtml(`Cruise Ships Visiting ${port.port_name} in 2026`),
+      OG_DESC: escHtml(port.meta_description),
+      BODY_CLASS: "ships",
+      NAV: navLinks(port),
+      JSON_LD: "",
+      CONTENT: `<div class="container">${shipsIndexContent}</div>`,
+    });
+    writeFile(path.join(DIST, "ports", port.port_id, "cruise-ships-2026", "index.html"), shipsIndexHtml);
+    urls.push(canonical(`/ports/${port.port_id}/cruise-ships-2026/`));
+
+    // Individual ship pages (port-scoped)
+    for (const shipObj of portShips) {
+      const pc = (shipObj.port_calls || []).find(x => x.port_id === port.port_id);
+      const { gross, net, totalBuffer } = pc ? netAvailableHours(pc) : { gross: 0, net: 0, totalBuffer: 0 };
+
+      const shipCompatibleTours = portTours
+        .map(t => {
+          const fit = pc ? fitTier(net, t.duration_hours) : { tier: "RED", label: "Not feasible" };
+          return { t, fit };
+        })
+        .sort((a, b) => {
+          const order = { GREEN: 0, YELLOW: 1, ORANGE: 2, RED: 3 };
+          return order[a.fit.tier] - order[b.fit.tier];
+        });
+
+      const compatList = shipCompatibleTours.slice(0, 12).map(x => `
+        <div class="row">
+          <div>${badge(x.fit.tier)} <a href="/ports/${port.port_id}/tours/${x.t.tour_id}/">${escHtml(x.t.tour_name)}</a></div>
+          <div class="right muted">${escHtml(x.t.duration_hours)}h</div>
+        </div>
+      `).join("");
+
+      const shipContent = renderBase(tpl.ship, {
+        SHIP_NAME: escHtml(shipObj.ship_name),
+        LINE: escHtml(shipObj.cruise_line),
+        CLASS: escHtml(shipObj.class || ""),
+        NOTES: escHtml(shipObj.notes_history || ""),
+        PORTCALL: pc
+          ? `<div class="note"><strong>Port call window:</strong> ${escHtml(pc.arrival)}–${escHtml(pc.departure)} · gross ${gross.toFixed(1)}h · buffers ${totalBuffer.toFixed(1)}h · <strong>net ${net.toFixed(1)}h</strong></div>`
+          : `<div class="note">No port-call window recorded for this port yet.</div>`,
+        AMENITIES: `<ul>${(shipObj.amenities || []).map(x => `<li>${escHtml(x)}</li>`).join("")}</ul>`,
+        COMPAT: compatList || `<p>No tour data yet.</p>`,
+      });
+
+      const shipHtml = renderBase(tpl.base, {
+        PAGE_TITLE: escHtml(`${shipObj.ship_name} in ${port.port_name} | ${SITE.name}`),
+        META_DESC: escHtml(`Port call feasibility view for ${shipObj.ship_name} in ${port.port_name}: net hours + excursion fit tiers.`),
+        CANONICAL: canonical(`/ports/${port.port_id}/ships/${shipObj.ship_id}/`),
+        OG_TITLE: escHtml(`${shipObj.ship_name} in ${port.port_name}`),
+        OG_DESC: escHtml(port.meta_description),
+        BODY_CLASS: "ship",
+        NAV: navLinks(port),
+        JSON_LD: `<script type="application/ld+json">${jsonLD_Ship(port, shipObj)}</script>`,
+        CONTENT: `<div class="container">${shipContent}</div>`,
+      });
+      writeFile(path.join(DIST, "ports", port.port_id, "ships", shipObj.ship_id, "index.html"), shipHtml);
+      urls.push(canonical(`/ports/${port.port_id}/ships/${shipObj.ship_id}/`));
+    }
+  }
+
+  // Final outputs
+  writeFile(path.join(DIST, "sitemap.xml"), buildSitemap(urls));
+  writeFile(path.join(DIST, "robots.txt"), buildRobots());
+
+  const now = new Date().toISOString();
+  console.log(`✅ Built ${urls.length} URLs into dist/ at ${now}`);
+}
+
+build();

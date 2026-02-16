@@ -1,0 +1,32 @@
+{
+  "tour_id": "helicopter-glacier-walkabout",
+  "port_id": "juneau",
+  "tour_name": "Juneau Helicopter Glacier Walkabout",
+  "category": "helicopter",
+  "sub_category": "glacier-walkabout",
+  "operator": "NorthStar Trekking",
+  "duration_hours": 3.25,
+  "price_usd": {
+    "adult": 499,
+    "child": null,
+    "pricing_notes": "Your notes mention extra charge for guests over 250 lbs."
+  },
+  "highlights": [
+    "Flight to Mendenhall Glacier",
+    "Gear up with crampons/poles (as described)",
+    "Personalized guided walk with glaciology commentary"
+  ],
+  "inclusions": [
+    "Gear (as described)",
+    "Transport (as described)",
+    "Small-group format (as described)"
+  ],
+  "exclusions": ["Meals"],
+  "requirements": {
+    "min_age": 8,
+    "fitness_level": "easy-moderate",
+    "notes": "Min age shown as ~8 in your notes."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (Walkabout entry).",
+  "update_date": "2026-02-02"
+}

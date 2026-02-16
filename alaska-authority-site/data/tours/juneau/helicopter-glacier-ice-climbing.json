@@ -1,0 +1,30 @@
+{
+  "tour_id": "helicopter-glacier-ice-climbing",
+  "port_id": "juneau",
+  "tour_name": "Juneau Helicopter Glacier Ice Climbing Tour",
+  "category": "helicopter",
+  "sub_category": "ice-climbing",
+  "operator": "NorthStar Trekking",
+  "duration_hours": 4.25,
+  "price_usd": {
+    "adult": 599,
+    "child": null,
+    "pricing_notes": null
+  },
+  "highlights": [
+    "Helicopter access to glacier",
+    "Top-rope ice climbing instruction with axes/crampons (as described)"
+  ],
+  "inclusions": [
+    "Technical gear + instruction (as described)",
+    "Snacks (as described)"
+  ],
+  "exclusions": [],
+  "requirements": {
+    "min_age": 15,
+    "fitness_level": "strenuous",
+    "notes": "No experience needed per your notes; physical fitness required."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (Ice Climbing entry).",
+  "update_date": "2026-02-02"
+}

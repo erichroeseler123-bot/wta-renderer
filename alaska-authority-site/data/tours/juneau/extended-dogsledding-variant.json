@@ -1,0 +1,23 @@
+{
+  "tour_id": "extended-dogsledding-variant",
+  "port_id": "juneau",
+  "tour_name": "Extended Helicopter Glacier Dog Sledding (Variant)",
+  "category": "helicopter",
+  "sub_category": "dog-sledding-extended",
+  "operator": null,
+  "duration_hours": 3.5,
+  "price_usd": {
+    "adult_range": [800, 850],
+    "pricing_notes": "Your notes: ~$800–$850."
+  },
+  "highlights": ["Longer time at dog camp / glacier (as described)"],
+  "inclusions": [],
+  "exclusions": [],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy",
+    "notes": "Variant placeholder for duration/pricing band only (no invented operator)."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide; needs firm operator listing if you want operator-level pages.",
+  "update_date": "2026-02-02"
+}

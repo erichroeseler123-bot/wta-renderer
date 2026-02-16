@@ -1,0 +1,33 @@
+{
+  "tour_id": "juneau-icefield-helicopter-tour",
+  "port_id": "juneau",
+  "tour_name": "Juneau Icefield Helicopter Tour",
+  "category": "helicopter",
+  "sub_category": "glacier-landing-walk",
+  "operator": "Coastal Helicopters",
+  "duration_hours": 2.5,
+  "price_usd": {
+    "adult": 429,
+    "child": 379,
+    "pricing_notes": "Guests over 250 lbs typically pay +50% surcharge (per your notes)."
+  },
+  "highlights": [
+    "Glacier flightseeing over rainforest, peaks, and icefields",
+    "Glacier landing with guided walkabout",
+    "Narration on geology/wildlife"
+  ],
+  "inclusions": [
+    "Round-trip transport from cruise/downtown (as described)",
+    "Helicopter flight",
+    "Glacier gear (boots/gloves/jacket as described)",
+    "Guide"
+  ],
+  "exclusions": ["Snacks", "Gratuities", "Travel insurance"],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy-moderate",
+    "notes": "Must be able to walk on uneven ice surfaces."
+  },
+  "source_notes": "This record is derived from your pasted helicopter mega-guide section (Coastal Helicopters 'Glacier Helicopter Tour' details).",
+  "update_date": "2026-02-02"
+}

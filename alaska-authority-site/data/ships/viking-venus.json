@@ -1,0 +1,16 @@
+{
+  "ship_id": "viking-venus",
+  "ship_name": "Viking Venus",
+  "cruise_line": "Viking Ocean Cruises",
+  "class": "Star class",
+  "notes_history": "Smaller, destination-focused ship. Generally easier logistics and less crowd pressure.",
+  "amenities": ["Adult-oriented onboard experience", "Destination programming"],
+  "port_calls": [
+    {
+      "port_id": "juneau",
+      "arrival": "08:00",
+      "departure": "20:00",
+      "buffers": { "disembark": 0.75, "reboard": 1.0, "transit": 0.75 }
+    }
+  ]
+}

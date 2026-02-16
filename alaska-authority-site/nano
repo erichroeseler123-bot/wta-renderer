@@ -1,0 +1,64 @@
+function buildJuneau(port, logicPages) {
+  const baseDir = path.join(DIST_ROOT, "ports", port);
+  ensureDir(baseDir);
+
+  const logicLinks = logicPages.map(p => ({
+    href: p.href,
+    label: p.title
+  }));
+
+  // Main port page
+  writeHTML(
+    path.join(baseDir, "index.html"),
+    "Juneau Cruise Port Guide",
+    `<p>Juneau excursions are constrained by weather, ship timing, and physical feasibility. Not every tour works for every ship.</p>`,
+    logicLinks
+  );
+
+  // Whale Watching
+  ensureDir(path.join(baseDir, "whale-watching"));
+  writeHTML(
+    path.join(baseDir, "whale-watching", "index.html"),
+    "Whale Watching in Juneau",
+    `<p>Whale watching success depends heavily on conditions and available port time.</p>`,
+    logicLinks.filter(l =>
+      l.href.includes("whale") ||
+      l.href.includes("weather") ||
+      l.href.includes("short-port")
+    )
+  );
+
+  // Helicopter Tours
+  ensureDir(path.join(baseDir, "helicopter-tours"));
+  writeHTML(
+    path.join(baseDir, "helicopter-tours", "index.html"),
+    "Helicopter Tours in Juneau",
+    `<p>Flightseeing in Juneau is weather-sensitive and affected by weight and wind limits.</p>`,
+    logicLinks.filter(l =>
+      l.href.includes("helicopter") ||
+      l.href.includes("fog") ||
+      l.href.includes("wind")
+    )
+  );
+
+  // SHIP-AWARE: Norwegian Bliss
+  const shipDir = path.join(baseDir, "ships", "norwegian-bliss");
+  ensureDir(shipDir);
+
+  const blissLinks = logicLinks.filter(l =>
+    [
+      "short-port-calls",
+      "helicopter-weight-limits",
+      "weather-cancellation-risk",
+      "fog-and-flightseeing",
+      "when-not-to-leave-the-ship"
+    ].some(key => l.href.includes(key))
+  );
+
+  writeHTML(
+    path.join(shipDir, "index.html"),
+    "Norwegian Bliss in Juneau: What Actually Works",
+    `<p>Norwegian Bliss passengers face unique planning constraints due to ship size, timing, and Juneau’s weather patterns.</p>`,
+    blissLinks
+  );
+}

@@ -1,0 +1,35 @@
+{
+  "port_id": "juneau",
+  "port_name": "Juneau, Alaska",
+  "region": "southeast alaska",
+  "seasonality": {
+    "typical_months": ["april", "may", "june", "july", "august", "september"],
+    "notes": "Tours are highly seasonal; peak demand aligns with summer cruise season."
+  },
+  "positioning": {
+    "one_liner": "Independent feasibility guidance for Juneau cruise visitors: tours, ship time windows, and what realistically fits your day.",
+    "focus": [
+      "glaciers",
+      "helicopters",
+      "whale watching",
+      "wildlife",
+      "port-day planning"
+    ]
+  },
+  "tour_categories": [
+    "helicopter",
+    "whale-watching",
+    "glacier",
+    "dog-sledding",
+    "kayak-canoe",
+    "hiking-adventure",
+    "fishing",
+    "city-sightseeing",
+    "combination"
+  ],
+  "internal_links": {
+    "tours_hub": "/ports/juneau/tours/",
+    "ships_2026": "/ports/juneau/cruise-ships-2026/"
+  },
+  "update_date": "2026-02-02"
+}

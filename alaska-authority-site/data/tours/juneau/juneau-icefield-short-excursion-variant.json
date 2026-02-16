@@ -1,0 +1,25 @@
+{
+  "tour_id": "juneau-icefield-short-excursion-variant",
+  "port_id": "juneau",
+  "tour_name": "Juneau Icefield Helicopter Excursion (Short Variant)",
+  "category": "helicopter",
+  "sub_category": "short-excursion",
+  "operator": null,
+  "duration_hours": null,
+  "price_usd": {
+    "adult_range": [350, 450],
+    "pricing_notes": "Your notes describe 1–2 hour focus on flight/brief landing, various sellers."
+  },
+  "highlights": [
+    "Basic flightseeing over icefield with possible brief landing (as described)"
+  ],
+  "inclusions": [],
+  "exclusions": [],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy",
+    "notes": "Variant record; normalize once you pick which operator offerings you want canonical."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide; explicitly listed as 'various'.",
+  "update_date": "2026-02-02"
+}

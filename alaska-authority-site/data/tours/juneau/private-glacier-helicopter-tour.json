@@ -1,0 +1,27 @@
+{
+  "tour_id": "private-glacier-helicopter-tour",
+  "port_id": "juneau",
+  "tour_name": "Private Glacier Helicopter Tour",
+  "category": "helicopter",
+  "sub_category": "private-charter",
+  "operator": "Coastal Helicopters",
+  "duration_hours": 2.5,
+  "price_usd": {
+    "group_from": 3140,
+    "pricing_notes": "Your notes: from $3,140 per group (up to ~5-6)."
+  },
+  "highlights": [
+    "Exclusive helicopter flight + landing",
+    "Private timing and group control",
+    "Same core experience as standard glacier tour, but private"
+  ],
+  "inclusions": ["Private helicopter for your group (as described)"],
+  "exclusions": [],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy-moderate",
+    "notes": "Still weather-dependent; glacier walking may be involved depending on route."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (Private Glacier Helicopter Tour entry).",
+  "update_date": "2026-02-02"
+}

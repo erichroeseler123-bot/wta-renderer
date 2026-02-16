@@ -1,0 +1,30 @@
+{
+  "tour_id": "dog-sled-plus-added-glacier-landing",
+  "port_id": "juneau",
+  "tour_name": "Dog Sledding + Added Glacier Landing (Dual Landing Variant)",
+  "category": "helicopter",
+  "sub_category": "dog-sledding-plus-landing",
+  "operator": "Coastal Helicopters",
+  "duration_hours": 3.5,
+  "price_usd": {
+    "adult": 839,
+    "child": null,
+    "pricing_notes": "Your notes describe extra landing time and dual experience."
+  },
+  "highlights": [
+    "Dog sledding on glacier",
+    "Second landing for extra glacier time / walkabout (as described)"
+  ],
+  "inclusions": [
+    "Dog camp experience (as described)",
+    "Additional glacier time (as described)"
+  ],
+  "exclusions": [],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy-moderate",
+    "notes": "Weather-dependent; operator confirmation required for exact glacier."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (Dog Sled tour with additional glacier landing).",
+  "update_date": "2026-02-02"
+}

@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+
+# Authority site: informational only
+# No booking, no transactions

@@ -1,0 +1,24 @@
+{
+  "tour_id": "juneau-whale-watching-auke-bay",
+  "port_id": "juneau",
+  "tour_name": "Auke Bay Whale Watching Cruise",
+  "operator": "Local operators (varies)",
+  "category": "Whale Watching",
+  "duration_hours": 3.5,
+  "price_usd": {
+    "adult": 169,
+    "child": 129,
+    "notes": "Example pricing; varies by operator."
+  },
+  "description_short": "3–4 hour whale-focused cruise with high wildlife odds; generally a strong fit for most Juneau port calls.",
+  "description_long": "Whale watching is one of the most reliable high-value Juneau activities for cruise passengers. It’s less weather-fragile than helicopters and usually fits comfortably into common 7–10 hour port calls (after buffers).",
+  "inclusions": [
+    "Wildlife cruise with narration",
+    "Heated cabin on many vessels (varies)",
+    "Binoculars/snacks sometimes included"
+  ],
+  "requirements": ["Dress for wind/rain on deck", "Arrive early for check-in"],
+  "links": {
+    "booking": "https://www.traveljuneau.com/"
+  }
+}

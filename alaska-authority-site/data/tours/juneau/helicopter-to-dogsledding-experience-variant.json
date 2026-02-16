@@ -1,0 +1,27 @@
+{
+  "tour_id": "helicopter-to-dogsledding-experience-variant",
+  "port_id": "juneau",
+  "tour_name": "Helicopter To a Dogsledding Experience (Variant)",
+  "category": "helicopter",
+  "sub_category": "dog-sledding",
+  "operator": null,
+  "duration_hours": 3.0,
+  "price_usd": {
+    "adult": 727,
+    "child": null,
+    "pricing_notes": "Your notes list this as a Viator-branded variant."
+  },
+  "highlights": [
+    "Small-group dogsledding on glacier camp (as described)",
+    "Helicopter flight included"
+  ],
+  "inclusions": ["Round-trip flight (as described)"],
+  "exclusions": [],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy",
+    "notes": "Variant record pending operator identity."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide; explicitly labeled as a variant.",
+  "update_date": "2026-02-02"
+}

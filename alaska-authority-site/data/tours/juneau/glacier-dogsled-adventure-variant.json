@@ -1,0 +1,32 @@
+{
+  "tour_id": "glacier-dogsled-adventure-variant",
+  "port_id": "juneau",
+  "tour_name": "Helicopter Glacier Dogsled Adventure (Variant)",
+  "category": "helicopter",
+  "sub_category": "dog-sledding",
+  "operator": null,
+  "duration_hours": 3.25,
+  "price_usd": {
+    "adult": 739,
+    "child": null,
+    "pricing_notes": "Your notes list NorthStar ~$739; also mention TEMSCO/Coastal variants $699–$709."
+  },
+  "highlights": [
+    "Flight to glacier camp (Norris/Mendenhall mentioned as variants)",
+    "Mushing prep + ride",
+    "High-touch dog camp experience (as described)"
+  ],
+  "inclusions": [
+    "Gear (as described)",
+    "Transport (as described)",
+    "Musher-led instruction (as described)"
+  ],
+  "exclusions": ["Food"],
+  "requirements": {
+    "min_age": null,
+    "fitness_level": "easy",
+    "notes": "Operator-specific rules vary; keep as a variant until you normalize operators."
+  },
+  "source_notes": "This is explicitly marked as a variant because your source text lists multiple operators/brands for similar offering.",
+  "update_date": "2026-02-02"
+}

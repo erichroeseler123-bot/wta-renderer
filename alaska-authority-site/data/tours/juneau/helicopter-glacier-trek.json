@@ -1,0 +1,30 @@
+{
+  "tour_id": "helicopter-glacier-trek",
+  "port_id": "juneau",
+  "tour_name": "Juneau Helicopter Glacier Trek",
+  "category": "helicopter",
+  "sub_category": "trek",
+  "operator": "NorthStar Trekking",
+  "duration_hours": 4.25,
+  "price_usd": {
+    "adult": 549,
+    "child": null,
+    "pricing_notes": null
+  },
+  "highlights": [
+    "Panoramic helicopter flight",
+    "Guided 2-hour trek on icefield terrain (as described)"
+  ],
+  "inclusions": [
+    "Gear (crampons/harness mentioned in your notes)",
+    "Snacks (as described)"
+  ],
+  "exclusions": ["Lunch"],
+  "requirements": {
+    "min_age": 13,
+    "fitness_level": "strenuous",
+    "notes": "Your notes: good fitness required."
+  },
+  "source_notes": "Derived from your pasted helicopter mega-guide (Glacier Trek entry).",
+  "update_date": "2026-02-02"
+}

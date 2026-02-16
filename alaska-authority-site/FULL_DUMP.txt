@@ -1,0 +1,523 @@
+===== TREE =====
+.
+├── build.js
+├── build.js.bak
+├── content
+│   ├── image-credits.md
+│   ├── logic
+│   │   └── ship-tour-compatibility.md
+│   └── ports
+│       ├── juneau
+│       │   ├── categories
+│       │   │   ├── glacier-tours.md
+│       │   │   ├── helicopter-tours.md
+│       │   │   └── whale-watching.md
+│       │   ├── index.md
+│       │   ├── logic
+│       │   │   ├── best-time-of-day-for-tours.md
+│       │   │   ├── cruise-line-vs-independent-tours.md
+│       │   │   ├── elderly-cruise-passengers.md
+│       │   │   ├── families-with-young-kids.md
+│       │   │   ├── fog-and-flightseeing.md
+│       │   │   ├── glacier-access-without-helicopter.md
+│       │   │   ├── glacier-visibility-realities.md
+│       │   │   ├── helicopter-weight-limits.md
+│       │   │   ├── high-wind-day-impacts.md
+│       │   │   ├── last-minute-excursions.md
+│       │   │   ├── long-port-calls.md
+│       │   │   ├── mobility-accessible-excursions.md
+│       │   │   ├── peak-season-crowds.md
+│       │   │   ├── port-distance-realities.md
+│       │   │   ├── rain-day-what-still-works.md
+│       │   │   ├── rainforest-hikes-feasibility.md
+│       │   │   ├── refund-and-cancellation-policies.md
+│       │   │   ├── short-port-calls.md
+│       │   │   ├── should-you-book-in-advance.md
+│       │   │   ├── tight-ship-departure-times.md
+│       │   │   ├── transportation-from-dock.md
+│       │   │   ├── walking-distance-at-port.md
+│       │   │   ├── weather-cancellation-risk.md
+│       │   │   ├── whale-watching-success-rates.md
+│       │   │   └── when-not-to-leave-the-ship.md
+│       │   ├── ships
+│       │   │   └── norwegian-bliss.md
+│       │   └── tours
+│       │       └── helicopter-mendenhall-glacier-walk.md
+│       ├── ketchikan
+│       │   ├── categories
+│       │   │   ├── floatplane-tours
+│       │   │   │   └── index.md
+│       │   │   ├── misty-fjords
+│       │   │   │   └── index.md
+│       │   │   └── whale-watching
+│       │   │       └── index.md
+│       │   ├── index.md
+│       │   ├── logic
+│       │   │   ├── elderly-cruise-passengers.md
+│       │   │   ├── families-with-young-kids.md
+│       │   │   ├── floatplane-weather-risk.md
+│       │   │   ├── last-minute-excursions.md
+│       │   │   ├── long-port-calls.md
+│       │   │   ├── misty-fjords-feasibility.md
+│       │   │   ├── mobility-accessible-options.md
+│       │   │   ├── peak-season-crowds.md
+│       │   │   ├── rain-and-sea-conditions.md
+│       │   │   ├── rain-day-what-still-works.md
+│       │   │   ├── short-port-calls.md
+│       │   │   ├── should-you-book-in-advance.md
+│       │   │   ├── walking-distance-at-port.md
+│       │   │   ├── whale-watching-reliability.md
+│       │   │   └── when-not-to-leave-the-ship.md
+│       │   ├── ships
+│       │   │   ├── carnival-luminosa.md
+│       │   │   └── norwegian-bliss.md
+│       │   └── tours
+│       │       ├── misty-fjords.md
+│       │       ├── totem-and-culture.md
+│       │       └── wildlife-and-fishing.md
+│       └── skagway
+│           ├── index.md
+│           ├── logic
+│           │   ├── elderly-cruise-passengers.md
+│           │   ├── families-with-young-kids.md
+│           │   ├── last-minute-excursions.md
+│           │   ├── long-port-calls.md
+│           │   ├── mobility-accessible-options.md
+│           │   ├── peak-season-crowds.md
+│           │   ├── short-port-calls.md
+│           │   ├── should-you-book-in-advance.md
+│           │   ├── tight-return-windows.md
+│           │   ├── train-schedule-realities.md
+│           │   ├── walking-distance-at-port.md
+│           │   ├── weather-in-the-pass.md
+│           │   ├── when-not-to-leave-the-ship.md
+│           │   └── yukon-border-crossing-times.md
+│           ├── ships
+│           │   └── norwegian-bliss.md
+│           └── tours
+│               ├── walking-history.md
+│               ├── white-pass-railroad.md
+│               └── yukon-tours.md
+├── data
+│   ├── categories
+│   │   └── juneau-helicopter.json
+│   ├── ports
+│   │   └── juneau.json
+│   ├── ships
+│   │   ├── norwegian-bliss.json
+│   │   └── viking-venus.json
+│   └── tours
+│       ├── juneau
+│       │   ├── dogsledding-mendenhall-variant.json
+│       │   ├── dog-sled-plus-added-glacier-landing.json
+│       │   ├── extended-dogsledding-variant.json
+│       │   ├── glacier-dogsled-adventure-variant.json
+│       │   ├── glacier-dog-sledding-helicopter-tour.json
+│       │   ├── helicopter-glacier-ice-climbing.json
+│       │   ├── helicopter-glacier-trek.json
+│       │   ├── helicopter-glacier-walkabout.json
+│       │   ├── helicopter-to-dogsledding-experience-variant.json
+│       │   ├── juneau-icefield-helicopter-tour.json
+│       │   ├── juneau-icefield-short-excursion-variant.json
+│       │   ├── mendenhall-helicopter-guided-walk.json
+│       │   ├── private-glacier-helicopter-tour.json
+│       │   ├── small-group-helicopter-glacier-trek-variant.json
+│       │   └── taku-glacier-helicopter-airboat.json
+│       ├── juneau-helicopter-mendenhall-glacier-walk.json
+│       ├── juneau-mendenhall-glacier-express.json
+│       └── juneau-whale-watching-auke-bay.json
+├── fix-frontmatter.js
+├── FULL_DUMP.txt
+├── generate-sitemap.js
+├── .gitignore
+├── nano
+├── package.json
+├── package-lock.json
+├── public
+│   ├── css
+│   │   ├── site.css
+│   │   └── style.css
+│   ├── images
+│   │   ├── credits
+│   │   ├── credits.json
+│   │   ├── juneau
+│   │   │   └── juneau-helicopter-glacier.jpg
+│   │   ├── ketchikan
+│   │   │   ├── ketchikan-cruise-port.jpg
+│   │   │   ├── ketchikan-misty-fjords.jpg
+│   │   │   └── ketchikan-whale-watching.jpg
+│   │   └── ports
+│   ├── robots.txt
+│   └── style.css
+├── scripts
+│   ├── fetch-unsplash.js
+│   └── hero-map.js
+├── skagway-entry-site
+│   ├── content
+│   │   └── pages
+│   │       ├── index.md
+│   │       └── skagway-with-6-to-7-hours.md
+│   └── public
+│       └── robots.txt
+├── strip-md-headings.js
+├── templates
+│   ├── base.html
+│   ├── port.html
+│   ├── ship.html
+│   ├── ships-index.html
+│   ├── tour.html
+│   ├── tours-category.html
+│   └── tours-index.html
+├── .wrangler
+│   └── tmp
+└── wrangler.toml
+
+42 directories, 130 files
+
+===== build.js =====
+/**
+ * Authority Site Builder (v1 – clean canonical)
+ *
+ * Input:  data/ports/*.json
+ * Output: dist/ (static HTML)
+ */
+
+import fs from "fs";
+import path from "path";
+
+/* ---------------- config ---------------- */
+
+const ROOT = process.cwd();
+const DIST = path.join(ROOT, "dist");
+
+const SITE = {
+  origin: "http://localhost:8787",
+  name: "Alaska Cruise Port Authority",
+};
+
+/* ---------------- utils ---------------- */
+
+function read(file) {
+  return fs.readFileSync(file, "utf8");
+}
+
+function write(file, contents) {
+  fs.mkdirSync(path.dirname(file), { recursive: true });
+  fs.writeFileSync(file, contents, "utf8");
+}
+
+function cleanDist() {
+  if (fs.existsSync(DIST)) fs.rmSync(DIST, { recursive: true, force: true });
+  fs.mkdirSync(DIST, { recursive: true });
+}
+
+function copyDir(src, dest) {
+  if (!fs.existsSync(src)) return;
+  fs.mkdirSync(dest, { recursive: true });
+  for (const entry of fs.readdirSync(src)) {
+    const s = path.join(src, entry);
+    const d = path.join(dest, entry);
+    if (fs.statSync(s).isDirectory()) {
+      copyDir(s, d);
+    } else {
+      fs.copyFileSync(s, d);
+    }
+  }
+}
+
+function esc(s = "") {
+  return String(s)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;");
+}
+
+function render(template, vars) {
+  let out = template;
+  for (const [key, value] of Object.entries(vars)) {
+    out = out.replaceAll(`{{${key}}}`, value ?? "");
+  }
+  return out;
+}
+
+/* ---------------- data ---------------- */
+
+function loadPorts() {
+  const dir = path.join(ROOT, "data", "ports");
+  if (!fs.existsSync(dir)) return [];
+  return fs.readdirSync(dir)
+    .filter(f => f.endsWith(".json"))
+    .map(f => JSON.parse(read(path.join(dir, f))));
+}
+
+/* ---------------- templates ---------------- */
+
+const BASE = read(path.join(ROOT, "templates", "base.html"));
+
+/* ---------------- build ---------------- */
+
+function build() {
+  cleanDist();
+
+  // copy static assets (css, images, etc)
+  copyDir(path.join(ROOT, "public"), DIST);
+
+  const ports = loadPorts();
+  const urls = [];
+
+  /* ---------- homepage ---------- */
+
+  const homeHtml = render(BASE, {
+    PAGE_TITLE: SITE.name,
+    META_DESC: "Independent feasibility guidance for Alaska cruise ports.",
+    CANONICAL: SITE.origin + "/",
+    NAV: `<a href="/">Home</a> <a href="/ports/">Ports</a>`,
+    JSON_LD: "",
+    CONTENT: `
+      <h1>${SITE.name}</h1>
+      <p>Independent feasibility guidance for Alaska cruise ports.</p>
+      <ul>
+        ${ports.map(p =>
+          `<li><a href="/ports/${p.port_id}/">${esc(p.port_name)}</a></li>`
+        ).join("")}
+      </ul>
+    `,
+  });
+
+  write(path.join(DIST, "index.html"), homeHtml);
+  urls.push("/");
+
+  /* ---------- ports index ---------- */
+
+  const portsIndex = render(BASE, {
+    PAGE_TITLE: `Ports | ${SITE.name}`,
+    META_DESC: "Alaska cruise port guides.",
+    CANONICAL: SITE.origin + "/ports/",
+    NAV: `<a href="/">Home</a> <a href="/ports/">Ports</a>`,
+    JSON_LD: "",
+    CONTENT: `
+      <h1>Ports</h1>
+      <ul>
+        ${ports.map(p =>
+          `<li><a href="/ports/${p.port_id}/">${esc(p.port_name)}</a></li>`
+        ).join("")}
+      </ul>
+    `,
+  });
+
+  write(path.join(DIST, "ports", "index.html"), portsIndex);
+  urls.push("/ports/");
+
+  /* ---------- individual ports ---------- */
+
+  for (const port of ports) {
+    const portHtml = render(BASE, {
+      PAGE_TITLE: `${port.port_name} | ${SITE.name}`,
+      META_DESC: port.meta_description || "",
+      CANONICAL: SITE.origin + `/ports/${port.port_id}/`,
+      NAV: `
+        <a href="/">Home</a>
+        <a href="/ports/">Ports</a>
+        <a href="/ports/${port.port_id}/">${esc(port.port_name)}</a>
+      `,
+      JSON_LD: "",
+      CONTENT: `
+        <h1>${esc(port.port_name)}</h1>
+        <p>${esc(port.meta_description || "")}</p>
+        <ul>
+          <li><a href="/ports/${port.port_id}/tours/">Tours</a></li>
+          <li><a href="/ports/${port.port_id}/cruise-ships-2026/">Cruise Ships 2026</a></li>
+        </ul>
+      `,
+    });
+
+    write(
+      path.join(DIST, "ports", port.port_id, "index.html"),
+      portHtml
+    );
+
+    urls.push(`/ports/${port.port_id}/`);
+  }
+
+  console.log(`✅ Built ${urls.length} pages`);
+}
+
+/* ---------------- run ---------------- */
+
+build();
+
+===== templates/base.html =====
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>{{PAGE_TITLE}}</title>
+  <meta name="description" content="{{META_DESC}}" />
+  <link rel="canonical" href="{{CANONICAL}}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/css/style.css" />
+  {{JSON_LD}}
+</head>
+<body>
+  <header>
+    <nav>{{NAV}}</nav>
+  </header>
+
+  <main>
+    {{CONTENT}}
+  </main>
+
+  <footer>
+    <p>Independent feasibility guidance. Always confirm with operator and ship.</p>
+  </footer>
+</body>
+</html>
+
+===== data/ports/*.json =====
+
+----- data/ports/juneau.json -----
+{
+  "port_id": "juneau",
+  "port_name": "Juneau, Alaska",
+  "region": "southeast alaska",
+  "seasonality": {
+    "typical_months": ["april", "may", "june", "july", "august", "september"],
+    "notes": "Tours are highly seasonal; peak demand aligns with summer cruise season."
+  },
+  "positioning": {
+    "one_liner": "Independent feasibility guidance for Juneau cruise visitors: tours, ship time windows, and what realistically fits your day.",
+    "focus": ["glaciers", "helicopters", "whale watching", "wildlife", "port-day planning"]
+  },
+  "tour_categories": [
+    "helicopter",
+    "whale-watching",
+    "glacier",
+    "dog-sledding",
+    "kayak-canoe",
+    "hiking-adventure",
+    "fishing",
+    "city-sightseeing",
+    "combination"
+  ],
+  "internal_links": {
+    "tours_hub": "/ports/juneau/tours/",
+    "ships_2026": "/ports/juneau/cruise-ships-2026/"
+  },
+  "update_date": "2026-02-02"
+}
+
+===== public/css/style.css =====
+/* ==============================
+   Alaska Cruise Port Authority
+   Authority UI (v1)
+   ============================== */
+
+:root {
+  --bg: #ffffff;
+  --fg: #111111;
+  --muted: #666666;
+  --border: #e5e5e5;
+  --accent: #0b5fff;
+  --maxw: 960px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont,
+               "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* ---------- Layout ---------- */
+
+header {
+  border-bottom: 1px solid var(--border);
+  background: #fafafa;
+}
+
+nav {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 1rem 1.25rem;
+  display: flex;
+  gap: 1.25rem;
+  font-weight: 600;
+}
+
+main {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem;
+}
+
+footer {
+  border-top: 1px solid var(--border);
+  margin-top: 4rem;
+  padding: 2rem 1.25rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+/* ---------- Typography ---------- */
+
+h1 {
+  font-size: 2.25rem;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 1.5rem;
+  margin-top: 3rem;
+  margin-bottom: 0.75rem;
+}
+
+p {
+  margin: 0.5rem 0 1rem 0;
+}
+
+ul {
+  padding-left: 1.25rem;
+}
+
+li {
+  margin: 0.5rem 0;
+}
+
+/* ---------- Authority Cards ---------- */
+
+ul li a {
+  font-weight: 500;
+}
+
+section {
+  margin-top: 3rem;
+}
+
+/* ---------- Utility ---------- */
+
+.muted {
+  color: var(--muted);
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 3rem 0;
+}

@@ -1,0 +1,20 @@
+{
+  "ship_id": "norwegian-bliss",
+  "ship_name": "Norwegian Bliss",
+  "cruise_line": "Norwegian Cruise Line",
+  "class": "Breakaway Plus",
+  "notes_history": "Large modern ship with strong Alaska deployment and high passenger volume; plan buffers conservatively.",
+  "amenities": [
+    "Observation Lounge",
+    "Multiple dining venues",
+    "Large-ship entertainment"
+  ],
+  "port_calls": [
+    {
+      "port_id": "juneau",
+      "arrival": "07:00",
+      "departure": "17:00",
+      "buffers": { "disembark": 1.0, "reboard": 1.0, "transit": 0.75 }
+    }
+  ]
+}
