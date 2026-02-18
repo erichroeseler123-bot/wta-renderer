@@ -14,11 +14,11 @@ export default function CheckoutClient({ disabled }: { disabled?: boolean }) {
   const [working, setWorking] = useState(false);
 
   const missingSelection = useMemo(() => {
-    return (items || []).some((it) => !it.availabilityPk || !it.startAt);
+    return (items || []).some((it: any) => !it.availabilityPk || !it.startAt);
   }, [items]);
 
   const totalCents = useMemo(() => {
-    return (items || []).reduce((acc, it) => {
+    return (items || []).reduce((acc: number, it: any) => {
       const price = Number(it.price || 0);
       const qty = Number(it.qty || 1);
       return acc + price * qty;
@@ -26,18 +26,20 @@ export default function CheckoutClient({ disabled }: { disabled?: boolean }) {
   }, [items]);
 
   async function go() {
+    if (disabled) {
+      alert("Demo mode: checkout is disabled. This preview shows tour selection + itinerary cart only.");
+      return;
+    }
     if (missingSelection) return;
 
     setWorking(true);
     try {
-      // TODO: This is where you'll call your server booking endpoint.
-      // Example future call:
-      // await fetch("/api/fareharbor/book", { method:"POST", body: JSON.stringify({ items }) })
-      // Then redirect to success page.
+      // DEMO SAFE:
+      // No payments, no FareHarbor booking creation, no inventory consumption.
+      alert("Demo mode: this would proceed to payment + booking confirmation. (No charge / no booking in this preview.)");
 
-      // For now: just simulate "checkout"
-      clear();
-perl -0777 -pi -e 's/window\.location\.href\s*=\s*["'\'']\/checkout\/success["'\'']\s*;?/alert("Demo mode: checkout is not enabled yet. This preview shows the tour picker + itinerary cart UI.");/g' app/components/cart/CheckoutClient.tsx
+      // Optional: clear the cart to simulate an action, or leave it for demo review.
+      // clear();
     } finally {
       setWorking(false);
     }
@@ -77,13 +79,12 @@ perl -0777 -pi -e 's/window\.location\.href\s*=\s*["'\'']\/checkout\/success["'\
               : "bg-indigo-700 text-white hover:bg-indigo-800",
         ].join(" ")}
       >
-        {working ? "Processing…" : "Checkout"}
+        {working ? "Processing…" : disabled ? "Checkout (Demo)" : "Checkout"}
       </button>
 
       <div className="text-[11px] text-white/60">
-        No payment collected today. Deposit rules can be shown here (or pulled from supplier).
+        Demo preview only — no payment collected and no booking is created.
       </div>
     </div>
   );
 }
-
