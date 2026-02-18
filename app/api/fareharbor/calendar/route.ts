@@ -1,77 +1,105 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-function dayKey(iso: string) {
-  return iso.slice(0, 10);
+function okJson(obj: any, status = 200) {
+  return new NextResponse(JSON.stringify(obj), {
+    status,
+    headers: { "content-type": "application/json; charset=utf-8" },
+  });
 }
 
-export async function GET(req: NextRequest) {
+function groupByDay(availabilities: any[]) {
+  const byDay = new Map<string, any[]>();
+
+  for (const a of availabilities || []) {
+    const startAt = String(a?.start_at ?? a?.startAt ?? "");
+    if (startAt.length < 10) continue;
+    const day = startAt.slice(0, 10);
+    if (!byDay.has(day)) byDay.set(day, []);
+    byDay.get(day)!.push(a);
+  }
+
+  const days = Array.from(byDay.entries())
+    .sort((a, b) => a[0].localeCompare(b[0]))
+    .map(([day, slots]) => ({
+      day,
+      slots: slots
+        .slice()
+        .sort((x, y) =>
+          String(x?.start_at ?? x?.startAt ?? "").localeCompare(
+            String(y?.start_at ?? y?.startAt ?? ""),
+          ),
+        )
+        .map((s) => ({
+          pk: Number(s?.pk ?? s?.availability_pk ?? 0),
+          start_at: s?.start_at ?? s?.startAt,
+          startAt: s?.startAt ?? s?.start_at,
+          capacity: s?.capacity ?? null,
+          customer_type_rates: s?.customer_type_rates ?? [],
+        })),
+    }));
+
+  const totalSlots = days.reduce((sum, d) => sum + (d.slots?.length || 0), 0);
+  return { days, totalSlots };
+}
+
+export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
-  const company = searchParams.get("company");
-  const item = searchParams.get("item");
-  const start = searchParams.get("start"); // YYYY-MM-DD
-  const end = searchParams.get("end"); // YYYY-MM-DD
+  const company = searchParams.get("company") || "";
+  const item = searchParams.get("item") || "";
+  const start = searchParams.get("start") || "";
+  const end = searchParams.get("end") || "";
 
   if (!company || !item || !start || !end) {
-    return NextResponse.json(
-      { ok: false, error: "Missing company, item, start, end" },
-      { status: 400 },
+    return okJson(
+      { ok: false, error: "Missing required params: company, item, start, end" },
+      400,
     );
   }
 
-  // Use your existing working engine (big horizon, chunk scan).
-  // Horizon just needs to cover start->end window; give it a cushion.
-  const startDate = new Date(start + "T00:00:00Z");
-  const endDate = new Date(end + "T00:00:00Z");
-  const ms = endDate.getTime() - startDate.getTime();
-  const horizonDays = Math.max(1, Math.ceil(ms / 86400000) + 7);
-
-  const base = `${req.nextUrl.origin}/api/fareharbor/next-availability`;
-  const url =
-    `${base}?company=${encodeURIComponent(company)}` +
-    `&item=${encodeURIComponent(item)}` +
-    `&start=${encodeURIComponent(start)}` +
-    `&horizonDays=${horizonDays}` +
-    `&chunkDays=30`;
-
-  const r = await fetch(url, { cache: "no-store" });
-  const j = await r.json();
-
-  const avs: any[] = j.availabilities || [];
-  const filtered = avs.filter((a) => {
-    const s = a.start_at || a.startAt;
-    if (!s) return false;
-    const d = dayKey(s);
-    return d >= start && d < end;
-  });
-
-  // group by day
-  const byDay: Record<string, any[]> = {};
-  for (const a of filtered) {
-    const s = a.start_at || a.startAt;
-    const d = dayKey(s);
-    (byDay[d] ||= []).push(a);
-  }
-
-  // nice: day list sorted
-  const days = Object.keys(byDay)
-    .sort()
-    .map((d) => ({
-      day: d,
-      slots: byDay[d].sort((x, y) => {
-        const xs = (x.start_at || x.startAt) ?? "";
-        const ys = (y.start_at || y.startAt) ?? "";
-        return xs.localeCompare(ys);
-      }),
-    }));
-
-  return NextResponse.json({
-    ok: true,
+  // Call OUR working endpoint (same origin)
+  const base = new URL(req.url);
+  base.pathname = "/api/fareharbor/availabilities";
+  base.search = new URLSearchParams({
     company,
-    item: Number(item),
+    item,
     start,
     end,
-    days,
-    totalSlots: filtered.length,
-  });
+  }).toString();
+
+  try {
+    const res = await fetch(base.toString(), { cache: "no-store" });
+    const j = await res.json();
+
+    if (!j?.ok) {
+      return okJson(
+        {
+          ok: false,
+          error: "Upstream availabilities failed",
+          upstream: j,
+          url: base.toString(),
+        },
+        200,
+      );
+    }
+
+    const avs: any[] = Array.isArray(j?.availabilities) ? j.availabilities : [];
+    const { days, totalSlots } = groupByDay(avs);
+
+    return okJson({
+      ok: true,
+      company,
+      item: Number(item),
+      start,
+      end,
+      days,
+      totalSlots,
+      count: avs.length,
+    });
+  } catch (e: any) {
+    return okJson(
+      { ok: false, error: "Calendar route failed", detail: String(e?.message || e) },
+      200,
+    );
+  }
 }

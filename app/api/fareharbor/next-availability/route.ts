@@ -1,108 +1,92 @@
 import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+function pickEarliestStartAt(payload: any): string | null {
+  // Support a few possible shapes:
+  // - array of slots
+  // - { availabilities: [...] }
+  // - { results: [...] }
+  const list =
+    Array.isArray(payload) ? payload :
+    Array.isArray(payload?.availabilities) ? payload.availabilities :
+    Array.isArray(payload?.results) ? payload.results :
+    Array.isArray(payload?.data) ? payload.data :
+    [];
 
-function ymdUTC(d: Date) {
-  const yyyy = d.getUTCFullYear();
-  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const dd = String(d.getUTCDate()).padStart(2, "0");
-  return `${yyyy}-${mm}-${dd}`;
-}
+  let best: string | null = null;
 
-function addDaysUTC(d: Date, days: number) {
-  const x = new Date(d.getTime());
-  x.setUTCDate(x.getUTCDate() + days);
-  return x;
+  for (const x of list) {
+    const s =
+      x?.startAt ??
+      x?.start_at ??
+      x?.start ??
+      x?.availability?.startAt ??
+      null;
+
+    if (typeof s === "string" && s.length >= 10) {
+      if (!best || s < best) best = s;
+    }
+  }
+
+  return best;
 }
 
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const company = (url.searchParams.get("company") || "").trim();
-    const item = (url.searchParams.get("item") || "").trim();
-    const start = (url.searchParams.get("start") || "").trim();
+    const company = url.searchParams.get("company") || "";
+    const itemPk = ((url.searchParams.get("item") ?? url.searchParams.get("itemPk")) || "").trim();
 
-    const horizonDays = Number(url.searchParams.get("horizonDays") || 365);
-    const chunkDays = Number(url.searchParams.get("chunkDays") || 30);
-
-    if (!company)
+    if (!company || !itemPk) {
       return NextResponse.json(
-        { ok: false, error: "Missing ?company=" },
-        { status: 400 },
+        { startAt: null, error: "Missing company or item (or itemPk)" },
+        { status: 400 }
       );
-    if (!item)
-      return NextResponse.json(
-        { ok: false, error: "Missing ?item=" },
-        { status: 400 },
-      );
-
-    let cursor = start ? new Date(`${start}T00:00:00Z`) : new Date();
-    if (Number.isNaN(cursor.getTime())) cursor = new Date();
-
-    const endLimit = addDaysUTC(cursor, horizonDays);
-
-    while (cursor <= endLimit) {
-      const chunkEnd = addDaysUTC(cursor, chunkDays - 1);
-
-      const s = ymdUTC(cursor);
-      const e = ymdUTC(chunkEnd > endLimit ? endLimit : chunkEnd);
-
-      const r = await fetch(
-        `${url.origin}/api/fareharbor/availabilities?company=${encodeURIComponent(company)}&item=${encodeURIComponent(
-          item,
-        )}&start=${encodeURIComponent(s)}&end=${encodeURIComponent(e)}`,
-        { cache: "no-store" },
-      );
-
-      const j = await r.json();
-
-      const av = Array.isArray(j?.availabilities) ? j.availabilities : [];
-      if (av.length > 0) {
-        // choose earliest start_at / startAt
-        const withStart = av
-          .map((a: any) => ({
-            raw: a,
-            startAt:
-              a.start_at ||
-              a.startAt ||
-              a.start_time ||
-              a.start_datetime ||
-              null,
-          }))
-          .filter((x: any) => x.startAt);
-
-        withStart.sort((a: any, b: any) =>
-          String(a.startAt).localeCompare(String(b.startAt)),
-        );
-
-        return NextResponse.json({
-          ok: true,
-          company,
-          item: Number(item),
-          searched: { start: s, end: e },
-          next: withStart[0]?.raw || av[0],
-          count: av.length,
-          availabilities: av,
-        });
-      }
-
-      cursor = addDaysUTC(chunkEnd, 1);
     }
 
-    return NextResponse.json({
-      ok: true,
-      company,
-      item: Number(item),
-      searchedUntil: ymdUTC(endLimit),
-      next: null,
-      count: 0,
-      availabilities: [],
+    // Call OUR working availabilities endpoint on the same origin (works local + prod)
+    const origin = url.origin;
+
+    // Give it a decent window to find the next slot
+    const start = new Date();
+    const end = new Date();
+    end.setDate(end.getDate() + 90);
+
+    const fmt = (d: Date) => d.toISOString().slice(0, 10);
+
+    const qs = new URLSearchParams({
+      company: String(company),
+      item: String(itemPk),
+      start: fmt(start),
+      end: fmt(end),
     });
-  } catch (err: any) {
+
+    const res = await fetch(`${origin}/api/fareharbor/availabilities?${qs.toString()}`, {
+      // keep it fresh-ish
+      cache: "no-store",
+    });
+
+    const text = await res.text();
+    let json: any = null;
+    try { json = JSON.parse(text); } catch { json = text; }
+
+    if (!res.ok) {
+      return NextResponse.json(
+        {
+          startAt: null,
+          error: `Availabilities endpoint error ${res.status}`,
+          detail: json,
+        },
+        { status: 200 }
+      );
+    }
+
+    const startAt = pickEarliestStartAt(json);
+
+    return NextResponse.json({ startAt }, { status: 200 });
+  } catch (e: any) {
     return NextResponse.json(
-      { ok: false, error: err?.message || String(err) },
-      { status: 500 },
+      { startAt: null, error: "next-availability failed", detail: String(e?.message || e) },
+      { status: 200 }
     );
   }
 }

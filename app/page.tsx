@@ -1,54 +1,45 @@
 import Link from 'next/link';
-import { getToursFromFareHarbor } from '@/lib/data/tours';
 
-export default async function Home() {
-  // Fetch the 125 live tours from all 21 companies
-  const allTours = await getToursFromFareHarbor();
-
-  const ports = [
-    { 
-      name: 'Juneau', 
-      image: '🏔️', 
-      count: allTours.filter(t => t.port?.toLowerCase().includes('juneau') || t.fareharbor.company.includes('juneau')).length 
-    },
-    { 
-      name: 'Skagway', 
-      image: '🚂', 
-      count: allTours.filter(t => t.port?.toLowerCase().includes('skagway') || t.fareharbor.company.includes('skagway')).length 
-    },
-    { 
-      name: 'Ketchikan', 
-      image: '🌲', 
-      count: allTours.filter(t => t.port?.toLowerCase().includes('ketchikan') || t.fareharbor.company.includes('ketchikan')).length 
-    },
-  ];
-
+export default function HomePage() {
   return (
-    <main className="bg-white min-h-screen">
-      <section className="relative py-24 bg-[#0F172A] text-white text-center">
-        <div className="max-w-4xl mx-auto px-6">
-          <h1 className="text-6xl font-black tracking-tighter mb-6 uppercase leading-none">
-            Alaskan Shore <span className="text-blue-500">Excursions</span>
+    <main className="min-h-screen bg-white">
+      {/* HERO SECTION - NO ICONS */}
+      <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-slate-900">
+        <img 
+          src="/hero/hero5678.jpg" 
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
+          alt="Alaska Landscape"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-900/20 via-transparent to-white" />
+        
+        <div className="relative z-10 text-center px-6">
+          <h1 className="text-8xl font-black text-white uppercase tracking-tighter leading-none mb-6 drop-shadow-2xl">
+            Welcome <span className="text-blue-500">To</span> Alaska
           </h1>
-          <p className="text-xl text-slate-400 mb-10 font-medium">
-            Live Inventory from 21 Operators. 100% Back-to-Ship Guarantee.
+          <p className="text-2xl text-white font-bold uppercase tracking-widest mb-12 drop-shadow-lg">
+            Direct-To-Operator Port Excursions
           </p>
-          <div className="flex justify-center gap-4">
-            <Link href="/tours" className="bg-indigo-700 px-8 py-4 rounded-2xl font-black uppercase tracking-tight shadow-xl shadow-indigo-700/20 hover:bg-blue-500 transition-all">
-              Browse All {allTours.length} Tours
-            </Link>
-          </div>
+          <Link href="/tours" className="inline-block bg-blue-600 text-white px-12 py-5 rounded-full font-black text-xl uppercase tracking-tighter hover:bg-blue-700 transition-all shadow-2xl hover:scale-105">
+            View All Juneau Tours →
+          </Link>
         </div>
       </section>
 
-      <section className="max-w-7xl mx-auto px-6 py-20">
-        <h2 className="text-3xl font-black text-slate-900 mb-12 uppercase tracking-tighter text-center">Browse by Port</h2>
+      {/* PORT CATEGORIES - PHOTOGRAPHY DRIVEN */}
+      <section className="max-w-7xl mx-auto px-8 py-24">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {ports.map((port) => (
-            <Link key={port.name} href={`/tours?port=${port.name.toLowerCase()}`} className="group relative overflow-hidden rounded-3xl bg-slate-100 p-10 hover:bg-white hover:shadow-2xl transition-all border border-slate-200">
-              <span className="text-6xl mb-6 block">{port.image}</span>
-              <h3 className="text-2xl font-black text-slate-900 uppercase">{port.name}</h3>
-              <p className="text-slate-500 font-bold">{port.count} Tours Available →</p>
+          {[
+            { name: 'Juneau', img: '/hero/juneau.jpg' },
+            { name: 'Skagway', img: '/hero/skagway.jpg' },
+            { name: 'Ketchikan', img: '/hero/ketchikan.png' }
+          ].map((port) => (
+            <Link key={port.name} href={`/tours?port=${port.name.toLowerCase()}`} className="group relative aspect-[4/5] rounded-[40px] overflow-hidden shadow-2xl">
+              <img src={port.img} className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" alt={port.name} />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
+              <div className="absolute bottom-10 left-10">
+                <h3 className="text-4xl font-black text-white uppercase tracking-tighter">{port.name}</h3>
+                <p className="text-blue-400 font-bold uppercase text-xs tracking-widest mt-2">Explore Tours →</p>
+              </div>
             </Link>
           ))}
         </div>

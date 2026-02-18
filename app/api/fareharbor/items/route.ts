@@ -1,79 +1,42 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export async function GET() {
+  const companies = [
+    'beyondak', 'alaska-galore-juneau-whale-watching', 'akhummer', 
+    'alaskatales', 'aktraveladventures', 'exclusivealaska', 
+    'coastalhelicopters', 'dolphintours', 'moorecharters', 
+    'alaskarainforest', 'ketchikanadventurevue', 'akduck', 
+    'northstartrekking', 'kayakketchikan', 'skagwayscooters', 
+    'snorkelalaska', 'taquanair', 'temsco-summercamp-juneau', 
+    'temscoair-juneau', 'temscoair-skagway', 'wingsairways'
+  ];
 
-const BASE = "https://fareharbor.com/api/external/v1";
+  const appKey = process.env.FAREHARBOR_APP_KEY;
+  const userKey = process.env.FAREHARBOR_USER_KEY;
 
-function mustEnv(name: string) {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing env var: ${name}`);
-  return v;
-}
+  let allTours: any[] = [];
 
-export async function GET(req: Request) {
-  try {
-    const url = new URL(req.url);
-    const company = (
-      url.searchParams.get("company") ||
-      process.env.FAREHARBOR_COMPANY_SHORTNAME ||
-      ""
-    ).trim();
-
-    if (!company) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error:
-            "Missing ?company=SHORTNAME (or set FAREHARBOR_COMPANY_SHORTNAME)",
+  for (const shortname of companies) {
+    try {
+      const response = await fetch(`https://fareharbor.com/api/external/v1/companies/${shortname}/items/`, {
+        headers: {
+          'X-FareHarbor-API-App': appKey || '',
+          'X-FareHarbor-API-User': userKey || '',
         },
-        { status: 400 },
-      );
+        next: { revalidate: 0 } 
+      });
+      const data = await response.json();
+      if (data.items) {
+        const itemsWithPort = data.items.map((item: any) => ({ ...item, company: shortname }));
+        allTours = [...allTours, ...itemsWithPort];
+      }
+    } catch (error) {
+      console.error(`Error fetching ${shortname}:`, error);
     }
-
-    const APP = mustEnv("FAREHARBOR_APP_KEY");
-    const USER = mustEnv("FAREHARBOR_USER_KEY");
-
-    const fhUrl =
-      `${BASE}/companies/${encodeURIComponent(company)}/items/` +
-      `?detailed=yes&optimized=yes&require_future_availabilities=yes`;
-
-    const resp = await fetch(fhUrl, {
-      headers: {
-        "X-FareHarbor-API-App": APP,
-        "X-FareHarbor-API-User": USER,
-        Accept: "application/json",
-        // sometimes helps with picky WAFs:
-        "User-Agent": "wta-ui/1.0 (+welcometoalaskatours.com)",
-      },
-      cache: "no-store",
-    });
-
-    const text = await resp.text();
-
-    if (!resp.ok) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: `FareHarbor request failed ${resp.status} ${resp.statusText}`,
-          fhUrl,
-          bodyPreview: text.slice(0, 400),
-        },
-        { status: 500 },
-      );
-    }
-
-    const data = JSON.parse(text);
-    return NextResponse.json({
-      ok: true,
-      company,
-      count: (data.items ?? []).length,
-      items: data.items ?? [],
-    });
-  } catch (err: any) {
-    return NextResponse.json(
-      { ok: false, error: err?.message || String(err) },
-      { status: 500 },
-    );
   }
+
+  return NextResponse.json({ 
+    count: allTours.length, 
+    items: allTours 
+  });
 }

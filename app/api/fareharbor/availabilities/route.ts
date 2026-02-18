@@ -45,10 +45,10 @@ function daysBetweenInclusiveUTC(a: Date, b: Date) {
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const company = (url.searchParams.get("company") || "").trim();
-    const item = (url.searchParams.get("item") || "").trim();
-    let start = (url.searchParams.get("start") || "").trim();
-    let end = (url.searchParams.get("end") || "").trim();
+      const company = (url.searchParams.get("company") || "").trim();
+      const item = ((url.searchParams.get("item") ?? url.searchParams.get("itemPk")) || "").trim();
+      let start = (url.searchParams.get("start") || "").trim();
+      let end = (url.searchParams.get("end") || "").trim();
 
     if (!company) {
       return NextResponse.json(
