@@ -41,7 +41,7 @@ export default function AddToItineraryPanel({
         disabled={!when}
         onClick={() => {
           if (!when || !slot) return;
-          cart.add({
+          cart.addItem({
             company,
             itemPk,
             title,
@@ -51,7 +51,8 @@ export default function AddToItineraryPanel({
             startAt: slot.startAt,
             qty: 1,
           });
-        }}
+        cart.open();
+}}
         className="w-full rounded-2xl bg-slate-950 px-4 py-3 text-sm font-bold text-white disabled:opacity-40"
       >
         {when ? `Add to Itinerary (${when.date} · ${when.time})` : "Pick a time to add"}
