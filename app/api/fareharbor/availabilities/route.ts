@@ -85,10 +85,10 @@ export async function GET(req: Request) {
     const endD = parseYmdUTC(end);
 
     async function fetchChunk(sYmd: string, eYmd: string) {
-      const fhUrl =
-        `${BASE}/companies/${encodeURIComponent(company)}` +
+      const fhUrlBase = `${BASE}/companies/${encodeURIComponent(company)}` +
         `/items/${encodeURIComponent(item)}` +
         `/minimal/availabilities/date-range/${encodeURIComponent(sYmd)}/${encodeURIComponent(eYmd)}/`;
+        const fhUrl = fhUrlBase + `?api-user=${encodeURIComponent(USER)}`;
 
       const resp = await fetch(fhUrl, {
         headers: {
