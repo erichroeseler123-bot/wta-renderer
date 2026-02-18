@@ -76,8 +76,10 @@ export async function GET(req: Request) {
         ymdUTC(new Date(Date.UTC(e.getFullYear(), e.getMonth(), e.getDate())));
     }
 
-    const APP = mustEnv("FAREHARBOR_APP_KEY");
-    const USER = mustEnv("FAREHARBOR_USER_KEY");
+    const APP = (process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "");
+  if (!APP) throw new Error("Missing env var: FAREHARBOR_APP_KEY");
+    const USER = (process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "");
+  if (!USER) throw new Error("Missing env var: FAREHARBOR_USER_KEY");
 
     const startD = parseYmdUTC(start);
     const endD = parseYmdUTC(end);
