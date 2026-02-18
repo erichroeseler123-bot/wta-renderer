@@ -21,7 +21,7 @@ export async function GET() {
     const resp = await fetch(fhUrl, {
       headers: {
         "X-FareHarbor-API-App": APP,
-        "X-FareHarbor-API-User": USER,
+        "X-FareHarbor-API-Key": USER,
         Accept: "application/json",
         "User-Agent": "wta-ui/1.0 (+welcometoalaskatours.com)",
       },

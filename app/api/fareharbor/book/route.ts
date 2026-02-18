@@ -20,8 +20,8 @@ export async function POST(req: Request) {
     const response = await fetch(`https://fareharbor.com/api/external/v1/companies/${body.company}/bookings/`, {
       method: 'POST',
       headers: {
-        'X-FareHarbor-API-App': process.env.FH_APP_NAME,
-        'X-FareHarbor-API-Key': process.env.FH_API_KEY,
+        'X-FareHarbor-API-App': (process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME),
+        'X-FareHarbor-API-Key': (process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY),
         'Content-Type': 'application/json'
       },
       body: JSON.stringify(fhPayload)
