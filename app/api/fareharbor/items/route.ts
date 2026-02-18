@@ -21,7 +21,7 @@ export async function GET() {
       const response = await fetch(`https://fareharbor.com/api/external/v1/companies/${shortname}/items/`, {
         headers: {
           'X-FareHarbor-API-App': appKey || '',
-          'X-FareHarbor-API-Key': userKey || '',
+          'X-FareHarbor-API-User': userKey || '',
         },
         next: { revalidate: 0 } 
       });
