@@ -11,8 +11,8 @@ export async function GET() {
     'temscoair-juneau', 'temscoair-skagway', 'wingsairways'
   ];
 
-  const appKey = process.env.FAREHARBOR_APP_KEY;
-  const userKey = process.env.FAREHARBOR_USER_KEY;
+  const appKey = (process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "");
+  const userKey = (process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "");
 
   let allTours: any[] = [];
 
