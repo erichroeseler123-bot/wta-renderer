@@ -46,10 +46,7 @@ export default function AddToItineraryPanel({
             itemPk,
             title,
             image,
-            date: when.date,
-            time: when.time,
             startAt: slot.startAt,
-            qty: 1,
           });
         cart.open();
 }}
