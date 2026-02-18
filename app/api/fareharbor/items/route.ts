@@ -1,42 +1,100 @@
-import { NextResponse } from 'next/server';
+import { NextResponse } from "next/server";
 
-export async function GET() {
-  const companies = [
-    'beyondak', 'alaska-galore-juneau-whale-watching', 'akhummer', 
-    'alaskatales', 'aktraveladventures', 'exclusivealaska', 
-    'coastalhelicopters', 'dolphintours', 'moorecharters', 
-    'alaskarainforest', 'ketchikanadventurevue', 'akduck', 
-    'northstartrekking', 'kayakketchikan', 'skagwayscooters', 
-    'snorkelalaska', 'taquanair', 'temsco-summercamp-juneau', 
-    'temscoair-juneau', 'temscoair-skagway', 'wingsairways'
-  ];
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-  const appKey = (process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "");
-  const userKey = (process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "");
+const BASE = "https://fareharbor.com/api/external/v1";
 
-  let allTours: any[] = [];
+function splitCompanies(v: string) {
+  return v
+    .split(/[,\s]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
 
-  for (const shortname of companies) {
-    try {
-      const response = await fetch(`https://fareharbor.com/api/external/v1/companies/${shortname}/items/`, {
-        headers: {
-          'X-FareHarbor-API-App': appKey || '',
-          'X-FareHarbor-API-User': userKey || '',
+function mustEnv(name: string) {
+  const v = process.env[name];
+  if (!v) throw new Error(`Missing env var: ${name}`);
+  return v;
+}
+
+export async function GET(req: Request) {
+  try {
+    const url = new URL(req.url);
+
+    const APP = process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "";
+    const USER = process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "";
+    if (!APP) throw new Error("Missing env var: FAREHARBOR_APP_KEY");
+    if (!USER) throw new Error("Missing env var: FAREHARBOR_USER_KEY");
+
+    // If caller passes ?company=, just use that.
+    // Otherwise default to env-configured company/companies.
+    const companyParam = (url.searchParams.get("company") || "").trim();
+    const envCompanies = splitCompanies(
+      process.env.FAREHARBOR_COMPANY_SHORTNAME ??
+        process.env.FAREHARBOR_COMPANY ??
+        ""
+    );
+
+    const companies = companyParam ? [companyParam] : envCompanies;
+
+    if (!companies.length) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error:
+            "No companies configured. Set FAREHARBOR_COMPANY_SHORTNAME (or pass ?company=SHORTNAME).",
         },
-        next: { revalidate: 0 } 
-      });
-      const data = await response.json();
-      if (data.items) {
-        const itemsWithPort = data.items.map((item: any) => ({ ...item, company: shortname }));
-        allTours = [...allTours, ...itemsWithPort];
-      }
-    } catch (error) {
-      console.error(`Error fetching ${shortname}:`, error);
+        { status: 400 }
+      );
     }
-  }
 
-  return NextResponse.json({ 
-    count: allTours.length, 
-    items: allTours 
-  });
+    const results: any[] = [];
+    const errors: any[] = [];
+
+    for (const shortname of companies) {
+      const fhUrl = `${BASE}/companies/${encodeURIComponent(shortname)}/items/?api-user=${encodeURIComponent(USER)}`;
+
+      const resp = await fetch(fhUrl, {
+        headers: {
+          "X-FareHarbor-API-App": APP,
+          "X-FareHarbor-API-User": USER,
+          Accept: "application/json",
+          "User-Agent": "wta-ui/1.0 (+welcometoalaskatours.com)",
+        },
+        cache: "no-store",
+      });
+
+      const text = await resp.text();
+
+      if (!resp.ok) {
+        errors.push({
+          company: shortname,
+          status: resp.status,
+          statusText: resp.statusText,
+          fhUrl,
+          bodyPreview: text.slice(0, 500),
+        });
+        continue;
+      }
+
+      const data = JSON.parse(text);
+      const items = Array.isArray(data?.items) ? data.items : [];
+      for (const it of items) results.push({ ...it, company: shortname });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      count: results.length,
+      companies,
+      items: results,
+      errorsCount: errors.length,
+      errors: errors.slice(0, 20), // cap
+    });
+  } catch (err: any) {
+    return NextResponse.json(
+      { ok: false, error: err?.message || String(err) },
+      { status: 500 }
+    );
+  }
 }
