@@ -1,5 +1,6 @@
 "use client";
 
+import type React from "react";
 import { useMemo, useState } from "react";
 import { useCart } from "@/app/components/cart/CartContext";
 
@@ -19,7 +20,7 @@ export default function AddToItineraryPanel({
   itemPk: number;
   title: string;
   image?: string;
-  Calendar: (props: { company: string; item: number; onPickSlot: (slot: Slot) => void }) => JSX.Element;
+  Calendar: (props: { company: string; item: number; onPickSlot: (slot: Slot) => void }) => React.ReactElement;
 }) {
   const cart = useCart();
   const [slot, setSlot] = useState<Slot | null>(null);
