@@ -1,129 +1,88 @@
 import { NextResponse } from "next/server";
 
-export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
-
-const FH_BASE = "https://fareharbor.com/api/external/v1";
-
 function jsonError(message: string, status = 400, extra?: any) {
-  return NextResponse.json({ success: false, message, ...(extra ?? {}) }, { status });
+  return NextResponse.json({ success: false, error: message, ...extra }, { status });
 }
-
-type BookReq = {
-  company: string; // shortname, e.g. "beyondak"
-  availabilityPk: number;
-  contact: { name: string; email: string; phone?: string };
-  lines: Array<{ customerTypeRatePk: number; qty: number }>;
-  note?: string;
-  externalId?: string;
-};
 
 export async function POST(req: Request) {
   try {
-    const FH_APP_KEY =
-      process.env.FAREHARBOR_APP_KEY ||
-      process.env.FH_APP_KEY ||
-      process.env.FH_APP_NAME;
-
-    const FH_USER_KEY =
-      process.env.FAREHARBOR_USER_KEY ||
-      process.env.FH_USER_KEY ||
-      process.env.FH_API_KEY;
-
-    if (!FH_APP_KEY || !FH_USER_KEY) {
-      return jsonError(
-        "FareHarbor keys not configured on server (need FAREHARBOR_APP_KEY + FAREHARBOR_USER_KEY).",
-        500
-      );
+    // ---- INTERNAL-ONLY GUARD ----
+    const internal = req.headers.get("x-wta-internal");
+    const secret = String(process.env.WTA_INTERNAL_SECRET || "");
+    if (!secret || internal !== secret) {
+      return jsonError("Unauthorized (internal only).", 403);
     }
 
-    const body = (await req.json()) as Partial<BookReq>;
-
-    // ---- accept old payload shape too (your current vercel curl) ----
-    const company = String(body.company ?? "").trim();
-    const availabilityPk = Number(
-      (body as any).availabilityPk ?? (body as any).availability_pk ?? 0
-    );
-
-    // old shape: customer_type_rate_pk + qty (single line)
-    const oldRatePk = Number((body as any).customer_type_rate_pk ?? (body as any).customerTypeRatePk ?? 0);
-    const oldQty = Number((body as any).qty ?? 0);
-
-    const contact = (body as any).contact ?? (body as any).customer ?? null;
-
-    let lines = Array.isArray((body as any).lines) ? (body as any).lines : null;
-    if (!lines && Number.isFinite(oldRatePk) && oldRatePk > 0 && Number.isFinite(oldQty) && oldQty > 0) {
-      lines = [{ customerTypeRatePk: oldRatePk, qty: oldQty }];
+    // ---- SAFETY SWITCH ----
+    const enabled = String(process.env.FH_BOOKINGS_ENABLED || "0") === "1";
+    if (!enabled) {
+      return jsonError("Bookings are disabled (FH_BOOKINGS_ENABLED=0). Safety lock.", 409);
     }
 
-    if (!company) return jsonError("Missing company");
-    if (!Number.isFinite(availabilityPk) || availabilityPk <= 0) return jsonError("Invalid availabilityPk");
-    if (!contact?.name || !contact?.email) return jsonError("Missing contact.name or contact.email");
-    if (!Array.isArray(lines) || !lines.length) return jsonError("Missing lines[]");
+    const body = await req.json();
 
-    // ---- Build FH customers[] payload ----
-    const customers: Array<{ customer_type_rate: number }> = [];
-    for (const ln of lines) {
-      const pk = Number(ln.customerTypeRatePk ?? (ln as any).customer_type_rate_pk);
-      const qty = Number(ln.qty);
-      if (!Number.isFinite(pk) || pk <= 0) return jsonError("Invalid customerTypeRatePk in lines[]");
-      if (!Number.isFinite(qty) || qty <= 0 || qty > 50) return jsonError("Invalid qty in lines[]");
-      for (let i = 0; i < qty; i++) customers.push({ customer_type_rate: pk });
+    // Required fields (from webhook snapshot)
+    const company = String(body?.company || "");
+    const availability_pk = Number(body?.availability_pk || 0);
+    const customer_type_rate_pk = Number(body?.customer_type_rate_pk || 0);
+    const qty = Number(body?.qty || 0);
+
+    const contact = body?.contact || {};
+    const name = String(contact?.name || "");
+    const email = String(contact?.email || "");
+    const phone = String(contact?.phone || "");
+
+    const note = String(body?.note || "");
+    const amount_paid = Number(body?.amount_paid || 0); // cents, optional (try it)
+
+    if (!company || !availability_pk || !customer_type_rate_pk || qty <= 0) {
+      return jsonError("Missing company, availability_pk, customer_type_rate_pk, or qty.", 400);
     }
+    if (!name || !email) return jsonError("Missing contact.name or contact.email.", 400);
 
     const fhPayload: any = {
-      contact: {
-        name: String(contact.name),
-        email: String(contact.email),
-        phone: contact.phone ? String(contact.phone) : "",
-      },
-      customers,
+      voucher_number: `WTA-${Date.now()}`,
+      // If you are MoR, FH should consider this booking paid/collected by affiliate.
+      // Some FH setups accept amount_paid; some accept is_paid. We'll send both.
+      is_paid: true,
+      contact: { name, email, phone },
+      availability_pk,
+      customer_type_rates: [{ pk: customer_type_rate_pk, quantity: qty }],
+      note: note || "Booking via WTA (Stripe paid)",
     };
 
-    if ((body as any).note) fhPayload.note = String((body as any).note);
-    if ((body as any).externalId) fhPayload.external_id = String((body as any).externalId);
-
-    // Correct endpoint for booking from a specific availability:
-    const url = `${FH_BASE}/companies/${encodeURIComponent(
-      company
-    )}/availabilities/${encodeURIComponent(String(availabilityPk))}/bookings/`;
-
-    const fhRes = await fetch(url, {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-        "X-FareHarbor-API-App": FH_APP_KEY,
-        "X-FareHarbor-API-User": FH_USER_KEY,
-      },
-      body: JSON.stringify(fhPayload),
-    });
-
-    const text = await fhRes.text();
-    let data: any = null;
-    try {
-      data = text ? JSON.parse(text) : null;
-    } catch {
-      data = { raw: text };
+    // Try to pass amount_paid if provided (line total cents)
+    if (Number.isFinite(amount_paid) && amount_paid > 0) {
+      fhPayload.amount_paid = Math.floor(amount_paid);
     }
 
-    if (!fhRes.ok) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "FareHarbor booking failed",
-          status: fhRes.status,
-          fareharbor: data,
+    const appKey = String(process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "");
+    const userKey = String(process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "");
+    if (!appKey || !userKey) {
+      return jsonError("Missing FareHarbor API credentials in env.", 500);
+    }
+
+    const response = await fetch(
+      `https://fareharbor.com/api/external/v1/companies/${company}/bookings/`,
+      {
+        method: "POST",
+        headers: {
+          "X-FareHarbor-API-App": appKey,
+          "X-FareHarbor-API-User": userKey,
+          "Content-Type": "application/json",
         },
-        { status: 502 }
-      );
+        body: JSON.stringify(fhPayload),
+      },
+    );
+
+    const result = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      return jsonError("FareHarbor booking failed", 502, { details: result });
     }
 
-    return NextResponse.json({ success: true, booking: data }, { status: 200 });
-  } catch (err: any) {
-    return NextResponse.json(
-      { success: false, message: err?.message || "Server error" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: true, booking: result });
+  } catch (e: any) {
+    return jsonError("Booking route crashed", 500, { details: String(e?.message || e) });
   }
 }

@@ -1,49 +1,91 @@
 "use client";
-import Link from 'next/link';
-import { useCruise } from '@/context/CruiseContext';
+
+import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 
 export default function SuccessPage() {
-  const { ship, date } = useCruise();
-  const voucherNum = `WTA-${Date.now().toString().slice(-6)}`;
+  const [data, setData] = useState<any>(null);
+  const [err, setErr] = useState<string | null>(null);
+
+  const pi = useMemo(() => {
+    if (typeof window === "undefined") return "";
+    const u = new URL(window.location.href);
+    return u.searchParams.get("payment_intent") || "";
+  }, []);
+
+  useEffect(() => {
+    if (!pi) return;
+
+    let stop = false;
+    async function poll() {
+      try {
+        const r = await fetch(`/api/receipt?pi=${encodeURIComponent(pi)}`, { cache: "no-store" });
+        const j = await r.json();
+        if (stop) return;
+        setData(j);
+        if (j?.status === "pending") {
+          setTimeout(poll, 1500);
+        }
+      } catch (e: any) {
+        if (!stop) setErr(String(e?.message || e));
+      }
+    }
+    poll();
+    return () => {
+      stop = true;
+    };
+  }, [pi]);
 
   return (
-    <main className="min-h-screen bg-white flex items-center justify-center p-6 text-slate-900">
-      <div className="max-w-xl w-full text-center space-y-8">
-        <div className="inline-flex items-center justify-center w-24 h-24 bg-green-100 rounded-full text-green-600 text-5xl mb-4">
-          ✓
-        </div>
-        
-        <div className="space-y-2">
-          <h1 className="text-5xl font-black uppercase tracking-tighter italic">Booking Confirmed!</h1>
-          <p className="text-slate-500 font-bold uppercase tracking-widest text-sm">Pack your bags, you're going to Alaska.</p>
-        </div>
+    <div className="max-w-3xl mx-auto p-8">
+      <h1 className="text-3xl font-black mb-2">Payment received</h1>
+      <p className="text-slate-600 mb-6">We’re confirming bookings now.</p>
 
-        <div className="bg-slate-50 rounded-3xl p-8 border border-slate-100 space-y-4">
-          <div className="flex justify-between border-b border-slate-200 pb-4">
-            <span className="text-xs font-bold text-slate-400 uppercase">Voucher ID</span>
-            <span className="font-mono font-bold text-indigo-700">{voucherNum}</span>
-          </div>
-          {ship && (
-            <div className="flex justify-between">
-              <span className="text-xs font-bold text-slate-400 uppercase">Verified Ship</span>
-              <span className="font-bold">{ship}</span>
-            </div>
-          )}
-        </div>
+      {!pi ? (
+        <div className="text-red-600 font-semibold">Missing payment_intent in URL.</div>
+      ) : null}
 
-        <div className="p-6 bg-blue-50 rounded-2xl border border-blue-100 text-left">
-          <p className="text-blue-800 font-black uppercase text-[10px] mb-2 tracking-widest">Next Steps</p>
-          <ul className="text-sm text-blue-900 space-y-2 font-medium">
-            <li>• Check your email for detailed meeting instructions.</li>
-            <li>• Your 100% Back-to-Ship Guarantee is now active.</li>
-            <li>• We have notified the local operators of your arrival.</li>
-          </ul>
-        </div>
+      {err ? <div className="text-red-600 font-semibold">{err}</div> : null}
 
-        <Link href="/" className="block w-full bg-[#0F172A] text-white py-5 rounded-2xl font-black uppercase tracking-widest hover:bg-slate-800 transition-all">
-          Back to Home
-        </Link>
+      <div className="rounded-2xl border p-4 bg-white">
+        <div className="text-xs text-slate-500 mb-2">PaymentIntent</div>
+        <div className="font-mono text-sm break-all">{pi}</div>
+        <div className="mt-3 font-bold">
+          Status: <span className="uppercase">{data?.status || "pending"}</span>
+        </div>
       </div>
-    </main>
+
+      {data?.results?.length ? (
+        <div className="mt-6 space-y-3">
+          {data.results.map((r: any, idx: number) => (
+            <div key={idx} className="rounded-2xl border p-4 bg-white">
+              <div className="font-bold">
+                {r?.line?.title || "Tour"} — qty {r?.line?.qty}
+              </div>
+              <div className="text-sm text-slate-600">
+                {r?.line?.company} — {r?.line?.startAt || ""}
+              </div>
+              {r.ok ? (
+                <div className="mt-2 text-green-700 font-semibold">
+                  Booked ✓ {r?.booking?.display_id || r?.booking?.uuid || r?.booking?.pk || ""}
+                </div>
+              ) : (
+                <div className="mt-2 text-red-700 font-semibold">
+                  Failed ✕ {r?.error || "Booking failed"}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="mt-6 text-slate-600">
+          {data?.status === "pending" ? "Working…" : "No booking results yet."}
+        </div>
+      )}
+
+      <div className="mt-8">
+        <Link href="/tours" className="text-blue-700 font-bold">← Back to tours</Link>
+      </div>
+    </div>
   );
 }

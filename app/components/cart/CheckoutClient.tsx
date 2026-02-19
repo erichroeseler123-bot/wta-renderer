@@ -1,90 +1,126 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
+import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "./CartContext";
 
-function money(cents?: number) {
-  const n = Number(cents || 0);
-  return `$${(n / 100).toFixed(2)}`;
-}
+export default function CheckoutClient() {
+  const { items } = useCart();
+  const stripe = useStripe();
+  const elements = useElements();
 
-export default function CheckoutClient({ disabled }: { disabled?: boolean }) {
-  const { items, clear } = useCart();
-  const [working, setWorking] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
 
-  const missingSelection = useMemo(() => {
-    return (items || []).some((it: any) => !it.availabilityPk || !it.startAt);
+  // basic contact fields (you can replace with your own form)
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+
+  const payloadItems = useMemo(() => {
+    return (items || []).map((it: any) => ({
+      company: it.company,
+      itemPk: it.itemPk,
+      availabilityPk: it.availabilityPk,
+      ratePk: it.ratePk,
+      qty: it.qty,
+      title: it.title,
+      startAt: it.startAt,
+    }));
   }, [items]);
 
-  const totalCents = useMemo(() => {
-    return (items || []).reduce((acc: number, it: any) => {
-      const price = Number(it.price || 0);
-      const qty = Number(it.qty || 1);
-      return acc + price * qty;
-    }, 0);
-  }, [items]);
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
 
-  async function go() {
-    if (disabled) {
-      alert("Demo mode: checkout is disabled. This preview shows tour selection + itinerary cart only.");
-      return;
-    }
-    if (missingSelection) return;
+    if (!stripe || !elements) return;
+    if (!payloadItems.length) return setErr("Cart is empty.");
+    if (!name || !email) return setErr("Please enter name + email.");
 
-    setWorking(true);
+    setLoading(true);
     try {
-      // DEMO SAFE:
-      // No payments, no FareHarbor booking creation, no inventory consumption.
-      alert("Demo mode: this would proceed to payment + booking confirmation. (No charge / no booking in this preview.)");
+      // 1) Create PI from server-truth totals + snapshot
+      const r = await fetch("/api/stripe/create-intent", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          items: payloadItems,
+          contact: { name, email, phone },
+        }),
+      });
+      const j = await r.json();
+      if (!r.ok || !j?.success) throw new Error(j?.error || "Create intent failed");
 
-      // Optional: clear the cart to simulate an action, or leave it for demo review.
-      // clear();
-    } finally {
-      setWorking(false);
+      const clientSecret = j.client_secret as string;
+
+      // 2) Confirm payment (keeps user on your site)
+      const { error } = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          return_url: `${window.location.origin}/checkout/success`,
+        },
+      });
+
+      if (error) throw new Error(error.message || "Payment failed");
+    } catch (e: any) {
+      setErr(String(e?.message || e));
+      setLoading(false);
     }
   }
 
   return (
-    <div className="space-y-3">
-      <div className="rounded-2xl border border-white/10 bg-slate-900/40 p-4">
-        <div className="text-xs text-white/60">Order total</div>
-        <div className="mt-1 text-2xl font-black text-white">{money(totalCents)}</div>
-        <div className="mt-1 text-[11px] text-white/60">
-          Total is based on the selected departure time’s FareHarbor rate (when available).
-        </div>
+    <div className="max-w-2xl mx-auto p-6">
+      <h1 className="text-3xl font-black mb-2">Checkout</h1>
+      <p className="text-slate-600 mb-6">Complete payment to lock in your bookings.</p>
+
+      <div className="mb-6 rounded-2xl border p-4 bg-white">
+        <div className="font-bold mb-2">Cart ({payloadItems.length})</div>
+        <ul className="text-sm text-slate-700 space-y-1">
+          {payloadItems.map((it: any, idx: number) => (
+            <li key={idx}>
+              {it.title || "Tour"} — {it.company} — qty {it.qty}
+            </li>
+          ))}
+        </ul>
       </div>
 
-      {missingSelection ? (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-sm text-amber-200">
-          One or more items are missing a departure time. Go back and pick a time.
-          <div className="mt-2">
-            <Link href="/tours" className="underline text-amber-100 hover:text-white">
-              Back to tours →
-            </Link>
-          </div>
+      <form onSubmit={onSubmit} className="space-y-4">
+        <div className="grid gap-3">
+          <input
+            className="w-full rounded-xl border px-3 py-2"
+            placeholder="Full name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <input
+            className="w-full rounded-xl border px-3 py-2"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+          <input
+            className="w-full rounded-xl border px-3 py-2"
+            placeholder="Phone (optional)"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
         </div>
-      ) : null}
 
-      <button
-        type="button"
-        onClick={go}
-        disabled={working || missingSelection || !items?.length}
-        className={[
-          "w-full rounded-2xl px-5 py-4 text-base font-black shadow-xl transition",
-          working
-            ? "bg-slate-600 text-white/80 cursor-wait"
-            : missingSelection || !items?.length
-              ? "bg-slate-300 text-slate-600 cursor-not-allowed"
-              : "bg-indigo-700 text-white hover:bg-indigo-800",
-        ].join(" ")}
-      >
-        {working ? "Processing…" : disabled ? "Checkout (Demo)" : "Checkout"}
-      </button>
+        <div className="rounded-2xl border p-4 bg-white">
+          <PaymentElement />
+        </div>
 
-      <div className="text-[11px] text-white/60">
-        Demo preview only — no payment collected and no booking is created.
-      </div>
+        {err ? <div className="text-red-600 font-semibold">{err}</div> : null}
+
+        <button
+          type="submit"
+          disabled={!stripe || !elements || loading}
+          className="w-full rounded-2xl bg-blue-600 text-white font-black py-3 disabled:opacity-60"
+        >
+          {loading ? "Processing…" : "Pay & Book"}
+        </button>
+      </form>
     </div>
   );
 }
