@@ -3,7 +3,6 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { useCruise } from '@/context/CruiseContext';
 import ShipPicker from './ShipPicker';
-import CartDrawer from "../../app/components/cart/CartDrawer";
 import CartDrawer from "@/app/components/cart/CartDrawer";
 import CartButton from "@/app/components/cart/CartButton";
 
