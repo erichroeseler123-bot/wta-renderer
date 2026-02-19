@@ -31,7 +31,7 @@ export type CartItem = {
   lineCents?: number; // cents = unitCents * qty
 
   qty: number;
-};
+  };
 
 type CartState = {
   items: CartItem[];

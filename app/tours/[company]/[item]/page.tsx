@@ -81,14 +81,12 @@ const { addItem, setSelection, open } = useCart();
   }, [selection?.priceCents, tour?.fromPrice]);
 
   function addToItinerary() {
-      console.log("ADD CLICKED", { company, itemPk, selection });
-      alert("ADD CLICKED");
     if (!tour) return;
     if (!itemPk) {
       alert("This tour is missing an itemPk.");
       return;
     }
-    if (!selection?.availabilityPk || !selection?.startAt) {
+    if (!selection?.availabilityPk || !selection?.startAt || !selection?.ratePk || !selection?.qty) {
       alert("Pick a time first.");
       return;
     }
@@ -106,7 +104,8 @@ const { addItem, setSelection, open } = useCart();
         availabilityPk: selection.availabilityPk,
         startAt: selection.startAt,
         price: typeof selection.priceCents === "number" ? selection.priceCents : undefined,
-      },
+        ratePk: selection.ratePk,
+        rateLabel: selection.rateLabel,},
       1,
     );
 
@@ -115,7 +114,8 @@ const { addItem, setSelection, open } = useCart();
       availabilityPk: selection.availabilityPk,
       startAt: selection.startAt,
       price: typeof selection.priceCents === "number" ? selection.priceCents : undefined,
-    });
+        ratePk: selection.ratePk,
+        rateLabel: selection.rateLabel,});
 
     open();
   }

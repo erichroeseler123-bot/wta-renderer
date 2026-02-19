@@ -7,16 +7,54 @@ export type DepartureSelection = {
   availabilityPk: number;
   startAt: string;
   priceCents?: number;
+
+  // NEW
+  ratePk: number;
+  rateLabel?: string;
+  qty: number;
+};
+
+type Slot = {
+  availabilityPk: number;
+  startAt: string;
+  priceCents?: number;
 };
 
 type Props = {
-  selectedDay: string | null;                 // YYYY-MM-DD
+  selectedDay: string | null; // YYYY-MM-DD
   setSelectedDay: (day: string | null) => void;
   company: string;
   itemPk: number;
 
   onPickSelection: (sel: DepartureSelection) => void;
 };
+
+function pickRateFromSlot(slot: Slot): { ratePk: number; rateLabel?: string } | null {
+  // AvailabilityCalendar's Slot type doesn't include rates yet.
+  // So we read optional fields via `as any` without breaking TS for startAt/availabilityPk.
+  const s: any = slot;
+
+  // If AvailabilityCalendar flattens these:
+  if (Number.isFinite(Number(s?.ratePk)) && Number(s.ratePk) > 0) {
+    return { ratePk: Number(s.ratePk), rateLabel: s?.rateLabel ?? undefined };
+  }
+  if (Number.isFinite(Number(s?.customer_type_rate_pk)) && Number(s.customer_type_rate_pk) > 0) {
+    return { ratePk: Number(s.customer_type_rate_pk), rateLabel: s?.rateLabel ?? undefined };
+  }
+
+  // If AvailabilityCalendar passes through FH's customer_type_rates:
+  const rates = s?.customer_type_rates;
+  if (Array.isArray(rates) && rates.length) {
+    const r0 = rates[0];
+    const pk = Number(r0?.pk ?? 0);
+    if (Number.isFinite(pk) && pk > 0) {
+      const label = r0?.customer_type?.name ?? r0?.name ?? undefined;
+      return { ratePk: pk, rateLabel: label };
+    }
+  }
+
+  return null;
+}
 
 export default function ProductDepartureCalendar({
   selectedDay,
@@ -79,12 +117,22 @@ export default function ProductDepartureCalendar({
         item={itemPk}
         selectedDayExternal={selectedDay}
         onPickDay={(day) => setSelectedDay(day)}
-        onPickSlot={(slot) => {
+        onPickSlot={(slot: Slot) => {
+          // Slot is typed: only startAt/availabilityPk/priceCents exist.
           setSelectedDay(slot.startAt.slice(0, 10));
+
+          const rate = pickRateFromSlot(slot);
+          // If we can't extract a ratePk yet, we still set a selection with a sentinel ratePk=0?
+          // Better: do nothing so the UI forces us to wire ratePk properly.
+          if (!rate) return;
+
           onPickSelection({
             availabilityPk: slot.availabilityPk,
             startAt: slot.startAt,
             priceCents: slot.priceCents,
+            ratePk: rate.ratePk,
+            rateLabel: rate.rateLabel,
+            qty: 1,
           });
         }}
       />

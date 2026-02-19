@@ -21,6 +21,8 @@ type Slot = {
   startAt?: string;
   capacity?: number | null;
   customer_type_rates?: Rate[] | any[];
+  ratePk?: number;
+  rateLabel?: string;
 };
 
 type Day = {
