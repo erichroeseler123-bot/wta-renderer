@@ -27,6 +27,56 @@ export const CRUISE_SHIPS = [
 ] as const;
 
 export type CruiseShipName = (typeof CRUISE_SHIPS)[number];
+export type CruiseLineName =
+  | "Celebrity Cruises"
+  | "Holland America Line"
+  | "Norwegian Cruise Line"
+  | "Oceania Cruises"
+  | "Princess Cruises"
+  | "Regent Seven Seas Cruises"
+  | "Royal Caribbean"
+  | "Silversea Cruises"
+  | "Windstar Cruises";
+
+export const CRUISE_SHIP_LINES: Record<CruiseShipName, CruiseLineName> = {
+  "Celebrity Edge": "Celebrity Cruises",
+  "Celebrity Millennium": "Celebrity Cruises",
+  "Coral Princess": "Princess Cruises",
+  "Crown Princess": "Princess Cruises",
+  "Discovery Princess": "Princess Cruises",
+  Eurodam: "Holland America Line",
+  "Grand Princess": "Princess Cruises",
+  Koningsdam: "Holland America Line",
+  "Nieuw Amsterdam": "Holland America Line",
+  Noordam: "Holland America Line",
+  "Norwegian Bliss": "Norwegian Cruise Line",
+  "Norwegian Encore": "Norwegian Cruise Line",
+  "Norwegian Jade": "Norwegian Cruise Line",
+  "Ovation of the Seas": "Royal Caribbean",
+  "Quantum of the Seas": "Royal Caribbean",
+  "Radiance of the Seas": "Royal Caribbean",
+  Regatta: "Oceania Cruises",
+  "Ruby Princess": "Princess Cruises",
+  "Seven Seas Explorer": "Regent Seven Seas Cruises",
+  "Seven Seas Mariner": "Regent Seven Seas Cruises",
+  "Silver Moon": "Silversea Cruises",
+  "Silver Muse": "Silversea Cruises",
+  "Star Breeze": "Windstar Cruises",
+  Westerdam: "Holland America Line",
+  Zaandam: "Holland America Line",
+};
+
+export const CRUISE_LINES: CruiseLineName[] = [
+  "Celebrity Cruises",
+  "Holland America Line",
+  "Norwegian Cruise Line",
+  "Oceania Cruises",
+  "Princess Cruises",
+  "Regent Seven Seas Cruises",
+  "Royal Caribbean",
+  "Silversea Cruises",
+  "Windstar Cruises",
+];
 
 type CruisePlanHint = {
   portSlug: string;
@@ -71,4 +121,12 @@ export function getFirstSailingDateForShip(ship: string): string {
   const hint = CRUISE_ITINERARY_HINTS[ship as CruiseShipName];
   if (!hint?.departurePort) return "";
   return FIRST_SAILING_BY_DEPARTURE_PORT[hint.departurePort] || "";
+}
+
+export function getCruiseLineForShip(ship: string): CruiseLineName | "" {
+  return CRUISE_SHIP_LINES[ship as CruiseShipName] || "";
+}
+
+export function getShipsForCruiseLine(line: string): CruiseShipName[] {
+  return CRUISE_SHIPS.filter((ship) => CRUISE_SHIP_LINES[ship] === line);
 }

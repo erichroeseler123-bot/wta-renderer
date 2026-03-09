@@ -6,9 +6,11 @@ import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { useCruise } from "@/context/CruiseContext";
 import { useCart } from "@/app/components/cart/CartContext";
 import {
+  CRUISE_LINES,
   CRUISE_ITINERARY_HINTS,
-  CRUISE_SHIPS,
+  getCruiseLineForShip,
   getFirstSailingDateForShip,
+  getShipsForCruiseLine,
 } from "@/lib/cruiseShips";
 
 type Tour = {
@@ -26,8 +28,6 @@ type MatchState = {
   status: "checking" | "match" | "no_match" | "error";
   firstStartAt?: string;
 };
-
-const SHIP_OPTIONS = CRUISE_SHIPS;
 
 function normalize(s: string) {
   return String(s || "").trim().toLowerCase();
@@ -62,6 +62,7 @@ export default function ToursPage() {
   const [manualCat, setManualCat] = useState<string | null>(null);
   const [loadingTours, setLoadingTours] = useState(true);
   const [fitScheduleOnly, setFitScheduleOnly] = useState(true);
+  const [lineInput, setLineInput] = useState("");
   const [shipInput, setShipInput] = useState("");
   const [planInitialized, setPlanInitialized] = useState(false);
   const [matchMap, setMatchMap] = useState<Record<string, MatchState>>({});
@@ -92,6 +93,9 @@ export default function ToursPage() {
 
   useEffect(() => {
     if (!loaded || planInitialized) return;
+    const nextShip = ship || "";
+    const nextLine = nextShip ? getCruiseLineForShip(nextShip) : "";
+    setLineInput(nextLine);
     setShipInput(ship || "");
     setFitScheduleOnly(Boolean(ship && getFirstSailingDateForShip(ship)));
     setPlanInitialized(true);
@@ -140,6 +144,11 @@ export default function ToursPage() {
 
   const effectiveDate = shipInput ? getFirstSailingDateForShip(shipInput) : "";
   const profileComplete = Boolean(shipInput && effectiveDate);
+  const selectedLine = lineInput || (shipInput ? getCruiseLineForShip(shipInput) : "");
+  const shipOptions = useMemo(
+    () => (selectedLine ? getShipsForCruiseLine(selectedLine) : []),
+    [selectedLine],
+  );
   const itineraryHint = CRUISE_ITINERARY_HINTS[shipInput as keyof typeof CRUISE_ITINERARY_HINTS];
   const itineraryPort = normalize(itineraryHint?.portSlug || "");
   const dateKeyFor = useCallback(
@@ -235,14 +244,31 @@ export default function ToursPage() {
             <div className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Cruise Day Planner</div>
             <div className="flex flex-col gap-3 md:flex-row md:items-end">
               <div className="flex-1">
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Cruise Ship</label>
+                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Cruise Line</label>
                 <select
-                  value={shipInput}
-                  onChange={(e) => setShipInput(e.target.value)}
+                  value={selectedLine}
+                  onChange={(e) => {
+                    setLineInput(e.target.value);
+                    setShipInput("");
+                  }}
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
                 >
-                  <option value="">Select your ship...</option>
-                  {SHIP_OPTIONS.map((v) => (
+                  <option value="">Select your cruise line...</option>
+                  {CRUISE_LINES.map((v) => (
+                    <option key={v} value={v}>{v}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="flex-1">
+                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Ship</label>
+                <select
+                  value={shipInput}
+                  disabled={!selectedLine}
+                  onChange={(e) => setShipInput(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-100"
+                >
+                  <option value="">{selectedLine ? "Select your ship..." : "Select line first"}</option>
+                  {shipOptions.map((v) => (
                     <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
@@ -270,6 +296,7 @@ export default function ToursPage() {
                 type="button"
                 onClick={() => {
                   setShipInput("");
+                  setLineInput("");
                   setFitScheduleOnly(false);
                   clearCruise();
                 }}
@@ -329,7 +356,7 @@ export default function ToursPage() {
               </div>
             ) : (
               <p className="mt-3 text-sm text-slate-600">
-                Add your ship and sail date to see tours that fit your cruise schedule and save your plan for next time.
+                Add your cruise line and ship to load your first sailing date and find tours that fit your day.
               </p>
             )}
           </div>
