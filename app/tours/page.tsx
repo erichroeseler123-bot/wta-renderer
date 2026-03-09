@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 
 type Tour = {
@@ -33,17 +32,29 @@ function matchCategory(input: string, categories: string[]) {
 }
 
 export default function ToursPage() {
-  const sp = useSearchParams();
-
   const [tours, setTours] = useState<Tour[]>([]);
   const [manualCat, setManualCat] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [queryParams, setQueryParams] = useState({
+    portFilter: "",
+    categoryFilterRaw: "",
+    handoffId: "",
+    party: "",
+    date: "",
+  });
 
-  const portFilter = normalize(sp.get("port") || "");
-  const categoryFilterRaw = sp.get("category") || "";
-  const handoffId = sp.get("handoffId") || "";
-  const party = sp.get("party") || "";
-  const date = sp.get("date") || "";
+  const { portFilter, categoryFilterRaw, handoffId, party, date } = queryParams;
+
+  useEffect(() => {
+    const sp = new URLSearchParams(window.location.search);
+    setQueryParams({
+      portFilter: normalize(sp.get("port") || ""),
+      categoryFilterRaw: sp.get("category") || "",
+      handoffId: sp.get("handoffId") || "",
+      party: sp.get("party") || "",
+      date: sp.get("date") || "",
+    });
+  }, []);
 
   useEffect(() => {
     fetch("/data/tours.json")
