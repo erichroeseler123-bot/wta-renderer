@@ -3,12 +3,14 @@
 import FromPrice from "@/components/tours/FromPrice";
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import ProductDepartureCalendar, {
   DepartureSelection,
 } from "@/components/tours/ProductDepartureCalendar";
 import ItemBookingPicker from "@/components/tours/ItemBookingPicker";
 import { useCart } from "@/app/components/cart/CartContext";
+import { inferPortFromCompany } from "@/lib/handoff/mappings";
 
 function fmtCents(cents?: number) {
   if (!cents || !Number.isFinite(cents) || cents <= 0) return null;
@@ -21,15 +23,35 @@ export default function TourDetailPage({
   params: Promise<{ company: string; item: string }>;
 }) {
   const { company, item } = use(params) as { company: string; item: string };
+  const sp = useSearchParams();
 
-
-const { addItem, setSelection, open } = useCart();
+  const { addItem, setSelection, open } = useCart();
 
   const [tour, setTour] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
   const [selection, setSelectionLocal] = useState<DepartureSelection | null>(null);
+
+  const handoffDate = sp.get("date") || "";
+  const handoffPartySize = sp.get("partySize") || "";
+  const handoffAdults = sp.get("adults") || "";
+  const handoffChildren = sp.get("children") || "";
+  const handoffCruiseShip = sp.get("cruiseShip") || "";
+  const handoffCruiseShipSlug = sp.get("cruiseShipSlug") || "";
+  const handoffTimeOfDay = sp.get("timeOfDay") || "";
+  const handoffBudgetTier = sp.get("budgetTier") || "";
+  const handoffSource = sp.get("source") || sp.get("handoffSource") || "";
+  const handoffId = sp.get("handoff_id") || sp.get("handoffId") || "";
+  const handoffAuthorityTopic = sp.get("authority_topic") || sp.get("topic") || "";
+  const handoffReferrerPath = sp.get("referrer_path") || sp.get("referrerPath") || "";
+  const handoffCategory = sp.get("category") || "";
+
+  useEffect(() => {
+    if (!selectedDay && handoffDate && /^\d{4}-\d{2}-\d{2}$/.test(handoffDate)) {
+      setSelectedDay(handoffDate);
+    }
+  }, [selectedDay, handoffDate]);
 
   // 1) Load tour snapshot
   useEffect(() => {
@@ -105,7 +127,23 @@ const { addItem, setSelection, open } = useCart();
         startAt: selection.startAt,
         price: typeof selection.priceCents === "number" ? selection.priceCents : undefined,
         ratePk: selection.ratePk,
-        rateLabel: selection.rateLabel,},
+        rateLabel: selection.rateLabel,
+
+        handoffSource: handoffSource || undefined,
+        handoffId: handoffId || undefined,
+        authorityTopic: handoffAuthorityTopic || undefined,
+        referrerPath: handoffReferrerPath || undefined,
+        handoffCategory: handoffCategory || undefined,
+        handoffDate: handoffDate || undefined,
+        partySize: handoffPartySize ? Number(handoffPartySize) : undefined,
+        adults: handoffAdults ? Number(handoffAdults) : undefined,
+        children: handoffChildren ? Number(handoffChildren) : undefined,
+        cruiseShip: handoffCruiseShip || undefined,
+        cruiseShipSlug: handoffCruiseShipSlug || undefined,
+        timeOfDay: handoffTimeOfDay || undefined,
+        budgetTier: handoffBudgetTier || undefined,
+        portSlug: inferPortFromCompany(company) || undefined,
+      },
       1,
     );
 
@@ -168,6 +206,20 @@ const { addItem, setSelection, open } = useCart();
 
       <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
         <div className="lg:col-span-2">
+          {(handoffSource || handoffId || handoffDate || handoffPartySize || handoffCategory) ? (
+            <div className="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide">
+              {handoffSource ? <span className="rounded-full bg-blue-50 text-blue-700 px-3 py-1">From {handoffSource} plan</span> : null}
+              {handoffId ? <span className="rounded-full bg-blue-50 text-blue-700 px-3 py-1">Handoff {handoffId}</span> : null}
+              {handoffCategory ? <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1">{handoffCategory}</span> : null}
+              {handoffDate ? <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1">{handoffDate}</span> : null}
+              {handoffPartySize ? <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1">Party {handoffPartySize}</span> : null}
+              {handoffCruiseShip ? <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1">{handoffCruiseShip}</span> : null}
+              {!handoffCruiseShip && handoffCruiseShipSlug ? <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1">{handoffCruiseShipSlug}</span> : null}
+              {handoffTimeOfDay ? <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1">{handoffTimeOfDay}</span> : null}
+              {handoffBudgetTier ? <span className="rounded-full bg-slate-100 text-slate-700 px-3 py-1">{handoffBudgetTier}</span> : null}
+            </div>
+          ) : null}
+
           <h2 className="text-2xl font-black mb-6 text-blue-900 uppercase">
             1. Pick a Date + Time
           </h2>
