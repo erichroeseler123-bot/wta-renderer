@@ -14,7 +14,13 @@ import { assertBookingsEnabled } from "@/lib/fareharbor";
 
 export const runtime = "nodejs";
 
-const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY || ""), {});
+function getStripeClient() {
+  const secret = String(process.env.STRIPE_SECRET_KEY || "");
+  if (!secret) {
+    throw new Error("Missing STRIPE_SECRET_KEY");
+  }
+  return new Stripe(secret, {});
+}
 
 function ok() {
   return NextResponse.json({ received: true });
@@ -31,6 +37,7 @@ async function markOrderFailed(order: OrderSnapshot, reason: string) {
 
 export async function POST(req: Request) {
   try {
+    const stripe = getStripeClient();
     const kv = await getKV();
     if (!kv) {
       return NextResponse.json({ error: "KV not configured" }, { status: 500 });
