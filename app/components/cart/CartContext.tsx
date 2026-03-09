@@ -30,6 +30,22 @@ export type CartItem = {
   unitCentsWithTax?: number | null; // cents
   lineCents?: number; // cents = unitCents * qty
 
+  // handoff attribution + traveler context
+  handoffSource?: string;
+  handoffId?: string;
+  authorityTopic?: string;
+  referrerPath?: string;
+  handoffCategory?: string;
+  portSlug?: string;
+  handoffDate?: string;
+  partySize?: number;
+  adults?: number;
+  children?: number;
+  cruiseShip?: string;
+  cruiseShipSlug?: string;
+  timeOfDay?: string;
+  budgetTier?: string;
+
   qty: number;
   };
 

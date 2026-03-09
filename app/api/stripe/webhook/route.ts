@@ -1,19 +1,41 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
-import { kv } from "@vercel/kv";
+import { getKV } from "@/lib/kv";
+import {
+  acquireOrderLock,
+  getOrder,
+  getOrderByPaymentIntent,
+  releaseOrderLock,
+  saveOrder,
+  type OrderSnapshot,
+} from "@/lib/orders";
+import { runFareHarborBookingsForOrder } from "@/lib/bookingRunner";
+import { assertBookingsEnabled } from "@/lib/fareharbor";
 
 export const runtime = "nodejs";
 
-const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY || ""), {
-  apiVersion: "2024-06-20",
-});
+const stripe = new Stripe(String(process.env.STRIPE_SECRET_KEY || ""), {});
 
 function ok() {
   return NextResponse.json({ received: true });
 }
 
+async function markOrderFailed(order: OrderSnapshot, reason: string) {
+  await saveOrder({
+    ...order,
+    status: "booking_failed",
+    bookingAttempts: (order.bookingAttempts || 0) + 1,
+    lastError: reason,
+  });
+}
+
 export async function POST(req: Request) {
   try {
+    const kv = await getKV();
+    if (!kv) {
+      return NextResponse.json({ error: "KV not configured" }, { status: 500 });
+    }
+
     const whSecret = String(process.env.STRIPE_WEBHOOK_SECRET || "");
     if (!whSecret) return NextResponse.json({ error: "Missing STRIPE_WEBHOOK_SECRET" }, { status: 500 });
 
@@ -26,91 +48,73 @@ export async function POST(req: Request) {
     if (event.type !== "payment_intent.succeeded") return ok();
 
     const pi = event.data.object as Stripe.PaymentIntent;
-    const piId = pi.id;
-    const cart_id = String(pi.metadata?.cart_id || "");
+    const piId = String(pi.id || "");
+    if (!piId) return ok();
 
-    if (!cart_id) {
-      await kv.set(`receipt:${piId}`, { status: "error", error: "Missing cart_id metadata" }, { ex: 60 * 60 * 24 * 30 });
+    const orderIdFromMeta = String(pi.metadata?.order_id || "");
+    let order = orderIdFromMeta ? await getOrder(orderIdFromMeta) : null;
+    if (!order) order = await getOrderByPaymentIntent(piId);
+
+    if (!order) {
+      await kv.set(
+        `receipt:${piId}`,
+        {
+          status: "booking_failed",
+          payment_intent_id: piId,
+          lastError: "Missing order snapshot",
+          results: [],
+          updatedAt: new Date().toISOString(),
+        },
+        { ex: 60 * 60 * 24 * 30 },
+      );
       return ok();
     }
 
-    // ---- IDEMPOTENCY LOCK ----
-    const lockKey = `processed:pi:${piId}`;
-    const locked = await kv.set(lockKey, "1", { nx: true, ex: 60 * 60 * 24 * 30 });
-    if (locked !== "OK") {
-      return ok();
-    }
+    if (order.status === "booked") return ok();
 
-    const snapshot = await kv.get<any>(`cart:${cart_id}`);
-    if (!snapshot?.items?.length) {
-      await kv.set(`receipt:${piId}`, { status: "error", error: "Missing cart snapshot", cart_id }, { ex: 60 * 60 * 24 * 30 });
-      return ok();
-    }
+    const gotLock = await acquireOrderLock(order.order_id, 120);
+    if (!gotLock) return ok();
 
-    const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_SITE_URL || "";
-    const internalSecret = String(process.env.WTA_INTERNAL_SECRET || "");
+    try {
+      const reloaded = (await getOrder(order.order_id)) || order;
+      if (reloaded.status === "booked") return ok();
 
-    const results = [];
-    for (const line of snapshot.items) {
-      try {
-        const r = await fetch(`${origin}/api/fareharbor/book`, {
-          method: "POST",
-          headers: {
-            "content-type": "application/json",
-            "x-wta-internal": internalSecret,
-          },
-          body: JSON.stringify({
-            company: line.company,
-            availability_pk: line.availabilityPk,
-            customer_type_rate_pk: line.ratePk,
-            qty: line.qty,
-            amount_paid: line.lineTotalCents, // cents (optional if FH supports)
-            contact: snapshot.contact,
-            note: `WTA cart ${cart_id} / PI ${piId}`,
-          }),
-        });
-
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok || !j?.success) {
-          results.push({ ok: false, line, error: j?.error || "Booking failed", details: j?.details || j });
-        } else {
-          // store key info (pk/uuid if present)
-          const booking = j?.booking?.booking || j?.booking || j;
-          results.push({
-            ok: true,
-            line,
-            booking: {
-              pk: booking?.pk,
-              uuid: booking?.uuid,
-              display_id: booking?.display_id,
-              dashboard_url: booking?.dashboard_url,
-              start_at: booking?.availability?.start_at,
-            },
-          });
-        }
-      } catch (e: any) {
-        results.push({ ok: false, line, error: String(e?.message || e) });
-      }
-    }
-
-    const allOk = results.every((x) => x.ok);
-    await kv.set(
-      `receipt:${piId}`,
-      {
-        status: allOk ? "booked" : "partial_or_failed",
-        cart_id,
+      const paid: OrderSnapshot = {
+        ...reloaded,
         payment_intent_id: piId,
-        totalCents: snapshot.totalCents,
-        currency: snapshot.currency,
-        contact: snapshot.contact,
-        results,
-        createdAt: new Date().toISOString(),
-      },
-      { ex: 60 * 60 * 24 * 30 },
-    );
+        paidAt: reloaded.paidAt || new Date().toISOString(),
+        status: "booking_pending",
+      };
+      await saveOrder(paid);
 
-    return ok();
-  } catch (err: any) {
-    return NextResponse.json({ error: "Webhook error", details: String(err?.message || err) }, { status: 400 });
+      try {
+        assertBookingsEnabled();
+      } catch (e: unknown) {
+        const err = e as Error;
+        await markOrderFailed(paid, String(err?.message || e));
+        return ok();
+      }
+
+      const { results, allOk } = await runFareHarborBookingsForOrder(paid, piId);
+
+      const firstError = results
+        .map((x) => (typeof x.error === "string" ? x.error : ""))
+        .find((x) => x.length > 0);
+
+      await saveOrder({
+        ...paid,
+        bookingResults: results,
+        bookingAttempts: (paid.bookingAttempts || 0) + 1,
+        status: allOk ? "booked" : "booking_failed",
+        lastError: allOk ? undefined : firstError || "One or more FareHarbor bookings failed",
+      });
+
+      return ok();
+    } finally {
+      await releaseOrderLock(order.order_id);
+    }
+  } catch (err: unknown) {
+    const error = err as Error;
+    return NextResponse.json({ error: "Webhook error", details: String(error?.message || err) }, { status: 400 });
   }
 }

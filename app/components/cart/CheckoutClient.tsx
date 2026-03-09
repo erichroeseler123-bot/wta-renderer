@@ -26,6 +26,20 @@ export default function CheckoutClient() {
       qty: it.qty,
       title: it.title,
       startAt: it.startAt,
+      handoffSource: it.handoffSource,
+      handoffId: it.handoffId,
+      authorityTopic: it.authorityTopic,
+      referrerPath: it.referrerPath,
+      handoffCategory: it.handoffCategory,
+      handoffDate: it.handoffDate,
+      partySize: it.partySize,
+      adults: it.adults,
+      children: it.children,
+      cruiseShip: it.cruiseShip,
+      cruiseShipSlug: it.cruiseShipSlug,
+      timeOfDay: it.timeOfDay,
+      budgetTier: it.budgetTier,
+      portSlug: it.portSlug,
     }));
   }, [items]);
 
