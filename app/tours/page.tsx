@@ -258,7 +258,7 @@ export default function ToursPage() {
                     setLineInput(e.target.value);
                     setShipInput("");
                   }}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm"
                 >
                   <option value="">Select your cruise line...</option>
                   {CRUISE_LINES.map((v) => (
@@ -272,7 +272,7 @@ export default function ToursPage() {
                   value={shipInput}
                   disabled={!selectedLine}
                   onChange={(e) => setShipInput(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm disabled:cursor-not-allowed disabled:bg-slate-100"
+                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
                 >
                   <option value="">{selectedLine ? "Select your ship..." : "Select line first"}</option>
                   {shipOptions.map((v) => (
@@ -282,7 +282,7 @@ export default function ToursPage() {
               </div>
               <div>
                 <label className="mb-1 block text-sm font-semibold text-slate-600">First sailing date</label>
-                <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+                <div className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900">
                   {effectiveDate || "Select a ship to load date"}
                 </div>
               </div>
@@ -308,7 +308,7 @@ export default function ToursPage() {
                       setFitScheduleOnly(false);
                       clearCruise();
                     }}
-                    className="rounded-xl px-2 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800"
+                    className="rounded-xl px-2 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
                   >
                     Clear plan
                   </button>
@@ -384,7 +384,7 @@ export default function ToursPage() {
                 className={`rounded-full px-6 py-2 text-xs font-black uppercase tracking-widest transition-all ${
                   activeCat === cat
                     ? "bg-blue-600 text-white shadow-xl shadow-blue-200"
-                    : "bg-slate-100 text-slate-400 hover:bg-slate-200"
+                    : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                 }`}
               >
                 {cat}

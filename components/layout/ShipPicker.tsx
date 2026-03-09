@@ -25,10 +25,10 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
         <h2 className="text-2xl font-black uppercase tracking-tighter text-slate-900">Plan Your Cruise Day</h2>
         <div className="space-y-4">
           <div>
-            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Cruise Line</label>
+            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600">Cruise Line</label>
             <select
               value={selectedLine}
-              className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500"
+              className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 outline-none focus:border-blue-500"
               onChange={(e) => {
                 setTempLine(e.target.value);
                 setTempShip("");
@@ -41,11 +41,11 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
             </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Ship</label>
+            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600">Ship</label>
           <select
             value={selectedShip}
             disabled={!selectedLine}
-            className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 disabled:cursor-not-allowed disabled:bg-slate-100"
+            className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-900 outline-none focus:border-blue-500 disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
             onChange={(e) => setTempShip(e.target.value)}
           >
             <option value="">{selectedLine ? "Choose your ship..." : "Select cruise line first"}</option>
@@ -55,8 +55,8 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
           </select>
           </div>
           <div>
-            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Sail Date</label>
-            <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
+            <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-600">Sail Date</label>
+            <div className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900">
               {selectedDate || "Select ship to load first sailing date"}
             </div>
           </div>
