@@ -5,7 +5,11 @@ import Link from "next/link";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { useCruise } from "@/context/CruiseContext";
 import { useCart } from "@/app/components/cart/CartContext";
-import { CRUISE_ITINERARY_HINTS, CRUISE_SHIPS } from "@/lib/cruiseShips";
+import {
+  CRUISE_ITINERARY_HINTS,
+  CRUISE_SHIPS,
+  getFirstSailingDateForShip,
+} from "@/lib/cruiseShips";
 
 type Tour = {
   pk: number;
@@ -59,7 +63,6 @@ export default function ToursPage() {
   const [loadingTours, setLoadingTours] = useState(true);
   const [fitScheduleOnly, setFitScheduleOnly] = useState(true);
   const [shipInput, setShipInput] = useState("");
-  const [dateInput, setDateInput] = useState("");
   const [planInitialized, setPlanInitialized] = useState(false);
   const [matchMap, setMatchMap] = useState<Record<string, MatchState>>({});
   const [fitLoading, setFitLoading] = useState(false);
@@ -89,12 +92,18 @@ export default function ToursPage() {
 
   useEffect(() => {
     if (!loaded || planInitialized) return;
-    const d = savedDate || date || "";
     setShipInput(ship || "");
-    setDateInput(d);
-    setFitScheduleOnly(Boolean(ship && d));
+    setFitScheduleOnly(Boolean(ship && getFirstSailingDateForShip(ship)));
     setPlanInitialized(true);
-  }, [loaded, planInitialized, ship, savedDate, date]);
+  }, [loaded, planInitialized, ship]);
+
+  useEffect(() => {
+    if (!loaded || !ship) return;
+    const derivedDate = getFirstSailingDateForShip(ship);
+    if (derivedDate && savedDate !== derivedDate) {
+      setCruise(ship, derivedDate);
+    }
+  }, [loaded, ship, savedDate, setCruise]);
 
   useEffect(() => {
     fetch("/data/tours.json")
@@ -129,7 +138,7 @@ export default function ToursPage() {
     });
   }, [tours, portFilter, activeCat]);
 
-  const effectiveDate = dateInput || date || "";
+  const effectiveDate = shipInput ? getFirstSailingDateForShip(shipInput) : "";
   const profileComplete = Boolean(shipInput && effectiveDate);
   const itineraryHint = CRUISE_ITINERARY_HINTS[shipInput as keyof typeof CRUISE_ITINERARY_HINTS];
   const itineraryPort = normalize(itineraryHint?.portSlug || "");
@@ -239,22 +248,20 @@ export default function ToursPage() {
                 </select>
               </div>
               <div className="w-full md:w-56">
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Sail Date</label>
-                <input
-                  type="date"
-                  value={dateInput}
-                  onChange={(e) => setDateInput(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
-                />
+                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">First Sailing Date</label>
+                <div className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">
+                  {effectiveDate || "Select a ship to load date"}
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => {
-                  if (shipInput && dateInput) {
-                    setCruise(shipInput, dateInput);
+                  if (shipInput && effectiveDate) {
+                    setCruise(shipInput, effectiveDate);
                     setFitScheduleOnly(true);
                   }
                 }}
+                disabled={!(shipInput && effectiveDate)}
                 className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-700"
               >
                 Find My Best Fits
@@ -263,7 +270,6 @@ export default function ToursPage() {
                 type="button"
                 onClick={() => {
                   setShipInput("");
-                  setDateInput("");
                   setFitScheduleOnly(false);
                   clearCruise();
                 }}
@@ -355,7 +361,7 @@ export default function ToursPage() {
           <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-800">
             <div className="text-base font-black">No tour matches found for this ship/date</div>
             <p className="mt-1 text-sm">
-              Try another date, turn off fit filtering, or browse all tours first.
+              Try another ship, turn off fit filtering, or browse all tours first.
             </p>
             <button
               type="button"

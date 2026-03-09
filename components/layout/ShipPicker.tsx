@@ -1,14 +1,13 @@
 "use client";
 import { useState } from "react";
 import { useCruise } from "@/context/CruiseContext";
-import { CRUISE_SHIPS } from "@/lib/cruiseShips";
+import { CRUISE_SHIPS, getFirstSailingDateForShip } from "@/lib/cruiseShips";
 
 export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { ship, date, setCruise, clearCruise } = useCruise();
   const [tempShip, setTempShip] = useState("");
-  const [tempDate, setTempDate] = useState("");
   const selectedShip = tempShip || ship || "";
-  const selectedDate = tempDate || date || "";
+  const selectedDate = selectedShip ? getFirstSailingDateForShip(selectedShip) : "";
 
   if (!isOpen) return null;
 
@@ -27,23 +26,23 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
               <option key={v} value={v}>{v}</option>
             ))}
           </select>
-          <input
-            type="date"
-            value={selectedDate}
-            className="w-full border-b-2 border-slate-100 py-3 outline-none focus:border-indigo-700 transition-colors"
-            onChange={(e) => setTempDate(e.target.value)}
-          />
+          <div className="w-full border-b-2 border-slate-100 py-3 text-sm font-semibold text-slate-700">
+            {selectedDate
+              ? `First Sailing Date: ${selectedDate}`
+              : "Select a ship to load its first sailing date"}
+          </div>
         </div>
         <div className="grid gap-3">
           <button
             onClick={() => { if (selectedShip && selectedDate) { setCruise(selectedShip, selectedDate); onClose(); } }}
+            disabled={!(selectedShip && selectedDate)}
             className="w-full bg-indigo-700 text-white py-4 rounded-2xl font-bold hover:bg-blue-500 transition-all shadow-lg shadow-indigo-700/20"
           >
             See My Schedule
           </button>
           {(ship || date) ? (
             <button
-              onClick={() => { clearCruise(); setTempShip(""); setTempDate(""); onClose(); }}
+              onClick={() => { clearCruise(); setTempShip(""); onClose(); }}
               className="w-full border border-slate-200 text-slate-700 py-3 rounded-2xl font-semibold hover:bg-slate-50 transition"
             >
               Clear Saved Cruise
