@@ -5,6 +5,7 @@ import Link from "next/link";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { useCruise } from "@/context/CruiseContext";
 import { useCart } from "@/app/components/cart/CartContext";
+import { CRUISE_ITINERARY_HINTS, CRUISE_SHIPS } from "@/lib/cruiseShips";
 
 type Tour = {
   pk: number;
@@ -22,13 +23,7 @@ type MatchState = {
   firstStartAt?: string;
 };
 
-const SHIP_WINDOWS: Record<string, { portSlug: string; window: string }> = {
-  "Norwegian Encore": { portSlug: "juneau", window: "07:00 - 20:00" },
-  "Discovery Princess": { portSlug: "ketchikan", window: "06:30 - 18:00" },
-  "Ovation of the Seas": { portSlug: "skagway", window: "07:00 - 17:00" },
-};
-
-const SHIP_OPTIONS = Object.keys(SHIP_WINDOWS);
+const SHIP_OPTIONS = CRUISE_SHIPS;
 
 function normalize(s: string) {
   return String(s || "").trim().toLowerCase();
@@ -136,7 +131,8 @@ export default function ToursPage() {
 
   const effectiveDate = dateInput || date || "";
   const profileComplete = Boolean(shipInput && effectiveDate);
-  const itineraryPort = normalize(SHIP_WINDOWS[shipInput]?.portSlug || "");
+  const itineraryHint = CRUISE_ITINERARY_HINTS[shipInput as keyof typeof CRUISE_ITINERARY_HINTS];
+  const itineraryPort = normalize(itineraryHint?.portSlug || "");
   const dateKeyFor = useCallback(
     (t: Tour) => `${t.company}:${t.pk}:${effectiveDate}`,
     [effectiveDate],
@@ -289,9 +285,9 @@ export default function ToursPage() {
                         Port {itineraryPort}
                       </span>
                     ) : null}
-                    {SHIP_WINDOWS[shipInput]?.window ? (
+                    {itineraryHint?.window ? (
                       <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
-                        Window {SHIP_WINDOWS[shipInput].window}
+                        Window {itineraryHint.window}
                       </span>
                     ) : null}
                   </div>

@@ -1,12 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useCruise } from "@/context/CruiseContext";
-
-const SHIPS = [
-  "Norwegian Encore",
-  "Discovery Princess",
-  "Ovation of the Seas",
-];
+import { CRUISE_SHIPS } from "@/lib/cruiseShips";
 
 export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { ship, date, setCruise, clearCruise } = useCruise();
@@ -28,7 +23,7 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
             onChange={(e) => setTempShip(e.target.value)}
           >
             <option value="">Choose a ship...</option>
-            {SHIPS.map((v) => (
+            {CRUISE_SHIPS.map((v) => (
               <option key={v} value={v}>{v}</option>
             ))}
           </select>
