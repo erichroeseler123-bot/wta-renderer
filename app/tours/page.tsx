@@ -54,6 +54,11 @@ function timeLabel(startAt?: string) {
   }
 }
 
+function trustLineForTour(tour: Tour, port: string) {
+  if (port) return `Popular with ${port[0].toUpperCase()}${port.slice(1)} cruise guests`;
+  return "Curated for cruise day timing and easy shore return";
+}
+
 export default function ToursPage() {
   const { ship, date: savedDate, loaded, setCruise, clearCruise } = useCruise();
   const { items } = useCart();
@@ -221,6 +226,7 @@ export default function ToursPage() {
       .filter((it) => (it.day || it.handoffDate || "").slice(0, 10) === effectiveDate)
       .sort((a, b) => String(a.startAt || "").localeCompare(String(b.startAt || "")));
   }, [items, effectiveDate]);
+  const fallbackTours = useMemo(() => filteredByQuery.slice(0, 4), [filteredByQuery]);
 
   if (!loaded || loadingTours) {
     return <div className="p-20 text-center text-4xl font-black text-slate-500">Loading Your Tour Matches...</div>;
@@ -240,18 +246,19 @@ export default function ToursPage() {
             </div>
           ) : null}
 
-          <div className="mb-8 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-            <div className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Cruise Day Planner</div>
-            <div className="flex flex-col gap-3 md:flex-row md:items-end">
-              <div className="flex-1">
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Cruise Line</label>
+          <div className="mb-8 rounded-3xl border border-slate-200 bg-gradient-to-b from-slate-50 to-white p-6 shadow-sm">
+            <div className="mb-4 text-lg font-black tracking-tight text-slate-900">Cruise Day Planner</div>
+            <div className="grid gap-4 lg:grid-cols-[1.2fr_1fr]">
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="md:col-span-2">
+                  <label className="mb-1 block text-sm font-semibold text-slate-600">Cruise line</label>
                 <select
                   value={selectedLine}
                   onChange={(e) => {
                     setLineInput(e.target.value);
                     setShipInput("");
                   }}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm"
                 >
                   <option value="">Select your cruise line...</option>
                   {CRUISE_LINES.map((v) => (
@@ -259,13 +266,13 @@ export default function ToursPage() {
                   ))}
                 </select>
               </div>
-              <div className="flex-1">
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Ship</label>
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">Ship</label>
                 <select
                   value={shipInput}
                   disabled={!selectedLine}
                   onChange={(e) => setShipInput(e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:bg-slate-100"
+                  className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm shadow-sm disabled:cursor-not-allowed disabled:bg-slate-100"
                 >
                   <option value="">{selectedLine ? "Select your ship..." : "Select line first"}</option>
                   {shipOptions.map((v) => (
@@ -273,74 +280,80 @@ export default function ToursPage() {
                   ))}
                 </select>
               </div>
-              <div className="w-full md:w-56">
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">First Sailing Date</label>
-                <div className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold text-slate-700">
+              <div>
+                <label className="mb-1 block text-sm font-semibold text-slate-600">First sailing date</label>
+                <div className="w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-slate-700">
                   {effectiveDate || "Select a ship to load date"}
                 </div>
               </div>
-              <button
-                type="button"
-                onClick={() => {
-                  if (shipInput && effectiveDate) {
-                    setCruise(shipInput, effectiveDate);
-                    setFitScheduleOnly(true);
-                  }
-                }}
-                disabled={!(shipInput && effectiveDate)}
-                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-700"
-              >
-                Find My Best Fits
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setShipInput("");
-                  setLineInput("");
-                  setFitScheduleOnly(false);
-                  clearCruise();
-                }}
-                className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100"
-              >
-                Clear Plan
-              </button>
-            </div>
+                <div className="md:col-span-2 flex flex-wrap items-center gap-3 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (shipInput && effectiveDate) {
+                        setCruise(shipInput, effectiveDate);
+                        setFitScheduleOnly(true);
+                      }
+                    }}
+                    disabled={!(shipInput && effectiveDate)}
+                    className="min-w-52 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                  >
+                    Find My Best Fits
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShipInput("");
+                      setLineInput("");
+                      setFitScheduleOnly(false);
+                      clearCruise();
+                    }}
+                    className="rounded-xl px-2 py-2 text-sm font-semibold text-slate-500 hover:text-slate-800"
+                  >
+                    Clear plan
+                  </button>
+                </div>
+              </div>
 
-            {profileComplete ? (
-              <div className="mt-4 grid gap-3 md:grid-cols-2">
-                <div className="rounded-2xl border border-slate-200 bg-white p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Trip Snapshot</div>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{shipInput}</span>
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{effectiveDate}</span>
-                    {itineraryPort ? (
-                      <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                        Port {itineraryPort}
-                      </span>
-                    ) : null}
-                    {itineraryHint?.window ? (
-                      <span className="rounded-full bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
-                        Window {itineraryHint.window}
-                      </span>
-                    ) : null}
-                  </div>
-                  <label className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
-                    <input
-                      type="checkbox"
-                      checked={fitScheduleOnly}
-                      onChange={(e) => setFitScheduleOnly(e.target.checked)}
-                    />
-                    Show only tours that fit this ship date
-                  </label>
-                  {fitScheduleOnly && profileComplete ? (
-                    <div className="mt-2 text-xs text-slate-600">
-                      {fitLoading ? "Checking live schedule fit..." : `Checked ${fitChecked} tours for this date`}
-                    </div>
+              <div className="rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="text-sm font-semibold text-slate-900">Trip Snapshot</div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {shipInput ? (
+                    <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                      Ship: {shipInput}
+                    </span>
+                  ) : null}
+                  {effectiveDate ? (
+                    <span className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
+                      Date: {effectiveDate}
+                    </span>
+                  ) : null}
+                  {itineraryPort ? (
+                    <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                      Port: {itineraryPort}
+                    </span>
+                  ) : null}
+                  {itineraryHint?.window ? (
+                    <span className="rounded-full border border-violet-200 bg-violet-50 px-3 py-1 text-xs font-semibold text-violet-700">
+                      Window: {itineraryHint.window}
+                    </span>
                   ) : null}
                 </div>
-
-                <div className="rounded-2xl border border-slate-200 bg-white p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Saved Itinerary</div>
+                <label className="mt-3 inline-flex items-center gap-2 text-xs font-semibold text-slate-700">
+                  <input
+                    type="checkbox"
+                    checked={fitScheduleOnly}
+                    onChange={(e) => setFitScheduleOnly(e.target.checked)}
+                  />
+                  Show only tours that fit this ship date
+                </label>
+                {fitScheduleOnly && profileComplete ? (
+                  <div className="mt-2 text-xs text-slate-600">
+                    {fitLoading ? "Checking live schedule fit..." : `Checked ${fitChecked} tours for this date`}
+                  </div>
+                ) : null}
+                <div className="mt-4 border-t border-slate-100 pt-3">
+                  <div className="text-sm font-semibold text-slate-900">Saved Itinerary</div>
                   {plannedForDate.length > 0 ? (
                     <ul className="mt-2 space-y-2">
                       {plannedForDate.slice(0, 4).map((it) => (
@@ -354,11 +367,13 @@ export default function ToursPage() {
                   )}
                 </div>
               </div>
-            ) : (
+            </div>
+
+            {!profileComplete ? (
               <p className="mt-3 text-sm text-slate-600">
                 Add your cruise line and ship to load your first sailing date and find tours that fit your day.
               </p>
-            )}
+            ) : null}
           </div>
 
           <div className="flex flex-wrap gap-3 border-b-2 border-slate-100 pb-8">
@@ -386,56 +401,98 @@ export default function ToursPage() {
 
         {fitScheduleOnly && profileComplete && !fitLoading && filtered.length < 1 ? (
           <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-800">
-            <div className="text-base font-black">No tour matches found for this ship/date</div>
+            <div className="text-base font-black">Nothing matched this exact cruise timing yet</div>
             <p className="mt-1 text-sm">
-              Try another ship, turn off fit filtering, or browse all tours first.
+              Browse all excursions for this port, or turn off fit filtering to see more options.
             </p>
-            <button
-              type="button"
-              onClick={() => setFitScheduleOnly(false)}
-              className="mt-3 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-amber-700"
-            >
-              Browse All Tours
-            </button>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setManualCat("All");
+                  setFitScheduleOnly(false);
+                }}
+                className="rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-amber-700"
+              >
+                Browse All Excursions
+              </button>
+              <button
+                type="button"
+                onClick={() => setFitScheduleOnly(false)}
+                className="rounded-xl border border-amber-300 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-amber-700 hover:bg-amber-100"
+              >
+                Turn Off Fit Filter
+              </button>
+            </div>
+            {fallbackTours.length > 0 ? (
+              <div className="mt-4 grid gap-3 md:grid-cols-2">
+                {fallbackTours.map((tour) => (
+                  <Link
+                    key={`fallback:${tour.company}:${tour.pk}`}
+                    href={`/tours/${tour.company}/${tour.pk}`}
+                    className="rounded-xl border border-amber-200 bg-white p-3 hover:border-amber-300"
+                  >
+                    <div className="text-xs font-semibold text-amber-700">Recommended next</div>
+                    <div className="mt-1 text-sm font-bold text-slate-900">{tour.title}</div>
+                    <div className="mt-1 text-xs text-slate-600">{tour.fromPrice || "Check price and departures"}</div>
+                  </Link>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
 
-        <div className="grid grid-cols-1 gap-12 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((tour) => (
-            <Link key={`${tour.company}:${tour.pk}`} href={`/tours/${tour.company}/${tour.pk}`} className="group flex flex-col">
-              <div className="mb-6 aspect-[4/3] overflow-hidden rounded-3xl border-2 border-transparent bg-slate-100 transition-all group-hover:border-blue-500">
+            <Link
+              key={`${tour.company}:${tour.pk}`}
+              href={`/tours/${tour.company}/${tour.pk}`}
+              className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl"
+            >
+              <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
                 <img
                   src={tour.image || "/hero/hero5678.jpg"}
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   alt={tour.title}
                 />
-              </div>
-              <div className="flex-grow">
-                <div className="mb-4 flex items-start justify-between">
-                  <span className="rounded-full bg-blue-50 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-600">
+                <div className="absolute left-3 top-3 flex gap-2">
+                  <span className="rounded-full bg-white/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-blue-600">
                     {tour.category || "Adventures"}
                   </span>
-                  <div className="text-2xl font-black text-slate-900">{tour.fromPrice || "Check Price"}</div>
+                  <span className="rounded-full bg-emerald-500/90 px-3 py-1 text-[10px] font-black uppercase tracking-widest text-white">
+                    Cruise Guest Pick
+                  </span>
                 </div>
+              </div>
+              <div className="flex flex-grow flex-col p-5">
+                <div className="mb-3 flex items-start justify-between gap-3">
+                  <h3 className="text-2xl font-black tracking-tight leading-none text-slate-900 group-hover:text-blue-600">
+                    {tour.title}
+                  </h3>
+                  <div className="whitespace-nowrap text-xl font-black text-slate-900">{tour.fromPrice || "Check Price"}</div>
+                </div>
+                <p className="mb-3 text-sm leading-relaxed text-slate-600">{trustLineForTour(tour, portFilter || itineraryPort)}</p>
                 {(fitScheduleOnly && profileComplete) ? (
-                  <div className="mb-3 text-[11px] font-bold uppercase tracking-wide">
+                  <div className="mb-3 text-xs font-bold tracking-wide">
                     {matchMap[dateKeyFor(tour)]?.status === "match" ? (
-                      <span className="rounded-full bg-emerald-50 px-2 py-1 text-emerald-700">
-                        Fits {effectiveDate}{matchMap[dateKeyFor(tour)]?.firstStartAt ? ` • ${timeLabel(matchMap[dateKeyFor(tour)]?.firstStartAt)}` : ""}
+                      <span className="rounded-full border border-emerald-200 bg-emerald-50 px-3 py-1 text-emerald-700">
+                        Fits your cruise day{matchMap[dateKeyFor(tour)]?.firstStartAt ? ` • ${timeLabel(matchMap[dateKeyFor(tour)]?.firstStartAt)}` : ""}
                       </span>
                     ) : matchMap[dateKeyFor(tour)]?.status === "checking" ? (
-                      <span className="rounded-full bg-blue-50 px-2 py-1 text-blue-700">Checking schedule...</span>
+                      <span className="rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-blue-700">Checking schedule...</span>
                     ) : matchMap[dateKeyFor(tour)]?.status === "no_match" ? (
-                      <span className="rounded-full bg-slate-100 px-2 py-1 text-slate-500">No slots on {effectiveDate}</span>
+                      <span className="rounded-full border border-slate-200 bg-slate-100 px-3 py-1 text-slate-500">No slots on {effectiveDate}</span>
                     ) : matchMap[dateKeyFor(tour)]?.status === "error" ? (
-                      <span className="rounded-full bg-rose-50 px-2 py-1 text-rose-700">Schedule check failed</span>
+                      <span className="rounded-full border border-rose-200 bg-rose-50 px-3 py-1 text-rose-700">Schedule check failed</span>
                     ) : null}
                   </div>
                 ) : null}
-                <h3 className="mb-3 text-2xl font-black uppercase tracking-tighter leading-none text-slate-900 group-hover:text-blue-600">
-                  {tour.title}
-                </h3>
-                <p className="line-clamp-2 text-sm italic leading-relaxed text-slate-500">{tour.description || ""}</p>
+                <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">{tour.description || ""}</p>
+                <div className="mt-4">
+                  <span className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition-colors group-hover:bg-blue-600">
+                    View Tour
+                  </span>
+                </div>
               </div>
             </Link>
           ))}
