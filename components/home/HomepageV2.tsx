@@ -31,7 +31,7 @@ const TRUST = [
 
 export default function HomepageV2() {
   return (
-    <main className="min-h-screen bg-black text-white">
+    <main className="min-h-[70vh] sm:min-h-[80vh] bg-black text-white">
       {/* HERO */}
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0">
@@ -39,14 +39,14 @@ export default function HomepageV2() {
           <div className="absolute inset-0 opacity-[0.08] bg-[linear-gradient(to_right,rgba(255,255,255,0.4)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.4)_1px,transparent_1px)] bg-[size:64px_64px]" />
         </div>
 
-        <div className="relative mx-auto max-w-6xl px-6 py-16 md:py-24">
+        <div className="relative mx-auto max-w-6xl px-6 py-10 md:py-16">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-xs text-white/70">
               <span className="h-1.5 w-1.5 rounded-full bg-[#4CC9F0]" />
               Live port-ready booking intel
             </div>
 
-            <h1 className="mt-5 text-4xl font-bold tracking-tight md:text-6xl">
+            <h1 className="mt-5 text-3xl font-black tracking-tight sm:text-4xl lg:text-6xl leading-[1.05] leading-[1.05]">
               Welcome to Alaska Tours
             </h1>
 

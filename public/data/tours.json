@@ -70,21 +70,21 @@
     "title": "Harv's Original 6 Passenger Whale Watch",
     "slug": "harv-s-original-6-passenger-whale-watch",
     "description": "3 hour tour on our 6 passenger boats. Limited availability, reserve early! All ages welcome.",
-    "image": "https://cdn.filestackcontent.com/uY8RK1YZR2Kv87VA1aGQ",
+    "image": "https://cdn.filestackcontent.com/yhEJiyfzTFygwKNl107S",
     "company": "alaska-galore-juneau-whale-watching",
     "fromPrice": "From $189",
     "rateSummary": "189 • 210",
     "category": "Whale Watching"
   },
   {
-    "pk": 585456,
-    "title": "Private Whale Watch",
-    "slug": "private-whale-watch",
-    "description": "Best Choice - Only your group and the Captain and crew on board! For any size group up to 49 people.",
-    "image": "https://cdn.filestackcontent.com/zQlnSTMSYy5VvqvJNZKB",
+    "pk": 585466,
+    "title": "Marv's Signature 18 Passenger Whale Watch",
+    "slug": "marv-s-signature-18-passenger-whale-watch",
+    "description": "All Ages Welcome • Public tour on our 18-passenger boats!",
+    "image": "https://cdn.filestackcontent.com/6E3uZHfRUYG5uzREcPQ1",
     "company": "alaska-galore-juneau-whale-watching",
-    "fromPrice": "From $1150",
-    "rateSummary": "1150 • 1690 • 1859 +4 more",
+    "fromPrice": "From $179",
+    "rateSummary": "179",
     "category": "Whale Watching"
   },
   {
@@ -92,10 +92,21 @@
     "title": "Outback Experience Whale Watch",
     "slug": "outback-experience-whale-watch",
     "description": "Our most popular 3 hour tour. Operated on 18 passenger or larger boats. All ages welcome.",
-    "image": "https://cdn.filestackcontent.com/GSKfv30uRNyAjIJ4XKas",
+    "image": "https://cdn.filestackcontent.com/JpcRAObATnuSNjyL3ev6",
     "company": "alaska-galore-juneau-whale-watching",
     "fromPrice": "From $139",
     "rateSummary": "139 • 159",
+    "category": "Whale Watching"
+  },
+  {
+    "pk": 585456,
+    "title": "Private Whale Watch",
+    "slug": "private-whale-watch",
+    "description": "Best Choice - Only your group and the Captain and crew on board! For any size group up to 49 people.",
+    "image": "https://cdn.filestackcontent.com/BiZrxNkTHaMstzWv7dEA",
+    "company": "alaska-galore-juneau-whale-watching",
+    "fromPrice": "From $1150",
+    "rateSummary": "1150 • 1690 • 1859 +4 more",
     "category": "Whale Watching"
   },
   {
@@ -110,6 +121,17 @@
     "category": "Whale Watching"
   },
   {
+    "pk": 708105,
+    "title": "Local Membership",
+    "slug": "local-membership",
+    "description": "pricing: Our local membership is an initial $250 investment that gets you and your family unlimited whale watches for $50 per person for the whole season. \ndescription: The best way to get you and your family out on the water this season!\n\nHarv & Marv's is excited to offer this membership to Juneau locals to help you explore your backyard. It has never been easier to get you and your family out on the water to see whales, orcas, sea lions, and more.Think of it as our way of saying thanks for being such great neighbors.\n\nThe initial membership costs $250 and gives you and your immediate family access to unlimited $50 whale watches for the 2026 season.\n\nOur local membership is good for family units so you, your partner, your kids, and your in-laws can all experience Juneau's premier whale watching tour together.\n\n$50 tours apply to our 'Outback Experience Whale Watch' and 'Whale Watching & Lighthouse' tours. Membership pricing does not apply to our private or small boat departures. \n\nEach tour starts and ends at Statter Harbor in Auke Bay for easy self-transport. All ages are welcome, but there is no child price as part of this membership. Space is as-available and is not guaranteed. All member tours will be confirmed 48 hours in advance. \n\nTo book online, members will input their membership number at checkout and membership pricing will be applied automatically. Members can also book by calling 907-209-7288 or emailing info@alaskagalore.com.\nrestrictions: Membership pricing does not apply to private or small boat tours. Memberships are only good for a single season and will expire at the end of they year they are activated in. \ndisclaimers: Membership seats are space available and will be released 48 hours before the tour. ",
+    "image": "https://cdn.filestackcontent.com/IibOfqmITjGpF0ToBWQF",
+    "company": "alaska-galore-juneau-whale-watching",
+    "fromPrice": "From $250",
+    "rateSummary": "250",
+    "category": "Adventures"
+  },
+  {
     "pk": 585325,
     "title": "Harv's Private Tour: Up to 6 Guests",
     "slug": "harv-s-private-tour-up-to-6-guests",
@@ -119,17 +141,6 @@
     "fromPrice": "From $1095",
     "rateSummary": "1095",
     "category": "Adventures"
-  },
-  {
-    "pk": 585466,
-    "title": "Signature Whale Watch",
-    "slug": "signature-whale-watch",
-    "description": "All Ages Welcome • Public tour on our 18-passenger boats!",
-    "image": "https://cdn.filestackcontent.com/HvIuCEQySve1T9LKKnVw",
-    "company": "alaska-galore-juneau-whale-watching",
-    "fromPrice": "From $179",
-    "rateSummary": "179",
-    "category": "Whale Watching"
   },
   {
     "pk": 585901,
@@ -546,7 +557,7 @@
     "image": "https://cdn.filestackcontent.com/8nwX1jaCRHWUa1ou3MpP",
     "company": "exclusivealaska",
     "fromPrice": "From $379",
-    "rateSummary": "379 • 399",
+    "rateSummary": "379 • 389",
     "category": "Fishing"
   },
   {
@@ -622,8 +633,8 @@
     "description": "3 Hours • All Ages",
     "image": "https://cdn.filestackcontent.com/MY7gLjORnauQs7dB2dOm",
     "company": "coastalhelicopters",
-    "fromPrice": "Check Price",
-    "rateSummary": "",
+    "fromPrice": "From $709",
+    "rateSummary": "709 • 756 • 859 +3 more",
     "category": "Dog Sledding"
   },
   {
@@ -941,8 +952,8 @@
     "description": "3 Hours & 15 Minutes • Ages 2+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/tvfb2N7fR4iVtjCHko68",
     "company": "northstartrekking",
-    "fromPrice": "From $300",
-    "rateSummary": "300 • 739",
+    "fromPrice": "From $591",
+    "rateSummary": "591",
     "category": "Dog Sledding"
   },
   {
@@ -952,8 +963,8 @@
     "description": "3 Hours & 15 Minutes • Age 8+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/B909nF6TQqVuKDz3XLZ6",
     "company": "northstartrekking",
-    "fromPrice": "From $160",
-    "rateSummary": "160 • 499",
+    "fromPrice": "From $399",
+    "rateSummary": "399",
     "category": "Air Tours"
   },
   {
@@ -963,8 +974,8 @@
     "description": "4 Hours & 15 Minutes • Age 12+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/cOhoNqnERLmiIhpPY4bu",
     "company": "northstartrekking",
-    "fromPrice": "From $210",
-    "rateSummary": "210 • 549",
+    "fromPrice": "From $439",
+    "rateSummary": "439",
     "category": "Air Tours"
   },
   {
@@ -974,8 +985,8 @@
     "description": "$633 per Person • 5 Hours & 15 Minutes • Age 15+",
     "image": "https://cdn.filestackcontent.com/T6IuBihwQBynY4XpI56E",
     "company": "northstartrekking",
-    "fromPrice": "From $633",
-    "rateSummary": "633",
+    "fromPrice": "From $507",
+    "rateSummary": "507",
     "category": "Air Tours"
   },
   {
@@ -985,8 +996,8 @@
     "description": "3 Hours & 15 Minutes • Age 7+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/KRVtt607RkKp6bDCU3HO",
     "company": "northstartrekking",
-    "fromPrice": "From $260",
-    "rateSummary": "260 • 688",
+    "fromPrice": "From $550",
+    "rateSummary": "550",
     "category": "Air Tours"
   },
   {
@@ -996,8 +1007,8 @@
     "description": "$405 Per Person | 2 Hours & 15 Minutes | Activity level: Light",
     "image": "https://cdn.filestackcontent.com/Oed3sFGxRgSYBj6iP8nu",
     "company": "northstartrekking",
-    "fromPrice": "From $160",
-    "rateSummary": "160 • 419",
+    "fromPrice": "From $335",
+    "rateSummary": "335",
     "category": "Air Tours"
   },
   {
@@ -1007,8 +1018,8 @@
     "description": "4 Hours & 15 Minutes • Age 12+",
     "image": "https://cdn.filestackcontent.com/hc4Dld6oRaOLcxZnVfFz",
     "company": "northstartrekking",
-    "fromPrice": "From $210",
-    "rateSummary": "210 • 599",
+    "fromPrice": "From $479",
+    "rateSummary": "479",
     "category": "Air Tours"
   },
   {

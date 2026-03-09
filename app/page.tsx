@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-[70vh] sm:min-h-[80vh] bg-white">
       {/* HERO SECTION - NO ICONS */}
       <section className="relative h-[85vh] flex items-center justify-center overflow-hidden bg-slate-900">
         <img 
@@ -13,7 +13,7 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/20 via-transparent to-white" />
         
         <div className="relative z-10 text-center px-6">
-          <h1 className="text-8xl font-black text-white uppercase tracking-tighter leading-none mb-6 drop-shadow-2xl">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white uppercase tracking-tighter leading-[1.05] mb-6 drop-shadow-2xl">
             Welcome <span className="text-blue-500">To</span> Alaska
           </h1>
           <p className="text-2xl text-white font-bold uppercase tracking-widest mb-12 drop-shadow-lg">
