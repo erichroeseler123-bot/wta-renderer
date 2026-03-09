@@ -199,7 +199,7 @@ export default function ToursPage() {
     return filteredByPortWindow.filter((t) => matchMap[dateKeyFor(t)]?.status === "match");
   }, [fitScheduleOnly, profileComplete, filteredByQuery, filteredByPortWindow, matchMap, dateKeyFor]);
 
-  const heading = portFilter ? `${portFilter[0].toUpperCase()}${portFilter.slice(1)} Excursions` : "Alaska Excursions";
+  const heading = portFilter ? `${portFilter[0].toUpperCase()}${portFilter.slice(1)} Shore Excursions` : "Alaska Shore Excursions";
 
   const plannedForDate = useMemo(() => {
     if (!effectiveDate) return [];
@@ -209,7 +209,7 @@ export default function ToursPage() {
   }, [items, effectiveDate]);
 
   if (!loaded || loadingTours) {
-    return <div className="p-20 text-center text-4xl font-black text-slate-500">Loading Cruise Schedule...</div>;
+    return <div className="p-20 text-center text-4xl font-black text-slate-500">Loading Your Tour Matches...</div>;
   }
 
   return (
@@ -227,23 +227,23 @@ export default function ToursPage() {
           ) : null}
 
           <div className="mb-8 rounded-3xl border border-slate-200 bg-slate-50 p-5">
-            <div className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Cruise Plan</div>
+            <div className="mb-3 text-xs font-black uppercase tracking-[0.16em] text-slate-500">Cruise Day Planner</div>
             <div className="flex flex-col gap-3 md:flex-row md:items-end">
               <div className="flex-1">
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Cruise ship</label>
+                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Cruise Ship</label>
                 <select
                   value={shipInput}
                   onChange={(e) => setShipInput(e.target.value)}
                   className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm"
                 >
-                  <option value="">Select ship...</option>
+                  <option value="">Select your ship...</option>
                   {SHIP_OPTIONS.map((v) => (
                     <option key={v} value={v}>{v}</option>
                   ))}
                 </select>
               </div>
               <div className="w-full md:w-56">
-                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Sail date</label>
+                <label className="mb-1 block text-[11px] font-bold uppercase tracking-wide text-slate-500">Sail Date</label>
                 <input
                   type="date"
                   value={dateInput}
@@ -261,7 +261,7 @@ export default function ToursPage() {
                 }}
                 className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-700"
               >
-                Save Plan
+                Find My Best Fits
               </button>
               <button
                 type="button"
@@ -273,14 +273,14 @@ export default function ToursPage() {
                 }}
                 className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100"
               >
-                Reset
+                Clear Plan
               </button>
             </div>
 
             {profileComplete ? (
               <div className="mt-4 grid gap-3 md:grid-cols-2">
                 <div className="rounded-2xl border border-slate-200 bg-white p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Itinerary Summary</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Trip Snapshot</div>
                   <div className="mt-2 flex flex-wrap gap-2">
                     <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">{shipInput}</span>
                     <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">{effectiveDate}</span>
@@ -301,17 +301,17 @@ export default function ToursPage() {
                       checked={fitScheduleOnly}
                       onChange={(e) => setFitScheduleOnly(e.target.checked)}
                     />
-                    Show only tours that fit this schedule
+                    Show only tours that fit this ship date
                   </label>
                   {fitScheduleOnly && profileComplete ? (
                     <div className="mt-2 text-xs text-slate-600">
-                      {fitLoading ? "Loading schedule fit..." : `Checked ${fitChecked} tours for this date`}
+                      {fitLoading ? "Checking live schedule fit..." : `Checked ${fitChecked} tours for this date`}
                     </div>
                   ) : null}
                 </div>
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-3">
-                  <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">My Day Plan</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wide text-slate-500">Saved Itinerary</div>
                   {plannedForDate.length > 0 ? (
                     <ul className="mt-2 space-y-2">
                       {plannedForDate.slice(0, 4).map((it) => (
@@ -321,13 +321,13 @@ export default function ToursPage() {
                       ))}
                     </ul>
                   ) : (
-                    <p className="mt-2 text-sm text-slate-600">No itinerary items yet for this date.</p>
+                    <p className="mt-2 text-sm text-slate-600">No tours saved for this date yet. Add options you like to build your day plan.</p>
                   )}
                 </div>
               </div>
             ) : (
               <p className="mt-3 text-sm text-slate-600">
-                Add your ship and sail date to filter tours that fit your schedule and save your plan for next visit.
+                Add your ship and sail date to see tours that fit your cruise schedule and save your plan for next time.
               </p>
             )}
           </div>
@@ -351,22 +351,22 @@ export default function ToursPage() {
 
         {fitScheduleOnly && profileComplete && fitLoading ? (
           <div className="mb-6 rounded-2xl border border-blue-100 bg-blue-50 px-4 py-3 text-sm font-semibold text-blue-700">
-            Loading schedule fit...
+            Checking which tours fit your cruise day...
           </div>
         ) : null}
 
         {fitScheduleOnly && profileComplete && !fitLoading && filtered.length < 1 ? (
           <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-800">
-            <div className="text-base font-black">No matching tours for this ship/date</div>
+            <div className="text-base font-black">No tour matches found for this ship/date</div>
             <p className="mt-1 text-sm">
-              Try another date, disable schedule-fit filtering, or browse all tours first.
+              Try another date, turn off fit filtering, or browse all tours first.
             </p>
             <button
               type="button"
               onClick={() => setFitScheduleOnly(false)}
               className="mt-3 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-amber-700"
             >
-              Show All Tours
+              Browse All Tours
             </button>
           </div>
         ) : null}

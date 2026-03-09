@@ -37,7 +37,7 @@ export default function Header() {
           href="/"
           className="text-xl font-black tracking-tighter text-white/90 hover:text-white"
         >
-          Welcome <span className="text-blue-500">To</span> Alaska
+          Welcome To Alaska <span className="text-blue-500">Tours</span>
         </Link>
 
         <div className="flex items-center gap-4">
@@ -65,7 +65,7 @@ export default function Header() {
               Cruise Ship
             </span>
             <span className="text-sm font-semibold text-amber-500">
-              {ship ? `${ship} (${date})` : "Select Ship →"}
+              {ship ? `${ship} (${date})` : "Plan My Cruise Day →"}
             </span>
           </button>
         </div>
