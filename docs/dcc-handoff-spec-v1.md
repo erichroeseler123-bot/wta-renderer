@@ -1,33 +1,33 @@
 # DCC Handoff Spec v1
 
 ## 1. Purpose
-
-Standard contract for all DCC-origin handoffs into WTA-like satellite sites so routing, attribution, observability, and recovery are consistent across nodes.
+Define a stable, reusable contract for DCC-origin handoffs into WTA-style receiver sites so routing, attribution, and observability behave consistently across nodes.
 
 ## 2. Versioning
-
-- `source` MUST be `"dcc"`
-- `version` MUST be `"1"`
-- Future breaking changes require `version: "2"` (no silent behavior change in v1)
+- `source` MUST be `"dcc"`.
+- `version` MUST be `"1"`.
+- Breaking changes require a new major payload version (for example `"2"`).
 
 ## 3. Transport
+### 3.1 Endpoint
+- Receiver endpoint: `GET /handoff/dcc`
 
-### Endpoint
+### 3.2 Query params
+- `payload` (required): base64url-encoded UTF-8 JSON payload.
+- `sig` (conditionally required): signature over raw `payload` string.
 
-- `GET /handoff/dcc`
+### 3.3 Signature
+When receiver secret is configured (`DCC_WTA_HANDOFF_SECRET` or `WTA_HANDOFF_SECRET`):
+- `sig` is REQUIRED.
+- Signature algorithm is fixed:
 
-### Query Params
+```text
+sig = base64url(HMAC-SHA256(payload, secret))
+```
 
-- `payload` (required): base64url-encoded UTF-8 JSON
-- `sig` (optional/required by env): hex HMAC-SHA256 of raw payload
+- Missing or invalid signature MUST be rejected.
 
-### Signature Rule
-
-- If `DCC_WTA_HANDOFF_SECRET` (or `WTA_HANDOFF_SECRET`) is configured on receiver:
-  - `sig` is REQUIRED
-  - invalid/missing `sig` => reject
-- If secret is not configured:
-  - unsigned payloads may be accepted (dev/back-compat mode)
+When no secret is configured, unsigned payloads MAY be accepted (development/back-compat mode only).
 
 ## 4. Payload Schema (v1)
 
@@ -36,6 +36,7 @@ Standard contract for all DCC-origin handoffs into WTA-like satellite sites so r
   "source": "dcc",
   "version": "1",
   "handoffId": "string-required",
+  "createdAt": "ISO-8601 timestamp, recommended",
   "destination": {
     "regionSlug": "string-optional",
     "citySlug": "string-optional",
@@ -65,28 +66,26 @@ Standard contract for all DCC-origin handoffs into WTA-like satellite sites so r
 }
 ```
 
-### Required
-
+### 4.1 Required fields
 - `source`, `version`, `handoffId`
 
-### Normalization
+### 4.2 Normalization rules
+- Slug-like strings should be trimmed and normalized to lowercase.
+- Date values must match `YYYY-MM-DD`.
+- Traveler counts must be positive integers.
+- If `partySize` is omitted, receiver MAY derive it from `adults + children`.
 
-- slugs lowercased/trimmed
-- dates must match `^\d{4}-\d{2}-\d{2}$`
-- positive ints only for counts
-- if `partySize` missing, receiver may derive `adults + children`
+## 5. Resolution Priority
+Receiver resolves the final route in this order:
+1. Exact `intent.itemSlug` mapping -> `/tours/[company]/[item]`
+2. `destination.portSlug` (optionally with category filter) -> `/ports/[slug]`
+3. Category-only intent -> `/tours?category=...`
+4. Fallback -> `/tours`
 
-## 5. Resolution Priority (Routing)
-
-1. `intent.itemSlug` exact mapped product -> `/tours/[company]/[item]`
-2. `destination.portSlug` (+ optional category) -> `/ports/[slug]`
-3. `intent.category` only -> `/tours?category=...`
-4. fallback -> `/tours`
+The receiver owns final commercial mapping. DCC MUST NOT send transactional identifiers (provider PKs, cart IDs, payment IDs, booking IDs).
 
 ## 6. Query Mapping Contract
-
-Receiver should preserve attribution and traveler context in redirect query:
-
+On successful redirect, receiver should preserve attribution/traveler context in query params where available:
 - `source=dcc`
 - `handoff_id=<handoffId>`
 - `date`, `partySize`, `adults`, `children`
@@ -95,53 +94,80 @@ Receiver should preserve attribution and traveler context in redirect query:
 - `referrer_path`, `authority_topic`, `campaign`, `node_slug`
 
 ## 7. Cookie Contract
-
-On successful handoff response, set:
-
+On successful handoff, receiver sets:
 - `wta_handoff_source=dcc`
 - `wta_handoff_id=<handoffId>`
 - optional `wta_authority_topic=<authorityTopic>`
-- `SameSite=Lax`, `path=/`, `max-age=7d`
+
+Recommended attributes: `Path=/`, `SameSite=Lax`, max age 7 days.
 
 ## 8. Persistence Contract
-
-Store each received handoff (KV/Redis):
-
-- key: `handoff:received:<handoffId>`
-- index: `handoff:received:recent` (max ~300)
-- fields: `handoffId`, `source`, `version`, `targetUrl`, `intent`, `receivedAt`, `ip`, `userAgent`, `reason`
+Receiver should persist received handoffs in storage (KV/Redis) when available:
+- row key: `handoff:received:<handoffId>`
+- recent index key: `handoff:received:recent`
+- index size cap: ~300
 - TTL: 30 days
 
-## 9. Error Contract
+Stored row should include at least:
+- `handoffId`, `source`, `version`, `sourceMode`
+- `targetUrl`, `reason`
+- `payload` (full normalized handoff payload, not just `intent`)
+- `receivedAt`, `ip`, `userAgent`
 
-- `400` invalid/missing payload/signature/source/version
-- `401/403` debug endpoint unauthenticated
-- `302/307` successful redirect
-- body shape on error:
+## 9. Error Contract
+- `400`: invalid payload, decode/JSON failure, invalid source/version, missing required fields.
+- `403`: missing/invalid signature when signature is required.
+- `302` or `307`: successful redirect.
+
+Error body format:
 
 ```json
-{ "success": false, "error": "<message>", "details": "<optional>" }
+{
+  "success": false,
+  "error": "string",
+  "details": "optional"
+}
 ```
 
 ## 10. Debug/Admin Contract
-
-- `GET /api/handoff/dcc/debug?limit=N`
-- Auth required
-- `200` response:
+- Endpoint: `GET /api/handoff/dcc/debug?limit=N`
+- Auth required.
+- Unauthenticated response should be `401` or `403`.
+- Authenticated response:
 
 ```json
-{ "success": true, "count": 1, "rows": [] }
+{
+  "success": true,
+  "count": 1,
+  "rows": []
+}
 ```
 
 ## 11. Conformance Tests (Minimum)
-
 1. Missing payload -> `400`
 2. Invalid base64/json -> `400`
 3. Bad source/version -> `400`
-4. Valid payload -> `302/307`
-5. Redirect route class matches expected (item/port/category/fallback)
-6. Cookies set correctly
-7. Debug unauth -> `401/403`
-8. Debug auth -> `200` and row contains `handoffId`
-9. Mapping fidelity for port, date, partySize, category
-10. Optional checkout test: attribution fields persist into order/receipt
+4. Signature required + missing/invalid sig -> `403`
+5. Valid payload -> redirect (`302`/`307`)
+6. Redirect route class matches expected (`ports`, `tours`, `tour_item`)
+7. Handoff cookies are set
+8. Debug unauth -> `401`/`403`
+9. Debug auth -> `200` and row contains `handoffId`
+10. Mapping fidelity check (`port`, `date`, `partySize`, `category`)
+11. Optional checkout attribution persistence test
+
+## 12. Receiver Responsibilities
+- Verify signature when configured.
+- Normalize payload fields.
+- Resolve route using local mapping rules.
+- Persist debug record when storage is available.
+- Set handoff cookies on success.
+- Preserve attribution fields into downstream cart/order flows where applicable.
+
+## 13. Non-Goals
+This spec does not transport:
+- payment identifiers
+- booking confirmations
+- provider-specific inventory PKs
+- cart state
+- checkout session state

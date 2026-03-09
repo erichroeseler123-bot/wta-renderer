@@ -7,47 +7,55 @@
   "required": ["source", "version", "handoffId"],
   "properties": {
     "source": {
-      "type": "string",
-      "const": "dcc"
+      "const": "dcc",
+      "description": "Protocol source identifier."
     },
     "version": {
-      "type": "string",
-      "const": "1"
+      "const": "1",
+      "description": "Payload version identifier."
     },
     "handoffId": {
       "type": "string",
-      "minLength": 1
+      "minLength": 1,
+      "maxLength": 128,
+      "pattern": "^[A-Za-z0-9._:-]+$",
+      "description": "Unique handoff correlation ID."
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Optional payload creation timestamp in UTC ISO-8601."
     },
     "destination": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "regionSlug": { "type": "string", "minLength": 1 },
-        "citySlug": { "type": "string", "minLength": 1 },
-        "portSlug": { "type": "string", "minLength": 1 }
+        "regionSlug": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "citySlug": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "portSlug": { "type": "string", "minLength": 1, "maxLength": 100 }
       }
     },
     "traveler": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "adults": { "type": "integer", "minimum": 1 },
-        "children": { "type": "integer", "minimum": 1 },
-        "partySize": { "type": "integer", "minimum": 1 },
+        "adults": { "type": "integer", "minimum": 1, "maximum": 50 },
+        "children": { "type": "integer", "minimum": 0, "maximum": 50 },
+        "partySize": { "type": "integer", "minimum": 1, "maximum": 99 },
         "cruiseDate": {
           "type": "string",
           "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
         },
-        "cruiseShip": { "type": "string", "minLength": 1 },
-        "cruiseShipSlug": { "type": "string", "minLength": 1 }
+        "cruiseShip": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "cruiseShipSlug": { "type": "string", "minLength": 1, "maxLength": 120 }
       }
     },
     "intent": {
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "category": { "type": "string", "minLength": 1 },
-        "itemSlug": { "type": "string", "minLength": 1 },
+        "category": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "itemSlug": { "type": "string", "minLength": 1, "maxLength": 160 },
         "date": {
           "type": "string",
           "pattern": "^\\d{4}-\\d{2}-\\d{2}$"
@@ -66,10 +74,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "referrerPath": { "type": "string", "minLength": 1 },
-        "authorityTopic": { "type": "string", "minLength": 1 },
-        "campaign": { "type": "string", "minLength": 1 },
-        "nodeSlug": { "type": "string", "minLength": 1 }
+        "referrerPath": { "type": "string", "minLength": 1, "maxLength": 500 },
+        "authorityTopic": { "type": "string", "minLength": 1, "maxLength": 200 },
+        "campaign": { "type": "string", "minLength": 1, "maxLength": 120 },
+        "nodeSlug": { "type": "string", "minLength": 1, "maxLength": 120 }
       }
     }
   }
