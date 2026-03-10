@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import styles from "./home.module.css";
 import { getToursFromFareHarbor } from "@/lib/data/tours";
+import { inferPortFromCompany } from "@/lib/handoff/mappings";
 
 export const metadata: Metadata = {
   title: "Alaska Flight Tours | Live FareHarbor Inventory",
@@ -25,6 +26,8 @@ function isExcludedOffer(tour: { title?: string; description?: string }): boolea
   const blockedPhrases = [
     "gift card",
     "gift cards",
+    "fundraising",
+    "fundraiser",
     "local's day",
     "locals day",
     "for locals",
@@ -33,6 +36,16 @@ function isExcludedOffer(tour: { title?: string; description?: string }): boolea
     "residents only",
   ];
   return blockedPhrases.some((phrase) => text.includes(phrase));
+}
+
+function cityForTour(companyRaw: string): "juneau" | "skagway" | null {
+  const company = String(companyRaw || "").toLowerCase();
+  if (company.includes("skagway")) return "skagway";
+
+  const inferred = inferPortFromCompany(company);
+  if (inferred === "juneau") return "juneau";
+  if (inferred === "skagway") return "skagway";
+  return null;
 }
 
 function formatUpdatedAt(date: Date): string {
@@ -51,12 +64,16 @@ export default async function HomeFlightsPage() {
   const flights = tours
     .filter((tour) => providerRank(tour.fareharbor?.company || "") < 3)
     .filter((tour) => !isExcludedOffer(tour))
+    .filter((tour) => cityForTour(tour.fareharbor?.company || "") !== null)
     .sort((a, b) => {
       const rankDiff = providerRank(a.fareharbor?.company || "") - providerRank(b.fareharbor?.company || "");
       if (rankDiff !== 0) return rankDiff;
       return a.title.localeCompare(b.title);
     })
     .slice(0, 24);
+
+  const juneauFlights = flights.filter((f) => cityForTour(f.fareharbor?.company || "") === "juneau");
+  const skagwayFlights = flights.filter((f) => cityForTour(f.fareharbor?.company || "") === "skagway");
 
   const updatedAt = formatUpdatedAt(new Date());
 
@@ -101,22 +118,63 @@ export default async function HomeFlightsPage() {
             </Link>
           </div>
         ) : (
-          <div className={styles.grid}>
-            {flights.map((flight) => (
-              <article key={`${flight.fareharbor.company}:${flight.pk}`} className={styles.card}>
-                <p className={styles.company}>{flight.fareharbor.company}</p>
-                <h3>{flight.title}</h3>
-                <p className={styles.meta}>
-                  {flight.fromPrice || "Check Price"}
-                  {flight.duration ? ` • ${flight.duration}` : ""}
-                </p>
-                <p className={styles.description}>{flight.description || "View details and availability."}</p>
-                <Link href={`/tours/${flight.fareharbor.company}/${flight.pk}`} className={styles.cardBtn}>
-                  View Flight
-                </Link>
-              </article>
-            ))}
-          </div>
+          <>
+            <h3 className={styles.cityHeading}>Juneau</h3>
+            {juneauFlights.length < 1 ? (
+              <p className={styles.cityEmpty}>No Juneau flights available right now.</p>
+            ) : (
+              <div className={styles.grid}>
+                {juneauFlights.map((flight) => (
+                  <article key={`${flight.fareharbor.company}:${flight.pk}`} className={styles.card}>
+                    {flight.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img className={styles.cardImage} src={flight.image} alt={flight.title} loading="lazy" />
+                    ) : (
+                      <div className={styles.cardImageFallback}>Flight Tour</div>
+                    )}
+                    <p className={styles.company}>{flight.fareharbor.company}</p>
+                    <h3>{flight.title}</h3>
+                    <p className={styles.meta}>
+                      {flight.fromPrice || "Check Price"}
+                      {flight.duration ? ` • ${flight.duration}` : ""}
+                    </p>
+                    <p className={styles.description}>{flight.description || "View details and availability."}</p>
+                    <Link href={`/tours/${flight.fareharbor.company}/${flight.pk}`} className={styles.cardBtn}>
+                      View Flight
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            )}
+
+            <h3 className={styles.cityHeading}>Skagway</h3>
+            {skagwayFlights.length < 1 ? (
+              <p className={styles.cityEmpty}>No Skagway flights available right now.</p>
+            ) : (
+              <div className={styles.grid}>
+                {skagwayFlights.map((flight) => (
+                  <article key={`${flight.fareharbor.company}:${flight.pk}`} className={styles.card}>
+                    {flight.image ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img className={styles.cardImage} src={flight.image} alt={flight.title} loading="lazy" />
+                    ) : (
+                      <div className={styles.cardImageFallback}>Flight Tour</div>
+                    )}
+                    <p className={styles.company}>{flight.fareharbor.company}</p>
+                    <h3>{flight.title}</h3>
+                    <p className={styles.meta}>
+                      {flight.fromPrice || "Check Price"}
+                      {flight.duration ? ` • ${flight.duration}` : ""}
+                    </p>
+                    <p className={styles.description}>{flight.description || "View details and availability."}</p>
+                    <Link href={`/tours/${flight.fareharbor.company}/${flight.pk}`} className={styles.cardBtn}>
+                      View Flight
+                    </Link>
+                  </article>
+                ))}
+              </div>
+            )}
+          </>
         )}
       </section>
 
