@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useCruise } from "@/context/CruiseContext";
 import { getCruiseLineForShip } from "@/lib/cruiseShips";
 import ShipPicker from "./ShipPicker";
@@ -9,8 +10,10 @@ import CartDrawer from "@/app/components/cart/CartDrawer";
 import CartButton from "@/app/components/cart/CartButton";
 
 export default function Header() {
+  const pathname = usePathname();
   const { ship, date, setCruise } = useCruise();
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const showCruisePicker = pathname !== "/home";
 
   // Hide owner link unless URL has ?admin=1
   const showOwner = useMemo(() => {
@@ -57,24 +60,26 @@ export default function Header() {
 
           <CartButton />
 
-          <button
-            type="button"
-            onClick={() => setIsPickerOpen(true)}
-            className="flex flex-col items-end rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-left hover:bg-white/10"
-            aria-label="Select cruise ship"
-            title="Select cruise ship"
-          >
-            <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
-              Cruise Ship
-            </span>
-            <span className="text-sm font-semibold text-amber-500">
-              {ship ? `${ship} (${date})` : "Plan My Cruise Day →"}
-            </span>
-          </button>
+          {showCruisePicker ? (
+            <button
+              type="button"
+              onClick={() => setIsPickerOpen(true)}
+              className="flex flex-col items-end rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-left hover:bg-white/10"
+              aria-label="Select cruise ship"
+              title="Select cruise ship"
+            >
+              <span className="text-[10px] font-semibold uppercase tracking-wide text-slate-400">
+                Cruise Ship
+              </span>
+              <span className="text-sm font-semibold text-amber-500">
+                {ship ? `${ship} (${date})` : "Plan My Cruise Day →"}
+              </span>
+            </button>
+          ) : null}
         </div>
       </div>
 
-      <ShipPicker isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} />
+      {showCruisePicker ? <ShipPicker isOpen={isPickerOpen} onClose={() => setIsPickerOpen(false)} /> : null}
       <CartDrawer />
     </header>
   );
