@@ -61,6 +61,15 @@ function trustLineForTour(tour: Tour, port: string) {
   return "Curated for cruise day timing and easy shore return";
 }
 
+function parseFromPriceCents(value?: string) {
+  if (!value) return null;
+  const match = value.replace(/,/g, "").match(/(\d+(?:\.\d+)?)/);
+  if (!match) return null;
+  const n = Number(match[1]);
+  if (!Number.isFinite(n) || n <= 0) return null;
+  return Math.round(n * 100);
+}
+
 export default function ToursPage() {
   const { line: savedLine, ship, date: savedDate, loaded, setCruise, clearCruise } = useCruise();
   const { items } = useCart();
@@ -75,6 +84,10 @@ export default function ToursPage() {
   const [matchMap, setMatchMap] = useState<Record<string, MatchState>>({});
   const [fitLoading, setFitLoading] = useState(false);
   const [fitChecked, setFitChecked] = useState(0);
+  const [searchText, setSearchText] = useState("");
+  const [manualPort, setManualPort] = useState("");
+  const [operatorFilter, setOperatorFilter] = useState("all");
+  const [priceTier, setPriceTier] = useState<"all" | "under150" | "150to250" | "over250">("all");
   const fitCacheRef = useRef<Map<string, Record<string, MatchState>>>(new Map());
   const [queryParams, setQueryParams] = useState({
     portFilter: "",
@@ -84,9 +97,12 @@ export default function ToursPage() {
     date: "",
     cruiseLine: "",
     cruiseShip: "",
+    queryText: "",
+    operator: "",
+    priceTier: "",
   });
 
-  const { portFilter, categoryFilterRaw, handoffId, party, date, cruiseLine, cruiseShip } = queryParams;
+  const { portFilter, categoryFilterRaw, handoffId, party, date, cruiseLine, cruiseShip, queryText, operator, priceTier: queryPriceTier } = queryParams;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -99,8 +115,24 @@ export default function ToursPage() {
       date: sp.get("date") || sp.get("cruiseDate") || "",
       cruiseLine: sp.get("cruiseLine") || "",
       cruiseShip: sp.get("cruiseShip") || "",
+      queryText: sp.get("q") || "",
+      operator: sp.get("operator") || "",
+      priceTier: sp.get("priceTier") || "",
     });
   }, []);
+
+  useEffect(() => {
+    if (queryText) setSearchText(queryText);
+    if (operator) setOperatorFilter(operator);
+    if (
+      queryPriceTier === "under150" ||
+      queryPriceTier === "150to250" ||
+      queryPriceTier === "over250"
+    ) {
+      setPriceTier(queryPriceTier);
+    }
+    if (portFilter) setManualPort(portFilter);
+  }, [queryText, operator, queryPriceTier, portFilter]);
 
   useEffect(() => {
     if (!loaded || planInitialized) return;
@@ -148,15 +180,38 @@ export default function ToursPage() {
     [categoryFilterRaw, categories],
   );
   const activeCat = manualCat ?? (queryCategory || "All");
+  const activePort = manualPort || portFilter;
+
+  const portOptions = useMemo(
+    () => ["all", ...new Set(tours.map((t) => inferPortFromCompany(t.company)).filter(Boolean))],
+    [tours],
+  );
+  const operatorOptions = useMemo(
+    () => ["all", ...new Set(tours.map((t) => t.company).filter(Boolean))].sort(),
+    [tours],
+  );
 
   const filteredByQuery = useMemo(() => {
+    const q = normalize(searchText);
     return tours.filter((t) => {
       const tPort = inferPortFromCompany(t.company);
-      if (portFilter && tPort !== portFilter) return false;
+      if (activePort && activePort !== "all" && tPort !== activePort) return false;
       if (activeCat !== "All" && (t.category || "Adventures") !== activeCat) return false;
+      if (operatorFilter !== "all" && t.company !== operatorFilter) return false;
+      if (priceTier !== "all") {
+        const cents = parseFromPriceCents(t.fromPrice);
+        if (!cents) return false;
+        if (priceTier === "under150" && cents >= 15000) return false;
+        if (priceTier === "150to250" && (cents < 15000 || cents > 25000)) return false;
+        if (priceTier === "over250" && cents <= 25000) return false;
+      }
+      if (q) {
+        const hay = normalize(`${t.title} ${t.description || ""} ${t.company} ${t.category || ""}`);
+        if (!hay.includes(q)) return false;
+      }
       return true;
     });
-  }, [tours, portFilter, activeCat]);
+  }, [tours, activePort, activeCat, operatorFilter, priceTier, searchText]);
 
   const effectiveDate = shipInput ? getFirstSailingDateForShip(shipInput) : "";
   const profileComplete = Boolean(shipInput && effectiveDate);
@@ -180,7 +235,7 @@ export default function ToursPage() {
   useEffect(() => {
     if (!(fitScheduleOnly && profileComplete)) return;
     if (filteredByPortWindow.length < 1) return;
-    const port = itineraryPort || portFilter || "";
+    const port = itineraryPort || activePort || "";
     const category = activeCat !== "All" ? activeCat : "";
     const requestKey = `${effectiveDate}|${port}|${normalize(category)}`;
     const cached = fitCacheRef.current.get(requestKey);
@@ -222,14 +277,14 @@ export default function ToursPage() {
     return () => {
       cancelled = true;
     };
-  }, [fitScheduleOnly, profileComplete, filteredByPortWindow.length, effectiveDate, itineraryPort, portFilter, activeCat]);
+  }, [fitScheduleOnly, profileComplete, filteredByPortWindow.length, effectiveDate, itineraryPort, activePort, activeCat]);
 
   const filtered = useMemo(() => {
     if (!(fitScheduleOnly && profileComplete)) return filteredByQuery;
     return filteredByPortWindow.filter((t) => matchMap[dateKeyFor(t)]?.status === "match");
   }, [fitScheduleOnly, profileComplete, filteredByQuery, filteredByPortWindow, matchMap, dateKeyFor]);
 
-  const heading = portFilter ? `${portFilter[0].toUpperCase()}${portFilter.slice(1)} Shore Excursions` : "Alaska Shore Excursions";
+  const heading = activePort ? `${activePort[0].toUpperCase()}${activePort.slice(1)} Shore Excursions` : "Alaska Shore Excursions";
   const canonicalUrl = "https://welcometoalaskatours.com/tours";
 
   const plannedForDate = useMemo(() => {
@@ -422,6 +477,71 @@ export default function ToursPage() {
             ) : null}
           </div>
 
+          <div className="mb-5 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div className="mb-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+              Filters by port, operator, price, and search
+            </div>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {portOptions.map((port) => (
+                <button
+                  key={port}
+                  type="button"
+                  onClick={() => setManualPort(port === "all" ? "" : port)}
+                  className={`min-h-11 rounded-full px-3 py-2 text-xs font-bold uppercase tracking-wide ${
+                    (port === "all" ? !activePort : activePort === port)
+                      ? "bg-sky-600 text-white"
+                      : "bg-white text-slate-700 border border-slate-300"
+                  }`}
+                >
+                  {port}
+                </button>
+              ))}
+            </div>
+            <div className="grid gap-3 md:grid-cols-4">
+              <label className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Operator
+                <select
+                  value={operatorFilter}
+                  onChange={(e) => setOperatorFilter(e.target.value)}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                >
+                  {operatorOptions.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="text-xs font-bold uppercase tracking-wide text-slate-500">
+                Price
+                <select
+                  value={priceTier}
+                  onChange={(e) =>
+                    setPriceTier(e.target.value as "all" | "under150" | "150to250" | "over250")
+                  }
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                >
+                  <option value="all">All prices</option>
+                  <option value="under150">Under $150</option>
+                  <option value="150to250">$150 - $250</option>
+                  <option value="over250">Over $250</option>
+                </select>
+              </label>
+              <label className="md:col-span-2 text-xs font-bold uppercase tracking-wide text-slate-500">
+                Search tours
+                <input
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  className="mt-1 min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900"
+                  placeholder="whale, mendenhall, family, scenic..."
+                />
+              </label>
+            </div>
+            <div className="mt-2 text-xs font-semibold text-slate-600">
+              Showing {filtered.length} tour{filtered.length === 1 ? "" : "s"}.
+            </div>
+          </div>
+
           <div className="flex flex-wrap gap-3 border-b-2 border-slate-100 pb-8">
             {categories.map((cat) => (
               <button
@@ -545,7 +665,15 @@ export default function ToursPage() {
                   </h3>
                   <div className="whitespace-nowrap text-xl font-black text-slate-900">{tour.fromPrice || "Check Price"}</div>
                 </div>
-                <p className="mb-3 text-sm leading-relaxed text-slate-600">{trustLineForTour(tour, portFilter || itineraryPort)}</p>
+                <div className="mb-2 flex flex-wrap gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">{tour.company}</span>
+                  {inferPortFromCompany(tour.company) ? (
+                    <span className="rounded-full border border-slate-200 bg-slate-50 px-2 py-1">
+                      {inferPortFromCompany(tour.company)}
+                    </span>
+                  ) : null}
+                </div>
+                <p className="mb-3 text-sm leading-relaxed text-slate-600">{trustLineForTour(tour, activePort || itineraryPort)}</p>
                 {(fitScheduleOnly && profileComplete) ? (
                   <div className="mb-3 text-xs font-bold tracking-wide">
                     {matchMap[dateKeyFor(tour)]?.status === "match" ? (
@@ -561,7 +689,7 @@ export default function ToursPage() {
                     ) : null}
                   </div>
                 ) : null}
-                <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">{tour.description || ""}</p>
+                <p className="line-clamp-3 text-sm leading-relaxed text-slate-500">{tour.description || ""}</p>
                 <div className="mt-4">
                   <span className="inline-flex items-center rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white transition-colors group-hover:bg-blue-600">
                     View Tour

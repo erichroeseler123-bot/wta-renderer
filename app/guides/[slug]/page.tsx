@@ -89,6 +89,9 @@ export default async function GuidePage({
         <header className="mt-5">
           <div className="text-[11px] font-bold uppercase tracking-wide text-sky-700">
             {guide.targetKeyword} • {guide.readMinutes} min read
+            {" • "}
+            {guide.topic}
+            {guide.port ? ` • ${guide.port}` : ""}
           </div>
           <h1 className="mt-2 text-3xl font-black tracking-tight sm:text-4xl">{guide.title}</h1>
           <p className="mt-3 text-base text-slate-600">{guide.description}</p>
