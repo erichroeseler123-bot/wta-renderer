@@ -10,6 +10,7 @@ import ProductDepartureCalendar, {
 } from "@/components/tours/ProductDepartureCalendar";
 import ItemBookingPicker from "@/components/tours/ItemBookingPicker";
 import { useCart } from "@/app/components/cart/CartContext";
+import { useCruise } from "@/context/CruiseContext";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 
 type TourSnapshot = {
@@ -40,6 +41,7 @@ export default function TourDetailPage({
 }) {
   const { company, item } = use(params) as { company: string; item: string };
   const sp = useSearchParams();
+  const { ship: cruiseShip, date: cruiseDate, loaded: cruiseLoaded } = useCruise();
 
   const { addItem, setSelection, open } = useCart();
 
@@ -64,10 +66,12 @@ export default function TourDetailPage({
   const handoffCategory = sp.get("category") || "";
 
   useEffect(() => {
-    if (!selectedDay && handoffDate && /^\d{4}-\d{2}-\d{2}$/.test(handoffDate)) {
-      setSelectedDay(handoffDate);
-    }
-  }, [selectedDay, handoffDate]);
+    if (!cruiseLoaded || selectedDay) return;
+    const handoffValid = handoffDate && /^\d{4}-\d{2}-\d{2}$/.test(handoffDate);
+    const cruiseValid = cruiseDate && /^\d{4}-\d{2}-\d{2}$/.test(cruiseDate);
+    const preferredDate = handoffValid ? handoffDate : (cruiseValid ? cruiseDate : "");
+    if (preferredDate) setSelectedDay(preferredDate);
+  }, [selectedDay, handoffDate, cruiseDate, cruiseLoaded]);
 
   // 1) Load tour snapshot
   useEffect(() => {
@@ -295,6 +299,8 @@ export default function TourDetailPage({
               priceLabel={priceLabel}
               canAdd={canAdd}
               onAdd={addToItinerary}
+              cruiseShip={cruiseShip}
+              cruiseDate={cruiseDate}
             />
 
             <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600">

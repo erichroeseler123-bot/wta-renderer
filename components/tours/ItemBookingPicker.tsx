@@ -11,12 +11,16 @@ export default function ItemBookingPicker({
   priceLabel,
   canAdd,
   onAdd,
+  cruiseShip,
+  cruiseDate,
 }: {
   selectedDay: string | null;
   selectedTimeLabel: string | null; // "10:00"
   priceLabel: string | null;        // "$209.00"
   canAdd: boolean;
   onAdd: () => void;
+  cruiseShip?: string | null;
+  cruiseDate?: string | null;
 }) {
   const { ship } = useCruise();
   const { open } = useCart();
@@ -42,9 +46,19 @@ export default function ItemBookingPicker({
     <div className="space-y-6">
       <div className="rounded-2xl border border-slate-200 bg-white p-4 text-left">
         <h3 className="text-lg font-black tracking-tight text-slate-900">Choose Date and Departure Time</h3>
-        <p className="mt-1 text-sm text-slate-600">
-          Step 1: Select your date. Step 2: Select a departure time. Step 3: Add this tour to your cart.
-        </p>
+        {cruiseShip && cruiseDate ? (
+          <div className="mt-2 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-800">
+            <div className="font-semibold">Matched to your cruise schedule</div>
+            <div>{cruiseShip} • {cruiseDate}</div>
+            <Link href="/tours" className="mt-1 inline-block text-xs font-bold uppercase tracking-wide text-emerald-900 hover:underline">
+              Not your cruise date? Change cruise plan
+            </Link>
+          </div>
+        ) : (
+          <p className="mt-1 text-sm text-slate-600">
+            Step 1: Select your date. Step 2: Select a departure time. Step 3: Add this tour to your cart.
+          </p>
+        )}
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-white p-4 text-left">
