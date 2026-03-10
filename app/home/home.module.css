@@ -1,108 +1,40 @@
 .page {
-  --sky: #71d2ff;
-  --sun: #ffd34d;
-  --berry: #ff5b7f;
-  --mint: #6de39d;
-  --ink: #0e1e3d;
-  --card: #ffffff;
-  min-height: 100vh;
-  background:
-    radial-gradient(circle at 15% 8%, #ffffff99 0, #ffffff00 22%),
-    radial-gradient(circle at 82% 12%, #fff4b0 0, #fff4b000 25%),
-    linear-gradient(170deg, var(--sky) 0%, #a8e7ff 35%, #f6fdff 85%);
-  color: var(--ink);
-}
-
-.shell {
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 0 auto;
-  padding: 1.25rem 1rem 3rem;
+  padding: 1rem 1rem 5.5rem;
+  color: #12243a;
 }
 
 .hero {
-  position: relative;
-  overflow: hidden;
-  background: var(--card);
-  border: 4px solid #1f3e75;
-  border-radius: 1.5rem;
+  background: linear-gradient(145deg, #e9f3ff 0%, #ffffff 65%);
+  border: 1px solid #d4e3f7;
+  border-radius: 1rem;
   padding: 1rem;
-  box-shadow: 0 14px 0 #1f3e75;
 }
 
-.heroTopRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.6rem;
-}
-
-.heroBadge {
-  display: inline-block;
-  background: #1f3e75;
-  color: #fff;
-  font-size: 0.72rem;
+.kicker {
+  margin: 0;
+  font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  border-radius: 999px;
-  padding: 0.45rem 0.8rem;
-}
-
-.heroBadgeAlt {
-  display: inline-block;
-  background: var(--mint);
-  color: #0b355f;
-  font-size: 0.72rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  border-radius: 999px;
-  padding: 0.45rem 0.75rem;
-  border: 2px solid #1f3e75;
-  font-weight: 800;
-}
-
-.heroTitle {
-  margin: 0.9rem 0 0.65rem;
-  font-size: clamp(1.9rem, 9vw, 3.9rem);
-  line-height: 0.95;
-}
-
-.heroText {
-  margin: 0;
-  max-width: 42ch;
-  font-size: clamp(0.98rem, 3.6vw, 1.2rem);
   font-weight: 700;
+  color: #325781;
 }
 
-.heroArt {
-  margin-top: 0.85rem;
-  border-radius: 1rem;
-  border: 3px solid #1f3e75;
-  background: linear-gradient(170deg, #b7ecff 0%, #e9f8ff 70%);
-  padding: 0.65rem;
+.title {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.8rem, 7.8vw, 3rem);
+  line-height: 1.05;
 }
 
-.heroArtRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.4rem;
+.subtitle {
+  margin: 0.7rem 0 0;
+  max-width: 60ch;
+  color: #324c6a;
+  font-size: clamp(0.96rem, 3.8vw, 1.08rem);
 }
 
-.cloud {
-  border-radius: 999px;
-  border: 2px solid #1f3e75;
-  background: #fff;
-  padding: 0.12rem 0.52rem;
-  font-weight: 800;
-  font-size: 0.74rem;
-}
-
-.plane {
-  font-size: 1.8rem;
-  animation: glide 2.6s ease-in-out infinite;
-}
-
-.heroActions {
+.actions {
   margin-top: 1rem;
   display: flex;
   flex-wrap: wrap;
@@ -110,239 +42,151 @@
 }
 
 .primaryBtn,
-.secondaryBtn {
-  border-radius: 999px;
-  border: 3px solid #1f3e75;
-  padding: 0.74rem 1rem;
-  font-size: 0.9rem;
-  font-weight: 800;
+.secondaryBtn,
+.cardBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   text-decoration: none;
+  border-radius: 0.7rem;
+  font-weight: 700;
+  padding: 0.58rem 0.95rem;
 }
 
 .primaryBtn {
-  background: var(--sun);
-  color: #17274b;
+  background: #0f3a67;
+  color: #fff;
 }
 
 .secondaryBtn {
   background: #fff;
-  color: #17274b;
+  color: #12355d;
+  border: 1px solid #cdddf0;
 }
 
-.jets {
-  margin-top: 1.1rem;
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0.55rem;
-}
-
-.jet {
-  border: 3px solid #1f3e75;
-  border-radius: 0.95rem;
-  text-align: center;
-  font-size: 1.2rem;
-  padding: 0.6rem 0.2rem;
-  background: #fff;
-  animation: wiggle 2.1s ease-in-out infinite;
-}
-
-.jet:nth-child(2) {
-  animation-delay: 0.22s;
-}
-
-.jet:nth-child(3) {
-  animation-delay: 0.44s;
+.updatedAt {
+  margin: 0.85rem 0 0;
+  font-size: 0.83rem;
+  color: #4c6684;
 }
 
 .section {
-  margin-top: 1.3rem;
+  margin-top: 1.15rem;
 }
 
-.sectionTitle {
-  margin: 0 0 0.6rem;
-  font-size: clamp(1.3rem, 6vw, 2rem);
-  line-height: 1.05;
+.sectionHeader {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.65rem;
 }
 
-.flightGrid {
+.sectionHeader h2 {
+  margin: 0;
+  font-size: clamp(1.2rem, 5.8vw, 1.7rem);
+}
+
+.sectionHeader span {
+  font-size: 0.9rem;
+  color: #4c6684;
+}
+
+.grid {
+  margin-top: 0.7rem;
   display: grid;
-  gap: 0.8rem;
+  gap: 0.75rem;
 }
 
-.flightCard {
-  border: 4px solid #1f3e75;
-  border-radius: 1.15rem;
+.card,
+.emptyState {
+  border: 1px solid #d4e3f7;
+  border-radius: 0.9rem;
   background: #fff;
   padding: 0.9rem;
-  box-shadow: 0 8px 0 #1f3e75;
 }
 
-.flightCard:nth-child(1) {
-  background: linear-gradient(165deg, #ffe17f 0%, #fff 70%);
-}
-
-.flightCard:nth-child(2) {
-  background: linear-gradient(165deg, #9de4ff 0%, #fff 70%);
-}
-
-.flightCard:nth-child(3) {
-  background: linear-gradient(165deg, #ffc2d1 0%, #fff 70%);
-}
-
-.flightName {
+.company {
   margin: 0;
-  font-size: 1.1rem;
-}
-
-.flightMeta {
-  margin: 0.2rem 0 0;
-  font-size: 0.87rem;
+  font-size: 0.77rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #436387;
   font-weight: 700;
 }
 
-.flightCopy {
-  margin: 0.55rem 0 0;
-  font-size: 0.95rem;
-  font-weight: 700;
+.card h3,
+.emptyState h3 {
+  margin: 0.3rem 0 0;
+  font-size: 1.08rem;
+  line-height: 1.3;
 }
 
-.miniPill {
-  display: inline-block;
-  margin-top: 0.7rem;
-  border-radius: 999px;
-  border: 2px solid #1f3e75;
-  background: #fff;
-  font-size: 0.78rem;
-  font-weight: 800;
-  padding: 0.32rem 0.6rem;
+.meta {
+  margin: 0.33rem 0 0;
+  color: #335477;
+  font-size: 0.93rem;
+  font-weight: 600;
 }
 
-.cardAction {
+.description,
+.emptyState p {
+  margin: 0.58rem 0 0;
+  color: #324c6a;
+  font-size: 0.96rem;
+}
+
+.cardBtn {
   margin-top: 0.75rem;
-  display: inline-block;
-  border-radius: 999px;
-  border: 2px solid #1f3e75;
-  background: #fff;
-  color: #0d2a54;
-  text-decoration: none;
-  font-size: 0.78rem;
-  font-weight: 800;
-  padding: 0.38rem 0.72rem;
-}
-
-.whyGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem;
-}
-
-.whyCard {
-  border-radius: 1rem;
-  border: 3px solid #1f3e75;
-  background: #fff;
-  padding: 0.72rem;
-  font-weight: 800;
-}
-
-.faq {
-  margin: 0.55rem 0 0;
-  border-radius: 0.95rem;
-  border: 3px solid #1f3e75;
-  background: #fff;
-  overflow: hidden;
-}
-
-.faq summary {
-  cursor: pointer;
-  padding: 0.72rem 0.85rem;
-  font-weight: 800;
-  list-style: none;
-}
-
-.faq p {
-  margin: 0;
-  padding: 0 0.85rem 0.82rem;
-  font-size: 0.92rem;
-  font-weight: 700;
-}
-
-.footerCta {
-  margin-top: 1.4rem;
-  border-radius: 1.2rem;
-  border: 4px solid #1f3e75;
-  background: linear-gradient(145deg, var(--berry), #ff7e9b);
-  color: #fff;
-  padding: 0.95rem;
-  box-shadow: 0 8px 0 #1f3e75;
-}
-
-.footerCta p {
-  margin: 0.25rem 0 0;
-  font-size: 0.95rem;
-  font-weight: 700;
+  width: fit-content;
+  background: #eff5fc;
+  border: 1px solid #cbddf2;
+  color: #0f3a67;
 }
 
 .mobileSticky {
-  position: sticky;
-  bottom: 0.65rem;
-  z-index: 20;
-  margin-top: 1rem;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  background: #fff;
+  border-top: 1px solid #d4e3f7;
+  padding: 0.65rem 1rem calc(0.65rem + env(safe-area-inset-bottom));
 }
 
 .mobileSticky a {
-  display: block;
-  text-align: center;
+  display: flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
   text-decoration: none;
-  border-radius: 999px;
-  border: 3px solid #1f3e75;
-  background: var(--sun);
-  color: #1a2d54;
-  font-weight: 900;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 0.78rem 0.95rem;
-  box-shadow: 0 8px 0 #1f3e75;
+  font-weight: 800;
+  background: #0f3a67;
+  color: #fff;
 }
 
-@keyframes wiggle {
-  0%,
-  100% {
-    transform: translateY(0) rotate(0deg);
-  }
-  50% {
-    transform: translateY(-4px) rotate(-2deg);
-  }
-}
-
-@keyframes glide {
-  0%,
-  100% {
-    transform: translateX(0) rotate(0deg);
-  }
-  50% {
-    transform: translateX(7px) rotate(4deg);
-  }
-}
-
-@media (min-width: 700px) {
-  .shell {
-    padding: 1.8rem 1.4rem 4rem;
+@media (min-width: 768px) {
+  .page {
+    padding: 1.2rem 1.2rem 2.8rem;
   }
 
   .hero {
-    padding: 1.5rem;
-    border-radius: 1.8rem;
+    padding: 1.35rem;
   }
 
-  .flightGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .whyGrid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .mobileSticky {
     display: none;
+  }
+}
+
+@media (min-width: 1100px) {
+  .grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
