@@ -12,6 +12,22 @@ import ItemBookingPicker from "@/components/tours/ItemBookingPicker";
 import { useCart } from "@/app/components/cart/CartContext";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 
+type TourSnapshot = {
+  pk?: number | string;
+  company?: string;
+  slug?: string;
+  title?: string;
+  headline?: string;
+  shortDescription?: string;
+  image?: string;
+  supplierLabel?: string;
+  fromPrice?: string;
+  category?: string;
+  itemPk?: number | string;
+  item?: number | string;
+  fareharbor?: { itemPk?: number | string };
+};
+
 function fmtCents(cents?: number) {
   if (!cents || !Number.isFinite(cents) || cents <= 0) return null;
   return (cents / 100).toLocaleString(undefined, { style: "currency", currency: "USD" });
@@ -27,7 +43,7 @@ export default function TourDetailPage({
 
   const { addItem, setSelection, open } = useCart();
 
-  const [tour, setTour] = useState<any>(null);
+  const [tour, setTour] = useState<TourSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -58,13 +74,14 @@ export default function TourDetailPage({
     async function loadTour() {
       try {
         const res = await fetch("/data/tours.json", { cache: "no-store" });
-        const data = await res.json();
+        const data = (await res.json()) as unknown;
+        const tours = Array.isArray(data) ? (data as TourSnapshot[]) : [];
 
         const id = String(item);
 
         const found =
-          data.find((t: any) => t.company === company && String(t.pk) === id) ||
-          data.find((t: any) => t.company === company && t.slug === id);
+          tours.find((t) => t.company === company && String(t.pk) === id) ||
+          tours.find((t) => t.company === company && t.slug === id);
 
         setTour(found || null);
       } catch (e) {
@@ -185,26 +202,45 @@ export default function TourDetailPage({
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      <section className="relative h-[40vh] bg-slate-900">
+      <section className="relative h-[52vh] bg-slate-900">
         <img
           src={heroSrc}
           className="h-full w-full object-cover opacity-80"
           alt={tour.title}
         />
-        <div className="absolute bottom-0 left-0 p-8 bg-gradient-to-t from-black/80 to-transparent w-full">
-          <Link
-            href="/tours"
-            className="text-white bg-blue-600 px-4 py-1 rounded text-sm font-bold uppercase"
-          >
-            ← Back
-          </Link>
-          <h1 className="font-black text-3xl sm:text-4xl lg:text-5xl font-black text-white mt-4 uppercase drop-shadow-md">
-            {tour.title}
-          </h1>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 w-full p-8">
+          <div className="mx-auto max-w-6xl">
+            <Link
+              href="/tours"
+              className="inline-flex items-center rounded-xl bg-blue-600 px-4 py-1 text-sm font-bold uppercase text-white"
+            >
+              ← Back to tours
+            </Link>
+            <div className="mt-4 grid gap-4 md:grid-cols-[1fr_auto] md:items-end">
+              <div>
+                <div className="inline-flex rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200">
+                  {tour.category || "Shore Excursion"}
+                </div>
+                <h1 className="mt-3 text-3xl font-black text-white drop-shadow-md sm:text-4xl lg:text-5xl">
+                  {tour.title}
+                </h1>
+                <p className="mt-2 max-w-2xl text-sm text-slate-200 sm:text-base">
+                  Pick your departure day and time, then checkout securely to confirm this tour.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/20 bg-white/10 px-5 py-4 text-right backdrop-blur">
+                <div className="text-[11px] font-bold uppercase tracking-widest text-cyan-100">From</div>
+                <div className="text-3xl font-black text-white">
+                  <FromPrice company={tour.company} item={tour.itemPk ?? tour.item ?? tour.pk} initial={tour.fromPrice} />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
-      <div className="max-w-6xl mx-auto px-6 py-12 grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-6 py-12 lg:grid-cols-3">
         <div className="lg:col-span-2">
           {(handoffSource || handoffId || handoffDate || handoffPartySize || handoffCategory) ? (
             <div className="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide">
@@ -220,9 +256,12 @@ export default function TourDetailPage({
             </div>
           ) : null}
 
-          <h2 className="text-2xl font-black mb-6 text-blue-900 uppercase">
-            1. Pick a Date + Time
+          <h2 className="mb-3 text-2xl font-black tracking-tight text-slate-900">
+            Choose Date and Departure Time
           </h2>
+          <p className="mb-6 text-sm text-slate-600">
+            Select your preferred day first, then choose an available departure that fits your cruise timing.
+          </p>
 
           <ProductDepartureCalendar
             company={company}
@@ -240,12 +279,12 @@ export default function TourDetailPage({
         </div>
 
         <div className="relative">
-          <div className="sticky top-24 bg-slate-50 p-8 rounded-3xl border-2 border-slate-100 shadow-xl">
-            <div className="text-slate-400 font-bold uppercase text-[10px] tracking-widest mb-1">
-              From
-            </div>
-            <div className="text-5xl font-black text-blue-600 mb-6">
-<FromPrice company={tour.company} item={tour.itemPk ?? tour.item ?? tour.pk} initial={tour.fromPrice} />
+          <div className="sticky top-24 rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-xl">
+            <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-4">
+              <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Best available rate</div>
+              <div className="text-4xl font-black text-blue-700">
+                <FromPrice company={tour.company} item={tour.itemPk ?? tour.item ?? tour.pk} initial={tour.fromPrice} />
+              </div>
             </div>
 
             <ItemBookingPicker
@@ -255,6 +294,11 @@ export default function TourDetailPage({
               canAdd={canAdd}
               onAdd={addToItinerary}
             />
+
+            <div className="mt-4 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600">
+              <div>Free cancellation policy depends on the tour operator.</div>
+              <div>You will see live confirmation status right after checkout.</div>
+            </div>
           </div>
         </div>
       </div>

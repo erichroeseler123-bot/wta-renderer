@@ -19,25 +19,25 @@ export default function ItemBookingPicker({
 
   return (
     <div className="text-center space-y-6">
-      <div className="p-4 bg-white rounded-2xl border border-slate-200">
-        <p className="text-[10px] uppercase font-bold text-slate-400 tracking-widest">
-          Selected
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 text-left">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500">
+          Selected departure
         </p>
 
         <p className="text-2xl font-black text-slate-900">
           {selectedDay ? selectedDay : "--- -- ---"}
         </p>
 
-        <p className="text-sm text-slate-600 mt-1">
+        <p className="mt-1 text-sm text-slate-700">
           Time: <span className="font-bold">{selectedTimeLabel || "—"}</span>
         </p>
 
-        <p className="text-sm text-slate-600">
+        <p className="text-sm text-slate-700">
           Price: <span className="font-bold">{priceLabel || "Shown at checkout if not listed"}</span>
         </p>
 
         {ship ? (
-          <p className="text-[10px] text-indigo-700 font-bold mt-3 uppercase tracking-widest">
+          <p className="mt-3 text-[10px] font-bold uppercase tracking-widest text-indigo-700">
             Ship: {ship}
           </p>
         ) : null}
@@ -56,9 +56,11 @@ export default function ItemBookingPicker({
         {canAdd ? "Add to Alaska Itinerary" : "Select a Time Above"}
       </button>
 
-      <p className="text-[10px] text-slate-400 font-medium">
-        You’ll review your itinerary at checkout. Booking happens through FareHarbor for the selected time.
-      </p>
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-left text-xs text-slate-600">
+        <div>Secure payment via Stripe</div>
+        <div>Booking confirmed for selected departure</div>
+        <div>Receipt and status shown immediately after checkout</div>
+      </div>
     </div>
   );
 }

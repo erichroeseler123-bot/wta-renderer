@@ -6,6 +6,13 @@ import { useCart } from "./CartContext";
 
 export default function CartDrawer() {
   const { items, isOpen, close, removeItem, setQty, clear, count } = useCart();
+  const estimatedTotal = items.reduce((sum, it) => {
+    const line = Number(it.price || 0) * Number(it.qty || 0);
+    return sum + (Number.isFinite(line) ? line : 0);
+  }, 0);
+  const estimatedTotalLabel = estimatedTotal > 0
+    ? (estimatedTotal / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })
+    : null;
 
   // ESC to close
   useEffect(() => {
@@ -28,16 +35,16 @@ export default function CartDrawer() {
       />
 
       {/* Panel */}
-      <div className="absolute right-0 top-0 h-full w-full max-w-md border-l border-white/10 bg-zinc-950 text-white shadow-2xl">
-        <div className="flex items-center justify-between border-b border-white/10 p-4">
+      <div className="absolute right-0 top-0 h-full w-full max-w-md border-l border-slate-200 bg-white text-slate-900 shadow-2xl">
+        <div className="flex items-center justify-between border-b border-slate-200 p-4">
           <div>
-            <div className="text-lg font-semibold">Your Itinerary</div>
-            <div className="text-xs text-white/60">{count} item(s)</div>
+            <div className="text-lg font-semibold">Your Cart</div>
+            <div className="text-xs text-slate-600">{count} item(s)</div>
           </div>
 
           <button
             onClick={close}
-            className="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white/80 hover:bg-white/10"
+            className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-50"
           >
             Close
           </button>
@@ -45,18 +52,18 @@ export default function CartDrawer() {
 
         <div className="h-[calc(100%-140px)] overflow-auto p-4">
           {items.length === 0 ? (
-            <div className="rounded-2xl border border-white/10 bg-white/5 p-5 text-white/70">
-              Your itinerary is empty. Go add tours from the Tours page.
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-slate-700">
+              Your cart is empty. Browse tours and add a departure to start checkout.
             </div>
           ) : (
             <div className="grid gap-3">
               {items.map((it) => (
                 <div
                   key={it.id}
-                  className="rounded-2xl border border-white/10 bg-white/5 p-4"
+                  className="rounded-2xl border border-slate-200 bg-white p-4"
                 >
                   <div className="flex gap-3">
-                    <div className="h-16 w-16 overflow-hidden rounded-xl bg-white/5">
+                    <div className="h-16 w-16 overflow-hidden rounded-xl bg-slate-100">
                       {it.image ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
@@ -69,31 +76,36 @@ export default function CartDrawer() {
 
                     <div className="min-w-0 flex-1">
                       <div className="truncate font-semibold">{it.title}</div>
-                      <div className="text-xs text-white/60">
+                      <div className="text-xs text-slate-600">
                         {it.supplierLabel || it.company}
                       </div>
                       {it.headline ? (
-                        <div className="mt-1 line-clamp-2 text-sm text-white/70">
+                        <div className="mt-1 line-clamp-2 text-sm text-slate-600">
                           {it.headline}
                         </div>
                       ) : null}
 
                       <div className="mt-3 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <label className="text-xs text-white/60">Qty</label>
+                          <label className="text-xs text-slate-600">Qty</label>
                           <input
                             value={it.qty}
                             onChange={(e) =>
                               setQty(it.id, Number(e.target.value))
                             }
-                            className="w-16 rounded-lg border border-white/10 bg-black/30 px-2 py-1 text-sm text-white outline-none"
+                            className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none"
                             inputMode="numeric"
                           />
                         </div>
+                        {typeof it.price === "number" ? (
+                          <div className="text-sm font-bold text-slate-900">
+                            {(Number(it.price) / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })}
+                          </div>
+                        ) : null}
 
                         <button
                           onClick={() => removeItem(it.id)}
-                          className="text-sm text-white/70 hover:text-white"
+                          className="text-sm text-slate-500 hover:text-slate-800"
                         >
                           Remove
                         </button>
@@ -105,7 +117,7 @@ export default function CartDrawer() {
                     <Link
                       href={`/tours/${it.company}/${it.itemPk}`}
                       onClick={close}
-                      className="text-sm text-[#4CC9F0] hover:underline"
+                      className="text-sm font-semibold text-blue-700 hover:underline"
                     >
                       View details →
                     </Link>
@@ -116,26 +128,36 @@ export default function CartDrawer() {
           )}
         </div>
 
-        <div className="border-t border-white/10 p-4">
+        <div className="border-t border-slate-200 bg-slate-50 p-4">
+          {items.length > 0 ? (
+            <div className="mb-3 rounded-xl border border-slate-200 bg-white p-3">
+              <div className="flex items-center justify-between text-sm">
+                <span className="font-semibold text-slate-700">Estimated total</span>
+                <span className="text-lg font-black text-slate-900">{estimatedTotalLabel || "Calculated at checkout"}</span>
+              </div>
+              <div className="mt-1 text-xs text-slate-600">
+                Final total is confirmed live at checkout based on selected departure rates.
+              </div>
+            </div>
+          ) : null}
           <div className="flex gap-2">
             <Link
               href="/checkout"
               onClick={close}
-              className="flex-1 rounded-xl bg-white text-center py-2 text-sm font-semibold text-black hover:opacity-90"
+              className="flex-1 rounded-xl bg-slate-900 py-2 text-center text-sm font-semibold text-white hover:bg-slate-700"
             >
               Checkout →
             </Link>
             <button
               onClick={clear}
-              className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10"
+              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
             >
               Clear
             </button>
           </div>
 
-          <div className="mt-2 text-xs text-white/50">
-            This is your multi-item itinerary cart (v2). Payment/availability
-            happens per supplier.
+          <div className="mt-2 text-xs text-slate-600">
+            Secure checkout with Stripe. Booking confirmation and receipt are shown immediately after payment.
           </div>
         </div>
       </div>

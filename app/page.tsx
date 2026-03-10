@@ -36,6 +36,24 @@ const pipeline = [
   "Get booking confirmation and receipt",
 ];
 
+const featuredTours = [
+  {
+    title: "Whale Watching in Juneau",
+    blurb: "Cruise-friendly departures with premium wildlife viewing windows.",
+    href: "/tours?port=juneau&category=whale-watching",
+  },
+  {
+    title: "Skagway Scenic Adventures",
+    blurb: "Top shore options timed for day-port arrivals and returns.",
+    href: "/tours?port=skagway",
+  },
+  {
+    title: "Ketchikan Family Excursions",
+    blurb: "Easy-to-book tours for mixed groups, first-timers, and families.",
+    href: "/tours?port=ketchikan",
+  },
+];
+
 export default function HomePage() {
   const { ship, date, loaded } = useCruise();
   const toursHref = useMemo(() => {
@@ -60,11 +78,11 @@ export default function HomePage() {
               Alaska Shore Excursions
             </div>
             <h1 className="mt-5 text-4xl font-black leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl">
-              Plan Shore Days
-              <span className="block text-cyan-300">You’ll Actually Enjoy</span>
+              Excursions That Fit
+              <span className="block text-cyan-300">Your Cruise Schedule</span>
             </h1>
             <p className="mt-5 max-w-xl text-base text-slate-200 sm:text-lg">
-              Find the right Alaska excursion for your ship schedule, book directly with local operators, and head to port with confidence.
+              Enter your cruise ship and sail date to find Alaska shore tours matched to your timing, then book securely in minutes.
             </p>
             {loaded ? (
               <div className="mt-4 flex flex-wrap gap-2">
@@ -98,6 +116,20 @@ export default function HomePage() {
                 Explore Juneau Tours
               </Link>
             </div>
+            <div className="mt-6 grid max-w-lg grid-cols-3 gap-3 text-center text-xs text-cyan-100">
+              <div className="rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
+                <div className="text-lg font-black text-white">100%</div>
+                Cruise-day focused
+              </div>
+              <div className="rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
+                <div className="text-lg font-black text-white">Live</div>
+                Departure matching
+              </div>
+              <div className="rounded-2xl border border-white/20 bg-white/10 px-3 py-2">
+                <div className="text-lg font-black text-white">Secure</div>
+                Stripe checkout
+              </div>
+            </div>
           </div>
 
           <div className="rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-md">
@@ -124,7 +156,7 @@ export default function HomePage() {
       <section className="mx-auto max-w-7xl px-6 py-14">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-black tracking-tight sm:text-3xl">Why Travelers Book Here</h2>
+            <h2 className="text-2xl font-black tracking-tight sm:text-3xl">Trusted By Cruise Travelers</h2>
             <p className="mt-1 text-sm text-slate-600">
               Practical features designed for stress-free cruise days.
             </p>
@@ -173,6 +205,34 @@ export default function HomePage() {
                   View Top Excursions
                 </p>
               </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <div className="flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-black tracking-tight sm:text-3xl">Featured Shore Tours</h2>
+            <p className="mt-1 text-sm text-slate-600">
+              Fast-start picks for the most common Alaska cruise stops.
+            </p>
+          </div>
+          <Link href="/tours" className="text-xs font-bold uppercase tracking-wide text-sky-700 hover:text-sky-900">
+            Browse Everything
+          </Link>
+        </div>
+        <div className="mt-6 grid gap-5 md:grid-cols-3">
+          {featuredTours.map((tour) => (
+            <Link
+              key={tour.title}
+              href={tour.href}
+              className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_12px_30px_-18px_rgba(15,23,42,0.35)] transition hover:-translate-y-1 hover:shadow-lg"
+            >
+              <div className="text-xs font-bold uppercase tracking-widest text-sky-700">Featured</div>
+              <h3 className="mt-2 text-xl font-black tracking-tight text-slate-900">{tour.title}</h3>
+              <p className="mt-2 text-sm text-slate-600">{tour.blurb}</p>
+              <div className="mt-4 text-sm font-bold text-slate-900">View matching tours →</div>
             </Link>
           ))}
         </div>

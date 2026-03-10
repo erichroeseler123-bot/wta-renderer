@@ -3,8 +3,29 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
+type ReceiptResult = {
+  ok?: boolean;
+  error?: string;
+  line?: {
+    title?: string;
+    qty?: number;
+    company?: string;
+    startAt?: string;
+  };
+  booking?: {
+    display_id?: string;
+    uuid?: string;
+    pk?: string | number;
+  };
+};
+
+type ReceiptPayload = {
+  status?: string;
+  results?: ReceiptResult[];
+};
+
 export default function SuccessPage() {
-  const [data, setData] = useState<any>(null);
+  const [data, setData] = useState<ReceiptPayload | null>(null);
   const [err, setErr] = useState<string | null>(null);
 
   const pi = useMemo(() => {
@@ -23,11 +44,11 @@ export default function SuccessPage() {
         const j = await r.json();
         if (stop) return;
         setData(j);
-        if (j?.status === "pending") {
+        if (j?.status === "pending" || j?.status === "payment_pending" || j?.status === "booking_pending") {
           setTimeout(poll, 1500);
         }
-      } catch (e: any) {
-        if (!stop) setErr(String(e?.message || e));
+      } catch (e: unknown) {
+        if (!stop) setErr(e instanceof Error ? e.message : String(e));
       }
     }
     poll();
@@ -36,56 +57,81 @@ export default function SuccessPage() {
     };
   }, [pi]);
 
+  const status = data?.status || "pending";
+  const isDone = status === "booked" || status === "completed";
+
   return (
-    <div className="max-w-3xl mx-auto p-8">
-      <h1 className="text-3xl font-black mb-2">Payment received</h1>
-      <p className="text-slate-600 mb-6">We’re confirming bookings now.</p>
+    <main className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+        <h1 className="text-3xl font-black tracking-tight text-slate-900">Booking Confirmation</h1>
+        <p className="mt-2 text-slate-600">
+          Payment was received. We are finalizing your booking details and operator confirmations.
+        </p>
 
-      {!pi ? (
-        <div className="text-red-600 font-semibold">Missing payment_intent in URL.</div>
-      ) : null}
+        {!pi ? (
+          <div className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
+            Missing payment_intent in URL.
+          </div>
+        ) : null}
 
-      {err ? <div className="text-red-600 font-semibold">{err}</div> : null}
+        {err ? (
+          <div className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
+            {err}
+          </div>
+        ) : null}
 
-      <div className="rounded-2xl border p-4 bg-white">
-        <div className="text-xs text-slate-500 mb-2">PaymentIntent</div>
-        <div className="font-mono text-sm break-all">{pi}</div>
-        <div className="mt-3 font-bold">
-          Status: <span className="uppercase">{data?.status || "pending"}</span>
-        </div>
-      </div>
-
-      {data?.results?.length ? (
-        <div className="mt-6 space-y-3">
-          {data.results.map((r: any, idx: number) => (
-            <div key={idx} className="rounded-2xl border p-4 bg-white">
-              <div className="font-bold">
-                {r?.line?.title || "Tour"} — qty {r?.line?.qty}
-              </div>
-              <div className="text-sm text-slate-600">
-                {r?.line?.company} — {r?.line?.startAt || ""}
-              </div>
-              {r.ok ? (
-                <div className="mt-2 text-green-700 font-semibold">
-                  Booked ✓ {r?.booking?.display_id || r?.booking?.uuid || r?.booking?.pk || ""}
-                </div>
-              ) : (
-                <div className="mt-2 text-red-700 font-semibold">
-                  Failed ✕ {r?.error || "Booking failed"}
-                </div>
-              )}
+        <div className="mt-6 grid gap-3 rounded-2xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-[1fr_auto] md:items-end">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Payment Intent</div>
+            <div className="font-mono text-sm break-all text-slate-700">{pi || "n/a"}</div>
+          </div>
+          <div className="text-right">
+            <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</div>
+            <div className={`text-lg font-black uppercase ${isDone ? "text-emerald-700" : "text-slate-900"}`}>
+              {status}
             </div>
-          ))}
+          </div>
         </div>
-      ) : (
-        <div className="mt-6 text-slate-600">
-          {data?.status === "pending" ? "Working…" : "No booking results yet."}
-        </div>
-      )}
 
-      <div className="mt-8">
-        <Link href="/tours" className="text-blue-700 font-bold">← Back to tours</Link>
+        {data?.results?.length ? (
+          <div className="mt-6 space-y-3">
+            {data.results.map((r, idx) => (
+              <div key={idx} className="rounded-2xl border border-slate-200 bg-white p-4">
+                <div className="font-bold text-slate-900">
+                  {r?.line?.title || "Tour"} — qty {r?.line?.qty}
+                </div>
+                <div className="text-sm text-slate-600">
+                  {r?.line?.company} • {r?.line?.startAt || "Time pending"}
+                </div>
+                {r.ok ? (
+                  <div className="mt-2 text-sm font-semibold text-emerald-700">
+                    Booked ✓ {r?.booking?.display_id || r?.booking?.uuid || r?.booking?.pk || ""}
+                  </div>
+                ) : (
+                  <div className="mt-2 text-sm font-semibold text-rose-700">
+                    Pending/Failed ✕ {r?.error || "Booking still processing"}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-sm text-slate-600">
+            {status === "pending" || status === "payment_pending" || status === "booking_pending"
+              ? "Finalizing your booking now. This page updates automatically."
+              : "No booking line items were returned yet."}
+          </div>
+        )}
+
+        <div className="mt-8 flex flex-wrap gap-3">
+          <Link href="/tours" className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-bold text-white hover:bg-slate-700">
+            Back to Tours
+          </Link>
+          <Link href="/" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">
+            Return Home
+          </Link>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

@@ -4,6 +4,30 @@ import { useMemo, useState } from "react";
 import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "./CartContext";
 
+type PayloadItem = {
+  company: string;
+  itemPk: number;
+  availabilityPk: number;
+  ratePk: number;
+  qty: number;
+  title?: string;
+  startAt?: string;
+  handoffSource?: string;
+  handoffId?: string;
+  authorityTopic?: string;
+  referrerPath?: string;
+  handoffCategory?: string;
+  handoffDate?: string;
+  partySize?: number;
+  adults?: number;
+  children?: number;
+  cruiseShip?: string;
+  cruiseShipSlug?: string;
+  timeOfDay?: string;
+  budgetTier?: string;
+  portSlug?: string;
+};
+
 export default function CheckoutClient() {
   const { items } = useCart();
   const stripe = useStripe();
@@ -17,31 +41,44 @@ export default function CheckoutClient() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
 
-  const payloadItems = useMemo(() => {
-    return (items || []).map((it: any) => ({
-      company: it.company,
-      itemPk: it.itemPk,
-      availabilityPk: it.availabilityPk,
-      ratePk: it.ratePk,
-      qty: it.qty,
-      title: it.title,
-      startAt: it.startAt,
-      handoffSource: it.handoffSource,
-      handoffId: it.handoffId,
-      authorityTopic: it.authorityTopic,
-      referrerPath: it.referrerPath,
-      handoffCategory: it.handoffCategory,
-      handoffDate: it.handoffDate,
-      partySize: it.partySize,
-      adults: it.adults,
-      children: it.children,
-      cruiseShip: it.cruiseShip,
-      cruiseShipSlug: it.cruiseShipSlug,
-      timeOfDay: it.timeOfDay,
-      budgetTier: it.budgetTier,
-      portSlug: it.portSlug,
+  const payloadItems = useMemo<PayloadItem[]>(() => {
+    const source = (items || []) as Array<Record<string, unknown>>;
+    return source.map((it) => ({
+      company: String(it.company || ""),
+      itemPk: Number(it.itemPk || 0),
+      availabilityPk: Number(it.availabilityPk || 0),
+      ratePk: Number(it.ratePk || 0),
+      qty: Number(it.qty || 0),
+      title: it.title ? String(it.title) : undefined,
+      startAt: it.startAt ? String(it.startAt) : undefined,
+      handoffSource: it.handoffSource ? String(it.handoffSource) : undefined,
+      handoffId: it.handoffId ? String(it.handoffId) : undefined,
+      authorityTopic: it.authorityTopic ? String(it.authorityTopic) : undefined,
+      referrerPath: it.referrerPath ? String(it.referrerPath) : undefined,
+      handoffCategory: it.handoffCategory ? String(it.handoffCategory) : undefined,
+      handoffDate: it.handoffDate ? String(it.handoffDate) : undefined,
+      partySize: it.partySize ? Number(it.partySize) : undefined,
+      adults: it.adults ? Number(it.adults) : undefined,
+      children: it.children ? Number(it.children) : undefined,
+      cruiseShip: it.cruiseShip ? String(it.cruiseShip) : undefined,
+      cruiseShipSlug: it.cruiseShipSlug ? String(it.cruiseShipSlug) : undefined,
+      timeOfDay: it.timeOfDay ? String(it.timeOfDay) : undefined,
+      budgetTier: it.budgetTier ? String(it.budgetTier) : undefined,
+      portSlug: it.portSlug ? String(it.portSlug) : undefined,
     }));
   }, [items]);
+  const estimatedTotal = useMemo(() => {
+    const source = (items || []) as Array<Record<string, unknown>>;
+    return source.reduce((sum, it) => {
+      const price = Number(it.price || 0);
+      const qty = Number(it.qty || 0);
+      const line = price * qty;
+      return sum + (Number.isFinite(line) ? line : 0);
+    }, 0);
+  }, [items]);
+  const estimatedTotalLabel = estimatedTotal > 0
+    ? (estimatedTotal / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })
+    : "Calculated live";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -77,64 +114,93 @@ export default function CheckoutClient() {
       });
 
       if (error) throw new Error(error.message || "Payment failed");
-    } catch (e: any) {
-      setErr(String(e?.message || e));
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : String(e);
+      setErr(msg);
       setLoading(false);
     }
   }
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <h1 className="text-3xl font-black mb-2">Checkout</h1>
-      <p className="text-slate-600 mb-6">Complete payment to lock in your bookings.</p>
+    <main className="min-h-screen bg-slate-50 px-4 py-10">
+      <div className="mx-auto grid max-w-6xl gap-6 lg:grid-cols-[1.4fr_0.9fr]">
+        <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h1 className="mb-2 text-3xl font-black tracking-tight text-slate-900">Secure Checkout</h1>
+          <p className="mb-6 text-slate-600">
+            Complete payment to confirm your selected departures. You will receive booking results and receipt on the confirmation page.
+          </p>
 
-      <div className="mb-6 rounded-2xl border p-4 bg-white">
-        <div className="font-bold mb-2">Cart ({payloadItems.length})</div>
-        <ul className="text-sm text-slate-700 space-y-1">
-          {payloadItems.map((it: any, idx: number) => (
-            <li key={idx}>
-              {it.title || "Tour"} — {it.company} — qty {it.qty}
-            </li>
-          ))}
-        </ul>
+          <form onSubmit={onSubmit} className="space-y-4">
+            <div className="grid gap-3">
+              <label className="text-sm font-semibold text-slate-700">
+                Full name
+                <input
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900"
+                  placeholder="Your full name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                />
+              </label>
+              <label className="text-sm font-semibold text-slate-700">
+                Email
+                <input
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
+              </label>
+              <label className="text-sm font-semibold text-slate-700">
+                Phone (optional)
+                <input
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900"
+                  placeholder="(555) 123-4567"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                />
+              </label>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-4">
+              <PaymentElement />
+            </div>
+
+            <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800">
+              Payments are encrypted and processed by Stripe. Tour availability and pricing are verified at confirmation time.
+            </div>
+
+            {err ? <div className="rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{err}</div> : null}
+
+            <button
+              type="submit"
+              disabled={!stripe || !elements || loading}
+              className="w-full rounded-2xl bg-slate-900 py-3 font-black text-white disabled:opacity-60"
+            >
+              {loading ? "Processing…" : "Pay & Confirm Booking"}
+            </button>
+          </form>
+        </section>
+
+        <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+          <div className="text-sm font-semibold uppercase tracking-wide text-slate-500">Order summary</div>
+          <div className="mt-2 flex items-end justify-between border-b border-slate-100 pb-3">
+            <div className="text-sm text-slate-600">{payloadItems.length} item(s)</div>
+            <div className="text-2xl font-black text-slate-900">{estimatedTotalLabel}</div>
+          </div>
+          <ul className="mt-4 space-y-2 text-sm">
+            {payloadItems.map((it, idx) => (
+              <li key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+                <div className="font-semibold text-slate-900">{it.title || "Tour"}</div>
+                <div className="text-slate-600">{it.company} • Qty {it.qty}</div>
+                {it.startAt ? <div className="text-xs text-slate-500">{String(it.startAt).slice(0, 16).replace("T", " ")}</div> : null}
+              </li>
+            ))}
+          </ul>
+          <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+            After payment, we finalize booking and show per-tour status in confirmation.
+          </div>
+        </aside>
       </div>
-
-      <form onSubmit={onSubmit} className="space-y-4">
-        <div className="grid gap-3">
-          <input
-            className="w-full rounded-xl border px-3 py-2"
-            placeholder="Full name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          />
-          <input
-            className="w-full rounded-xl border px-3 py-2"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-          <input
-            className="w-full rounded-xl border px-3 py-2"
-            placeholder="Phone (optional)"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-          />
-        </div>
-
-        <div className="rounded-2xl border p-4 bg-white">
-          <PaymentElement />
-        </div>
-
-        {err ? <div className="text-red-600 font-semibold">{err}</div> : null}
-
-        <button
-          type="submit"
-          disabled={!stripe || !elements || loading}
-          className="w-full rounded-2xl bg-blue-600 text-white font-black py-3 disabled:opacity-60"
-        >
-          {loading ? "Processing…" : "Pay & Book"}
-        </button>
-      </form>
-    </div>
+    </main>
   );
 }
