@@ -158,10 +158,10 @@ export default function ToursPage() {
   }, [loaded, ship, savedDate, savedLine, setCruise]);
 
   useEffect(() => {
-    fetch("/data/tours.json")
+    fetch("/api/tours/list", { cache: "no-store" })
       .then((r) => r.json())
       .then((d) => {
-        setTours(Array.isArray(d) ? d : []);
+        setTours(Array.isArray(d?.tours) ? d.tours : []);
         setLoadingTours(false);
       })
       .catch(() => {

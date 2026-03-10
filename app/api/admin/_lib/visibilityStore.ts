@@ -7,7 +7,7 @@ type Store = {
   updatedAt: string;
 };
 
-const STORE_PATH = path.join(process.cwd(), "data", "admin-visibility.json");
+const STORE_PATH = path.join(process.cwd(), "data", "visibility.json");
 
 const EMPTY: Store = {
   providers: {},

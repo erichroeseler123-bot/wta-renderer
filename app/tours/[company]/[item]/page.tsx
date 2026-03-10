@@ -81,9 +81,9 @@ export default function TourDetailPage({
   useEffect(() => {
     async function loadTour() {
       try {
-        const res = await fetch("/data/tours.json", { cache: "no-store" });
-        const data = (await res.json()) as unknown;
-        const tours = Array.isArray(data) ? (data as TourSnapshot[]) : [];
+        const res = await fetch("/api/tours/list", { cache: "no-store" });
+        const data = (await res.json()) as { tours?: unknown };
+        const tours = Array.isArray(data?.tours) ? (data.tours as TourSnapshot[]) : [];
 
         const id = String(item);
 

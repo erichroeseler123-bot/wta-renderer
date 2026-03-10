@@ -14,6 +14,16 @@ type AdminOrder = {
   confirmationEmailSentAt?: string;
   confirmationEmailError?: string;
   lastError?: string;
+  stripeData?: {
+    status: string;
+    amount: number;
+    currency: string;
+    created: string;
+    last4: string | null;
+    customerId: string | null;
+    dashboardPaymentUrl: string;
+    dashboardCustomerUrl: string | null;
+  } | null;
 };
 
 function fmtDate(v?: string) {
@@ -35,6 +45,7 @@ export default function AdminOrdersPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [stripeLookupError, setStripeLookupError] = useState<string | null>(null);
 
   const totalLabel = useMemo(() => `${orders.length} order${orders.length === 1 ? "" : "s"}`, [orders.length]);
 
@@ -50,9 +61,11 @@ export default function AdminOrdersPage() {
         throw new Error(j?.error || "Failed to load orders");
       }
       setOrders(Array.isArray(j.orders) ? (j.orders as AdminOrder[]) : []);
+      setStripeLookupError(typeof j.stripeLookupError === "string" ? j.stripeLookupError : null);
       setLoaded(true);
     } catch (e: unknown) {
       setOrders([]);
+      setStripeLookupError(null);
       setLoaded(true);
       setError(e instanceof Error ? e.message : "Network error");
     } finally {
@@ -91,6 +104,11 @@ export default function AdminOrdersPage() {
       </div>
 
       {error ? <div className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">Error: {error}</div> : null}
+      {stripeLookupError ? (
+        <div className="mt-4 rounded-xl bg-amber-50 px-3 py-2 text-sm font-semibold text-amber-700">
+          Stripe lookup warning: {stripeLookupError}
+        </div>
+      ) : null}
       {loaded && !error ? <div className="mt-4 text-sm font-semibold text-slate-600">{totalLabel}</div> : null}
 
       <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200 bg-white">
@@ -102,6 +120,7 @@ export default function AdminOrdersPage() {
               <th className="px-3 py-3 text-left">Created</th>
               <th className="px-3 py-3 text-left">Total</th>
               <th className="px-3 py-3 text-left">Payment Intent</th>
+              <th className="px-3 py-3 text-left">Stripe</th>
               <th className="px-3 py-3 text-left">Email Sent</th>
               <th className="px-3 py-3 text-left">Booking Results</th>
               <th className="px-3 py-3 text-left">Error</th>
@@ -123,6 +142,43 @@ export default function AdminOrdersPage() {
                     : "—"}
                 </td>
                 <td className="px-3 py-3 font-mono text-xs">{order.payment_intent_id || "—"}</td>
+                <td className="px-3 py-3">
+                  {order.stripeData ? (
+                    <div className="space-y-1">
+                      <div>
+                        <span className="rounded bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
+                          {order.stripeData.status}
+                        </span>
+                      </div>
+                      <div className="text-xs text-slate-600">
+                        {order.stripeData.currency} {order.stripeData.amount.toFixed(2)}
+                        {order.stripeData.last4 ? ` • **** ${order.stripeData.last4}` : ""}
+                      </div>
+                      <div className="flex flex-wrap gap-2 text-xs">
+                        <a
+                          href={order.stripeData.dashboardPaymentUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="font-semibold text-blue-700 hover:underline"
+                        >
+                          Payment
+                        </a>
+                        {order.stripeData.dashboardCustomerUrl ? (
+                          <a
+                            href={order.stripeData.dashboardCustomerUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="font-semibold text-blue-700 hover:underline"
+                          >
+                            Customer
+                          </a>
+                        ) : null}
+                      </div>
+                    </div>
+                  ) : (
+                    <span className="text-xs text-slate-500">—</span>
+                  )}
+                </td>
                 <td className="px-3 py-3 whitespace-nowrap">
                   {order.confirmationEmailSentAt ? fmtDate(order.confirmationEmailSentAt) : "—"}
                   {order.confirmationEmailError ? (
@@ -137,7 +193,7 @@ export default function AdminOrdersPage() {
             ))}
             {loaded && orders.length < 1 ? (
               <tr>
-                <td className="px-3 py-6 text-slate-500" colSpan={8}>
+                <td className="px-3 py-6 text-slate-500" colSpan={9}>
                   No recent orders found.
                 </td>
               </tr>
