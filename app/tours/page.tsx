@@ -149,7 +149,7 @@ export default function ToursPage() {
 
   const effectiveDate = shipInput ? getFirstSailingDateForShip(shipInput) : "";
   const profileComplete = Boolean(shipInput && effectiveDate);
-  const selectedLine = lineInput || (shipInput ? getCruiseLineForShip(shipInput) : "");
+  const selectedLine = lineInput;
   const shipOptions = useMemo(
     () => (selectedLine ? getShipsForCruiseLine(selectedLine) : []),
     [selectedLine],

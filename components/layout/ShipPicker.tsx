@@ -10,12 +10,18 @@ import {
 
 export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const { ship, date, setCruise, clearCruise } = useCruise();
-  const [tempLine, setTempLine] = useState("");
-  const [tempShip, setTempShip] = useState("");
-  const selectedShip = tempShip || ship || "";
-  const selectedLine = tempLine || (selectedShip ? getCruiseLineForShip(selectedShip) : "");
+  const [tempLine, setTempLine] = useState<string | null>(null);
+  const [tempShip, setTempShip] = useState<string | null>(null);
+  const selectedShip = tempShip ?? (ship || "");
+  const selectedLine = tempLine ?? (selectedShip ? getCruiseLineForShip(selectedShip) : "");
   const shipOptions = selectedLine ? getShipsForCruiseLine(selectedLine) : [];
   const selectedDate = selectedShip ? getFirstSailingDateForShip(selectedShip) : "";
+
+  function closeAndReset() {
+    setTempLine(null);
+    setTempShip(null);
+    onClose();
+  }
 
   if (!isOpen) return null;
 
@@ -63,7 +69,7 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
         </div>
         <div className="grid gap-3">
           <button
-            onClick={() => { if (selectedShip && selectedDate) { setCruise(selectedShip, selectedDate); onClose(); } }}
+            onClick={() => { if (selectedShip && selectedDate) { setCruise(selectedShip, selectedDate); closeAndReset(); } }}
             disabled={!(selectedShip && selectedDate)}
             className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
           >
@@ -71,7 +77,7 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
           </button>
           {(ship || date) ? (
             <button
-              onClick={() => { clearCruise(); setTempLine(""); setTempShip(""); onClose(); }}
+              onClick={() => { clearCruise(); closeAndReset(); }}
               className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-100"
             >
               Clear Cruise Plan
