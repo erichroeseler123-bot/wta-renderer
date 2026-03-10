@@ -9,11 +9,11 @@ import {
 } from "@/lib/cruiseShips";
 
 export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const { ship, date, setCruise, clearCruise } = useCruise();
+  const { line, ship, date, setCruise, clearCruise } = useCruise();
   const [tempLine, setTempLine] = useState<string | null>(null);
   const [tempShip, setTempShip] = useState<string | null>(null);
   const selectedShip = tempShip ?? (ship || "");
-  const selectedLine = tempLine ?? (selectedShip ? getCruiseLineForShip(selectedShip) : "");
+  const selectedLine = tempLine ?? line ?? (selectedShip ? getCruiseLineForShip(selectedShip) : "");
   const shipOptions = selectedLine ? getShipsForCruiseLine(selectedLine) : [];
   const selectedDate = selectedShip ? getFirstSailingDateForShip(selectedShip) : "";
 
@@ -69,8 +69,8 @@ export default function ShipPicker({ isOpen, onClose }: { isOpen: boolean; onClo
         </div>
         <div className="grid gap-3">
           <button
-            onClick={() => { if (selectedShip && selectedDate) { setCruise(selectedShip, selectedDate); closeAndReset(); } }}
-            disabled={!(selectedShip && selectedDate)}
+            onClick={() => { if (selectedLine && selectedShip && selectedDate) { setCruise(selectedLine, selectedShip, selectedDate); closeAndReset(); } }}
+            disabled={!(selectedLine && selectedShip && selectedDate)}
             className="w-full rounded-xl bg-slate-900 px-4 py-3 text-sm font-bold text-white hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-400"
           >
             See Matching Tours

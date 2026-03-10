@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useCruise } from "@/context/CruiseContext";
+import { getCruiseLineForShip } from "@/lib/cruiseShips";
 import ShipPicker from "./ShipPicker";
 import CartDrawer from "@/app/components/cart/CartDrawer";
 import CartButton from "@/app/components/cart/CartButton";
@@ -22,11 +23,13 @@ export default function Header() {
     if (ship && date) return;
 
     const sp = new URLSearchParams(window.location.search);
+    const lineFromUrl = sp.get("cruiseLine") || "";
     const shipFromUrl = sp.get("cruiseShip") || "";
     const dateFromUrl = sp.get("date") || sp.get("cruiseDate") || "";
+    const inferredLine = shipFromUrl ? getCruiseLineForShip(shipFromUrl) : "";
 
     if (shipFromUrl && dateFromUrl) {
-      setCruise(shipFromUrl, dateFromUrl);
+      setCruise(lineFromUrl || inferredLine, shipFromUrl, dateFromUrl);
     }
   }, [ship, date, setCruise]);
 

@@ -55,12 +55,13 @@ const featuredTours = [
 ];
 
 export default function HomePage() {
-  const { ship, date, loaded } = useCruise();
+  const { line, ship, date, loaded } = useCruise();
   const toursHref = useMemo(() => {
     if (!ship || !date) return "/tours";
     const qs = new URLSearchParams({ cruiseShip: ship, date });
+    if (line) qs.set("cruiseLine", line);
     return `/tours?${qs.toString()}`;
-  }, [ship, date]);
+  }, [line, ship, date]);
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] text-slate-900">

@@ -2,10 +2,11 @@
 import { createContext, useContext, useState, ReactNode, useSyncExternalStore } from "react";
 
 type CruiseIdentity = {
+  line: string | null;
   ship: string | null;
   date: string | null;
   loaded: boolean;
-  setCruise: (ship: string, date: string) => void;
+  setCruise: (line: string, ship: string, date: string) => void;
   clearCruise: () => void;
 };
 
@@ -19,22 +20,26 @@ export function CruiseProvider({ children }: { children: ReactNode }) {
     () => false,
   );
 
-  const [cruise, setCruiseState] = useState<{ ship: string; date: string } | null>(() => {
+  const [cruise, setCruiseState] = useState<{ line: string; ship: string; date: string } | null>(() => {
     if (typeof window === "undefined") return null;
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return null;
 
-      const parsed = JSON.parse(raw) as { ship?: string; date?: string } | null;
+      const parsed = JSON.parse(raw) as { line?: string; ship?: string; date?: string } | null;
       if (!parsed?.ship || !parsed?.date) return null;
-      return { ship: parsed.ship, date: parsed.date };
+      return {
+        line: parsed.line || "",
+        ship: parsed.ship,
+        date: parsed.date,
+      };
     } catch {
       return null;
     }
   });
 
-  const setCruise = (ship: string, date: string) => {
-    const next = { ship, date };
+  const setCruise = (line: string, ship: string, date: string) => {
+    const next = { line, ship, date };
     setCruiseState(next);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -55,6 +60,7 @@ export function CruiseProvider({ children }: { children: ReactNode }) {
   return (
     <CruiseContext.Provider
       value={{
+        line: cruise?.line || null,
         ship: cruise?.ship || null,
         date: cruise?.date || null,
         loaded,

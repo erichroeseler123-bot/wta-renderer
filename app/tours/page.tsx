@@ -60,7 +60,7 @@ function trustLineForTour(tour: Tour, port: string) {
 }
 
 export default function ToursPage() {
-  const { ship, date: savedDate, loaded, setCruise, clearCruise } = useCruise();
+  const { line: savedLine, ship, date: savedDate, loaded, setCruise, clearCruise } = useCruise();
   const { items } = useCart();
 
   const [tours, setTours] = useState<Tour[]>([]);
@@ -80,9 +80,11 @@ export default function ToursPage() {
     handoffId: "",
     party: "",
     date: "",
+    cruiseLine: "",
+    cruiseShip: "",
   });
 
-  const { portFilter, categoryFilterRaw, handoffId, party, date } = queryParams;
+  const { portFilter, categoryFilterRaw, handoffId, party, date, cruiseLine, cruiseShip } = queryParams;
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -93,26 +95,33 @@ export default function ToursPage() {
       handoffId: sp.get("handoff_id") || sp.get("handoffId") || "",
       party: sp.get("partySize") || sp.get("party") || "",
       date: sp.get("date") || sp.get("cruiseDate") || "",
+      cruiseLine: sp.get("cruiseLine") || "",
+      cruiseShip: sp.get("cruiseShip") || "",
     });
   }, []);
 
   useEffect(() => {
     if (!loaded || planInitialized) return;
-    const nextShip = ship || "";
-    const nextLine = nextShip ? getCruiseLineForShip(nextShip) : "";
+    const nextShip = cruiseShip || ship || "";
+    const nextLine = cruiseLine || (nextShip ? getCruiseLineForShip(nextShip) : (savedLine || ""));
+    const nextDate = nextShip ? getFirstSailingDateForShip(nextShip) : "";
     setLineInput(nextLine);
-    setShipInput(ship || "");
-    setFitScheduleOnly(Boolean(ship && getFirstSailingDateForShip(ship)));
+    setShipInput(nextShip);
+    setFitScheduleOnly(Boolean(nextShip && nextDate));
+    if (nextShip && nextDate) {
+      setCruise(nextLine, nextShip, nextDate);
+    }
     setPlanInitialized(true);
-  }, [loaded, planInitialized, ship]);
+  }, [loaded, planInitialized, ship, savedLine, cruiseLine, cruiseShip, setCruise]);
 
   useEffect(() => {
     if (!loaded || !ship) return;
     const derivedDate = getFirstSailingDateForShip(ship);
+    const derivedLine = savedLine || getCruiseLineForShip(ship);
     if (derivedDate && savedDate !== derivedDate) {
-      setCruise(ship, derivedDate);
+      setCruise(derivedLine, ship, derivedDate);
     }
-  }, [loaded, ship, savedDate, setCruise]);
+  }, [loaded, ship, savedDate, savedLine, setCruise]);
 
   useEffect(() => {
     fetch("/data/tours.json")
@@ -290,11 +299,11 @@ export default function ToursPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      if (shipInput && effectiveDate) {
-                        setCruise(shipInput, effectiveDate);
-                        setFitScheduleOnly(true);
-                      }
-                    }}
+                  if (shipInput && effectiveDate) {
+                    setCruise(selectedLine || getCruiseLineForShip(shipInput), shipInput, effectiveDate);
+                    setFitScheduleOnly(true);
+                  }
+                }}
                     disabled={!(shipInput && effectiveDate)}
                     className="min-w-52 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
                   >
