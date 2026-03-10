@@ -361,9 +361,12 @@ export default function AvailabilityCalendar({
                 const start = String(s.start_at ?? s.startAt ?? "");
                 const label = start.slice(11, 16);
                 const priceCents = minPriceCentsFromRates(s.customer_type_rates as unknown[]);
-                const firstRate = Array.isArray(s.customer_type_rates) ? s.customer_type_rates[0] : null;
+                const firstRate = Array.isArray(s.customer_type_rates)
+                  ? (s.customer_type_rates[0] as Record<string, unknown> | undefined)
+                  : undefined;
+                const customerType = firstRate?.customer_type as Record<string, unknown> | undefined;
                 const ratePk = Number(firstRate?.pk ?? 0) || undefined;
-                const rateLabel = firstRate?.customer_type?.name || firstRate?.name || undefined;
+                const rateLabel = String(customerType?.name || firstRate?.name || "") || undefined;
                 const isPicked = selectedSlotPk === s.pk;
 
                 return (
