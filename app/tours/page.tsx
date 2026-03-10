@@ -183,7 +183,14 @@ export default function ToursPage() {
   const activePort = manualPort || portFilter;
 
   const portOptions = useMemo(
-    () => ["all", ...new Set(tours.map((t) => inferPortFromCompany(t.company)).filter(Boolean))],
+    () => [
+      "all",
+      ...new Set(
+        tours
+          .map((t) => inferPortFromCompany(t.company))
+          .filter((v): v is string => typeof v === "string" && v.length > 0),
+      ),
+    ],
     [tours],
   );
   const operatorOptions = useMemo(
