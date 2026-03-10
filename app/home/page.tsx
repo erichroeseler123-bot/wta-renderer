@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import styles from "./home.module.css";
-import { getToursFromFareHarbor, type Tour } from "@/lib/data/tours";
+import { getToursFromFareHarbor } from "@/lib/data/tours";
 
 export const metadata: Metadata = {
   title: "Alaska Flight Tours | Live FareHarbor Inventory",
@@ -12,22 +12,12 @@ export const metadata: Metadata = {
   },
 };
 
-const FLIGHT_COMPANIES = new Set<string>([
-  "coastalhelicopters",
-  "taquanair",
-  "temscoair-juneau",
-  "temscoair-skagway",
-  "wingsairways",
-]);
-
-const FLIGHT_TERMS = ["flight", "helicopter", "seaplane", "air tour", "airways", "plane"];
-
-function isFlightTour(tour: Tour): boolean {
-  const company = String(tour.fareharbor?.company || "").toLowerCase();
-  if (FLIGHT_COMPANIES.has(company)) return true;
-
-  const haystack = `${tour.title} ${tour.description}`.toLowerCase();
-  return FLIGHT_TERMS.some((term) => haystack.includes(term));
+function providerRank(companyRaw: string): number {
+  const company = String(companyRaw || "").toLowerCase();
+  if (company === "coastalhelicopters") return 0;
+  if (company === "northstartrekking") return 1;
+  if (company.startsWith("temsco")) return 2;
+  return 99;
 }
 
 function formatUpdatedAt(date: Date): string {
@@ -44,8 +34,12 @@ function formatUpdatedAt(date: Date): string {
 export default async function HomeFlightsPage() {
   const tours = await getToursFromFareHarbor();
   const flights = tours
-    .filter(isFlightTour)
-    .sort((a, b) => a.title.localeCompare(b.title))
+    .filter((tour) => providerRank(tour.fareharbor?.company || "") < 3)
+    .sort((a, b) => {
+      const rankDiff = providerRank(a.fareharbor?.company || "") - providerRank(b.fareharbor?.company || "");
+      if (rankDiff !== 0) return rankDiff;
+      return a.title.localeCompare(b.title);
+    })
     .slice(0, 24);
 
   const updatedAt = formatUpdatedAt(new Date());
