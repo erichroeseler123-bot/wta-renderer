@@ -180,6 +180,18 @@ export async function listOrdersNeedingAttention(limit = 50) {
   return out;
 }
 
+export async function listRecentOrders(limit = 50) {
+  const ids = await readIndex("orders:recent");
+  const out: OrderSnapshot[] = [];
+
+  for (const id of ids.slice(0, Math.max(1, limit))) {
+    const order = await getOrder(id);
+    if (order) out.push(order);
+  }
+
+  return out;
+}
+
 export async function acquireOrderLock(orderId: string, ttlSeconds = 120) {
   const kv = await getKV();
   if (!kv) return false;
