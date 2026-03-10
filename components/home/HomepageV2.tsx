@@ -3,7 +3,7 @@ import Link from "next/link";
 const CATS = [
   {
     title: "Helicopter & Flightseeing",
-    href: "/tours/coastalhelicopters",
+    href: "/tours?operator=coastalhelicopters",
     meta: "Glaciers • Icefields • Peaks",
   },
   {
@@ -102,7 +102,7 @@ export default function HomepageV2() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
-                href="/tours/coastalhelicopters"
+                href="/tours?operator=coastalhelicopters"
                 className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
               >
                 Juneau Helicopters →
@@ -114,7 +114,7 @@ export default function HomepageV2() {
                 All tours →
               </Link>
               <Link
-                href="/guide"
+                href="/guides"
                 className="rounded-2xl border border-white/10 bg-white/5 px-4 py-2 text-sm text-white/80 hover:bg-white/10 transition"
               >
                 Port guides →
@@ -220,7 +220,7 @@ export default function HomepageV2() {
               </div>
             </div>
             <Link
-              href="/tours/coastalhelicopters"
+              href="/tours?operator=coastalhelicopters"
               className="inline-flex items-center justify-center rounded-2xl bg-[#4CC9F0]/20 px-6 py-3 text-sm font-semibold text-white hover:bg-[#4CC9F0]/28 border border-[#4CC9F0]/25 transition"
             >
               Browse Juneau tours →
