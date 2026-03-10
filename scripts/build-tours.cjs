@@ -358,6 +358,25 @@ async function buildTours() {
 
   const dataPath = path.join(process.cwd(), "public/data/tours.json");
   fs.mkdirSync(path.dirname(dataPath), { recursive: true });
+
+  if (allTours.length < 1) {
+    let existingTours = [];
+    try {
+      const existingRaw = fs.readFileSync(dataPath, "utf8");
+      const parsed = JSON.parse(existingRaw);
+      if (Array.isArray(parsed)) existingTours = parsed;
+    } catch {}
+
+    if (existingTours.length > 0) {
+      console.warn(
+        `⚠ build-tours fetched 0 tours. Keeping existing snapshot with ${existingTours.length} tours.`,
+      );
+      return;
+    }
+
+    throw new Error("build-tours fetched 0 tours and no existing snapshot is available.");
+  }
+
   fs.writeFileSync(dataPath, JSON.stringify(allTours, null, 2));
 
   const withDollar = allTours.filter((x) => String(x.fromPrice || "").includes("$")).length;
