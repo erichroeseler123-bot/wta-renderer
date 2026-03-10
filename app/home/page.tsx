@@ -47,6 +47,12 @@ export default async function HomeFlightsPage() {
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
+        <div className={styles.logo} aria-label="Flight Desk logo">
+          <span className={styles.logoWing} aria-hidden="true">
+            ✈
+          </span>
+          <span className={styles.logoText}>Flight Desk</span>
+        </div>
         <p className={styles.kicker}>Flights</p>
         <h1 className={styles.title}>Alaska Flight Tours</h1>
         <p className={styles.subtitle}>

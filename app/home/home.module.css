@@ -12,8 +12,32 @@
   padding: 1rem;
 }
 
+.logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: #0f3a67;
+  color: #ffffff;
+  border-radius: 999px;
+  padding: 0.34rem 0.72rem;
+  box-shadow: inset 0 0 0 1px #3e6d9f;
+}
+
+.logoWing {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.logoText {
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 800;
+  line-height: 1;
+}
+
 .kicker {
-  margin: 0;
+  margin: 0.55rem 0 0;
   font-size: 0.78rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
