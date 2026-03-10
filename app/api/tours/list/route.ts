@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import path from "path";
 import { promises as fs } from "fs";
 import { getVisibility } from "@/lib/visibilityStore";
+import { getToursFromFareHarbor, type Tour as LiveTour } from "@/lib/data/tours";
 
 type Tour = {
   pk: number;
@@ -15,10 +16,36 @@ type Tour = {
   category?: string;
 };
 
+function asCatalogTour(live: LiveTour): Tour {
+  return {
+    pk: Number(live.pk || 0),
+    title: String(live.title || ""),
+    slug: String(live.slug || ""),
+    description: String(live.description || ""),
+    image: live.image || undefined,
+    company: String(live.fareharbor?.company || ""),
+    fromPrice: live.fromPrice || undefined,
+    category: live.port || undefined,
+  };
+}
+
 export async function GET() {
   const p = path.join(process.cwd(), "public", "data", "tours.json");
-  const raw = await fs.readFile(p, "utf8");
-  const tours: Tour[] = JSON.parse(raw);
+
+  let tours: Tour[] = [];
+  try {
+    const raw = await fs.readFile(p, "utf8");
+    const parsed = JSON.parse(raw);
+    tours = Array.isArray(parsed) ? (parsed as Tour[]) : [];
+  } catch {
+    tours = [];
+  }
+
+  // Production safety net: if the static snapshot is missing/empty, recover from live FareHarbor.
+  if (tours.length < 1) {
+    const liveTours = await getToursFromFareHarbor();
+    tours = liveTours.map(asCatalogTour).filter((t) => t.company && t.pk > 0);
+  }
 
   const vis = await getVisibility();
 
