@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
+import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "./CartContext";
 
 type PayloadItem = {
@@ -102,18 +102,32 @@ export default function CheckoutClient() {
       const j = await r.json();
       if (!r.ok || !j?.success) throw new Error(j?.error || "Create intent failed");
 
-      const clientSecret = j.client_secret as string;
+      const clientSecret = String(j.client_secret || "");
+      if (!clientSecret) throw new Error("Missing client secret.");
 
-      // 2) Confirm payment (keeps user on your site)
-      const { error } = await stripe.confirmPayment({
-        elements,
-        clientSecret,
-        confirmParams: {
-          return_url: `${window.location.origin}/checkout/success`,
+      const card = elements.getElement(CardElement);
+      if (!card) throw new Error("Card form failed to load.");
+
+      // 2) Confirm payment using card element
+      const { error, paymentIntent } = await stripe.confirmCardPayment(clientSecret, {
+        payment_method: {
+          card,
+          billing_details: {
+            name,
+            email,
+            phone: phone || undefined,
+          },
         },
       });
 
       if (error) throw new Error(error.message || "Payment failed");
+      if (!paymentIntent?.id) throw new Error("Payment completed but no payment intent id was returned.");
+
+      if (paymentIntent.status !== "succeeded" && paymentIntent.status !== "processing") {
+        throw new Error(`Payment status: ${paymentIntent.status}`);
+      }
+
+      window.location.href = `/checkout/success?payment_intent=${encodeURIComponent(paymentIntent.id)}`;
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       setErr(msg);
@@ -162,7 +176,18 @@ export default function CheckoutClient() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <PaymentElement />
+              <CardElement
+                options={{
+                  hidePostalCode: true,
+                  style: {
+                    base: {
+                      fontSize: "16px",
+                      color: "#0f172a",
+                      "::placeholder": { color: "#64748b" },
+                    },
+                  },
+                }}
+              />
             </div>
 
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800">

@@ -1,6 +1,37 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCart } from "@/app/components/cart/CartContext";
+import { inferPortFromCompany } from "@/lib/handoff/mappings";
+
+type SlotRate = {
+  pk: number;
+  customer_type?: {
+    singular?: string;
+    note?: string;
+  };
+  capacity?: number;
+  customer_prototype?: {
+    total?: number;
+  };
+};
+
+type Slot = {
+  pk: number;
+  start_at: string;
+  startAt?: string;
+  capacity?: number;
+  customer_type_rates?: SlotRate[];
+};
+
+type PickerRate = {
+  ratePk: number;
+  name?: string;
+  note?: string;
+  cap?: number;
+  price?: number;
+};
 
 function fmtTime(startAt: string) {
   // "2026-05-01T07:45:00-0800" -> "07:45"
@@ -13,8 +44,10 @@ export default function DayPage({
   params: { company: string; item: string; day: string };
 }) {
   const { company, item, day } = params;
-  const [slots, setSlots] = useState<any[]>([]);
-  const [selected, setSelected] = useState<any | null>(null);
+  const sp = useSearchParams();
+  const { addItem, open } = useCart();
+  const [slots, setSlots] = useState<Slot[]>([]);
+  const [selected, setSelected] = useState<Slot | null>(null);
   const [ratePk, setRatePk] = useState<number | null>(null);
   const [qty, setQty] = useState<number>(1);
 
@@ -31,14 +64,14 @@ export default function DayPage({
         { cache: "no-store" },
       );
       const j = await r.json();
-      const dayObj = (j.days ?? [])[0];
+      const dayObj = (j.days ?? [])[0] as { slots?: Slot[] } | undefined;
       setSlots(dayObj?.slots ?? []);
     })();
   }, [company, item, day]);
 
-  const rates = useMemo(() => {
+  const rates = useMemo<PickerRate[]>(() => {
     if (!selected?.customer_type_rates) return [];
-    return selected.customer_type_rates.map((r: any) => ({
+    return selected.customer_type_rates.map((r) => ({
       ratePk: r.pk,
       name: r.customer_type?.singular,
       note: r.customer_type?.note,
@@ -49,18 +82,41 @@ export default function DayPage({
 
   function addToCart() {
     if (!selected || !ratePk) return;
+    const chosenRate = rates.find((r) => Number(r.ratePk) === Number(ratePk));
+    const safeQty = Math.max(1, Math.min(99, Math.floor(Number(qty) || 1)));
+    const unitCents = Number(chosenRate?.price || 0) || undefined;
 
-    // TODO: replace with your real CartContext action
-    console.log("ADD_TO_CART", {
-      company,
-      item: Number(item),
-      availability_pk: selected.pk,
-      start_at: selected.start_at,
-      rate_pk: ratePk,
-      qty,
-    });
+    addItem(
+      {
+        company,
+        itemPk: Number(item),
+        title: `Tour ${item}`,
+        supplierLabel: company,
+        day,
+        availabilityPk: Number(selected.pk),
+        startAt: String(selected.start_at || selected.startAt || ""),
+        ratePk: Number(ratePk),
+        rateLabel: chosenRate?.name ? String(chosenRate.name) : undefined,
+        price: unitCents,
+        handoffSource: sp.get("source") || sp.get("handoffSource") || undefined,
+        handoffId: sp.get("handoff_id") || sp.get("handoffId") || undefined,
+        authorityTopic: sp.get("authority_topic") || sp.get("topic") || undefined,
+        referrerPath: sp.get("referrer_path") || sp.get("referrerPath") || undefined,
+        handoffCategory: sp.get("category") || undefined,
+        handoffDate: sp.get("date") || day || undefined,
+        partySize: Number(sp.get("partySize") || 0) || undefined,
+        adults: Number(sp.get("adults") || 0) || undefined,
+        children: Number(sp.get("children") || 0) || undefined,
+        cruiseShip: sp.get("cruiseShip") || undefined,
+        cruiseShipSlug: sp.get("cruiseShipSlug") || undefined,
+        timeOfDay: sp.get("timeOfDay") || undefined,
+        budgetTier: sp.get("budgetTier") || undefined,
+        portSlug: inferPortFromCompany(company) || undefined,
+      },
+      safeQty,
+    );
 
-    alert("Added (wire into CartContext next)");
+    open();
   }
 
   return (
@@ -99,7 +155,7 @@ export default function DayPage({
           <div className="font-semibold">Choose passenger type</div>
 
           <div className="mt-3 grid gap-2">
-            {rates.map((r: any) => (
+            {rates.map((r) => (
               <label
                 key={r.ratePk}
                 className="flex items-center justify-between gap-4 rounded-xl border border-white/10 bg-white/5 px-3 py-2"
@@ -113,7 +169,7 @@ export default function DayPage({
                 </div>
                 <div className="flex items-center gap-3">
                   <div className="text-sm text-white/80">
-                    ${(r.price / 100).toFixed(0)}
+                    ${((Number(r.price || 0)) / 100).toFixed(0)}
                   </div>
                   <input
                     type="radio"

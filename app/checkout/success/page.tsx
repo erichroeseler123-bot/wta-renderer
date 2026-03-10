@@ -38,6 +38,22 @@ export default function SuccessPage() {
     if (!pi) return;
 
     let stop = false;
+    let finalizeTriggered = false;
+
+    async function triggerFinalize() {
+      if (finalizeTriggered) return;
+      finalizeTriggered = true;
+      try {
+        await fetch("/api/stripe/finalize", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ payment_intent_id: pi }),
+        });
+      } catch {
+        // Ignore here; polling below keeps the page updated.
+      }
+    }
+
     async function poll() {
       try {
         const r = await fetch(`/api/receipt?pi=${encodeURIComponent(pi)}`, { cache: "no-store" });
@@ -51,6 +67,7 @@ export default function SuccessPage() {
         if (!stop) setErr(e instanceof Error ? e.message : String(e));
       }
     }
+    triggerFinalize();
     poll();
     return () => {
       stop = true;
