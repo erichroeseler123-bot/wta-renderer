@@ -202,7 +202,12 @@ export default function TourDetailPage({
     );
   }
 
-  const canAdd = Boolean(selection?.availabilityPk && selection?.startAt);
+  const canAdd = Boolean(
+    selection?.availabilityPk &&
+    selection?.startAt &&
+    selection?.ratePk &&
+    selection?.qty,
+  );
   const fromPriceCompany = String(tour.company || company);
   const fromPriceItem = tour.itemPk ?? tour.item ?? tour.pk ?? item;
 
