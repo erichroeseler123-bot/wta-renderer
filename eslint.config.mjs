@@ -12,6 +12,11 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Generated build/deploy artifacts and local test output:
+    ".vercel/**",
+    "test-results/**",
+    // Node CJS helper scripts are intentionally CommonJS:
+    "scripts/**/*.cjs",
   ]),
 ]);
 

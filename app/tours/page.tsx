@@ -2,9 +2,11 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { useCruise } from "@/context/CruiseContext";
 import { useCart } from "@/app/components/cart/CartContext";
+import JsonLd from "@/components/seo/JsonLd";
 import {
   CRUISE_LINES,
   CRUISE_ITINERARY_HINTS,
@@ -228,6 +230,7 @@ export default function ToursPage() {
   }, [fitScheduleOnly, profileComplete, filteredByQuery, filteredByPortWindow, matchMap, dateKeyFor]);
 
   const heading = portFilter ? `${portFilter[0].toUpperCase()}${portFilter.slice(1)} Shore Excursions` : "Alaska Shore Excursions";
+  const canonicalUrl = "https://welcometoalaskatours.com/tours";
 
   const plannedForDate = useMemo(() => {
     if (!effectiveDate) return [];
@@ -236,6 +239,38 @@ export default function ToursPage() {
       .sort((a, b) => String(a.startAt || "").localeCompare(String(b.startAt || "")));
   }, [items, effectiveDate]);
   const fallbackTours = useMemo(() => filteredByQuery.slice(0, 4), [filteredByQuery]);
+  const itemListSchema = useMemo(
+    () => ({
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      name: heading,
+      itemListElement: filtered.slice(0, 24).map((tour, index) => ({
+        "@type": "ListItem",
+        position: index + 1,
+        url: `https://welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`,
+        name: tour.title,
+      })),
+    }),
+    [filtered, heading],
+  );
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://welcometoalaskatours.com/",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Tours",
+        item: canonicalUrl,
+      },
+    ],
+  };
 
   if (!loaded || loadingTours) {
     return <div className="p-20 text-center text-4xl font-black text-slate-500">Loading Your Tour Matches...</div>;
@@ -243,9 +278,11 @@ export default function ToursPage() {
 
   return (
     <main className="min-h-screen bg-white">
+      <JsonLd data={itemListSchema} />
+      <JsonLd data={breadcrumbSchema} />
       <div className="mx-auto max-w-7xl px-8 py-20">
         <header className="mb-16">
-          <h1 className="mb-4 text-6xl font-black uppercase tracking-tighter text-slate-900">{heading}</h1>
+          <h1 className="mb-4 text-4xl font-black uppercase tracking-tighter text-slate-900 sm:text-5xl lg:text-6xl">{heading}</h1>
 
           {(handoffId || date || party) ? (
             <div className="mb-6 flex flex-wrap gap-2 text-xs uppercase tracking-wide">
@@ -267,7 +304,7 @@ export default function ToursPage() {
                     setLineInput(e.target.value);
                     setShipInput("");
                   }}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm"
+                  className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm"
                 >
                   <option value="">Select your cruise line...</option>
                   {CRUISE_LINES.map((v) => (
@@ -281,7 +318,7 @@ export default function ToursPage() {
                   value={shipInput}
                   disabled={!selectedLine}
                   onChange={(e) => setShipInput(e.target.value)}
-                  className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
+                  className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 shadow-sm disabled:cursor-not-allowed disabled:bg-slate-100 disabled:text-slate-500"
                 >
                   <option value="">{selectedLine ? "Select your ship..." : "Select line first"}</option>
                   {shipOptions.map((v) => (
@@ -289,9 +326,9 @@ export default function ToursPage() {
                   ))}
                 </select>
               </div>
-              <div>
-                <label className="mb-1 block text-sm font-semibold text-slate-600">First sailing date</label>
-                <div className="w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900">
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-600">First sailing date</label>
+                <div className="min-h-11 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900">
                   {effectiveDate || "Select a ship to load date"}
                 </div>
               </div>
@@ -305,7 +342,7 @@ export default function ToursPage() {
                   }
                 }}
                     disabled={!(shipInput && effectiveDate)}
-                    className="min-w-52 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
+                    className="min-h-11 min-w-52 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-400"
                   >
                     Find My Best Fits
                   </button>
@@ -317,7 +354,7 @@ export default function ToursPage() {
                       setFitScheduleOnly(false);
                       clearCruise();
                     }}
-                    className="rounded-xl px-2 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
+                    className="min-h-11 rounded-xl px-2 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900"
                   >
                     Clear plan
                   </button>
@@ -390,7 +427,7 @@ export default function ToursPage() {
               <button
                 key={cat}
                 onClick={() => setManualCat(cat)}
-                className={`rounded-full px-6 py-2 text-xs font-black uppercase tracking-widest transition-all ${
+                className={`min-h-11 rounded-full px-6 py-2 text-xs font-black uppercase tracking-widest transition-all ${
                   activeCat === cat
                     ? "bg-blue-600 text-white shadow-xl shadow-blue-200"
                     : "bg-slate-100 text-slate-600 hover:bg-slate-200"
@@ -421,14 +458,14 @@ export default function ToursPage() {
                   setManualCat("All");
                   setFitScheduleOnly(false);
                 }}
-                className="rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-amber-700"
+                className="min-h-11 rounded-xl bg-amber-600 px-3 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-amber-700"
               >
                 Browse All Excursions
               </button>
               <button
                 type="button"
                 onClick={() => setFitScheduleOnly(false)}
-                className="rounded-xl border border-amber-300 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-amber-700 hover:bg-amber-100"
+                className="min-h-11 rounded-xl border border-amber-300 bg-white px-3 py-2 text-xs font-bold uppercase tracking-wide text-amber-700 hover:bg-amber-100"
               >
                 Turn Off Fit Filter
               </button>
@@ -451,6 +488,32 @@ export default function ToursPage() {
           </div>
         ) : null}
 
+        {filtered.length < 1 ? (
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-8 text-center">
+            <h2 className="text-2xl font-black tracking-tight text-slate-900">No Tours Found</h2>
+            <p className="mt-2 text-sm text-slate-600">
+              Try removing filters or browse all tours to see currently available options.
+            </p>
+            <div className="mt-4 flex flex-wrap justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setManualCat("All");
+                  setFitScheduleOnly(false);
+                }}
+                className="min-h-11 rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold uppercase tracking-wide text-white hover:bg-slate-700"
+              >
+                Show All Tours
+              </button>
+              <Link
+                href="/contact-us"
+                className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 hover:bg-slate-100"
+              >
+                Contact Support
+              </Link>
+            </div>
+          </div>
+        ) : (
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-3">
           {filtered.map((tour) => (
             <Link
@@ -458,9 +521,11 @@ export default function ToursPage() {
               href={`/tours/${tour.company}/${tour.pk}`}
               className="group flex h-full flex-col overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm transition-all hover:-translate-y-1 hover:border-blue-200 hover:shadow-xl"
             >
-              <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
-                <img
+                <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+                <Image
                   src={tour.image || "/hero/hero5678.jpg"}
+                  fill
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                   className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   alt={tour.title}
                 />
@@ -506,6 +571,7 @@ export default function ToursPage() {
             </Link>
           ))}
         </div>
+        )}
       </div>
     </main>
   );

@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useMemo } from "react";
 import { useCruise } from "@/context/CruiseContext";
+import NewsletterSignup from "@/app/components/newsletter/NewsletterSignup";
 
 const ports = [
   { name: "Juneau", href: "/tours?port=juneau", image: "/hero/juneau.jpg" },
@@ -54,6 +56,51 @@ const featuredTours = [
   },
 ];
 
+const guideHighlights = [
+  {
+    title: "Best Juneau Shore Excursions for 2026",
+    href: "/guides/best-juneau-shore-excursions-2026",
+  },
+  {
+    title: "Skagway White Pass Independent Booking Guide",
+    href: "/guides/skagway-white-pass-railway-independent-booking",
+  },
+  {
+    title: "How to Save vs Ship Excursions",
+    href: "/guides/independent-alaska-shore-excursions-save-vs-ship",
+  },
+];
+
+const testimonials = [
+  {
+    quote: "We booked in under 10 minutes and the timing fit our ship perfectly.",
+    person: "Guest from Seattle",
+  },
+  {
+    quote: "The tour details and departure options were much clearer than booking last-minute at port.",
+    person: "Family cruise traveler",
+  },
+  {
+    quote: "Fast checkout and immediate confirmation status gave us confidence right away.",
+    person: "First-time Alaska cruiser",
+  },
+];
+
+const faqItems = [
+  {
+    q: "Do these tours fit cruise ship schedules?",
+    a: "Yes. Our cruise planner is designed to surface departures that align with your port timing.",
+  },
+  {
+    q: "When will I see booking confirmation?",
+    a: "Right after payment, your confirmation page updates with live booking status and operator confirmation details.",
+  },
+  {
+    q: "Can I get help picking tours?",
+    a: "Yes. Contact our team with your ship, date, and group size and we will help narrow down the best options.",
+  },
+];
+
 export default function HomePage() {
   const { line, ship, date, loaded } = useCruise();
   const toursHref = useMemo(() => {
@@ -66,8 +113,11 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[#F8FAFC] text-slate-900">
       <section className="relative overflow-hidden border-b border-slate-200">
-        <img
+        <Image
           src="/hero/hero5678.jpg"
+          fill
+          priority
+          sizes="100vw"
           className="absolute inset-0 h-full w-full object-cover opacity-20"
           alt="Alaska coast"
         />
@@ -194,9 +244,11 @@ export default function HomePage() {
               href={port.href}
               className="group relative block aspect-[4/5] overflow-hidden rounded-3xl border border-slate-200 bg-white"
             >
-              <img
+              <Image
                 src={port.image}
                 alt={port.name}
+                fill
+                sizes="(max-width: 768px) 100vw, 33vw"
                 className="absolute inset-0 h-full w-full object-cover transition duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-900/85 via-slate-900/25 to-transparent" />
@@ -237,6 +289,67 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-16">
+        <div className="rounded-3xl border border-slate-200 bg-slate-50 p-8">
+          <div className="flex flex-wrap items-end justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-black tracking-tight sm:text-3xl">Alaska Cruise Guides</h2>
+              <p className="mt-1 text-sm text-slate-600">
+                Port-specific planning content targeting the questions cruisers search most.
+              </p>
+            </div>
+            <Link href="/guides" className="text-xs font-bold uppercase tracking-wide text-sky-700 hover:text-sky-900">
+              View All Guides
+            </Link>
+          </div>
+          <div className="mt-5 grid gap-3 md:grid-cols-3">
+            {guideHighlights.map((guide) => (
+              <Link
+                key={guide.href}
+                href={guide.href}
+                className="rounded-2xl border border-slate-200 bg-white p-4 text-sm font-semibold text-slate-800 transition hover:border-sky-200"
+              >
+                {guide.title} →
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-16">
+        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+          <h2 className="text-2xl font-black tracking-tight sm:text-3xl">What Travelers Say</h2>
+          <div className="mt-6 grid gap-4 md:grid-cols-3">
+            {testimonials.map((t) => (
+              <div key={t.quote} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                <p className="text-sm text-slate-700">“{t.quote}”</p>
+                <p className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-500">{t.person}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <h2 className="text-2xl font-black tracking-tight sm:text-3xl">Frequently Asked Questions</h2>
+        <div className="mt-6 grid gap-4 md:grid-cols-3">
+          {faqItems.map((item) => (
+            <div key={item.q} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="text-base font-black text-slate-900">{item.q}</div>
+              <p className="mt-2 text-sm text-slate-600">{item.a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-7xl px-6 pb-20">
+        <NewsletterSignup
+          source="homepage"
+          title="Stay Updated on Alaska Adventures"
+          description="Get tour updates, cruise planning tips, wildlife and environmental news, and fun Alaska facts. Unsubscribe anytime."
+        />
       </section>
     </main>
   );

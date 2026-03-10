@@ -10,6 +10,14 @@ import {
 } from "@/lib/orders";
 import { runFareHarborBookingsForOrder } from "@/lib/bookingRunner";
 import { assertBookingsEnabled } from "@/lib/fareharbor";
+import { maybeSendBookingConfirmationEmail } from "@/lib/bookingEmail";
+import {
+  clientIpFromHeaders,
+  enforceRateLimit,
+  logSecurityEvent,
+  logServerError,
+  requestId,
+} from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -33,7 +41,23 @@ async function markOrderFailed(order: OrderSnapshot, reason: string) {
 }
 
 export async function POST(req: Request) {
+  const rid = requestId();
+  const ip = clientIpFromHeaders(req.headers);
   try {
+    const rl = await enforceRateLimit({
+      key: `finalize:${ip}`,
+      limit: 20,
+      windowSec: 60,
+    });
+    if (!rl.ok) {
+      logSecurityEvent("rate_limited_finalize", { rid, ip, retryAfterSec: rl.retryAfterSec });
+      const r = jsonError("Too many finalize attempts. Please wait and try again.", 429, {
+        request_id: rid,
+      });
+      r.headers.set("Retry-After", String(rl.retryAfterSec));
+      return r;
+    }
+
     const body = await req.json().catch(() => ({}));
     const piId = String(body?.payment_intent_id || body?.pi || "").trim();
     if (!piId) return jsonError("Missing payment_intent_id", 400);
@@ -48,6 +72,7 @@ export async function POST(req: Request) {
         status: pi.status,
         payment_intent_id: pi.id,
         error: "Payment not finalized yet",
+        request_id: rid,
       });
     }
 
@@ -62,6 +87,7 @@ export async function POST(req: Request) {
         status: order.status,
         order_id: order.order_id,
         payment_intent_id: pi.id,
+        request_id: rid,
       });
     }
 
@@ -72,6 +98,7 @@ export async function POST(req: Request) {
         status: "busy",
         order_id: order.order_id,
         payment_intent_id: pi.id,
+        request_id: rid,
       });
     }
 
@@ -83,6 +110,7 @@ export async function POST(req: Request) {
           status: reloaded.status,
           order_id: reloaded.order_id,
           payment_intent_id: pi.id,
+          request_id: rid,
         });
       }
 
@@ -115,18 +143,23 @@ export async function POST(req: Request) {
         lastError: allOk ? undefined : firstError || "One or more FareHarbor bookings failed",
       });
 
+      if (allOk) {
+        await maybeSendBookingConfirmationEmail(done);
+      }
+
       return NextResponse.json({
         success: allOk,
         status: done.status,
         order_id: done.order_id,
         payment_intent_id: pi.id,
         results,
+        request_id: rid,
       });
     } finally {
       await releaseOrderLock(order.order_id);
     }
   } catch (e: unknown) {
-    const err = e as Error;
-    return jsonError("Finalize failed", 500, { details: String(err?.message || e) });
+    logServerError("/api/stripe/finalize", rid, e, { ip });
+    return jsonError("Finalize failed", 500, { request_id: rid });
   }
 }

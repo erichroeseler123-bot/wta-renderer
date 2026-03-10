@@ -3,6 +3,7 @@
 import FromPrice from "@/components/tours/FromPrice";
 import { use, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useSearchParams } from "next/navigation";
 
 import ProductDepartureCalendar, {
@@ -12,6 +13,7 @@ import ItemBookingPicker from "@/components/tours/ItemBookingPicker";
 import { useCart } from "@/app/components/cart/CartContext";
 import { useCruise } from "@/context/CruiseContext";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
+import JsonLd from "@/components/seo/JsonLd";
 
 type TourSnapshot = {
   pk?: number | string;
@@ -43,7 +45,7 @@ export default function TourDetailPage({
   const sp = useSearchParams();
   const { ship: cruiseShip, date: cruiseDate, loaded: cruiseLoaded } = useCruise();
 
-  const { addItem, setSelection, open } = useCart();
+  const { addItem, setSelection, open, count } = useCart();
 
   const [tour, setTour] = useState<TourSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
@@ -210,12 +212,35 @@ export default function TourDetailPage({
   );
   const fromPriceCompany = String(tour.company || company);
   const fromPriceItem = tour.itemPk ?? tour.item ?? tour.pk ?? item;
+  const seoOfferPrice = selection?.priceCents ? Number(selection.priceCents) / 100 : undefined;
+  const seoData = {
+    "@context": "https://schema.org",
+    "@type": "TouristTrip",
+    name: tour.title || "Alaska Shore Excursion",
+    description: tour.shortDescription || tour.headline || "Cruise-friendly Alaska shore excursion.",
+    image: heroSrc,
+    provider: {
+      "@type": "Organization",
+      name: "Welcome To Alaska Tours",
+    },
+    offers: {
+      "@type": "Offer",
+      priceCurrency: "USD",
+      ...(seoOfferPrice ? { price: String(seoOfferPrice) } : {}),
+      availability: "https://schema.org/InStock",
+      url: typeof window !== "undefined" ? window.location.href : `https://welcometoalaskatours.com/tours/${company}/${item}`,
+    },
+  };
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
+      <JsonLd data={seoData} />
       <section className="relative h-[52vh] bg-slate-900">
-        <img
+        <Image
           src={heroSrc}
+          fill
+          priority
+          sizes="100vw"
           className="h-full w-full object-cover opacity-80"
           alt={tour.title}
         />
@@ -313,6 +338,33 @@ export default function TourDetailPage({
               <div>You will see live confirmation status right after checkout.</div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 shadow-2xl backdrop-blur lg:hidden">
+        <div className="mx-auto flex max-w-6xl items-center gap-3 pb-[env(safe-area-inset-bottom)]">
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-500">Selected</div>
+            <div className="truncate text-sm font-bold text-slate-900">
+              {selectedDay ? `${selectedDay} ${selectedTimeLabel || ""}`.trim() : "Choose a date and departure"}
+            </div>
+          </div>
+          {count > 0 ? (
+            <Link
+              href="/checkout"
+              className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-black text-slate-800"
+            >
+              Checkout
+            </Link>
+          ) : null}
+          <button
+            type="button"
+            onClick={addToItinerary}
+            disabled={!canAdd}
+            className="min-h-11 rounded-xl bg-indigo-700 px-4 py-2 text-sm font-black text-white disabled:cursor-not-allowed disabled:bg-slate-300"
+          >
+            {canAdd ? "Add to Cart" : "Select Time"}
+          </button>
         </div>
       </div>
     </main>

@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useCart } from "./CartContext";
 
 export default function CartDrawer() {
   const { items, isOpen, close, removeItem, setQty, clear, count } = useCart();
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
   const estimatedTotal = items.reduce((sum, it) => {
     const line = Number(it.price || 0) * Number(it.qty || 0);
     return sum + (Number.isFinite(line) ? line : 0);
@@ -35,7 +37,25 @@ export default function CartDrawer() {
       />
 
       {/* Panel */}
-      <div className="absolute right-0 top-0 h-[100dvh] w-full max-w-md border-l border-slate-200 bg-white text-slate-900 shadow-2xl flex flex-col">
+      <div
+        className="absolute right-0 top-0 h-[100dvh] w-full max-w-md border-l border-slate-200 bg-white text-slate-900 shadow-2xl flex flex-col"
+        onTouchStart={(e) => {
+          const t = e.changedTouches[0];
+          touchStartX.current = t.clientX;
+          touchStartY.current = t.clientY;
+        }}
+        onTouchEnd={(e) => {
+          const t = e.changedTouches[0];
+          const sx = touchStartX.current;
+          const sy = touchStartY.current;
+          touchStartX.current = null;
+          touchStartY.current = null;
+          if (sx == null || sy == null) return;
+          const deltaX = t.clientX - sx;
+          const deltaY = Math.abs(t.clientY - sy);
+          if (deltaX > 80 && deltaY < 70) close();
+        }}
+      >
         <div className="shrink-0 flex items-center justify-between border-b border-slate-200 p-4">
           <div>
             <div className="text-lg font-semibold">Your Cart</div>
@@ -93,7 +113,7 @@ export default function CartDrawer() {
                             onChange={(e) =>
                               setQty(it.id, Number(e.target.value))
                             }
-                            className="w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none"
+                            className="min-h-11 w-16 rounded-lg border border-slate-300 bg-white px-2 py-1 text-sm text-slate-900 outline-none"
                             inputMode="numeric"
                           />
                         </div>
@@ -144,13 +164,13 @@ export default function CartDrawer() {
             <Link
               href="/checkout"
               onClick={close}
-              className="flex-1 rounded-xl bg-slate-900 py-2 text-center text-sm font-semibold text-white hover:bg-slate-700"
+              className="flex-1 min-h-11 rounded-xl bg-slate-900 py-2 text-center text-sm font-semibold text-white hover:bg-slate-700"
             >
               Checkout →
             </Link>
             <button
               onClick={clear}
-              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
+              className="min-h-11 rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"
             >
               Clear
             </button>

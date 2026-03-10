@@ -11,6 +11,8 @@ import {
 } from "@/lib/orders";
 import { runFareHarborBookingsForOrder } from "@/lib/bookingRunner";
 import { assertBookingsEnabled } from "@/lib/fareharbor";
+import { maybeSendBookingConfirmationEmail } from "@/lib/bookingEmail";
+import { logServerError, requestId } from "@/lib/security";
 
 export const runtime = "nodejs";
 
@@ -36,6 +38,7 @@ async function markOrderFailed(order: OrderSnapshot, reason: string) {
 }
 
 export async function POST(req: Request) {
+  const rid = requestId();
   try {
     const stripe = getStripeClient();
     const kv = await getKV();
@@ -108,7 +111,7 @@ export async function POST(req: Request) {
         .map((x) => (typeof x.error === "string" ? x.error : ""))
         .find((x) => x.length > 0);
 
-      await saveOrder({
+      const done = await saveOrder({
         ...paid,
         bookingResults: results,
         bookingAttempts: (paid.bookingAttempts || 0) + 1,
@@ -116,12 +119,16 @@ export async function POST(req: Request) {
         lastError: allOk ? undefined : firstError || "One or more FareHarbor bookings failed",
       });
 
+      if (allOk) {
+        await maybeSendBookingConfirmationEmail(done);
+      }
+
       return ok();
     } finally {
       await releaseOrderLock(order.order_id);
     }
   } catch (err: unknown) {
-    const error = err as Error;
-    return NextResponse.json({ error: "Webhook error", details: String(error?.message || err) }, { status: 400 });
+    logServerError("/api/stripe/webhook", rid, err);
+    return NextResponse.json({ error: "Webhook error", request_id: rid }, { status: 400 });
   }
 }

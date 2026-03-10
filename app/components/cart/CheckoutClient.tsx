@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "./CartContext";
+import TurnstileWidget from "@/app/components/security/TurnstileWidget";
 
 type PayloadItem = {
   company: string;
@@ -40,6 +41,8 @@ export default function CheckoutClient() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const turnstileSiteKey = String(process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || "").trim();
 
   const payloadItems = useMemo<PayloadItem[]>(() => {
     const source = (items || []) as Array<Record<string, unknown>>;
@@ -87,6 +90,7 @@ export default function CheckoutClient() {
     if (!stripe || !elements) return;
     if (!payloadItems.length) return setErr("Cart is empty.");
     if (!name || !email) return setErr("Please enter name + email.");
+    if (turnstileSiteKey && !turnstileToken) return setErr("Please complete human verification.");
 
     setLoading(true);
     try {
@@ -97,6 +101,7 @@ export default function CheckoutClient() {
         body: JSON.stringify({
           items: payloadItems,
           contact: { name, email, phone },
+          turnstileToken,
         }),
       });
       const j = await r.json();
@@ -189,6 +194,10 @@ export default function CheckoutClient() {
                 }}
               />
             </div>
+
+            {turnstileSiteKey ? (
+              <TurnstileWidget siteKey={turnstileSiteKey} onToken={setTurnstileToken} />
+            ) : null}
 
             <div className="rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800">
               Payments are encrypted and processed by Stripe. Tour availability and pricing are verified at confirmation time.

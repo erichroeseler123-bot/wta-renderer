@@ -7,6 +7,14 @@ import {
   type OrderLine,
   type OrderSnapshot,
 } from "@/lib/orders";
+import {
+  clientIpFromHeaders,
+  enforceRateLimit,
+  logSecurityEvent,
+  logServerError,
+  requestId,
+  verifyTurnstileToken,
+} from "@/lib/security";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -79,17 +87,42 @@ function pickFirstNumber(lines: CartLine[], key: keyof CartLine) {
 }
 
 export async function POST(req: NextRequest) {
+  const rid = requestId();
+  const ip = clientIpFromHeaders(req.headers);
   try {
+    const rl = await enforceRateLimit({
+      key: `create-intent:${ip}`,
+      limit: 12,
+      windowSec: 60,
+    });
+    if (!rl.ok) {
+      logSecurityEvent("rate_limited_create_intent", { rid, ip, retryAfterSec: rl.retryAfterSec });
+      const r = jsonError("Too many checkout attempts. Please wait and try again.", 429, {
+        request_id: rid,
+      });
+      r.headers.set("Retry-After", String(rl.retryAfterSec));
+      return r;
+    }
+
     const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) return jsonError("Missing STRIPE_SECRET_KEY", 500);
+    if (!stripeKey) return jsonError("Payment service is not configured.", 500, { request_id: rid });
 
     const kv = await getKV();
-    if (!kv) return jsonError("KV is required for order durability but is not configured.", 500);
+    if (!kv) return jsonError("Booking storage is currently unavailable.", 500, { request_id: rid });
 
     const stripe = new Stripe(stripeKey, {});
 
     const body = await req.json().catch(() => null);
     if (!body) return jsonError("Invalid JSON body.", 400);
+
+    const turnstileToken = String(body?.turnstileToken || "").trim();
+    const turnstile = await verifyTurnstileToken(turnstileToken, ip);
+    if (!turnstile.ok) {
+      logSecurityEvent("turnstile_failed", { rid, ip, reason: turnstile.reason });
+      return jsonError("Human verification failed. Please refresh and try again.", 400, {
+        request_id: rid,
+      });
+    }
 
     const lines = (body?.items || []) as CartLine[];
     const contact = body?.contact || {};
@@ -248,9 +281,10 @@ export async function POST(req: NextRequest) {
       totalCents,
       currency: "usd",
       kvEnabled: true,
+      request_id: rid,
     });
   } catch (e: unknown) {
-    const err = e as Error;
-    return jsonError("Create intent failed.", 500, { details: String(err?.message || e) });
+    logServerError("/api/stripe/create-intent", rid, e, { ip });
+    return jsonError("Create intent failed.", 500, { request_id: rid });
   }
 }

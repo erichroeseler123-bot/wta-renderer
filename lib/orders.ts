@@ -69,6 +69,10 @@ export type OrderSnapshot = {
   bookingAttempts: number;
   lastError?: string;
   bookingResults?: Array<Record<string, unknown>>;
+  confirmationEmailSentAt?: string;
+  confirmationEmailProvider?: string;
+  confirmationEmailId?: string;
+  confirmationEmailError?: string;
 };
 
 function nowIso() {
@@ -134,6 +138,10 @@ export async function saveOrder(order: OrderSnapshot) {
         attribution: updated.attribution || null,
         results: updated.bookingResults || [],
         lastError: updated.lastError || null,
+        confirmationEmailSentAt: updated.confirmationEmailSentAt || null,
+        confirmationEmailProvider: updated.confirmationEmailProvider || null,
+        confirmationEmailId: updated.confirmationEmailId || null,
+        confirmationEmailError: updated.confirmationEmailError || null,
         updatedAt: updated.updatedAt,
       },
       { ex: ORDER_TTL_SECONDS },

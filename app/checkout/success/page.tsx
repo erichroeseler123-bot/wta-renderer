@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import NewsletterSignup from "@/app/components/newsletter/NewsletterSignup";
 
 type ReceiptResult = {
   ok?: boolean;
@@ -84,6 +85,9 @@ export default function SuccessPage() {
         <p className="mt-2 text-slate-600">
           Payment was received. We are finalizing your booking details and operator confirmations.
         </p>
+        <p className="mt-2 text-sm text-slate-500">
+          You should receive a payment receipt email, and tour confirmation details are shown below as processing completes.
+        </p>
 
         {!pi ? (
           <div className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
@@ -147,6 +151,14 @@ export default function SuccessPage() {
           <Link href="/" className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-100">
             Return Home
           </Link>
+        </div>
+
+        <div className="mt-8">
+          <NewsletterSignup
+            source="checkout_success"
+            title="Want More Alaska Cruise Inspiration?"
+            description="We share tour updates, cruise ship news, wildlife and environmental highlights, and practical port tips. Unsubscribe anytime."
+          />
         </div>
       </div>
     </main>
