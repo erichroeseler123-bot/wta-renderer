@@ -35,8 +35,8 @@ export default function CartDrawer() {
       />
 
       {/* Panel */}
-      <div className="absolute right-0 top-0 h-full w-full max-w-md border-l border-slate-200 bg-white text-slate-900 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-200 p-4">
+      <div className="absolute right-0 top-0 h-[100dvh] w-full max-w-md border-l border-slate-200 bg-white text-slate-900 shadow-2xl flex flex-col">
+        <div className="shrink-0 flex items-center justify-between border-b border-slate-200 p-4">
           <div>
             <div className="text-lg font-semibold">Your Cart</div>
             <div className="text-xs text-slate-600">{count} item(s)</div>
@@ -50,7 +50,7 @@ export default function CartDrawer() {
           </button>
         </div>
 
-        <div className="h-[calc(100%-140px)] overflow-auto p-4">
+        <div className="min-h-0 flex-1 overflow-y-auto p-4">
           {items.length === 0 ? (
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5 text-slate-700">
               Your cart is empty. Browse tours and add a departure to start checkout.
@@ -128,7 +128,7 @@ export default function CartDrawer() {
           )}
         </div>
 
-        <div className="border-t border-slate-200 bg-slate-50 p-4">
+        <div className="shrink-0 border-t border-slate-200 bg-slate-50 p-4 pb-[calc(1rem+env(safe-area-inset-bottom))]">
           {items.length > 0 ? (
             <div className="mb-3 rounded-xl border border-slate-200 bg-white p-3">
               <div className="flex items-center justify-between text-sm">
