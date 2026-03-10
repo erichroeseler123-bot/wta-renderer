@@ -20,6 +20,21 @@ function providerRank(companyRaw: string): number {
   return 99;
 }
 
+function isExcludedOffer(tour: { title?: string; description?: string }): boolean {
+  const text = `${tour.title || ""} ${tour.description || ""}`.toLowerCase();
+  const blockedPhrases = [
+    "gift card",
+    "gift cards",
+    "local's day",
+    "locals day",
+    "for locals",
+    "locals only",
+    "resident",
+    "residents only",
+  ];
+  return blockedPhrases.some((phrase) => text.includes(phrase));
+}
+
 function formatUpdatedAt(date: Date): string {
   return new Intl.DateTimeFormat("en-US", {
     month: "short",
@@ -35,6 +50,7 @@ export default async function HomeFlightsPage() {
   const tours = await getToursFromFareHarbor();
   const flights = tours
     .filter((tour) => providerRank(tour.fareharbor?.company || "") < 3)
+    .filter((tour) => !isExcludedOffer(tour))
     .sort((a, b) => {
       const rankDiff = providerRank(a.fareharbor?.company || "") - providerRank(b.fareharbor?.company || "");
       if (rankDiff !== 0) return rankDiff;
