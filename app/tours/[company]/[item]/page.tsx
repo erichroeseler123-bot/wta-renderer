@@ -199,6 +199,8 @@ export default function TourDetailPage({
   }
 
   const canAdd = Boolean(selection?.availabilityPk && selection?.startAt);
+  const fromPriceCompany = String(tour.company || company);
+  const fromPriceItem = tour.itemPk ?? tour.item ?? tour.pk ?? item;
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -229,10 +231,10 @@ export default function TourDetailPage({
                   Pick your departure day and time, then checkout securely to confirm this tour.
                 </p>
               </div>
-              <div className="rounded-2xl border border-white/20 bg-white/10 px-5 py-4 text-right backdrop-blur">
+                <div className="rounded-2xl border border-white/20 bg-white/10 px-5 py-4 text-right backdrop-blur">
                 <div className="text-[11px] font-bold uppercase tracking-widest text-cyan-100">From</div>
                 <div className="text-3xl font-black text-white">
-                  <FromPrice company={tour.company} item={tour.itemPk ?? tour.item ?? tour.pk} initial={tour.fromPrice} />
+                  <FromPrice company={fromPriceCompany} item={fromPriceItem} initial={tour.fromPrice} />
                 </div>
               </div>
             </div>
@@ -283,7 +285,7 @@ export default function TourDetailPage({
             <div className="mb-4 rounded-2xl border border-slate-200 bg-white p-4">
               <div className="text-[11px] font-bold uppercase tracking-widest text-slate-500">Best available rate</div>
               <div className="text-4xl font-black text-blue-700">
-                <FromPrice company={tour.company} item={tour.itemPk ?? tour.item ?? tour.pk} initial={tour.fromPrice} />
+                <FromPrice company={fromPriceCompany} item={fromPriceItem} initial={tour.fromPrice} />
               </div>
             </div>
 
