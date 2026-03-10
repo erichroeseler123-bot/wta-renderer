@@ -18,6 +18,9 @@ type Slot = {
   availabilityPk: number;
   startAt: string;
   priceCents?: number;
+  ratePk?: number;
+  rateLabel?: string;
+  customer_type_rates?: Array<{ pk?: number; customer_type?: { name?: string }; name?: string }>;
 };
 
 type Props = {
@@ -31,8 +34,8 @@ type Props = {
 
 function pickRateFromSlot(slot: Slot): { ratePk: number; rateLabel?: string } | null {
   // AvailabilityCalendar's Slot type doesn't include rates yet.
-  // So we read optional fields via `as any` without breaking TS for startAt/availabilityPk.
-  const s: any = slot;
+  // So we read optional fields via a loose record.
+  const s = slot as unknown as Record<string, unknown>;
 
   // If AvailabilityCalendar flattens these:
   if (Number.isFinite(Number(s?.ratePk)) && Number(s.ratePk) > 0) {
@@ -43,7 +46,7 @@ function pickRateFromSlot(slot: Slot): { ratePk: number; rateLabel?: string } | 
   }
 
   // If AvailabilityCalendar passes through FH's customer_type_rates:
-  const rates = s?.customer_type_rates;
+  const rates = s?.customer_type_rates as Array<Record<string, unknown>> | undefined;
   if (Array.isArray(rates) && rates.length) {
     const r0 = rates[0];
     const pk = Number(r0?.pk ?? 0);

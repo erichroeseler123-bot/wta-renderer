@@ -20,7 +20,7 @@ type Slot = {
   start_at?: string;
   startAt?: string;
   capacity?: number | null;
-  customer_type_rates?: Rate[] | any[];
+  customer_type_rates?: Rate[] | unknown[];
   ratePk?: number;
   rateLabel?: string;
 };
@@ -49,7 +49,7 @@ function daysInMonth(d: Date) {
   return new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
 }
 
-function parseMoneyToCents(v: any): number | undefined {
+function parseMoneyToCents(v: unknown): number | undefined {
   if (v === null || v === undefined) return undefined;
 
   if (typeof v === "number" && Number.isFinite(v)) {
@@ -74,18 +74,19 @@ function parseMoneyToCents(v: any): number | undefined {
   return undefined;
 }
 
-function minPriceCentsFromRates(rates: any[] | undefined): number | undefined {
+function minPriceCentsFromRates(rates: unknown[] | undefined): number | undefined {
   if (!rates || !Array.isArray(rates) || rates.length === 0) return undefined;
 
   const candidates: number[] = [];
   for (const r of rates) {
+    const rate = r as Record<string, unknown>;
     const cents =
-      parseMoneyToCents(r?.price_with_tax_cents) ??
-      parseMoneyToCents(r?.price_cents) ??
-      parseMoneyToCents(r?.amount_cents) ??
-      parseMoneyToCents(r?.price_with_tax) ??
-      parseMoneyToCents(r?.price) ??
-      parseMoneyToCents(r?.amount);
+      parseMoneyToCents(rate.price_with_tax_cents) ??
+      parseMoneyToCents(rate.price_cents) ??
+      parseMoneyToCents(rate.amount_cents) ??
+      parseMoneyToCents(rate.price_with_tax) ??
+      parseMoneyToCents(rate.price) ??
+      parseMoneyToCents(rate.amount);
 
     if (typeof cents === "number" && Number.isFinite(cents) && cents > 0) {
       candidates.push(cents);
@@ -112,7 +113,14 @@ export default function AvailabilityCalendar({
   item: number;
   selectedDayExternal?: string | null;
   onPickDay?: (day: string) => void;
-  onPickSlot: (slot: { availabilityPk: number; startAt: string; priceCents?: number }) => void;
+  onPickSlot: (slot: {
+    availabilityPk: number;
+    startAt: string;
+    priceCents?: number;
+    ratePk?: number;
+    rateLabel?: string;
+    customer_type_rates?: Rate[] | unknown[];
+  }) => void;
 }) {
   const [month, setMonth] = useState<Date>(() => startOfMonth(new Date()));
   const [loading, setLoading] = useState(false);
@@ -146,7 +154,7 @@ export default function AvailabilityCalendar({
     for (const d of days) {
       let best: number | undefined;
       for (const s of d.slots || []) {
-        const p = minPriceCentsFromRates(s.customer_type_rates as any[]);
+        const p = minPriceCentsFromRates(s.customer_type_rates as unknown[]);
         if (typeof p === "number") best = typeof best === "number" ? Math.min(best, p) : p;
       }
       if (typeof best === "number") m.set(d.day, best);
@@ -352,7 +360,10 @@ export default function AvailabilityCalendar({
               {selected.slots.map((s) => {
                 const start = String(s.start_at ?? s.startAt ?? "");
                 const label = start.slice(11, 16);
-                const priceCents = minPriceCentsFromRates(s.customer_type_rates as any[]);
+                const priceCents = minPriceCentsFromRates(s.customer_type_rates as unknown[]);
+                const firstRate = Array.isArray(s.customer_type_rates) ? s.customer_type_rates[0] : null;
+                const ratePk = Number(firstRate?.pk ?? 0) || undefined;
+                const rateLabel = firstRate?.customer_type?.name || firstRate?.name || undefined;
                 const isPicked = selectedSlotPk === s.pk;
 
                 return (
@@ -365,6 +376,9 @@ export default function AvailabilityCalendar({
                         availabilityPk: s.pk,
                         startAt: String(s.start_at ?? s.startAt ?? ""),
                         priceCents,
+                        ratePk,
+                        rateLabel,
+                        customer_type_rates: s.customer_type_rates,
                       });
                     }}
                     className={[
