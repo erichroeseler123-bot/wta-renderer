@@ -14,6 +14,8 @@ import { useCart } from "@/app/components/cart/CartContext";
 import { useCruise } from "@/context/CruiseContext";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import JsonLd from "@/components/seo/JsonLd";
+import FAQSection, { type FAQItem } from "@/app/components/faq/FAQSection";
+import TestimonialsSection from "@/app/components/testimonials/TestimonialsSection";
 
 type TourSnapshot = {
   pk?: number | string;
@@ -231,6 +233,33 @@ export default function TourDetailPage({
       url: typeof window !== "undefined" ? window.location.href : `https://welcometoalaskatours.com/tours/${company}/${item}`,
     },
   };
+  const tourFaqs: FAQItem[] = [
+    {
+      question: "Does this tour fit cruise ship schedules?",
+      answer:
+        "The booking flow is designed for cruise-day planning. Pick a departure that leaves enough margin before all-aboard.",
+    },
+    {
+      question: "When is my booking confirmed?",
+      answer:
+        "After payment, the confirmation page updates with booking status while finalization completes.",
+    },
+    {
+      question: "Can I see total pricing before payment?",
+      answer:
+        "Yes. Pricing is checked live against your selected departure, rate, and quantity before the payment step completes.",
+    },
+    {
+      question: "What if availability changes while I am checking out?",
+      answer:
+        "Live checks run during checkout. If availability or pricing changes, the flow returns a clear message so you can reselect.",
+    },
+    {
+      question: "Do I get email confirmation?",
+      answer:
+        "You receive a Stripe payment receipt, and booking confirmation details are surfaced during finalization.",
+    },
+  ];
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -340,6 +369,9 @@ export default function TourDetailPage({
           </div>
         </div>
       </div>
+
+      <TestimonialsSection compact />
+      <FAQSection faqs={tourFaqs} />
 
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 p-3 shadow-2xl backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-6xl items-center gap-3 pb-[env(safe-area-inset-bottom)]">

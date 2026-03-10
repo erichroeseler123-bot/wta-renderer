@@ -5,6 +5,8 @@ import Image from "next/image";
 import { useMemo } from "react";
 import { useCruise } from "@/context/CruiseContext";
 import NewsletterSignup from "@/app/components/newsletter/NewsletterSignup";
+import TestimonialsSection from "@/app/components/testimonials/TestimonialsSection";
+import FAQSection, { type FAQItem } from "@/app/components/faq/FAQSection";
 
 const ports = [
   { name: "Juneau", href: "/tours?port=juneau", image: "/hero/juneau.jpg" },
@@ -71,33 +73,31 @@ const guideHighlights = [
   },
 ];
 
-const testimonials = [
+const faqItems: FAQItem[] = [
   {
-    quote: "We booked in under 10 minutes and the timing fit our ship perfectly.",
-    person: "Guest from Seattle",
+    question: "Do these tours fit cruise ship schedules?",
+    answer:
+      "Yes. Our cruise planner is designed to surface departures that align with your port timing.",
   },
   {
-    quote: "The tour details and departure options were much clearer than booking last-minute at port.",
-    person: "Family cruise traveler",
+    question: "When will I see booking confirmation?",
+    answer:
+      "Right after payment, your confirmation page updates with live booking status and operator confirmation details.",
   },
   {
-    quote: "Fast checkout and immediate confirmation status gave us confidence right away.",
-    person: "First-time Alaska cruiser",
-  },
-];
-
-const faqItems = [
-  {
-    q: "Do these tours fit cruise ship schedules?",
-    a: "Yes. Our cruise planner is designed to surface departures that align with your port timing.",
+    question: "Can I get help picking tours?",
+    answer:
+      "Yes. Contact our team with your ship, date, and group size and we will help narrow down the best options.",
   },
   {
-    q: "When will I see booking confirmation?",
-    a: "Right after payment, your confirmation page updates with live booking status and operator confirmation details.",
+    question: "What if our cruise arrival is delayed?",
+    answer:
+      "Choose cruise-friendly departures with built-in time margins. Operator policies vary, so check details on each tour and in confirmation messages.",
   },
   {
-    q: "Can I get help picking tours?",
-    a: "Yes. Contact our team with your ship, date, and group size and we will help narrow down the best options.",
+    question: "Do you include hidden fees at checkout?",
+    answer:
+      "No. Pricing is confirmed live before payment and shown in checkout with the selected departure and rate.",
   },
 ];
 
@@ -318,31 +318,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 pb-16">
-        <div className="rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-          <h2 className="text-2xl font-black tracking-tight sm:text-3xl">What Travelers Say</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-3">
-            {testimonials.map((t) => (
-              <div key={t.quote} className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-                <p className="text-sm text-slate-700">“{t.quote}”</p>
-                <p className="mt-3 text-xs font-bold uppercase tracking-wide text-slate-500">{t.person}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-6 pb-20">
-        <h2 className="text-2xl font-black tracking-tight sm:text-3xl">Frequently Asked Questions</h2>
-        <div className="mt-6 grid gap-4 md:grid-cols-3">
-          {faqItems.map((item) => (
-            <div key={item.q} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-              <div className="text-base font-black text-slate-900">{item.q}</div>
-              <p className="mt-2 text-sm text-slate-600">{item.a}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      <TestimonialsSection includeOrganizationSchema />
+      <FAQSection faqs={faqItems} />
 
       <section className="mx-auto max-w-7xl px-6 pb-20">
         <NewsletterSignup
