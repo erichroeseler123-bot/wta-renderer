@@ -20,7 +20,7 @@ type Slot = {
   priceCents?: number;
   ratePk?: number;
   rateLabel?: string;
-  customer_type_rates?: Array<{ pk?: number; customer_type?: { name?: string }; name?: string }>;
+  customer_type_rates?: unknown[];
 };
 
 type Props = {
