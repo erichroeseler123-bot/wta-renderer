@@ -242,7 +242,7 @@ export default function TourDetailPage({
           priority
           sizes="100vw"
           className="h-full w-full object-cover opacity-80"
-          alt={tour.title}
+          alt={tour.title || "Alaska shore excursion"}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 w-full p-8">
