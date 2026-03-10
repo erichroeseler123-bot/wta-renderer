@@ -39,10 +39,16 @@ function pickRateFromSlot(slot: Slot): { ratePk: number; rateLabel?: string } | 
 
   // If AvailabilityCalendar flattens these:
   if (Number.isFinite(Number(s?.ratePk)) && Number(s.ratePk) > 0) {
-    return { ratePk: Number(s.ratePk), rateLabel: s?.rateLabel ?? undefined };
+    return {
+      ratePk: Number(s.ratePk),
+      rateLabel: s?.rateLabel ? String(s.rateLabel) : undefined,
+    };
   }
   if (Number.isFinite(Number(s?.customer_type_rate_pk)) && Number(s.customer_type_rate_pk) > 0) {
-    return { ratePk: Number(s.customer_type_rate_pk), rateLabel: s?.rateLabel ?? undefined };
+    return {
+      ratePk: Number(s.customer_type_rate_pk),
+      rateLabel: s?.rateLabel ? String(s.rateLabel) : undefined,
+    };
   }
 
   // If AvailabilityCalendar passes through FH's customer_type_rates:
@@ -51,7 +57,8 @@ function pickRateFromSlot(slot: Slot): { ratePk: number; rateLabel?: string } | 
     const r0 = rates[0];
     const pk = Number(r0?.pk ?? 0);
     if (Number.isFinite(pk) && pk > 0) {
-      const label = r0?.customer_type?.name ?? r0?.name ?? undefined;
+      const customerType = r0?.customer_type as Record<string, unknown> | undefined;
+      const label = String(customerType?.name || r0?.name || "") || undefined;
       return { ratePk: pk, rateLabel: label };
     }
   }
