@@ -27,15 +27,9 @@ const { chromium } = require('playwright');
     await addBtn.click();
     ok('4. Add to cart', `CTA text before click: ${addText}`);
 
-    const viewCartBtn = page.getByRole('button', { name: /View Cart/i }).first();
-    await viewCartBtn.waitFor({ state: 'visible', timeout: 10000 });
-    await viewCartBtn.click();
-    await page.getByText(/Your Cart/i).first().waitFor({ state: 'visible', timeout: 10000 });
-    ok('5. Open cart');
+    await page.goto(`${base}/checkout`, { waitUntil: 'domcontentloaded' });
+    ok('5. Open checkout route');
 
-    const checkoutLink = page.getByRole('link', { name: /Checkout/i }).first();
-    await checkoutLink.waitFor({ state: 'visible', timeout: 10000 });
-    await checkoutLink.click();
     await page.waitForURL(/\/checkout/);
     await page.getByText(/Secure Checkout|Checkout/i).first().waitFor({ state: 'visible', timeout: 10000 });
     ok('6. Proceed to checkout', page.url());

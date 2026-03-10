@@ -12,12 +12,13 @@ set -euo pipefail
 # Usage:
 #   TEST_DOMAIN="https://your-test-domain.vercel.app" \
 #   STRIPE_SECRET_KEY="sk_test_..." \
-#   ADMIN_PASSWORD="..." \
+#   ADMIN_PASSWORD="..." \  # optional if WTA_ADMIN_SECRET is set
+#   WTA_ADMIN_SECRET="..." \
 #   ./scripts/run-testmode-handoff-checkout-auto.sh
 
 : "${TEST_DOMAIN:?Set TEST_DOMAIN, e.g. https://your-test-domain.vercel.app}"
 : "${STRIPE_SECRET_KEY:?Set STRIPE_SECRET_KEY=sk_test_...}"
-: "${ADMIN_PASSWORD:?Set ADMIN_PASSWORD for /api/admin/login}"
+ADMIN_SECRET="${ADMIN_PASSWORD:-${WTA_ADMIN_SECRET:-}}"
 
 CONTACT_NAME="${CONTACT_NAME:-QA Stripe Test}"
 CONTACT_EMAIL="${CONTACT_EMAIL:-qa+stripe-test@example.com}"
@@ -30,6 +31,35 @@ echo "== Preflight =="
 echo "UTC: $UTC_NOW"
 echo "Domain: $TEST_DOMAIN"
 echo "Handoff ID: $HID"
+
+if [ -z "${ADMIN_SECRET}" ]; then
+  echo "WARN: ADMIN_PASSWORD and WTA_ADMIN_SECRET are both empty. Admin debug check will be skipped."
+fi
+
+if [ -n "${STRIPE_WEBHOOK_SECRET:-}" ] && [[ ! "${STRIPE_WEBHOOK_SECRET}" =~ ^whsec_ ]]; then
+  echo "WARN: STRIPE_WEBHOOK_SECRET does not look like a Stripe webhook signing secret (expected prefix: whsec_)."
+fi
+
+echo "== Stripe key sanity check =="
+if [[ "${STRIPE_SECRET_KEY}" == *"..."* ]] || [[ "${STRIPE_SECRET_KEY}" == *"Your"* ]]; then
+  echo "FAIL: STRIPE_SECRET_KEY looks like placeholder text. Use the real sk_test_... value."
+  exit 2
+fi
+
+stripe_account="$(curl -sS -u "$STRIPE_SECRET_KEY:" https://api.stripe.com/v1/account)"
+stripe_error="$(echo "$stripe_account" | jq -r '.error.message // empty')"
+if [ -n "$stripe_error" ]; then
+  echo "FAIL: Stripe auth failed: $stripe_error"
+  echo "Tip: export STRIPE_SECRET_KEY='sk_test_REAL_KEY' (no quotes inside, no ellipsis)."
+  exit 2
+fi
+
+stripe_livemode="$(echo "$stripe_account" | jq -r '.livemode // "unknown"')"
+if [ "$stripe_livemode" != "false" ]; then
+  echo "FAIL: STRIPE_SECRET_KEY is not test mode (livemode=$stripe_livemode)."
+  exit 2
+fi
+echo "Stripe auth OK (test mode)."
 
 echo "== Smoke checks =="
 code1="$(curl -sS -o /tmp/handoff_no_payload.out -w "%{http_code}" "$TEST_DOMAIN/handoff/dcc")"
@@ -56,8 +86,8 @@ RATE_PK=""
 START_AT=""
 TITLE=""
 
-# sample first 100 tours
-for row in $(echo "$tours_json" | jq -r '.tours[] | @base64' | head -n 100); do
+# sample first 100 tours (slice in jq to avoid pipefail+head broken-pipe aborts)
+for row in $(echo "$tours_json" | jq -r '.tours[:100][] | @base64'); do
   _jq(){ echo "$row" | base64 -d | jq -r "$1"; }
 
   COMPANY="$(_jq '.company')"
@@ -183,21 +213,28 @@ for k in handoffSource handoffId authorityTopic portSlug category date partySize
 done
 
 echo "== Validate handoff debug ingestion (auth) =="
-cookie_jar="$(mktemp)"
-trap 'rm -f "$cookie_jar"' EXIT
+admin_skipped=0
+found_debug=0
+if [ -z "${ADMIN_SECRET}" ]; then
+  admin_skipped=1
+  echo "SKIP: admin debug check (no admin secret provided)."
+else
+  cookie_jar="$(mktemp)"
+  trap 'rm -f "$cookie_jar"' EXIT
 
-login_code="$(curl -sS -c "$cookie_jar" -o /tmp/admin_login.out -w "%{http_code}" \
-  -X POST "$TEST_DOMAIN/api/admin/login" \
-  -H "content-type: application/json" \
-  -d "{\"password\":\"$ADMIN_PASSWORD\"}")"
-echo "admin_login_status=$login_code"
+  login_code="$(curl -sS -c "$cookie_jar" -o /tmp/admin_login.out -w "%{http_code}" \
+    -X POST "$TEST_DOMAIN/api/admin/login" \
+    -H "content-type: application/json" \
+    -d "{\"password\":\"$ADMIN_SECRET\"}")"
+  echo "admin_login_status=$login_code"
 
-debug_code="$(curl -sS -b "$cookie_jar" -o /tmp/handoff_debug_auth.out -w "%{http_code}" \
-  "$TEST_DOMAIN/api/handoff/dcc/debug?limit=50")"
-echo "debug_auth_status=$debug_code"
+  debug_code="$(curl -sS -b "$cookie_jar" -o /tmp/handoff_debug_auth.out -w "%{http_code}" \
+    "$TEST_DOMAIN/api/handoff/dcc/debug?limit=50")"
+  echo "debug_auth_status=$debug_code"
 
-found_debug="$(jq --arg hid "$HID" '[.rows[]? | select(.handoffId==$hid)] | length' /tmp/handoff_debug_auth.out)"
-echo "debug_row_found=$found_debug"
+  found_debug="$(jq --arg hid "$HID" '[.rows[]? | select(.handoffId==$hid)] | length' /tmp/handoff_debug_auth.out)"
+  echo "debug_row_found=$found_debug"
+fi
 
 echo "== Summary =="
 echo "handoff_id=$HID"
@@ -210,7 +247,7 @@ if [ "$missing" -ne 0 ]; then
   exit 3
 fi
 
-if [ "$found_debug" -lt 1 ]; then
+if [ "$admin_skipped" -eq 0 ] && [ "$found_debug" -lt 1 ]; then
   echo "RESULT: FAIL (handoff debug row not found)"
   exit 4
 fi
