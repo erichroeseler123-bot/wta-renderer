@@ -1,4 +1,6 @@
 import Link from "next/link";
+import fs from "node:fs/promises";
+import path from "node:path";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 
 type Tour = {
@@ -52,13 +54,15 @@ export default async function PortPage({
   const source = typeof sp.source === "string" ? sp.source : "";
   const handoffId = typeof sp.handoff_id === "string" ? sp.handoff_id : "";
 
-  const base = process.env.NEXT_PUBLIC_BASE_URL || process.env.SITE_URL || "http://localhost:3000";
-  const res = await fetch(`${base.replace(/\/+$/, "")}/api/tours/list`, {
-    next: { revalidate: 3600 },
-  });
-
-  const data = await res.json().catch(() => ({}));
-  const allTours: Tour[] = Array.isArray(data?.tours) ? data.tours : [];
+  let allTours: Tour[] = [];
+  try {
+    const file = path.join(process.cwd(), "public", "data", "tours.json");
+    const raw = await fs.readFile(file, "utf8");
+    const parsed = JSON.parse(raw);
+    allTours = Array.isArray(parsed) ? (parsed as Tour[]) : [];
+  } catch {
+    allTours = [];
+  }
 
   const portTours = allTours.filter((t) => {
     const port = inferPortFromCompany(t.company);
