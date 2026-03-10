@@ -29,6 +29,13 @@
   box-shadow: 0 14px 0 #1f3e75;
 }
 
+.heroTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
 .heroBadge {
   display: inline-block;
   background: #1f3e75;
@@ -38,6 +45,19 @@
   text-transform: uppercase;
   border-radius: 999px;
   padding: 0.45rem 0.8rem;
+}
+
+.heroBadgeAlt {
+  display: inline-block;
+  background: var(--mint);
+  color: #0b355f;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  padding: 0.45rem 0.75rem;
+  border: 2px solid #1f3e75;
+  font-weight: 800;
 }
 
 .heroTitle {
@@ -51,6 +71,35 @@
   max-width: 42ch;
   font-size: clamp(0.98rem, 3.6vw, 1.2rem);
   font-weight: 700;
+}
+
+.heroArt {
+  margin-top: 0.85rem;
+  border-radius: 1rem;
+  border: 3px solid #1f3e75;
+  background: linear-gradient(170deg, #b7ecff 0%, #e9f8ff 70%);
+  padding: 0.65rem;
+}
+
+.heroArtRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+}
+
+.cloud {
+  border-radius: 999px;
+  border: 2px solid #1f3e75;
+  background: #fff;
+  padding: 0.12rem 0.52rem;
+  font-weight: 800;
+  font-size: 0.74rem;
+}
+
+.plane {
+  font-size: 1.8rem;
+  animation: glide 2.6s ease-in-out infinite;
 }
 
 .heroActions {
@@ -168,6 +217,19 @@
   padding: 0.32rem 0.6rem;
 }
 
+.cardAction {
+  margin-top: 0.75rem;
+  display: inline-block;
+  border-radius: 999px;
+  border: 2px solid #1f3e75;
+  background: #fff;
+  color: #0d2a54;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 0.38rem 0.72rem;
+}
+
 .whyGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -220,6 +282,28 @@
   font-weight: 700;
 }
 
+.mobileSticky {
+  position: sticky;
+  bottom: 0.65rem;
+  z-index: 20;
+  margin-top: 1rem;
+}
+
+.mobileSticky a {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 999px;
+  border: 3px solid #1f3e75;
+  background: var(--sun);
+  color: #1a2d54;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.78rem 0.95rem;
+  box-shadow: 0 8px 0 #1f3e75;
+}
+
 @keyframes wiggle {
   0%,
   100% {
@@ -227,6 +311,16 @@
   }
   50% {
     transform: translateY(-4px) rotate(-2deg);
+  }
+}
+
+@keyframes glide {
+  0%,
+  100% {
+    transform: translateX(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(7px) rotate(4deg);
   }
 }
 
@@ -246,5 +340,9 @@
 
   .whyGrid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .mobileSticky {
+    display: none;
   }
 }

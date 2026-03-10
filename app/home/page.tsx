@@ -18,9 +18,19 @@ export default function HomeFlightsPage() {
     <main className={`${styles.page} ${baloo.className}`}>
       <div className={styles.shell}>
         <section className={styles.hero}>
-          <span className={styles.heroBadge}>Flights Only</span>
+          <div className={styles.heroTopRow}>
+            <span className={styles.heroBadge}>Flights Only</span>
+            <span className={styles.heroBadgeAlt}>Mobile First</span>
+          </div>
           <h1 className={`${styles.heroTitle} ${bungee.className}`}>{flightsHomeContent.heroTitle}</h1>
           <p className={styles.heroText}>{flightsHomeContent.heroText}</p>
+          <div className={styles.heroArt}>
+            <div className={styles.heroArtRow}>
+              <span className={styles.cloud}>Fast Seats</span>
+              <span className={styles.plane}>✈</span>
+              <span className={styles.cloud}>Happy Crew</span>
+            </div>
+          </div>
           <div className={styles.heroActions}>
             <Link className={styles.primaryBtn} href={flightsHomeContent.primaryCtaHref}>
               {flightsHomeContent.primaryCtaLabel}
@@ -45,6 +55,12 @@ export default function HomeFlightsPage() {
                 <p className={styles.flightMeta}>{flight.meta}</p>
                 <p className={styles.flightCopy}>{flight.copy}</p>
                 <span className={styles.miniPill}>{flight.badge}</span>
+                <Link
+                  className={styles.cardAction}
+                  href={`${flightsHomeContent.primaryCtaHref}?flight=${encodeURIComponent(flight.name)}`}
+                >
+                  Choose This Flight
+                </Link>
               </article>
             ))}
           </div>
@@ -75,6 +91,10 @@ export default function HomeFlightsPage() {
           <h2 className={bungee.className}>{flightsHomeContent.footerTitle}</h2>
           <p>{flightsHomeContent.footerText}</p>
         </section>
+
+        <div className={styles.mobileSticky}>
+          <Link href={flightsHomeContent.primaryCtaHref}>Book Flight Now</Link>
+        </div>
       </div>
     </main>
   );
