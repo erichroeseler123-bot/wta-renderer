@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
+import { getFareHarborCredentials } from "@/lib/fareharbor";
 
 const BASE = "https://demo.fareharbor.com/api/external/v1";
 const COMPANY = "bodyglove"; // demo company shortname
 
 export async function GET(req: Request) {
+  const { appKey, userKey } = getFareHarborCredentials();
   const { searchParams } = new URL(req.url);
   const itemPk = searchParams.get("itemPk");
   const date =
@@ -23,8 +25,8 @@ export async function GET(req: Request) {
     const res = await fetch(url, {
       headers: {
         Accept: "application/json",
-        "X-FareHarbor-API-App": process.env.FAREHARBOR_APP_KEY!,
-        "X-FareHarbor-API-User": process.env.FAREHARBOR_USER_KEY!,
+        "X-FareHarbor-API-App": appKey,
+        "X-FareHarbor-API-User": userKey,
       },
       cache: "no-store",
     });

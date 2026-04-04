@@ -46,6 +46,47 @@ export type HandoffDebugRow = {
   userAgent?: string;
 };
 
+export type DccCallbackRow = {
+  auditId: string;
+  handoffId: string;
+  eventType: string;
+  endpoint: string | null;
+  ok: boolean;
+  skipped: boolean;
+  responseStatus: number | null;
+  responseBody?: string | null;
+  error: string | null;
+  attemptedAt: string;
+  externalReference: string | null;
+  payload?: {
+    booking?: {
+      portSlug?: string;
+      productSlug?: string;
+    };
+    metadata?: {
+      embedDomain?: string;
+      embedPath?: string;
+      widgetPlacement?: string;
+      widgetId?: string;
+    };
+  };
+};
+
+export type DccProbeResult = {
+  success: boolean;
+  row?: {
+    handoffId: string;
+    endpoint: string | null;
+    ok: boolean;
+    skipped: boolean;
+    responseStatus: number | null;
+    responseBody: string | null;
+    error: string | null;
+    attemptedAt: string;
+  };
+  error?: string;
+};
+
 export function useAdminData() {
   const [authed, setAuthed] = useState(false);
   const [bookingsEnabled, setBookingsEnabled] = useState<number>(0);
@@ -54,6 +95,9 @@ export function useAdminData() {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [recoveryOrders, setRecoveryOrders] = useState<RecoveryOrder[]>([]);
   const [handoffRows, setHandoffRows] = useState<HandoffDebugRow[]>([]);
+  const [dccCallbackRows, setDccCallbackRows] = useState<DccCallbackRow[]>([]);
+  const [dccProbeRunning, setDccProbeRunning] = useState(false);
+  const [dccProbeResult, setDccProbeResult] = useState<DccProbeResult | null>(null);
 
   const totals = useMemo(() => ({
     providers: providers.length,
@@ -89,15 +133,21 @@ export function useAdminData() {
     if (j?.success) setHandoffRows(j.rows || []);
   }, []);
 
+  const refreshDccCallbacks = useCallback(async () => {
+    const r = await fetch("/api/admin/dcc-callbacks?limit=50");
+    const j = await r.json().catch(() => ({}));
+    if (j?.success) setDccCallbackRows(j.rows || []);
+  }, []);
+
   useEffect(() => {
     const t = window.setTimeout(() => {
       void refreshFlags().then(async () => {
-        await Promise.all([refreshTours(), refreshRecovery(), refreshHandoffs()]);
+        await Promise.all([refreshTours(), refreshRecovery(), refreshHandoffs(), refreshDccCallbacks()]);
       });
     }, 0);
 
     return () => window.clearTimeout(t);
-  }, [refreshFlags, refreshHandoffs, refreshRecovery, refreshTours]);
+  }, [refreshDccCallbacks, refreshFlags, refreshHandoffs, refreshRecovery, refreshTours]);
 
   const login = useCallback(async (password: string) => {
     setMsg("");
@@ -112,9 +162,9 @@ export function useAdminData() {
       return false;
     }
     await refreshFlags();
-    await Promise.all([refreshTours(), refreshRecovery(), refreshHandoffs()]);
+    await Promise.all([refreshTours(), refreshRecovery(), refreshHandoffs(), refreshDccCallbacks()]);
     return true;
-  }, [refreshFlags, refreshHandoffs, refreshRecovery, refreshTours]);
+  }, [refreshDccCallbacks, refreshFlags, refreshHandoffs, refreshRecovery, refreshTours]);
 
   const logout = useCallback(async () => {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -200,15 +250,30 @@ export function useAdminData() {
     await refreshRecovery();
   }, [refreshRecovery]);
 
+  const runDccProbe = useCallback(async () => {
+    setDccProbeRunning(true);
+    setDccProbeResult(null);
+    try {
+      const r = await fetch("/api/admin/dcc-callbacks/probe", { method: "POST" });
+      const j = await r.json().catch(() => ({}));
+      setDccProbeResult(j as DccProbeResult);
+      await refreshDccCallbacks();
+    } finally {
+      setDccProbeRunning(false);
+    }
+  }, [refreshDccCallbacks]);
+
   return {
-    authed, bookingsEnabled, providers, totals, msg, recoveryOrders, handoffRows,
+    authed, bookingsEnabled, providers, totals, msg, recoveryOrders, handoffRows, dccCallbackRows,
+    dccProbeRunning, dccProbeResult,
     setMsg,
     login, logout,
-    refreshFlags, refreshTours, refreshRecovery, refreshHandoffs,
+    refreshFlags, refreshTours, refreshRecovery, refreshHandoffs, refreshDccCallbacks,
     setBookings,
     setProviderHidden,
     setTourHidden,
     setProviderAndAllTours,
     retryOrderBooking,
+    runDccProbe,
   };
 }

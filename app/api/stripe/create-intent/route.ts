@@ -7,6 +7,7 @@ import {
   type OrderLine,
   type OrderSnapshot,
 } from "@/lib/orders";
+import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
 import {
   clientIpFromHeaders,
   enforceRateLimit,
@@ -29,11 +30,20 @@ type CartLine = {
   startAt?: string;
   handoffSource?: string;
   handoffId?: string;
+  sourceSlug?: string;
+  sourcePage?: string;
+  topicSlug?: string;
   authorityTopic?: string;
   referrerPath?: string;
   portSlug?: string;
+  productSlug?: string;
   handoffCategory?: string;
   handoffDate?: string;
+  dccReturnUrl?: string;
+  embedDomain?: string;
+  embedPath?: string;
+  widgetPlacement?: string;
+  widgetId?: string;
   partySize?: number;
   adults?: number;
   children?: number;
@@ -186,11 +196,20 @@ export async function POST(req: NextRequest) {
         currency,
         handoffSource: typeof it.handoffSource === "string" ? it.handoffSource : undefined,
         handoffId: typeof it.handoffId === "string" ? it.handoffId : undefined,
+        sourceSlug: typeof it.sourceSlug === "string" ? it.sourceSlug : undefined,
+        sourcePage: typeof it.sourcePage === "string" ? it.sourcePage : undefined,
+        topicSlug: typeof it.topicSlug === "string" ? it.topicSlug : undefined,
         authorityTopic: typeof it.authorityTopic === "string" ? it.authorityTopic : undefined,
         referrerPath: typeof it.referrerPath === "string" ? it.referrerPath : undefined,
         portSlug: typeof it.portSlug === "string" ? it.portSlug : undefined,
+        productSlug: typeof it.productSlug === "string" ? it.productSlug : undefined,
         category: typeof it.handoffCategory === "string" ? it.handoffCategory : undefined,
         handoffDate: typeof it.handoffDate === "string" ? it.handoffDate : undefined,
+        dccReturnUrl: typeof it.dccReturnUrl === "string" ? it.dccReturnUrl : undefined,
+        embedDomain: typeof it.embedDomain === "string" ? it.embedDomain : undefined,
+        embedPath: typeof it.embedPath === "string" ? it.embedPath : undefined,
+        widgetPlacement: typeof it.widgetPlacement === "string" ? it.widgetPlacement : undefined,
+        widgetId: typeof it.widgetId === "string" ? it.widgetId : undefined,
         partySize: Number.isFinite(Number(it.partySize)) ? Number(it.partySize) : undefined,
         adults: Number.isFinite(Number(it.adults)) ? Number(it.adults) : undefined,
         children: Number.isFinite(Number(it.children)) ? Number(it.children) : undefined,
@@ -209,11 +228,20 @@ export async function POST(req: NextRequest) {
     const attribution: OrderAttribution = {
       handoffSource: pickFirstString(lines, "handoffSource"),
       handoffId: pickFirstString(lines, "handoffId"),
+      sourceSlug: pickFirstString(lines, "sourceSlug"),
+      sourcePage: pickFirstString(lines, "sourcePage"),
+      topicSlug: pickFirstString(lines, "topicSlug"),
       authorityTopic: pickFirstString(lines, "authorityTopic"),
       referrerPath: pickFirstString(lines, "referrerPath"),
       portSlug: pickFirstString(lines, "portSlug"),
+      productSlug: pickFirstString(lines, "productSlug"),
       category: pickFirstString(lines, "handoffCategory"),
       date: pickFirstString(lines, "handoffDate"),
+      dccReturnUrl: pickFirstString(lines, "dccReturnUrl"),
+      embedDomain: pickFirstString(lines, "embedDomain"),
+      embedPath: pickFirstString(lines, "embedPath"),
+      widgetPlacement: pickFirstString(lines, "widgetPlacement"),
+      widgetId: pickFirstString(lines, "widgetId"),
       partySize: pickFirstNumber(lines, "partySize"),
       adults: pickFirstNumber(lines, "adults"),
       children: pickFirstNumber(lines, "children"),
@@ -238,6 +266,57 @@ export async function POST(req: NextRequest) {
     };
 
     await saveOrder(draft);
+
+    if (attribution.handoffSource === "dcc" && attribution.handoffId) {
+      console.log("[wta-create-intent:dcc]", {
+        orderId: order_id,
+        cartId: cart_id,
+        handoffId: attribution.handoffId,
+        sourceSlug: attribution.sourceSlug ?? null,
+        sourcePage: attribution.sourcePage ?? null,
+        topicSlug: attribution.topicSlug ?? null,
+        portSlug: attribution.portSlug ?? null,
+        category: attribution.category ?? null,
+      });
+
+      await emitDccSatelliteEvent({
+        handoffId: attribution.handoffId,
+        satelliteId: "welcome-to-alaska",
+        eventType: "lead_captured",
+        sourcePath: "/checkout",
+        externalReference: order_id,
+        status: draft.status,
+        stage: "checkout_started",
+        traveler: {
+          email,
+          phone: phone || undefined,
+          name,
+          partySize: attribution.partySize,
+        },
+        attribution: {
+          sourceSlug: attribution.sourceSlug || inferDccSourceSlug(attribution.sourcePage || attribution.referrerPath),
+          sourcePage: attribution.sourcePage || attribution.referrerPath,
+          topicSlug: attribution.topicSlug || attribution.authorityTopic,
+        },
+        booking: {
+          portSlug: attribution.portSlug,
+          productSlug: attribution.productSlug,
+          eventDate: attribution.date,
+          quantity: computed.reduce((sum, line) => sum + line.qty, 0),
+          currency: draft.currency,
+          amount: draft.totalCents / 100,
+        },
+        metadata: {
+          order_id,
+          cart_id,
+          line_count: computed.length,
+          embedDomain: attribution.embedDomain || null,
+          embedPath: attribution.embedPath || null,
+          widgetPlacement: attribution.widgetPlacement || null,
+          widgetId: attribution.widgetId || null,
+        },
+      });
+    }
 
     const pi = await stripe.paymentIntents.create(
       {

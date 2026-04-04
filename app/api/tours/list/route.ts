@@ -33,18 +33,17 @@ export async function GET() {
   const p = path.join(process.cwd(), "public", "data", "tours.json");
 
   let tours: Tour[] = [];
-  try {
-    const raw = await fs.readFile(p, "utf8");
-    const parsed = JSON.parse(raw);
-    tours = Array.isArray(parsed) ? (parsed as Tour[]) : [];
-  } catch {
-    tours = [];
-  }
+  const liveTours = await getToursFromFareHarbor().catch(() => []);
+  tours = liveTours.map(asCatalogTour).filter((t) => t.company && t.pk > 0);
 
-  // Production safety net: if the static snapshot is missing/empty, recover from live FareHarbor.
   if (tours.length < 1) {
-    const liveTours = await getToursFromFareHarbor();
-    tours = liveTours.map(asCatalogTour).filter((t) => t.company && t.pk > 0);
+    try {
+      const raw = await fs.readFile(p, "utf8");
+      const parsed = JSON.parse(raw);
+      tours = Array.isArray(parsed) ? (parsed as Tour[]) : [];
+    } catch {
+      tours = [];
+    }
   }
 
   const vis = await getVisibility();

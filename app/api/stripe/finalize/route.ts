@@ -11,6 +11,7 @@ import {
 import { runFareHarborBookingsForOrder } from "@/lib/bookingRunner";
 import { assertBookingsEnabled } from "@/lib/fareharbor";
 import { maybeSendBookingConfirmationEmail } from "@/lib/bookingEmail";
+import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
 import {
   clientIpFromHeaders,
   enforceRateLimit,
@@ -122,6 +123,48 @@ export async function POST(req: Request) {
       };
       await saveOrder(paid);
 
+      if (paid.attribution?.handoffSource === "dcc" && paid.attribution.handoffId) {
+        await emitDccSatelliteEvent({
+          handoffId: paid.attribution.handoffId,
+          satelliteId: "welcome-to-alaska",
+          eventType: "booking_started",
+          sourcePath: "/checkout/success",
+          externalReference: paid.order_id,
+          status: paid.status,
+          stage: "fareharbor_finalize",
+          traveler: {
+            email: paid.contact.email,
+            phone: paid.contact.phone,
+            name: paid.contact.name,
+            partySize: paid.attribution.partySize,
+          },
+          attribution: {
+            sourceSlug:
+              paid.attribution.sourceSlug ||
+              inferDccSourceSlug(paid.attribution.sourcePage || paid.attribution.referrerPath),
+            sourcePage: paid.attribution.sourcePage || paid.attribution.referrerPath,
+            topicSlug: paid.attribution.topicSlug || paid.attribution.authorityTopic,
+          },
+          booking: {
+            portSlug: paid.attribution.portSlug,
+            productSlug: paid.attribution.productSlug,
+            eventDate: paid.attribution.date,
+            quantity: paid.items.reduce((sum, line) => sum + line.qty, 0),
+            currency: paid.currency,
+            amount: paid.totalCents / 100,
+          },
+          metadata: {
+            order_id: paid.order_id,
+            payment_intent_id: pi.id,
+            item_count: paid.items.length,
+            embedDomain: paid.attribution.embedDomain || null,
+            embedPath: paid.attribution.embedPath || null,
+            widgetPlacement: paid.attribution.widgetPlacement || null,
+            widgetId: paid.attribution.widgetId || null,
+          },
+        });
+      }
+
       try {
         assertBookingsEnabled();
       } catch (e: unknown) {
@@ -145,6 +188,49 @@ export async function POST(req: Request) {
 
       if (allOk) {
         await maybeSendBookingConfirmationEmail(done);
+      }
+
+      if (done.attribution?.handoffSource === "dcc" && done.attribution.handoffId) {
+        await emitDccSatelliteEvent({
+          handoffId: done.attribution.handoffId,
+          satelliteId: "welcome-to-alaska",
+          eventType: allOk ? "booking_completed" : "booking_failed",
+          sourcePath: "/checkout/success",
+          externalReference: done.order_id,
+          status: done.status,
+          stage: allOk ? "confirmed" : "failed",
+          message: allOk ? undefined : done.lastError,
+          traveler: {
+            email: done.contact.email,
+            phone: done.contact.phone,
+            name: done.contact.name,
+            partySize: done.attribution.partySize,
+          },
+          attribution: {
+            sourceSlug:
+              done.attribution.sourceSlug ||
+              inferDccSourceSlug(done.attribution.sourcePage || done.attribution.referrerPath),
+            sourcePage: done.attribution.sourcePage || done.attribution.referrerPath,
+            topicSlug: done.attribution.topicSlug || done.attribution.authorityTopic,
+          },
+          booking: {
+            portSlug: done.attribution.portSlug,
+            productSlug: done.attribution.productSlug,
+            eventDate: done.attribution.date,
+            quantity: done.items.reduce((sum, line) => sum + line.qty, 0),
+            currency: done.currency,
+            amount: done.totalCents / 100,
+          },
+          metadata: {
+            order_id: done.order_id,
+            payment_intent_id: pi.id,
+            result_count: results.length,
+            embedDomain: done.attribution.embedDomain || null,
+            embedPath: done.attribution.embedPath || null,
+            widgetPlacement: done.attribution.widgetPlacement || null,
+            widgetId: done.attribution.widgetId || null,
+          },
+        });
       }
 
       return NextResponse.json({

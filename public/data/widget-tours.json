@@ -1,0 +1,145 @@
+[
+  {
+    "pk": 413056,
+    "title": "Icefield Excursion",
+    "slug": "icefield-excursion",
+    "description": "2.5 Hours • All Ages",
+    "image": "https://cdn.filestackcontent.com/NPg1gKoCQu6ewj2mnmsQ",
+    "company": "coastalhelicopters",
+    "fromPrice": "From $429",
+    "rateSummary": "429 • 456 • 579 +4 more",
+    "category": "Adventures"
+  },
+  {
+    "pk": 413073,
+    "title": "Dog Sled Tour",
+    "slug": "dog-sled-tour",
+    "description": "3 Hours • All Ages",
+    "image": "https://cdn.filestackcontent.com/MY7gLjORnauQs7dB2dOm",
+    "company": "coastalhelicopters",
+    "fromPrice": "From $709",
+    "rateSummary": "709 • 756 • 859 +3 more",
+    "category": "Dog Sledding"
+  },
+  {
+    "pk": 413093,
+    "title": "Dog Sled Tour with Glacier Landing",
+    "slug": "dog-sled-tour-with-glacier-landing",
+    "description": "3.5 Hours • All Ages",
+    "image": "https://cdn.filestackcontent.com/qpue1ZqTp62Bj5LGdhC0",
+    "company": "coastalhelicopters",
+    "fromPrice": "From $839",
+    "rateSummary": "839 • 895 • 989 +3 more",
+    "category": "Dog Sledding"
+  },
+  {
+    "pk": 115991,
+    "title": "Juneau Glacier Dog Sled Adventure",
+    "slug": "juneau-glacier-dog-sled-adventure",
+    "description": "3 Hours & 15 Minutes • Ages 2+ • Book Now with 25% Deposit",
+    "image": "https://cdn.filestackcontent.com/tvfb2N7fR4iVtjCHko68",
+    "company": "northstartrekking",
+    "fromPrice": "From $710",
+    "rateSummary": "710",
+    "category": "Dog Sledding"
+  },
+  {
+    "pk": 116029,
+    "title": "Helicopter Glacier Walkabout",
+    "slug": "helicopter-glacier-walkabout",
+    "description": "3 Hours & 15 Minutes • Age 8+ • Book Now with 25% Deposit",
+    "image": "https://cdn.filestackcontent.com/B909nF6TQqVuKDz3XLZ6",
+    "company": "northstartrekking",
+    "fromPrice": "From $479",
+    "rateSummary": "479",
+    "category": "Air Tours"
+  },
+  {
+    "pk": 116035,
+    "title": "Helicopter Glacier Trek",
+    "slug": "helicopter-glacier-trek",
+    "description": "4 Hours & 15 Minutes • Age 12+ • Book Now with 25% Deposit",
+    "image": "https://cdn.filestackcontent.com/cOhoNqnERLmiIhpPY4bu",
+    "company": "northstartrekking",
+    "fromPrice": "From $530",
+    "rateSummary": "530",
+    "category": "Air Tours"
+  },
+  {
+    "pk": 116037,
+    "title": "Taku Glacier Helicopter & Airboat Adventure",
+    "slug": "taku-glacier-helicopter-airboat-adventure",
+    "description": "3 Hours & 15 Minutes • Age 7+ • Book Now with 25% Deposit",
+    "image": "https://cdn.filestackcontent.com/KRVtt607RkKp6bDCU3HO",
+    "company": "northstartrekking",
+    "fromPrice": "From $688",
+    "rateSummary": "688",
+    "category": "Air Tours"
+  },
+  {
+    "pk": 405050,
+    "title": "Helicopter Flightseeing and Glacier Landing Tour",
+    "slug": "helicopter-flightseeing-and-glacier-landing-tour",
+    "description": "$405 Per Person | 2 Hours & 15 Minutes | Activity level: Light",
+    "image": "https://cdn.filestackcontent.com/Oed3sFGxRgSYBj6iP8nu",
+    "company": "northstartrekking",
+    "fromPrice": "From $388",
+    "rateSummary": "388",
+    "category": "Air Tours"
+  },
+  {
+    "pk": 645179,
+    "title": "Helicopter Glacier Ice Climbing Tour",
+    "slug": "helicopter-glacier-ice-climbing-tour",
+    "description": "4 Hours & 15 Minutes • Age 12+",
+    "image": "https://cdn.filestackcontent.com/hc4Dld6oRaOLcxZnVfFz",
+    "company": "northstartrekking",
+    "fromPrice": "From $530",
+    "rateSummary": "530",
+    "category": "Air Tours"
+  },
+  {
+    "pk": 213994,
+    "title": "Dog Sledding Summer Camp",
+    "slug": "dog-sledding-summer-camp",
+    "description": "Starting at $175 | All Ages | 2 Hours 15 Minutes | Experience the spirit of the Alaskan Gold Rush!",
+    "image": "https://cdn.filestackcontent.com/JGIMAlkYQdfzEdjpBb6p",
+    "company": "temsco-summercamp-juneau",
+    "fromPrice": "From $175",
+    "rateSummary": "175",
+    "category": "Dog Sledding"
+  },
+  {
+    "pk": 214803,
+    "title": "Mendenhall Glacier and Guided Walk",
+    "slug": "mendenhall-glacier-and-guided-walk",
+    "description": "Starting at $409 | All Ages | 2 Hours 15 Minutes | Bucket List Worthy Adventure!",
+    "image": "https://cdn.filestackcontent.com/GyqI6elSXKklaQiP9ULd",
+    "company": "temscoair-juneau",
+    "fromPrice": "From $409",
+    "rateSummary": "409",
+    "category": "Hiking & Glaciers"
+  },
+  {
+    "pk": 214810,
+    "title": "Dog Sledding on the Mendenhall Glacier",
+    "slug": "dog-sledding-on-the-mendenhall-glacier",
+    "description": "Starting at $699 | All Ages | 2 Hours 45 Minutes | Helicopters, Huskies, and Glaciers!",
+    "image": "https://cdn.filestackcontent.com/mjmYVT8aSPiQ6M0h9hb5",
+    "company": "temscoair-juneau",
+    "fromPrice": "From $699",
+    "rateSummary": "699",
+    "category": "Dog Sledding"
+  },
+  {
+    "pk": 214807,
+    "title": "Pilot's Choice",
+    "slug": "pilot-s-choice",
+    "description": "Starting at $579 | All Ages | 2 Hours 45 Minutes | Two Glacier Landings!",
+    "image": "https://cdn.filestackcontent.com/eV3DUI6kQHmVaiUAbIQ3",
+    "company": "temscoair-juneau",
+    "fromPrice": "From $579",
+    "rateSummary": "579",
+    "category": "Adventures"
+  }
+]

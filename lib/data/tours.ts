@@ -1,3 +1,5 @@
+import { getFareHarborCredentials } from "@/lib/fareharbor";
+
 export type Tour = {
   pk: number;
   slug: string;
@@ -15,8 +17,34 @@ export type Tour = {
   };
 };
 
-const APP_KEY = process.env.FAREHARBOR_APP_KEY || "";
-const USER_KEY = process.env.FAREHARBOR_USER_KEY || "";
+function cleanDescription(value: unknown) {
+  return String(value || "")
+    .replace(/\$\$/g, "$")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractDollarAmount(value: unknown) {
+  const match = String(value || "").match(/\$\s*([0-9]{1,3}(?:,[0-9]{3})*|[0-9]+)/);
+  if (!match) return null;
+  const dollars = Number(String(match[1]).replace(/,/g, ""));
+  return Number.isFinite(dollars) && dollars > 0 ? dollars : null;
+}
+
+function buildNorthstarFromPrice(item: any) {
+  const candidates = [
+    item?.structured_description?.pricing,
+    item?.description,
+    item?.headline,
+  ];
+
+  for (const candidate of candidates) {
+    const dollars = extractDollarAmount(candidate);
+    if (dollars) return `From $${dollars}`;
+  }
+
+  return null;
+}
 
 function itemToTour(item: any, shortname: string): Tour {
   const name = item?.name || `Tour ${item?.pk ?? ""}`;
@@ -24,13 +52,15 @@ function itemToTour(item: any, shortname: string): Tour {
   
   // FIX: Provide a fallback of 0 if price is missing, then check if it exists
   const rawPrice = item?.price || 0;
-  const fromPrice = rawPrice > 0 ? `From $${(rawPrice / 100).toFixed(0)}` : "Check Price";
+  const northstarPrice = shortname === "northstartrekking" ? buildNorthstarFromPrice(item) : null;
+  const fromPrice = northstarPrice || (rawPrice > 0 ? `From $${(rawPrice / 100).toFixed(0)}` : "Check Price");
 
   return {
       pk: Number(item?.pk || 0),
       slug,
     title: name,
-    description: item?.headline || item?.description || "View details and availability.",
+    description:
+      cleanDescription(item?.headline || item?.description) || "View details and availability.",
     duration: item?.duration_minutes ? `${Math.round(item.duration_minutes / 60 * 10) / 10} Hours` : undefined,
     fromPrice,
     image: item?.hero_image_url || item?.image_cdn_url || undefined,
@@ -54,7 +84,13 @@ export async function getToursFromFareHarbor(): Promise<Tour[]> {
     'temscoair-juneau', 'temscoair-skagway', 'wingsairways'
   ];
 
-  if (!APP_KEY || !USER_KEY) {
+  let appKey = "";
+  let userKey = "";
+  try {
+    const credentials = getFareHarborCredentials();
+    appKey = credentials.appKey;
+    userKey = credentials.userKey;
+  } catch {
     console.error("Missing FareHarbor API Keys");
     return [];
   }
@@ -63,7 +99,7 @@ export async function getToursFromFareHarbor(): Promise<Tour[]> {
   const tourPromises = companies.map(async (shortname) => {
     try {
       const res = await fetch(`https://fareharbor.com/api/external/v1/companies/${shortname}/items/`, {
-        headers: { "X-FareHarbor-API-App": APP_KEY, "X-FareHarbor-API-User": USER_KEY },
+        headers: { "X-FareHarbor-API-App": appKey, "X-FareHarbor-API-User": userKey },
         // Cache data for 24 hours to keep the site fast
         next: { revalidate: 86400 } 
       });

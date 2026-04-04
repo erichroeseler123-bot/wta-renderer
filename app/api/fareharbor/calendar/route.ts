@@ -68,7 +68,7 @@ export async function GET(req: Request) {
   }).toString();
 
   try {
-    const res = await fetch(base.toString(), { cache: "no-store" });
+    const res = await fetch(base.toString(), { next: { revalidate: 300 } });
     const j = await res.json();
 
     if (!j?.ok) {

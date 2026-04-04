@@ -9,11 +9,11 @@ export default function CartButton() {
     <button
       type="button"
       onClick={open}
-      className="relative rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
-      aria-label="Open itinerary cart"
+      className="relative rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-50"
+      aria-label="Open cart"
       title="Cart"
     >
-      <span className="mr-2">🛒</span>
+      <span className="mr-2" aria-hidden="true">🛒</span>
       Cart
       {count > 0 ? (
         <span className="ml-2 inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-cyan-300 px-2 py-0.5 text-xs font-bold text-slate-900">

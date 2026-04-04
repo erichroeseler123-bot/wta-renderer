@@ -1,5 +1,8 @@
+import { getFareHarborCredentials } from "@/lib/fareharbor";
+
 export async function POST(req: Request) {
   try {
+    const { appKey, userKey } = getFareHarborCredentials();
     const { bookingUuid, newAvailabilityPk } = await req.json();
 
     const res = await fetch(
@@ -8,8 +11,8 @@ export async function POST(req: Request) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-FareHarbor-API-App": process.env.FH_APP!,
-          "X-FareHarbor-API-User": process.env.FH_USER!,
+          "X-FareHarbor-API-App": appKey,
+          "X-FareHarbor-API-User": userKey,
         },
         body: JSON.stringify({
           availability: newAvailabilityPk,

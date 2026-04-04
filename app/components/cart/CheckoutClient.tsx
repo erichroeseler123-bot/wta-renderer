@@ -1,9 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "./CartContext";
 import TurnstileWidget from "@/app/components/security/TurnstileWidget";
+
+function sendPlanEvent(payload: Record<string, unknown>) {
+  const body = JSON.stringify(payload);
+
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    const blob = new Blob([body], { type: "application/json" });
+    navigator.sendBeacon("/api/plan-events", blob);
+    return;
+  }
+
+  void fetch("/api/plan-events", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body,
+    keepalive: true,
+  });
+}
 
 type PayloadItem = {
   company: string;
@@ -15,10 +32,22 @@ type PayloadItem = {
   startAt?: string;
   handoffSource?: string;
   handoffId?: string;
+  sourceSlug?: string;
+  sourcePage?: string;
+  topicSlug?: string;
   authorityTopic?: string;
   referrerPath?: string;
   handoffCategory?: string;
   handoffDate?: string;
+  dccReturnUrl?: string;
+  productSlug?: string;
+  requestedLane?: string;
+  resolvedLane?: string;
+  degradedFallback?: boolean;
+  embedDomain?: string;
+  embedPath?: string;
+  widgetPlacement?: string;
+  widgetId?: string;
   partySize?: number;
   adults?: number;
   children?: number;
@@ -56,10 +85,22 @@ export default function CheckoutClient() {
       startAt: it.startAt ? String(it.startAt) : undefined,
       handoffSource: it.handoffSource ? String(it.handoffSource) : undefined,
       handoffId: it.handoffId ? String(it.handoffId) : undefined,
+      sourceSlug: it.sourceSlug ? String(it.sourceSlug) : undefined,
+      sourcePage: it.sourcePage ? String(it.sourcePage) : undefined,
+      topicSlug: it.topicSlug ? String(it.topicSlug) : undefined,
       authorityTopic: it.authorityTopic ? String(it.authorityTopic) : undefined,
       referrerPath: it.referrerPath ? String(it.referrerPath) : undefined,
       handoffCategory: it.handoffCategory ? String(it.handoffCategory) : undefined,
       handoffDate: it.handoffDate ? String(it.handoffDate) : undefined,
+      dccReturnUrl: it.dccReturnUrl ? String(it.dccReturnUrl) : undefined,
+      productSlug: it.productSlug ? String(it.productSlug) : undefined,
+      requestedLane: it.requestedLane ? String(it.requestedLane) : undefined,
+      resolvedLane: it.resolvedLane ? String(it.resolvedLane) : undefined,
+      degradedFallback: typeof it.degradedFallback === "boolean" ? it.degradedFallback : undefined,
+      embedDomain: it.embedDomain ? String(it.embedDomain) : undefined,
+      embedPath: it.embedPath ? String(it.embedPath) : undefined,
+      widgetPlacement: it.widgetPlacement ? String(it.widgetPlacement) : undefined,
+      widgetId: it.widgetId ? String(it.widgetId) : undefined,
       partySize: it.partySize ? Number(it.partySize) : undefined,
       adults: it.adults ? Number(it.adults) : undefined,
       children: it.children ? Number(it.children) : undefined,
@@ -82,6 +123,26 @@ export default function CheckoutClient() {
   const estimatedTotalLabel = estimatedTotal > 0
     ? (estimatedTotal / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })
     : "Calculated live";
+
+  const checkoutTelemetrySentRef = useRef(false);
+
+  useEffect(() => {
+    if (checkoutTelemetrySentRef.current || payloadItems.length < 1) return;
+    checkoutTelemetrySentRef.current = true;
+
+    const first = payloadItems[0];
+    sendPlanEvent({
+      event: "checkout_start",
+      path: "/checkout",
+      requestedLane: first.requestedLane,
+      resolvedLane: first.resolvedLane,
+      degradedFallback: first.degradedFallback,
+      productSlug: first.productSlug,
+      port: first.portSlug,
+      topic: first.topicSlug || first.authorityTopic,
+      sourcePage: first.sourcePage || first.referrerPath,
+    });
+  }, [payloadItems]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

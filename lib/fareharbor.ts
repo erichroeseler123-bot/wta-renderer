@@ -4,6 +4,37 @@ function requiredEnv(name: string) {
   return v;
 }
 
+function readFirstEnv(names: string[]) {
+  for (const name of names) {
+    const value = String(process.env[name] || "").trim();
+    if (value) return value;
+  }
+  return "";
+}
+
+export function getFareHarborCredentials() {
+  const appKey = readFirstEnv([
+    "FAREHARBOR_APP_KEY",
+    "FH_APP_NAME",
+    "FH_APP_KEY",
+    "FAREHARBOR_APP",
+    "FH_APP",
+  ]);
+  const userKey = readFirstEnv([
+    "FAREHARBOR_USER_KEY",
+    "FH_API_KEY",
+    "FH_USER_KEY",
+    "FAREHARBOR_USER",
+    "FH_USER",
+  ]);
+
+  if (!appKey || !userKey) {
+    throw new Error("Missing FareHarbor credentials in env.");
+  }
+
+  return { appKey, userKey };
+}
+
 export type FareHarborBookingInput = {
   company: string;
   availabilityPk: number;
@@ -20,12 +51,7 @@ export type FareHarborBookingInput = {
 };
 
 export async function createFareHarborBooking(input: FareHarborBookingInput) {
-  const appKey = String(process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "").trim();
-  const userKey = String(process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "").trim();
-
-  if (!appKey || !userKey) {
-    throw new Error("Missing FareHarbor credentials in env.");
-  }
+  const { appKey, userKey } = getFareHarborCredentials();
 
   const company = String(input.company || "").trim();
   const availabilityPk = Number(input.availabilityPk || 0);

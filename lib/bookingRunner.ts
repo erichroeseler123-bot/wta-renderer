@@ -6,6 +6,21 @@ export async function runFareHarborBookingsForOrder(order: OrderSnapshot, paymen
 
   for (const line of order.items) {
     try {
+      const dccHandoffId = order.attribution?.handoffId?.trim();
+      const bookingNote = dccHandoffId
+        ? `WTA order ${order.order_id} / PI ${paymentIntentId} / DCC ${dccHandoffId}`
+        : `WTA order ${order.order_id} / PI ${paymentIntentId}`;
+
+      console.log("[fareharbor-booking]", {
+        orderId: order.order_id,
+        paymentIntentId,
+        handoffId: dccHandoffId ?? null,
+        company: line.company,
+        availabilityPk: line.availabilityPk,
+        ratePk: line.ratePk,
+        note: bookingNote,
+      });
+
       const booking = await createFareHarborBooking({
         company: line.company,
         availabilityPk: line.availabilityPk,
@@ -13,7 +28,7 @@ export async function runFareHarborBookingsForOrder(order: OrderSnapshot, paymen
         qty: line.qty,
         amountPaid: line.lineTotalCents,
         contact: order.contact,
-        note: `WTA order ${order.order_id} / PI ${paymentIntentId}`,
+        note: bookingNote,
         voucherNumber: `WTA-${order.order_id}-${line.availabilityPk}-${line.ratePk}`.slice(0, 64),
       });
 

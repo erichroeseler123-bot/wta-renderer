@@ -24,7 +24,9 @@ export default function FromPrice({
         );
         const j = await res.json();
         if (!alive) return;
-        if (j?.ok && j?.fromDisplay) setLabel(`From ${j.fromDisplay}`);
+        if ((j?.success || j?.ok) && j?.fromDisplay) {
+          setLabel(`From ${j.fromDisplay}`);
+        }
       } catch {}
     })();
 

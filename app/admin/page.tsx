@@ -21,6 +21,9 @@ export default function AdminPage() {
     providers,
     recoveryOrders,
     handoffRows,
+    dccCallbackRows,
+    dccProbeRunning,
+    dccProbeResult,
     msg,
     login,
     logout,
@@ -30,6 +33,8 @@ export default function AdminPage() {
     setProviderAndAllTours,
     retryOrderBooking,
     refreshHandoffs,
+    refreshDccCallbacks,
+    runDccProbe,
   } = useAdminData();
 
   return (
@@ -70,6 +75,9 @@ export default function AdminPage() {
           providers={providers}
           recoveryOrders={recoveryOrders}
           handoffRows={handoffRows}
+          dccCallbackRows={dccCallbackRows}
+          dccProbeRunning={dccProbeRunning}
+          dccProbeResult={dccProbeResult}
           msg={msg}
           onToggleBookings={(enabled) => setBookings(enabled)}
           onProviderHidden={(company, hidden) => setProviderHidden(company, hidden)}
@@ -77,6 +85,8 @@ export default function AdminPage() {
           onHideAll={(company, hideAll) => setProviderAndAllTours(company, hideAll)}
           onRetryOrderBooking={(orderId) => retryOrderBooking(orderId)}
           onRefreshHandoffs={() => refreshHandoffs()}
+          onRefreshDccCallbacks={() => refreshDccCallbacks()}
+          onRunDccProbe={() => runDccProbe()}
         />
       )}
     </div>

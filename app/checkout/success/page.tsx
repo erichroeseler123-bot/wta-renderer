@@ -2,6 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import DccHandoffStatusCard from "@/app/components/handoff/DccHandoffStatusCard";
+import PartnerForwardCard from "@/app/components/handoff/PartnerForwardCard";
 import NewsletterSignup from "@/app/components/newsletter/NewsletterSignup";
 
 type ReceiptResult = {
@@ -23,6 +25,24 @@ type ReceiptResult = {
 type ReceiptPayload = {
   status?: string;
   results?: ReceiptResult[];
+  order_id?: string;
+  attribution?: {
+    handoffSource?: string;
+    handoffId?: string;
+    sourceSlug?: string;
+    sourcePage?: string;
+    topicSlug?: string;
+    authorityTopic?: string;
+    referrerPath?: string;
+    portSlug?: string;
+    productSlug?: string;
+    dccReturnUrl?: string;
+    date?: string;
+    embedDomain?: string;
+    embedPath?: string;
+    widgetPlacement?: string;
+    widgetId?: string;
+  } | null;
 };
 
 export default function SuccessPage() {
@@ -113,6 +133,34 @@ export default function SuccessPage() {
             </div>
           </div>
         </div>
+
+        {data?.attribution?.handoffSource === "dcc" ? (
+          <DccHandoffStatusCard
+            handoffId={data.attribution.handoffId}
+            status={status}
+            sourcePage={data.attribution.sourcePage || data.attribution.referrerPath}
+            topic={data.attribution.topicSlug || data.attribution.authorityTopic}
+            returnUrl={data.attribution.dccReturnUrl}
+            orderId={data.order_id}
+            portSlug={data.attribution.portSlug}
+            productSlug={data.attribution.productSlug}
+            eventDate={data.attribution.date}
+            embedDomain={data.attribution.embedDomain}
+            embedPath={data.attribution.embedPath}
+            widgetPlacement={data.attribution.widgetPlacement}
+            widgetId={data.attribution.widgetId}
+          />
+        ) : null}
+
+        {isDone && data?.attribution?.handoffSource === "dcc" ? (
+          <PartnerForwardCard
+            handoffId={data.attribution.handoffId}
+            orderId={data.order_id}
+            dccReturnUrl={data.attribution.dccReturnUrl}
+            topic={data.attribution.authorityTopic}
+            eventDate={data.attribution.date}
+          />
+        ) : null}
 
         {data?.results?.length ? (
           <div className="mt-6 space-y-3">

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Welcome To Alaska Tours",
     short_name: "Alaska Tours",
     description:
-      "Cruise-friendly Alaska shore excursions with live availability, secure checkout, and confirmation tracking.",
+      "Juneau helicopter tours with live availability, simple booking, and secure checkout.",
     start_url: "/",
     display: "standalone",
     background_color: "#f8fafc",

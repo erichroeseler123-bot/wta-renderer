@@ -33,11 +33,23 @@ export type CartItem = {
   // handoff attribution + traveler context
   handoffSource?: string;
   handoffId?: string;
+  sourceSlug?: string;
+  sourcePage?: string;
+  topicSlug?: string;
   authorityTopic?: string;
   referrerPath?: string;
   handoffCategory?: string;
   portSlug?: string;
+  productSlug?: string;
+  requestedLane?: string;
+  resolvedLane?: string;
+  degradedFallback?: boolean;
   handoffDate?: string;
+  dccReturnUrl?: string;
+  embedDomain?: string;
+  embedPath?: string;
+  widgetPlacement?: string;
+  widgetId?: string;
   partySize?: number;
   adults?: number;
   children?: number;

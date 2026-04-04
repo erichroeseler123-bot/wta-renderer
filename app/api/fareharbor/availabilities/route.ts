@@ -1,18 +1,8 @@
 import { NextResponse } from "next/server";
+import { getFareHarborAvailabilities } from "@/lib/fareharborAvailability";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-
-const BASE = "https://fareharbor.com/api/external/v1";
-const MAX_RANGE_DAYS = 100;
-// Keep a little buffer to avoid inclusive-range off-by-one weirdness.
-const CHUNK_DAYS = 95;
-
-function mustEnv(name: string) {
-  const v = process.env[name];
-  if (!v) throw new Error(`Missing env var: ${name}`);
-  return v;
-}
 
 function ymdUTC(d: Date) {
   const yyyy = d.getUTCFullYear();
@@ -33,13 +23,6 @@ function addDaysUTC(d: Date, days: number) {
   const x = new Date(d.getTime());
   x.setUTCDate(x.getUTCDate() + days);
   return x;
-}
-
-function daysBetweenInclusiveUTC(a: Date, b: Date) {
-  const ms = 24 * 60 * 60 * 1000;
-  const aa = Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate());
-  const bb = Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), b.getUTCDate());
-  return Math.floor((bb - aa) / ms) + 1;
 }
 
 export async function GET(req: Request) {
@@ -76,88 +59,9 @@ export async function GET(req: Request) {
         ymdUTC(new Date(Date.UTC(e.getFullYear(), e.getMonth(), e.getDate())));
     }
 
-    const APP = (process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "");
-  if (!APP) throw new Error("Missing env var: FAREHARBOR_APP_KEY");
-    const USER = (process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "");
-  if (!USER) throw new Error("Missing env var: FAREHARBOR_USER_KEY");
-
-    const startD = parseYmdUTC(start);
-    const endD = parseYmdUTC(end);
-
-    async function fetchChunk(sYmd: string, eYmd: string) {
-      const fhUrlBase = `${BASE}/companies/${encodeURIComponent(company)}` +
-        `/items/${encodeURIComponent(item)}` +
-        `/minimal/availabilities/date-range/${encodeURIComponent(sYmd)}/${encodeURIComponent(eYmd)}/`;
-        const fhUrl = fhUrlBase + `?api-user=${encodeURIComponent(USER)}`;
-
-      const resp = await fetch(fhUrl, {
-        headers: {
-          "X-FareHarbor-API-App": APP,
-          "X-FareHarbor-API-User": USER,
-          Accept: "application/json",
-          "User-Agent": "wta-ui/1.0 (+welcometoalaskatours.com)",
-        },
-        cache: "no-store",
-      });
-
-      const text = await resp.text();
-      if (!resp.ok) {
-        return {
-          ok: false as const,
-          error: `FareHarbor request failed ${resp.status} ${resp.statusText}`,
-          fhUrl,
-          bodyPreview: text.slice(0, 400),
-        };
-      }
-
-      const data = JSON.parse(text);
-      return { ok: true as const, fhUrl, data };
-    }
-
-    const totalDays = daysBetweenInclusiveUTC(startD, endD);
-
-    // If within limit, just do one call
-    if (totalDays <= MAX_RANGE_DAYS) {
-      const r = await fetchChunk(start, end);
-      if (!r.ok) return NextResponse.json({ ...r, ok: false }, { status: 500 });
-
-      const av = r.data.availabilities ?? [];
-      return NextResponse.json({
-        ok: true,
-        company,
-        item: Number(item),
-        start,
-        end,
-        count: av.length,
-        availabilities: av,
-      });
-    }
-
-    // Otherwise chunk and merge
-    let merged: any[] = [];
-    let cursor = startD;
-
-    while (cursor <= endD) {
-      const chunkEnd = addDaysUTC(cursor, CHUNK_DAYS - 1);
-      const actualEnd = chunkEnd > endD ? endD : chunkEnd;
-
-      if (daysBetweenInclusiveUTC(cursor, actualEnd) > MAX_RANGE_DAYS) {
-        throw new Error(
-          `Internal chunking bug: requested >${MAX_RANGE_DAYS} days`,
-        );
-      }
-
-      const sY = ymdUTC(cursor);
-      const eY = ymdUTC(actualEnd);
-
-      const r = await fetchChunk(sY, eY);
-      if (!r.ok) return NextResponse.json({ ...r, ok: false }, { status: 500 });
-
-      const av = r.data.availabilities ?? [];
-      merged = merged.concat(av);
-
-      cursor = addDaysUTC(actualEnd, 1);
-    }
+    parseYmdUTC(start);
+    parseYmdUTC(end);
+    const merged = await getFareHarborAvailabilities(company, item, start, end);
 
     return NextResponse.json({
       ok: true,

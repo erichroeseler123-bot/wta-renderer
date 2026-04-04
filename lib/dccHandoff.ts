@@ -1,3 +1,5 @@
+import crypto from "crypto";
+
 export type DccToWtaHandoff = {
   source: "dcc";
   version: "1";
@@ -142,4 +144,16 @@ export function encodeHandoffPayload(payload: DccToWtaHandoff): string {
 export function decodeHandoffPayload(payload: string): unknown {
   const json = Buffer.from(payload, "base64url").toString("utf8");
   return JSON.parse(json);
+}
+
+export function signDccHandoffPayload(payload: string, secret: string) {
+  return crypto.createHmac("sha256", secret).update(payload).digest("hex");
+}
+
+export function verifyDccHandoffSignature(payload: string, sig: string, secret: string) {
+  const expected = signDccHandoffPayload(payload, secret);
+  const left = Buffer.from(expected, "utf8");
+  const right = Buffer.from(String(sig || ""), "utf8");
+  if (left.length !== right.length) return false;
+  return crypto.timingSafeEqual(left, right);
 }

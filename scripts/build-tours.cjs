@@ -12,6 +12,20 @@
 const fs = require("fs");
 const path = require("path");
 
+const WIDGET_COMPANIES = new Set([
+  "coastalhelicopters",
+  "northstartrekking",
+  "temscoair-juneau",
+  "temsco-summercamp-juneau",
+]);
+
+const WIDGET_ALLOWED_ITEMS = new Map([
+  ["coastalhelicopters", new Set([413056, 413073, 413093])],
+  ["northstartrekking", new Set([115991, 116029, 116035, 116037, 405050, 645179])],
+  ["temscoair-juneau", new Set([214803, 214807, 214810])],
+  ["temsco-summercamp-juneau", new Set([213994])],
+]);
+
 // load env (works locally + prod)
 try {
   require("dotenv").config({ path: ".env.local" });
@@ -21,14 +35,18 @@ try {
 function getKeys() {
   const APP_KEY =
     process.env.FAREHARBOR_APP_KEY ||
+    process.env.FH_APP_NAME ||
     process.env.FH_APP_KEY ||
     process.env.FAREHARBOR_APP ||
+    process.env.FH_APP ||
     "";
 
   const USER_KEY =
     process.env.FAREHARBOR_USER_KEY ||
+    process.env.FH_API_KEY ||
     process.env.FH_USER_KEY ||
     process.env.FAREHARBOR_USER ||
+    process.env.FH_USER ||
     "";
 
   return { APP_KEY, USER_KEY };
@@ -238,6 +256,51 @@ function categorize(name) {
   return "Adventures";
 }
 
+function cleanDescription(value) {
+  return String(value || "")
+    .replace(/\$\$/g, "$")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function extractDollarAmount(value) {
+  const match = String(value || "").match(/\$\s*([0-9]{1,3}(?:,[0-9]{3})*|[0-9]+)/);
+  if (!match) return null;
+  const dollars = Number(String(match[1]).replace(/,/g, ""));
+  return Number.isFinite(dollars) && dollars > 0 ? dollars : null;
+}
+
+function getNorthstarDisplayPrice(item, detail) {
+  if (String(item?.company || detail?.company || "").trim().toLowerCase() !== "northstartrekking") {
+    return null;
+  }
+
+  const candidates = [
+    detail?.structured_description?.pricing,
+    detail?.description,
+    detail?.headline,
+    item?.description,
+    item?.headline,
+  ];
+
+  for (const candidate of candidates) {
+    const dollars = extractDollarAmount(candidate);
+    if (dollars) return dollars;
+  }
+
+  return null;
+}
+
+function isWidgetEligibleTour(tour) {
+  const company = String(tour?.company || "").trim().toLowerCase();
+  const pk = Number(tour?.pk || 0);
+  const allowedItems = WIDGET_ALLOWED_ITEMS.get(company);
+
+  if (!WIDGET_COMPANIES.has(company)) return false;
+  if (!pk) return false;
+  return Boolean(allowedItems?.has(pk));
+}
+
 async function buildTours() {
   const { APP_KEY, USER_KEY } = getKeys();
 
@@ -297,7 +360,7 @@ async function buildTours() {
 
             // optional (detail page): Adult/Child/etc summary if available
             const rates = detail ? extractRateLabels(detail) : [];
-            const rateSummary = formatRateSummary(rates);
+            let rateSummary = formatRateSummary(rates);
 
             // always (grid): compute min price
             let fromCents = detail ? itemFromCents(detail) : 0;
@@ -330,6 +393,15 @@ async function buildTours() {
               fromPrice = await computeFromPriceSafe(shortname, pk, APP_KEY, USER_KEY);
             }
 
+            const northstarDisplayDollars = getNorthstarDisplayPrice(
+              { ...item, company: shortname },
+              detail ? { ...detail, company: shortname } : null,
+            );
+            if (northstarDisplayDollars) {
+              fromPrice = `From $${northstarDisplayDollars}`;
+              rateSummary = String(northstarDisplayDollars);
+            }
+
             return {
               pk,
               title: item.name,
@@ -337,7 +409,7 @@ async function buildTours() {
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-+|-+$/g, ""),
-              description: item.headline || item.description || "",
+              description: cleanDescription(item.headline || item.description || ""),
               image: item.hero_image_url || item.image_cdn_url || "",
               company: shortname,
               fromPrice,      // grid-safe
@@ -357,6 +429,7 @@ async function buildTours() {
   }
 
   const dataPath = path.join(process.cwd(), "public/data/tours.json");
+  const widgetDataPath = path.join(process.cwd(), "public/data/widget-tours.json");
   fs.mkdirSync(path.dirname(dataPath), { recursive: true });
 
   if (allTours.length < 1) {
@@ -378,6 +451,10 @@ async function buildTours() {
   }
 
   fs.writeFileSync(dataPath, JSON.stringify(allTours, null, 2));
+  fs.writeFileSync(
+    widgetDataPath,
+    JSON.stringify(allTours.filter((tour) => isWidgetEligibleTour(tour)), null, 2),
+  );
 
   const withDollar = allTours.filter((x) => String(x.fromPrice || "").includes("$")).length;
   const check = allTours.filter((x) => (x.fromPrice || "") === "Check Price").length;

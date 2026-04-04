@@ -2,9 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import {
   decodeHandoffPayload,
   normalizeDccToWtaHandoff,
+  verifyDccHandoffSignature,
   type DccToWtaHandoff,
 } from "@/lib/dccHandoff";
 import { buildRedirectUrl, resolveDccHandoffToWtaRoute } from "@/lib/dccToWtaMap";
+import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
 import { getKV } from "@/lib/kv";
 
 export const runtime = "nodejs";
@@ -20,6 +22,15 @@ function parseHandoffFromRequest(req: NextRequest): DccToWtaHandoff {
     throw new Error("Missing payload");
   }
 
+  const sig = req.nextUrl.searchParams.get("sig");
+  const secret = String(process.env.DCC_WTA_HANDOFF_SIG_SECRET || "").trim();
+  if (sig && !secret) {
+    throw new Error("Missing DCC_WTA_HANDOFF_SIG_SECRET");
+  }
+  if (sig && secret && !verifyDccHandoffSignature(payload, sig, secret)) {
+    throw new Error("Invalid handoff signature");
+  }
+
   const decoded = decodeHandoffPayload(payload);
   const handoff = normalizeDccToWtaHandoff(decoded);
 
@@ -30,7 +41,13 @@ function parseHandoffFromRequest(req: NextRequest): DccToWtaHandoff {
   return handoff;
 }
 
-async function recordHandoff(req: NextRequest, handoff: DccToWtaHandoff, redirectUrl: string, reason: string) {
+async function recordHandoff(
+  req: NextRequest,
+  handoff: DccToWtaHandoff,
+  redirectUrl: string,
+  reason: string,
+  dccReturn: string,
+) {
   const kv = await getKV();
   if (!kv) return;
 
@@ -42,6 +59,7 @@ async function recordHandoff(req: NextRequest, handoff: DccToWtaHandoff, redirec
     sourceMode: "payload",
     targetUrl: new URL(redirectUrl, req.url).toString(),
     reason,
+    dccReturn: dccReturn || null,
     intent: {
       destination: handoff.destination,
       bookingIntent: handoff.intent,
@@ -65,7 +83,12 @@ export async function GET(req: NextRequest) {
   try {
     const handoff = parseHandoffFromRequest(req);
     const resolved = resolveDccHandoffToWtaRoute(handoff);
-    const redirectUrl = buildRedirectUrl(resolved.pathname, resolved.query);
+    const dccReturn = req.nextUrl.searchParams.get("dcc_return") || "";
+    const redirectQuery = {
+      ...resolved.query,
+      ...(dccReturn ? { dcc_return: dccReturn } : {}),
+    };
+    const redirectUrl = buildRedirectUrl(resolved.pathname, redirectQuery);
 
     const res = NextResponse.redirect(new URL(redirectUrl, req.url), 302);
 
@@ -92,7 +115,42 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    await recordHandoff(req, handoff, redirectUrl, resolved.reason).catch(() => undefined);
+    if (dccReturn) {
+      res.cookies.set("wta_dcc_return", dccReturn, {
+        httpOnly: false,
+        sameSite: "lax",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    }
+
+    await recordHandoff(req, handoff, redirectUrl, resolved.reason, dccReturn).catch(() => undefined);
+    await emitDccSatelliteEvent({
+      handoffId: handoff.handoffId,
+      satelliteId: "welcome-to-alaska",
+      eventType: "handoff_viewed",
+      sourcePath: req.nextUrl.pathname,
+      status: "received",
+      stage: resolved.reason,
+      traveler: {
+        partySize: handoff.traveler?.partySize,
+      },
+      attribution: {
+        sourceSlug: inferDccSourceSlug(handoff.context?.referrerPath),
+        sourcePage: handoff.context?.referrerPath,
+        topicSlug: handoff.context?.authorityTopic,
+      },
+      booking: {
+        portSlug: handoff.destination?.portSlug,
+        citySlug: handoff.destination?.citySlug,
+        productSlug: handoff.intent?.itemSlug,
+        eventDate: handoff.intent?.date || handoff.traveler?.cruiseDate,
+      },
+      metadata: {
+        reason: resolved.reason,
+        has_dcc_return: Boolean(dccReturn),
+      },
+    });
 
     return res;
   } catch (e: unknown) {
