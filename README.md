@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# wta-renderer
 
-## Getting Started
+## What This Repo Is
 
-First, run the development server:
+`wta-renderer` is the WTA-facing renderer and booking-adjacent UI repo for Alaska excursion flows.
+It is a downstream surface in the DCC network, not the DCC decision layer and not the Party at Red Rocks booking vault.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Role In The System
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- role: `renderer`
+- network position: `DCC -> WTA renderer -> plan / booking continuation`
+- this repo should render Alaska-oriented flows clearly and continue the handoff state it receives from DCC
+- it should not redefine DCC doctrine locally
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Booking Impact
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- booking impact: `yes, potentially runtime-sensitive`
+- this repo contains booking-adjacent and checkout-adjacent code
+- treat payment, webhook, order, and callback paths as sensitive until explicitly classified
 
-## Learn More
+## Read These First
 
-To learn more about Next.js, take a look at the following resources:
+1. `package.json`
+2. `app/page.tsx`
+3. booking, payment, webhook, and callback routes
+4. any DCC handoff or embed entrypoints
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Do Not Touch Until Classified
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- payment routes
+- webhook routes
+- booking confirmation pages
+- token-based booking retrieval
+- order ledgers
+- middleware protecting customer or internal booking access
 
-## Deploy on Vercel
+## Practical Rule
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This repo does not own DCC decision logic.
+If a change affects money, order state, booking retrieval, or handoff continuity, it is not simple cleanup.
