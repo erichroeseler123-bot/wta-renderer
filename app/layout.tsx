@@ -10,14 +10,21 @@ import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/tourSeo";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://welcometoalaskatours.com"),
-  title: "Juneau Helicopter Tours | Welcome To Alaska Tours",
+  title: {
+    default: "Alaska Tours by Port, Timing & Traveler Fit | Welcome To Alaska Tours",
+    template: "%s | Welcome To Alaska Tours",
+  },
   description:
-    "Browse Juneau helicopter tours, choose a date, add your departure to the cart, and check out securely.",
+    "Find the right Alaska tour for your cruise port, schedule, and group. Browse whale watching, glacier, helicopter, wildlife, and train tours with cruise-safe timing notes.",
   keywords: [
-    "juneau helicopter tours",
-    "alaska helicopter tours",
-    "juneau glacier helicopter",
-    "book helicopter tours alaska",
+    "alaska tours",
+    "alaska cruise port tours",
+    "alaska shore excursions",
+    "juneau tours",
+    "skagway tours",
+    "ketchikan tours",
+    "alaska whale watching tours",
+    "alaska glacier tours",
   ],
   alternates: {
     canonical: "https://welcometoalaskatours.com",
@@ -26,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Welcome To Alaska Tours",
     description:
-      "Juneau helicopter tours with simple booking and secure checkout.",
+      "Alaska tours sorted by port, timing, and traveler fit. Browse by cruise port and compare tour types.",
     url: "https://welcometoalaskatours.com",
     siteName: "Welcome To Alaska Tours",
     type: "website",
@@ -35,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Welcome To Alaska Tours",
     description:
-      "Juneau helicopter tours with simple booking and secure checkout.",
+      "Alaska tours sorted by port, timing, and traveler fit. Browse by cruise port and compare tour types.",
   },
 };
 
