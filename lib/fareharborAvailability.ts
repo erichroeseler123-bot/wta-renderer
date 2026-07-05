@@ -1,4 +1,6 @@
 import { unstable_cache } from "next/cache";
+import { getKV } from "@/lib/kv";
+import { getPredictiveCacheTTL } from "@/lib/cache-timing";
 
 const BASE = "https://fareharbor.com/api/external/v1";
 const MAX_RANGE_DAYS = 100;
@@ -92,30 +94,39 @@ async function fetchAvailabilityChunk(
   return Array.isArray(data?.availabilities) ? data.availabilities : [];
 }
 
+async function getFreshFareHarborAvailabilities(
+  company: string,
+  item: string,
+  start: string,
+  end: string,
+) {
+  const startDate = parseYmdUTC(start);
+  const endDate = parseYmdUTC(end);
+  const totalDays = daysBetweenInclusiveUTC(startDate, endDate);
+
+  if (totalDays <= MAX_RANGE_DAYS) {
+    return fetchAvailabilityChunk(company, item, start, end);
+  }
+
+  let merged: any[] = [];
+  let cursor = startDate;
+
+  while (cursor <= endDate) {
+    const chunkEnd = addDaysUTC(cursor, CHUNK_DAYS - 1);
+    const actualEnd = chunkEnd > endDate ? endDate : chunkEnd;
+    const chunkStart = ymdUTC(cursor);
+    const chunkFinish = ymdUTC(actualEnd);
+    const chunk = await fetchAvailabilityChunk(company, item, chunkStart, chunkFinish);
+    merged = merged.concat(chunk);
+    cursor = addDaysUTC(actualEnd, 1);
+  }
+
+  return merged;
+}
+
 const getCachedFareHarborAvailabilities = unstable_cache(
   async (company: string, item: string, start: string, end: string) => {
-    const startDate = parseYmdUTC(start);
-    const endDate = parseYmdUTC(end);
-    const totalDays = daysBetweenInclusiveUTC(startDate, endDate);
-
-    if (totalDays <= MAX_RANGE_DAYS) {
-      return fetchAvailabilityChunk(company, item, start, end);
-    }
-
-    let merged: any[] = [];
-    let cursor = startDate;
-
-    while (cursor <= endDate) {
-      const chunkEnd = addDaysUTC(cursor, CHUNK_DAYS - 1);
-      const actualEnd = chunkEnd > endDate ? endDate : chunkEnd;
-      const chunkStart = ymdUTC(cursor);
-      const chunkFinish = ymdUTC(actualEnd);
-      const chunk = await fetchAvailabilityChunk(company, item, chunkStart, chunkFinish);
-      merged = merged.concat(chunk);
-      cursor = addDaysUTC(actualEnd, 1);
-    }
-
-    return merged;
+    return getFreshFareHarborAvailabilities(company, item, start, end);
   },
   ["fareharbor-availabilities"],
   { revalidate: 300 },
@@ -127,7 +138,31 @@ export async function getFareHarborAvailabilities(
   start: string,
   end: string,
 ) {
-  return getCachedFareHarborAvailabilities(company, item, start, end);
+  const kv = await getKV();
+  if (!kv) {
+    return getCachedFareHarborAvailabilities(company, item, start, end);
+  }
+
+  const cacheKey = `fareharbor:availabilities:${company}:${item}:${start}:${end}`;
+  try {
+    const cached = await kv.get<any[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+  } catch (e) {
+    console.error("Failed to read from KV cache", e);
+  }
+
+  const data = await getFreshFareHarborAvailabilities(company, item, start, end);
+
+  try {
+    const ttl = getPredictiveCacheTTL(start);
+    await kv.set(cacheKey, data, { ex: ttl });
+  } catch (e) {
+    console.error("Failed to write to KV cache", e);
+  }
+
+  return data;
 }
 
 export async function getFareHarborNextAvailability(
