@@ -12,42 +12,42 @@ const PORTS = [
   {
     slug: "juneau",
     title: "Juneau",
-    copy: "Our most complete catalog with live helicopter availability, glacier flightseeing, dog sledding, and direct booking calendars.",
+    copy: "Live helicopter capacity, glacier walks, and mushing camps. Direct FareHarbor API schedule sync.",
   },
   {
     slug: "skagway",
     title: "Skagway",
-    copy: "Review Skagway's railway timetables and helicopter operators. Dynamic timing checks help you schedule excursions safely.",
+    copy: "Railway transit timetables and helicopter routes. Scored against Skagway berthing windows.",
   },
   {
     slug: "ketchikan",
     title: "Ketchikan",
-    copy: "Plan rainforest hikes, kayaking expeditions, and boat charters around Ketchikan's specific cruise dock transfer windows.",
+    copy: "Rainforest and fjord transits. Ward Cove shuttle queues and downtown dock slots mapped.",
   },
   {
     slug: "sitka",
     title: "Sitka",
-    copy: "Coordinating marine wildlife quests or historical tours requires factoring in Sitka's outer shuttle terminal transfers.",
+    copy: "Halibut Point shuttle transits and ocean tender margins. Timing return buffers enforced.",
   },
   {
     slug: "icy-strait-point",
     title: "Icy Strait Point",
-    copy: "Review Hoonah high-adventure zipriders or brown bear searches matching your ship's limited port window.",
+    copy: "Adventure and Wilderness Landing gondola transit offsets. Ziprider timing limits mapped.",
   },
   {
     slug: "haines",
     title: "Haines",
-    copy: "Explore Bald Eagle Preserve rafting or fjord hiking. Timing rules factor in ferry schedules if docked in Skagway.",
+    copy: "Chilkat Preserve rafting and Skagway ferry transits. Multi-vessel schedule check.",
   },
   {
     slug: "seward",
     title: "Seward",
-    copy: "A turnaround hub for Kenai Fjords cruises. Verify train and shuttle connection timings for a stress-free turnaround.",
+    copy: "Turnaround terminal connection timelines. Train and shuttle departure sync.",
   },
   {
     slug: "whittier",
     title: "Whittier",
-    copy: "Calculate Prince William Sound catamarans around Whittier's strict hourly, single-lane access tunnel schedule.",
+    copy: "Resurrection Bay catamarans. Checked against hourly single-lane tunnel gates.",
   },
 ] as const;
 

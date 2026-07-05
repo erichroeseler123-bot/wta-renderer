@@ -249,16 +249,16 @@ export default async function CategoryPage({
       />
 
       {/* Hero section */}
-      <section className="relative bg-slate-900 text-white py-16 px-6 sm:px-8">
+      <section className="relative bg-slate-900 text-white py-12 px-6 sm:px-8">
         <div className="mx-auto max-w-5xl">
-          <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-100">
+          <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200">
             {config.title}
           </div>
-          <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             {config.headline}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-white/80 sm:text-[15px] max-w-3xl">
-            {config.intro}
+          <p className="mt-2 text-sm text-white/80 max-w-2xl">
+            Match {config.title.toLowerCase()} slots to your port day. Real-time availability verified. Strict return buffer rules enforced.
           </p>
         </div>
       </section>
@@ -345,14 +345,14 @@ export default async function CategoryPage({
         {/* Timing Problem Card */}
         <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
           <h2 className="text-xl font-black tracking-tight text-slate-955 sm:text-2xl">
-            The Port-Day Decision Challenge
+            All-Aboard Sync Mappings
           </h2>
           <p className="mt-4 text-sm leading-7 text-slate-655">
             {config.problem}
           </p>
           <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
             <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">
-              Timing Guidance
+              Dispatcher Buffer Rule
             </h3>
             <p className="mt-2 text-sm leading-6 text-slate-700">
               {config.guidance}

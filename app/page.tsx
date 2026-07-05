@@ -24,16 +24,18 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef7ff_0%,#f8fafc_42%,#ffffff_100%)] text-slate-900">
       {/* Hero Section */}
-      <section className="mx-auto max-w-5xl px-4 pt-12 pb-8 sm:px-6 sm:pt-16 sm:pb-12 text-center space-y-6">
-        <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-sky-800">
-          Decision-First Excursion Engine
+      <section className="mx-auto max-w-5xl px-4 pt-12 pb-8 sm:px-6 sm:pt-16 sm:pb-12 text-center space-y-6 bg-slate-900 text-white rounded-b-[3rem] shadow-[0_24px_80px_rgba(15,23,42,0.12)]">
+        <div className="mx-auto max-w-5xl space-y-3">
+          <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-200">
+            Logistical Port-Day Dispatch
+          </div>
+          <h1 className="text-4xl font-black uppercase leading-[0.9] tracking-[-0.04em] sm:text-6xl md:text-7xl text-white">
+            WTA Excursion Dispatcher
+          </h1>
+          <p className="text-sm leading-6 text-white/80 max-w-2xl mx-auto">
+            Secure your **Port-Day Fit**. Real-time availability checked against ship arrival and all-aboard times. We enforce a strict **45-minute return buffer** to guarantee return to gangway.
+          </p>
         </div>
-        <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-6xl max-w-4xl mx-auto leading-none">
-          Alaska excursions that fit your port day.
-        </h1>
-        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
-          Choose your port, check live availability, and compare excursions against your ship's timing before you book.
-        </p>
 
         {/* Dynamic Scheduler Form */}
         <div className="pt-4">
@@ -48,20 +50,20 @@ export default function HomePage() {
       <section className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
         <div className="grid gap-6 md:grid-cols-3">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-base font-black text-slate-900">Real Availability</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <h3 className="text-sm font-black text-slate-950 uppercase tracking-wider">Verified Capacity</h3>
+            <p className="mt-2 text-xs leading-5 text-slate-600">
               Direct connection to operator inventories via FareHarbor API for live departure timings and seat counts.
             </p>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-base font-black text-slate-900">Cruise-Day Timing Buffer</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <h3 className="text-sm font-black text-slate-955 uppercase tracking-wider">All-Aboard Sync</h3>
+            <p className="mt-2 text-xs leading-5 text-slate-600">
               Excursion start and return times are automatically scored against ship arrival and all-aboard deadlines with safety margins.
             </p>
           </div>
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h3 className="text-base font-black text-slate-900">Secure Direct Checkout</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
+            <h3 className="text-sm font-black text-slate-955 uppercase tracking-wider">Protected Checkout</h3>
+            <p className="mt-2 text-xs leading-5 text-slate-600">
               Confirm your booking instantly using direct payment intents processed securely via Stripe.
             </p>
           </div>

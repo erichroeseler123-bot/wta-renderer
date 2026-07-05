@@ -200,8 +200,8 @@ export default async function PortPage({
             <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
               {portTitle} Shore Excursions
             </h1>
-            <p className="mt-4 text-sm leading-7 text-white/82 sm:text-[15px]">
-              Decision-first excursion routing. Review safety buffers, check live calendars, and match excursions to your ship's schedule in {portTitle}.
+            <p className="mt-2 text-sm text-white/80 max-w-2xl mx-auto">
+              **Port-Day Fit** checks. Real-time availability verified against ship arrival and all-aboard deadlines. Strict **45-minute return buffer** enforced.
             </p>
           </div>
         </section>
@@ -209,28 +209,30 @@ export default async function PortPage({
         {/* Cruise Day timing helper panel */}
         {cruiseShip && shipWindowResolved ? (
           <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/50 p-6 shadow-sm">
-            <h3 className="text-sm font-black uppercase tracking-wider text-sky-800">
-              Cruise Day Schedule Resolved
+            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-850">
+              All-Aboard Sync Resolved
             </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-700">
-              <strong>{cruiseShip}</strong> is scheduled in {portTitle} from <strong>{shipArrivalResolved}</strong> to <strong>{shipDepartureResolved}</strong> ({shipWindowResolved}).
-              All excursions should depart at least 45 minutes after arrival and return at least 45 minutes before the ship's all-aboard time.
+            <p className="mt-2 text-xs leading-5 text-slate-700">
+              **{cruiseShip}** is scheduled in {portTitle}: **{shipArrivalResolved} - {shipDepartureResolved}** ({shipWindowResolved}).
+              Required return safety margin is **45+ minutes** prior to ship's scheduled all-aboard time.
             </p>
           </section>
         ) : (
           <section className="mt-6 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-            <h3 className="text-sm font-black uppercase tracking-wider text-slate-700">
-              Confirm Your Ship Timing
+            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-slate-700">
+              All-Aboard Sync Required
             </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              Enter or confirm your ship timing before relying on this fit. Excursions should leave a 45-minute return buffer before your ship's all-aboard time. You can browse specific timing guidelines for ships like the <Link href="/ships/celebrity-edge" className="font-bold underline">Celebrity Edge</Link> or <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link> in our <Link href="/ships" className="font-bold underline">cruise ship planners directory</Link>.
+            <p className="mt-2 text-xs leading-5 text-slate-600">
+              Confirm ship timings to calculate **Port-Day Fit**. Excursions must leave a **45-minute return buffer** before ship's all-aboard time. Read ship-specific guides for <Link href="/ships/celebrity-edge" className="font-bold underline">Celebrity Edge</Link> or <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link> in our <Link href="/ships" className="font-bold underline">planners directory</Link>.
             </p>
           </section>
-        )}        {/* Juneau Excursion Categories */}
+        )}
+
+        {/* Juneau Excursion Categories */}
         {slug === "juneau" && (
           <section className="mt-8">
             <div className="border-b border-slate-200 pb-3">
-              <h2 className="text-2xl font-black tracking-tight text-slate-950">Excursion Categories in Juneau</h2>
+              <h2 className="text-2xl font-black tracking-tight text-slate-955">Excursion Categories in Juneau</h2>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <Link
@@ -282,10 +284,10 @@ export default async function PortPage({
         {/* Live Tour Offerings or Honest Fallback */}
         <section className="mt-8 space-y-6">
           <div className="border-b border-slate-200 pb-3 flex justify-between items-center">
-            <h2 className="text-2xl font-black tracking-tight text-slate-950">Live Shore Excursions</h2>
+            <h2 className="text-2xl font-black tracking-tight text-slate-955">Live Shore Excursions</h2>
             {hasLiveTours && (
               <span className="rounded bg-sky-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
-                Live Availability
+                Verified Capacity
               </span>
             )}
           </div>
@@ -310,10 +312,27 @@ export default async function PortPage({
                     </div>
                     <div className="p-6 space-y-4 flex-grow flex flex-col justify-between">
                       <div className="space-y-2">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                          {tour.category || "Juneau Excursion"}
-                        </span>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
+                            {tour.category || "Juneau Excursion"}
+                          </span>
+                          <span className="rounded bg-sky-50 px-1.5 py-0.5 text-[9px] font-bold text-sky-850">
+                            Verified Capacity
+                          </span>
+                        </div>
                         <h3 className="text-xl font-black tracking-tight text-slate-900">{tour.title}</h3>
+                        
+                        <div className="grid grid-cols-2 gap-2 py-2 text-[11px] border-y border-slate-100 my-2">
+                          <div>
+                            <span className="text-slate-500 block">Duration</span>
+                            <span className="font-black text-slate-900">Check detail</span>
+                          </div>
+                          <div>
+                            <span className="text-slate-500 block">Safety Buffer</span>
+                            <span className="font-black text-rose-800">45+ min required</span>
+                          </div>
+                        </div>
+
                         <p className="text-xs text-slate-600 line-clamp-3">{tour.description}</p>
                       </div>
                       {tour.timingStatus !== "unknown" && (

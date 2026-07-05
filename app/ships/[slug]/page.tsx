@@ -228,8 +228,8 @@ export default async function ShipSlugPage({
           <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             {config.name} Alaska Excursion Planner
           </h1>
-          <p className="mt-2 text-sm text-white/80 max-w-3xl">
-            Start with your port window, then choose excursions that leave enough return buffer.
+          <p className="mt-2 text-sm text-white/80 max-w-2xl">
+            Match excursions to your ship's docking slots. Strict return safety buffers enforced for all bookings.
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <Link

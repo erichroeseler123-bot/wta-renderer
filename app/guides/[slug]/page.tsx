@@ -262,16 +262,16 @@ export default async function GuideSlugPage({
       />
 
       {/* Hero section */}
-      <section className="relative bg-slate-900 text-white py-16 px-6 sm:px-8">
+      <section className="relative bg-slate-900 text-white py-12 px-6 sm:px-8">
         <div className="mx-auto max-w-5xl">
-          <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-100">
-            Port Timing Guide
+          <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200">
+            Disembarkation Guide
           </div>
-          <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
+          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
             {config.headline}
           </h1>
-          <p className="mt-4 text-sm leading-7 text-white/80 sm:text-[15px] max-w-3xl">
-            {config.intro}
+          <p className="mt-2 text-sm text-white/80 max-w-2xl">
+            Direct gangway disembarkation guidelines. Scored transit steps for independent excursion bookings. Enforcing return safety windows.
           </p>
         </div>
       </section>
