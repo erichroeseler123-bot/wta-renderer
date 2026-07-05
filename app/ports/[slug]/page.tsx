@@ -100,17 +100,12 @@ export default async function PortPage({
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
 
-  // Resolve tours for this port
-  const allTours = await getHelicopterTours().catch(() => []);
-  const portTours = allTours.filter((t) => t.port === slug);
-  const hasLiveTours = portTours.length > 0;
-
   // Resolve ship timings
-  let shipArrival: string | undefined = undefined;
-  let shipDeparture: string | undefined = undefined;
-  let shipWindow: string | undefined = undefined;
+  let shipArrival: string | undefined = getParam(resolvedSearch.arrivalTime);
+  let shipDeparture: string | undefined = getParam(resolvedSearch.departureTime);
+  let shipWindow: string | undefined = shipArrival && shipDeparture ? `${shipArrival} - ${shipDeparture}` : undefined;
 
-  if (cruiseShip && CRUISE_ITINERARY_HINTS[cruiseShip as CruiseShipName]) {
+  if (!shipArrival && !shipDeparture && cruiseShip && CRUISE_ITINERARY_HINTS[cruiseShip as CruiseShipName]) {
     const hint = CRUISE_ITINERARY_HINTS[cruiseShip as CruiseShipName]!;
     if (hint.portSlug === slug) {
       const windowMatch = hint.window.match(/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/);
@@ -121,6 +116,62 @@ export default async function PortPage({
       }
     }
   }
+
+  // Resolve tours for this port
+  const allTours = await getHelicopterTours().catch(() => []);
+  const portTours = allTours.filter((t) => t.port === slug);
+  const hasLiveTours = portTours.length > 0;
+
+  const evaluatedTours = portTours.map((tour) => {
+    // Parse duration from description
+    const durationMatch = String(tour.description || "").match(/\b(\d+(?:\.\d+)?)\s*Hours?\b/i);
+    const durationHours = durationMatch ? parseFloat(durationMatch[1]) : 0;
+    const durationMinutes = Math.round(durationHours * 60);
+
+    let timingStatus: "safe" | "tight" | "unsafe" | "unknown" = "unknown";
+    let timingGuidanceText = "Enter or confirm your ship timing before relying on this fit.";
+
+    if (shipArrival && shipDeparture) {
+      if (durationMinutes > 0) {
+        const arrMin = parseTimeToMinutes(shipArrival);
+        const depMin = parseTimeToMinutes(shipDeparture);
+        if (arrMin !== null && depMin !== null) {
+          const allAboardMin = depMin - 30;
+          const earliestSafeStart = arrMin + 45;
+          const latestSafeStart = allAboardMin - durationMinutes - 45;
+
+          if (latestSafeStart >= earliestSafeStart) {
+            timingStatus = "safe";
+            timingGuidanceText = "Appears to fit your port window with a return buffer.";
+          } else if (allAboardMin - arrMin >= durationMinutes) {
+            timingStatus = "tight";
+            timingGuidanceText = "This may be tight. Confirm your ship’s all-aboard time before booking.";
+          } else {
+            timingStatus = "unsafe";
+            timingGuidanceText = "This may not fit your ship schedule with the recommended return buffer.";
+          }
+        }
+      }
+    }
+
+    return {
+      ...tour,
+      timingStatus,
+      timingGuidanceText,
+      // Priority: safe (3) > tight (2) > unknown (1) > unsafe (0)
+      priority: timingStatus === "safe" ? 3 : timingStatus === "tight" ? 2 : timingStatus === "unknown" ? 1 : 0,
+    };
+  });
+
+  // Sort evaluated tours: safer matches first
+  if (shipArrival && shipDeparture) {
+    evaluatedTours.sort((a, b) => b.priority - a.priority);
+  }
+
+  // Resolve ship timings
+  let shipArrivalResolved: string | undefined = shipArrival;
+  let shipDepartureResolved: string | undefined = shipDeparture;
+  let shipWindowResolved: string | undefined = shipWindow;
 
   const qs = new URLSearchParams();
   for (const [key, value] of Object.entries(resolvedSearch)) {
@@ -156,14 +207,23 @@ export default async function PortPage({
         </section>
 
         {/* Cruise Day timing helper panel */}
-        {cruiseShip && shipWindow && (
+        {cruiseShip && shipWindowResolved ? (
           <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/50 p-6 shadow-sm">
             <h3 className="text-sm font-black uppercase tracking-wider text-sky-800">
               Cruise Day Schedule Resolved
             </h3>
             <p className="mt-2 text-sm leading-6 text-slate-700">
-              <strong>{cruiseShip}</strong> is scheduled in {portTitle} from <strong>{shipArrival}</strong> to <strong>{shipDeparture}</strong> ({shipWindow}).
+              <strong>{cruiseShip}</strong> is scheduled in {portTitle} from <strong>{shipArrivalResolved}</strong> to <strong>{shipDepartureResolved}</strong> ({shipWindowResolved}).
               All excursions should depart at least 45 minutes after arrival and return at least 45 minutes before the ship's all-aboard time.
+            </p>
+          </section>
+        ) : (
+          <section className="mt-6 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 shadow-sm">
+            <h3 className="text-sm font-black uppercase tracking-wider text-slate-700">
+              Confirm Your Ship Timing
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Enter or confirm your ship timing before relying on this fit. Excursions should leave a 45-minute return buffer before your ship's all-aboard time.
             </p>
           </section>
         )}
@@ -195,9 +255,10 @@ export default async function PortPage({
 
           {hasLiveTours ? (
             <div className="grid gap-6 md:grid-cols-2">
-              {portTours.map((tour) => {
+              {evaluatedTours.map((tour) => {
                 const tourQs = new URLSearchParams(qs.toString());
                 tourQs.set("productSlug", tour.slug);
+
                 return (
                   <div
                     key={tour.pk}
@@ -218,6 +279,16 @@ export default async function PortPage({
                         <h3 className="text-xl font-black tracking-tight text-slate-900">{tour.title}</h3>
                         <p className="text-xs text-slate-600 line-clamp-3">{tour.description}</p>
                       </div>
+                      {tour.timingStatus !== "unknown" && (
+                        <div className={`rounded-xl border px-3 py-2 text-xs font-semibold ${
+                          tour.timingStatus === "safe" ? "border-emerald-200 bg-emerald-50 text-emerald-950" :
+                          tour.timingStatus === "tight" ? "border-amber-200 bg-amber-50 text-amber-950" :
+                          "border-rose-200 bg-rose-50 text-rose-950"
+                        }`}>
+                          {tour.timingStatus === "safe" ? "✅ " : tour.timingStatus === "tight" ? "⚠️ " : "❌ "}
+                          {tour.timingGuidanceText}
+                        </div>
+                      )}
                       <div className="pt-4 flex items-center justify-between border-t border-slate-100">
                         <span className="text-lg font-black text-slate-900">{tour.fromPrice || "Check Price"}</span>
                         <Link
