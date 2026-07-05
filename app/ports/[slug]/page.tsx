@@ -223,7 +223,7 @@ export default async function PortPage({
               Confirm Your Ship Timing
             </h3>
             <p className="mt-2 text-sm leading-6 text-slate-600">
-              Enter or confirm your ship timing before relying on this fit. Excursions should leave a 45-minute return buffer before your ship's all-aboard time.
+              Enter or confirm your ship timing before relying on this fit. Excursions should leave a 45-minute return buffer before your ship's all-aboard time. You can browse specific timing guidelines for ships like the <Link href="/ships/celebrity-edge" className="font-bold underline">Celebrity Edge</Link> or <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link> in our <Link href="/ships" className="font-bold underline">cruise ship planners directory</Link>.
             </p>
           </section>
         )}

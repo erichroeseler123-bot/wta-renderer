@@ -285,6 +285,21 @@ export default async function GuideSlugPage({
           <p className="mt-3 text-lg font-bold text-slate-955">
             {config.quickAnswer}
           </p>
+          {config.portSlug === "juneau" && (
+            <p className="mt-3 text-xs text-slate-600">
+              Common ships visiting Juneau include the <Link href="/ships/celebrity-edge" className="font-bold underline">Celebrity Edge</Link>, <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link>, and <Link href="/ships/koningsdam" className="font-bold underline">Koningsdam</Link>.
+            </p>
+          )}
+          {config.portSlug === "skagway" && (
+            <p className="mt-3 text-xs text-slate-600">
+              Common ships visiting Skagway include the <Link href="/ships/celebrity-edge" className="font-bold underline">Celebrity Edge</Link>, <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link>, and <Link href="/ships/koningsdam" className="font-bold underline">Koningsdam</Link>.
+            </p>
+          )}
+          {config.portSlug === "ketchikan" && (
+            <p className="mt-3 text-xs text-slate-600">
+              Common ships visiting Ketchikan include the <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link> (docked at Ward Cove) and <Link href="/ships/discovery-princess" className="font-bold underline">Discovery Princess</Link>.
+            </p>
+          )}
         </section>
 
         {/* Detailed Timings */}

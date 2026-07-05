@@ -61,6 +61,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const approvedShips = [
+    "celebrity-edge",
+    "royal-princess",
+    "discovery-princess",
+    "norwegian-bliss",
+    "koningsdam"
+  ];
+
+  const shipUrls = approvedShips.map((slug) => ({
+    url: `${baseUrl}/ships/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
   const portUrls = approvedPorts.map((slug) => ({
     url: `${baseUrl}/ports/${slug}`,
     lastModified: new Date(),
@@ -93,9 +108,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/ships`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
     ...portUrls,
     ...categoryUrls,
     ...guideUrls,
+    ...shipUrls,
     ...tourUrls,
   ];
 }

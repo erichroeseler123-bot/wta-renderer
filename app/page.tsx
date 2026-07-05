@@ -145,6 +145,16 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
+
+        <div className="pt-6 text-center">
+          <Link
+            href="/ships"
+            className="inline-flex rounded-2xl border border-sky-100 bg-sky-50/50 px-6 py-4 hover:shadow-sm transition text-slate-900 font-medium text-sm gap-2 items-center"
+          >
+            <span>🚢 Plan for your specific cruise ship?</span>
+            <span className="font-bold text-sky-800 hover:text-sky-900">Browse Cruise Ships →</span>
+          </Link>
+        </div>
       </section>
     </main>
   );
