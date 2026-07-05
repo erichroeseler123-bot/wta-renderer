@@ -11,17 +11,16 @@ test("getPredictiveCacheTTL returns expected TTL values based on proximity", () 
     return d.toISOString().split("T")[0];
   };
 
-  // 1. Imminent departure (today/tomorrow - t=1)
+  // 1. Imminent departures (within 48 hours: tomorrow t=1, 2 days out t=2)
   const ttlTomorrow = getPredictiveCacheTTL(addDays(1));
-  // Expected to be close to alpha (120 seconds) + some curve addition
-  // TTL(1) = 21600 - (21600 - 120) * e^(-0.15 * 1) = ~3112
-  assert.ok(ttlTomorrow > 120);
-  assert.ok(ttlTomorrow < 5000);
+  const ttlTwoDays = getPredictiveCacheTTL(addDays(2));
+  assert.strictEqual(ttlTomorrow, 120);
+  assert.strictEqual(ttlTwoDays, 120);
 
   // 2. Medium proximity (t=5)
   const ttlIn5Days = getPredictiveCacheTTL(addDays(5));
   // TTL(5) = 21600 - 21480 * e^(-0.75) = ~11459
-  assert.ok(ttlIn5Days > ttlTomorrow);
+  assert.ok(ttlIn5Days > 120);
   assert.ok(ttlIn5Days < 20000);
 
   // 3. Far-out departure (t=30)

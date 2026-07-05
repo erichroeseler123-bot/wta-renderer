@@ -38,6 +38,11 @@ export function getPredictiveCacheTTL(targetDateStr: string, config = DEFAULT_CO
     return 60; // 1 minute safety fallback
   }
 
+  // If target date is within 48 hours (t <= 2 days), clamp to alpha (e.g. 2 minutes) for high-intent near-term bookings
+  if (t <= 2) {
+    return config.alpha;
+  }
+
   // Calculate exponential scaling
   // At t = 0 (Today/Tomorrow): TTL = alpha (2 mins)
   // At t -> infinity: TTL = gamma (6 hours)
