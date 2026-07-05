@@ -1,13 +1,92 @@
-import { redirect } from "next/navigation";
 import type { Metadata } from "next";
+import Link from "next/link";
+import HomepageForm from "@/app/components/home/HomepageForm";
 
 export const metadata: Metadata = {
-  title: "Choose Your Alaska Excursion | Welcome To Alaska Tours",
+  title: "Alaska Cruise Port Excursions | Welcome To Alaska Tours",
   description:
-    "Decision-first Alaska routing for cruise travelers who should start with the right shortlist before opening a booking calendar.",
+    "Match Alaska shore excursions to your cruise port day. Choose your port, check live availability, and compare excursions against your ship timing with Return Buffer safety guidelines.",
   alternates: { canonical: "https://welcometoalaskatours.com" },
 };
 
+const APPROVED_PORTS = [
+  { slug: "juneau", title: "Juneau", description: "Mendenhall Glacier flights, helicopter dog sledding, and whale watching." },
+  { slug: "skagway", title: "Skagway", description: "White Pass & Yukon Route train rides, scooter tours, and glacier helicopter trips." },
+  { slug: "ketchikan", title: "Ketchikan", description: "Rainforest hikes, kayaking wilderness adventures, and Totem Bight state parks." },
+  { slug: "sitka", title: "Sitka", description: "Sea otter marine quests, Russian historical landmarks, and coastal hikes." },
+  { slug: "icy-strait-point", title: "Icy Strait Point", description: "High-adventure zipriders, Hoonah coastal wilderness, and brown bear searches." },
+  { slug: "haines", title: "Haines", description: "Chilkat Bald Eagle rafting, wildlife safaris, and quiet fjord tours." },
+  { slug: "seward", title: "Seward", description: "Kenai Fjords glacier boat cruises, Resurrection Bay sealife, and Exit Glacier hiking." },
+  { slug: "whittier", title: "Whittier", description: "Prince William Sound 26-glacier catamarans, and tunnel-accessed adventures." }
+];
+
 export default function HomePage() {
-  redirect("/plan?intent=best-for&topic=juneau-helicopter-tours&subtype=helicopter&port=juneau");
+  return (
+    <main className="min-h-screen bg-[linear-gradient(180deg,#eef7ff_0%,#f8fafc_42%,#ffffff_100%)] text-slate-900">
+      {/* Hero Section */}
+      <section className="mx-auto max-w-5xl px-4 pt-12 pb-8 sm:px-6 sm:pt-16 sm:pb-12 text-center space-y-6">
+        <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-sky-800">
+          Decision-First Excursion Engine
+        </div>
+        <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-6xl max-w-4xl mx-auto leading-none">
+          Alaska excursions that fit your port day.
+        </h1>
+        <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          Choose your port, check live availability, and compare excursions against your ship's timing before you book.
+        </p>
+
+        {/* Dynamic Scheduler Form */}
+        <div className="pt-4">
+          <HomepageForm approvedPorts={APPROVED_PORTS} />
+        </div>
+      </section>
+
+      {/* Trust & Utility points */}
+      <section className="mx-auto max-w-5xl px-4 py-6 sm:px-6">
+        <div className="grid gap-6 md:grid-cols-3">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-base font-black text-slate-900">Real Availability</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Direct connection to operator inventories via FareHarbor API for live departure timings and seat counts.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-base font-black text-slate-900">Cruise-Day Timing Buffer</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Excursion start and return times are automatically scored against ship arrival and all-aboard deadlines with safety margins.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-base font-black text-slate-900">Secure Direct Checkout</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-600">
+              Confirm your booking instantly using direct payment intents processed securely via Stripe.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Port Chooser Grid */}
+      <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">Browse by Alaska Port</h2>
+          <p className="text-sm text-slate-600">Select a port page to review specific timing constraints and excursions.</p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 md:grid-cols-4">
+          {APPROVED_PORTS.map((port) => (
+            <Link
+              key={port.slug}
+              href={`/ports/${port.slug}`}
+              className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
+            >
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Port Directory</span>
+              <h3 className="text-lg font-black text-slate-950 block">{port.title}</h3>
+              <p className="text-xs leading-5 text-slate-600 block">{port.description}</p>
+              <span className="text-xs font-bold text-sky-800 block hover:text-sky-900">Explore Port →</span>
+            </Link>
+          ))}
+        </div>
+      </section>
+    </main>
+  );
 }

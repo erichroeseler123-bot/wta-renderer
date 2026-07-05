@@ -12,6 +12,10 @@ export const metadata: Metadata = {
   title: "Juneau Helicopter Tours By Date | Welcome To Alaska Tours",
   description:
     "Enter your Juneau cruise date and see helicopter tour departures across participating operators from FareHarbor live inventory.",
+  robots: {
+    index: false,
+    follow: true,
+  },
   alternates: {
     canonical: "https://welcometoalaskatours.com/date-search",
   },

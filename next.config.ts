@@ -25,9 +25,6 @@ const nextConfig: NextConfig = {
       { source: "/contact-us", destination: "/", permanent: false },
       { source: "/guides", destination: "/", permanent: false },
       { source: "/guides/:path*", destination: "/", permanent: false },
-      { source: "/ports", destination: "/", permanent: false },
-      { source: "/ports/:path*", destination: "/", permanent: false },
-      { source: "/tours", destination: "/", permanent: false },
       { source: "/privacy", destination: "/", permanent: false },
       { source: "/terms", destination: "/", permanent: false },
     ];

@@ -1,9 +1,17 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   getFareHarborAvailabilities,
   getFareHarborNextAvailability,
 } from "@/lib/fareharborAvailability";
 import StageTelemetry from "@/app/components/plan/StageTelemetry";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 function groupByDay(availabilities: any[]) {
   const byDay = new Map<string, any[]>();

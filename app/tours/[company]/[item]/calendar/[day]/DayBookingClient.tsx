@@ -7,6 +7,8 @@ import { useCart } from "@/app/components/cart/CartContext";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { canonicalizePortSlug } from "@/lib/dccSatellite";
 import { parseWidgetInitContext } from "@/lib/widgetContext";
+import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
+import { evaluatePortDayFit, formatMinutesToTime } from "@/lib/timing";
 
 export type SlotRate = {
   pk: number;
@@ -45,11 +47,13 @@ export default function DayBookingClient({
   item,
   day,
   initialSlots,
+  tourDurationMinutes,
 }: {
   company: string;
   item: string;
   day: string;
   initialSlots: Slot[];
+  tourDurationMinutes: number | null;
 }) {
   const sp = useSearchParams();
   const { addItem, open } = useCart();
@@ -69,6 +73,25 @@ export default function DayBookingClient({
       price: r.customer_prototype?.total,
     }));
   }, [selected]);
+
+  // Resolve Cruise Ship and Window
+  const cruiseShip = sp.get("cruiseShip") || undefined;
+  const hint = cruiseShip ? CRUISE_ITINERARY_HINTS[cruiseShip as CruiseShipName] : undefined;
+  const port = inferPortFromCompany(company);
+  const matchedHint = hint && hint.portSlug === port ? hint : undefined;
+
+  let shipArrival: string | undefined = undefined;
+  let shipDeparture: string | undefined = undefined;
+  let shipWindow: string | undefined = undefined;
+
+  if (matchedHint) {
+    const windowMatch = matchedHint.window.match(/^(\d{1,2}:\d{2})\s*-\s*(\d{1,2}:\d{2})$/);
+    if (windowMatch) {
+      shipArrival = windowMatch[1];
+      shipDeparture = windowMatch[2];
+      shipWindow = matchedHint.window;
+    }
+  }
 
   function addToCart() {
     if (!selected || !ratePk) return;
@@ -121,9 +144,21 @@ export default function DayBookingClient({
     open();
   }
 
+  // Evaluate selected slot timing
+  const selectedEval = useMemo(() => {
+    if (!selected) return null;
+    const timeStr = selected.start_at.slice(11, 16);
+    return evaluatePortDayFit({
+      shipArrival,
+      shipDeparture,
+      tourStart: timeStr,
+      durationMinutes: tourDurationMinutes,
+    });
+  }, [selected, shipArrival, shipDeparture, tourDurationMinutes]);
+
   return (
-    <main className="min-h-screen bg-stone-50">
-      <div className="mx-auto max-w-3xl px-4 py-10 text-slate-900">
+    <main className="min-h-screen bg-stone-50 text-slate-900">
+      <div className="mx-auto max-w-3xl px-4 py-10">
         <Link
           href={`/tours/${company}/${item}/calendar`}
           className="inline-flex rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100"
@@ -136,28 +171,81 @@ export default function DayBookingClient({
           Choose a departure and passenger type, then add it to the cart.
         </p>
 
+        {cruiseShip && shipWindow && (
+          <div className="mt-4 p-4 rounded-xl border border-sky-100 bg-sky-50/50 text-sky-950 text-xs">
+            <strong>Cruise Schedule:</strong> {cruiseShip} is in port from {shipWindow} (All-aboard is 30m before departure). Excursion timing fit checks are displayed below.
+          </div>
+        )}
+
         <div className="mt-6 grid gap-2">
-          {slots.map((s) => (
-            <button
-              key={s.pk}
-              onClick={() => {
-                setSelected(s);
-                setRatePk(null);
-                setQty(1);
-              }}
-              className={[
-                "rounded-2xl border px-4 py-3 text-left transition",
-                selected?.pk === s.pk
-                  ? "border-slate-900 bg-slate-900 text-white"
-                  : "border-slate-200 bg-white hover:bg-slate-50",
-              ].join(" ")}
-            >
-              <div className="font-semibold">{fmtTime(s.start_at)}</div>
-              <div className={selected?.pk === s.pk ? "text-xs text-white/80" : "text-xs text-slate-600"}>
-                Capacity: {s.capacity ?? "?"}
-              </div>
-            </button>
-          ))}
+          {slots.map((s) => {
+            const timeStr = s.start_at.slice(11, 16);
+            const evalResult = evaluatePortDayFit({
+              shipArrival,
+              shipDeparture,
+              tourStart: timeStr,
+              durationMinutes: tourDurationMinutes,
+            });
+
+            const badgeConfig = {
+              safe: {
+                selected: "bg-emerald-800 text-emerald-100 border-emerald-700",
+                normal: "bg-emerald-100 text-emerald-800 border-emerald-200",
+                label: "✓ Safe return window",
+              },
+              tight: {
+                selected: "bg-amber-800 text-amber-100 border-amber-700",
+                normal: "bg-amber-100 text-amber-800 border-amber-200",
+                label: "⚠️ Tight return window",
+              },
+              unsafe: {
+                selected: "bg-rose-800 text-rose-100 border-rose-700",
+                normal: "bg-rose-100 text-rose-800 border-rose-200",
+                label: "✗ Timing warning",
+              },
+              unknown: {
+                selected: "bg-slate-700 text-slate-200 border-slate-600",
+                normal: "bg-slate-100 text-slate-600 border-slate-200",
+                label: cruiseShip ? "Verify ship schedules" : "Check ship window",
+              },
+            }[evalResult.status];
+
+            return (
+              <button
+                key={s.pk}
+                onClick={() => {
+                  setSelected(s);
+                  setRatePk(null);
+                  setQty(1);
+                }}
+                className={[
+                  "rounded-2xl border px-4 py-3 text-left transition flex items-center justify-between gap-4",
+                  selected?.pk === s.pk
+                    ? "border-slate-900 bg-slate-900 text-white"
+                    : "border-slate-200 bg-white hover:bg-slate-50",
+                ].join(" ")}
+              >
+                <div>
+                  <div className="font-semibold">{fmtTime(s.start_at)}</div>
+                  <div className={selected?.pk === s.pk ? "text-xs text-white/80" : "text-xs text-slate-600"}>
+                    Capacity: {s.capacity ?? "?"}
+                  </div>
+                </div>
+                <div className="flex flex-col items-end gap-1">
+                  <span className={`inline-flex items-center rounded border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${selected?.pk === s.pk ? badgeConfig.selected : badgeConfig.normal}`}>
+                    {badgeConfig.label}
+                  </span>
+                  {evalResult.status !== "unknown" && (
+                    <span className={`text-[10px] ${selected?.pk === s.pk ? "text-white/60" : "text-slate-400"}`}>
+                      {evalResult.status === "safe" || evalResult.status === "tight"
+                        ? `${evalResult.bufferMinutes}m return buffer`
+                        : "Tight/unsafe window"}
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
         </div>
 
         {!slots.length ? (
@@ -167,39 +255,49 @@ export default function DayBookingClient({
         ) : null}
 
         {selected && (
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="font-semibold">Choose passenger type</div>
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-6">
+            {selectedEval && selectedEval.status !== "unknown" && selectedEval.status !== "safe" && (
+              <div className={`p-4 rounded-xl border text-xs leading-5 ${selectedEval.status === "unsafe" ? "bg-rose-50 border-rose-200 text-rose-950" : "bg-amber-50 border-amber-200 text-amber-950"}`}>
+                <strong className="block uppercase tracking-wider text-[10px] font-black">
+                  {selectedEval.status === "unsafe" ? "Warning: Excursion Timing Conflict" : "Notice: Tight transfer buffer"}
+                </strong>
+                <span className="block mt-1">{selectedEval.reason} Verify your ship's actual all-aboard time.</span>
+              </div>
+            )}
 
-            <div className="mt-3 grid gap-2">
-              {rates.map((r) => (
-                <label
-                  key={r.ratePk}
-                  className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2"
-                >
-                  <div>
-                    <div className="text-sm font-semibold">{r.name}</div>
-                    <div className="text-xs text-slate-600">{r.note}</div>
-                    <div className="text-xs text-slate-500">Cap: {r.cap ?? "?"}</div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="text-sm font-semibold text-slate-800">
-                      ${((Number(r.price || 0)) / 100).toFixed(0)}
+            <div>
+              <div className="font-semibold">Choose passenger type</div>
+              <div className="mt-3 grid gap-2">
+                {rates.map((r) => (
+                  <label
+                    key={r.ratePk}
+                    className="flex items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 cursor-pointer"
+                  >
+                    <div>
+                      <div className="text-sm font-semibold">{r.name}</div>
+                      <div className="text-xs text-slate-600">{r.note}</div>
+                      <div className="text-xs text-slate-500">Cap: {r.cap ?? "?"}</div>
                     </div>
-                    <input
-                      type="radio"
-                      name="rate"
-                      checked={ratePk === r.ratePk}
-                      onChange={() => setRatePk(r.ratePk)}
-                    />
-                  </div>
-                </label>
-              ))}
+                    <div className="flex items-center gap-3">
+                      <div className="text-sm font-semibold text-slate-800">
+                        ${((Number(r.price || 0)) / 100).toFixed(0)}
+                      </div>
+                      <input
+                        type="radio"
+                        name="rate"
+                        checked={ratePk === r.ratePk}
+                        onChange={() => setRatePk(r.ratePk)}
+                      />
+                    </div>
+                  </label>
+                ))}
+              </div>
             </div>
 
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <div className="text-sm text-slate-600">Qty</div>
               <input
-                className="w-20 rounded-xl border border-slate-300 bg-white px-3 py-2"
+                className="w-20 rounded-xl border border-slate-300 bg-white px-3 py-2 text-slate-900"
                 type="number"
                 min={1}
                 value={qty}

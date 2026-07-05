@@ -1,7 +1,16 @@
 import {
   getFareHarborAvailabilities,
 } from "@/lib/fareharborAvailability";
+import { getHelicopterTour } from "@/lib/helicopterTours";
 import DayBookingClient, { type Slot } from "./DayBookingClient";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  robots: {
+    index: false,
+    follow: true,
+  },
+};
 
 function normalizeSlotsForDay(availabilities: any[], day: string): Slot[] {
   return availabilities
@@ -29,8 +38,20 @@ export default async function Page({
   params: Promise<{ company: string; item: string; day: string }>;
 }) {
   const { company, item, day } = await params;
-  const availabilities = await getFareHarborAvailabilities(company, item, day, day);
+  const [availabilities, tour] = await Promise.all([
+    getFareHarborAvailabilities(company, item, day, day),
+    getHelicopterTour(company, item),
+  ]);
   const initialSlots = normalizeSlotsForDay(availabilities, day);
+
+  let durationMinutes: number | null = null;
+  if (tour?.description) {
+    const durationMatch = tour.description.match(/\b(\d+(?:\.\d+)?)\s*Hours?\b/i);
+    if (durationMatch) {
+      const durationHours = parseFloat(durationMatch[1]);
+      durationMinutes = Math.round(durationHours * 60);
+    }
+  }
 
   return (
     <DayBookingClient
@@ -38,6 +59,7 @@ export default async function Page({
       item={item}
       day={day}
       initialSlots={initialSlots}
+      tourDurationMinutes={durationMinutes}
     />
   );
 }
