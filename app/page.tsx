@@ -36,7 +36,7 @@ export default function HomePage() {
               Juneau • Skagway • Ketchikan
             </div>
             <h1 className="text-3xl font-black uppercase tracking-tight sm:text-5xl lg:text-6xl leading-[0.95] text-white">
-              Alaska excursions that fit your port day.
+              Find Alaska excursions that fit your ship schedule.
             </h1>
             <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
               Choose your port, compare live excursions, and keep enough time to get back to your ship.
@@ -60,29 +60,53 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works Strip */}
-      <section className="bg-slate-900 border-y border-slate-800 py-8 text-white">
+      {/* Trust Cards Section */}
+      <section className="bg-sky-50 border-y border-sky-100 py-12">
         <div className="mx-auto max-w-5xl px-6">
-          <div className="grid gap-8 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-800 text-center md:text-left">
-            <div className="pt-6 md:pt-0 md:pl-6 first:pl-0 flex items-start gap-4 flex-col md:flex-row">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 font-black text-sm">1</span>
+          <h2 className="text-center text-2xl font-black text-slate-900 tracking-tight">
+            Why Cruisers Book with WTA
+          </h2>
+          <p className="mt-2 text-center text-xs text-slate-600">
+            The premier timing safety engine for independent Alaska excursions.
+          </p>
+          <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
               <div>
-                <h3 className="font-bold text-slate-100">Choose your port</h3>
-                <p className="mt-1 text-xs text-slate-400">Select Juneau, Skagway, or Ketchikan to see compatible excursions.</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">⚡</div>
+                <h3 className="mt-4 font-black text-slate-900 text-sm">Live Availability</h3>
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  Direct connection to real-time local operator calendars.
+                </p>
               </div>
             </div>
-            <div className="pt-6 md:pt-0 md:pl-6 flex items-start gap-4 flex-col md:flex-row">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 font-black text-sm">2</span>
+
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
               <div>
-                <h3 className="font-bold text-slate-100">Check your timing</h3>
-                <p className="mt-1 text-xs text-slate-400">Excursions are automatically cross-referenced with your ship's port times.</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">🏔️</div>
+                <h3 className="mt-4 font-black text-slate-900 text-sm">Real Operators</h3>
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  Run by fully licensed and top-rated local Alaskan outfits.
+                </p>
               </div>
             </div>
-            <div className="pt-6 md:pt-0 md:pl-6 flex items-start gap-4 flex-col md:flex-row">
-              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 font-black text-sm">3</span>
+
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
               <div>
-                <h3 className="font-bold text-slate-100">Book live availability</h3>
-                <p className="mt-1 text-xs text-slate-400">Secure your seats directly with direct operator inventory integration.</p>
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">🛡️</div>
+                <h3 className="mt-4 font-black text-slate-900 text-sm">Cruise Return Buffer</h3>
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  Strict 45-minute return safety margins applied automatically.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
+              <div>
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">💳</div>
+                <h3 className="mt-4 font-black text-slate-900 text-sm">Secure Checkout</h3>
+                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
+                  Protected payments processed securely via Stripe.
+                </p>
               </div>
             </div>
           </div>
@@ -185,32 +209,6 @@ export default function HomePage() {
             >
               Browse Ships
             </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust & Utility points */}
-      <section className="bg-slate-900/5 py-12 border-t border-slate-200">
-        <div className="mx-auto max-w-5xl px-6">
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="text-sm font-black text-slate-950 uppercase tracking-wider">Verified Capacity</h3>
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                Direct connection to operator inventories via FareHarbor API for live departure timings and seat counts.
-              </p>
-            </div>
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="text-sm font-black text-slate-955 uppercase tracking-wider">All-Aboard Sync</h3>
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                Excursion start and return times are automatically scored against ship arrival and all-aboard deadlines with safety margins.
-              </p>
-            </div>
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm">
-              <h3 className="text-sm font-black text-slate-955 uppercase tracking-wider">Protected Checkout</h3>
-              <p className="mt-2 text-xs leading-relaxed text-slate-600">
-                Confirm your booking instantly using direct payment intents processed securely via Stripe.
-              </p>
-            </div>
           </div>
         </div>
       </section>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getHelicopterTours } from "@/lib/helicopterTours";
+import { getProductOneLiner } from "@/lib/tourSeo";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { parseTimeToMinutes } from "@/lib/timing";
 
@@ -281,9 +282,9 @@ export default async function PortPage({
                           </div>
                         </div>
 
-                        {!isGenericDescription(tour.description || "") && tour.description && (
-                          <p className="text-xs text-slate-600 line-clamp-3">{tour.description}</p>
-                        )}
+                        <p className="text-xs text-slate-655 line-clamp-2">
+                          {getProductOneLiner(tour)}
+                        </p>
                       </div>
                       {tour.timingStatus !== "unknown" && (
                         <div className={`rounded-xl border px-3 py-2 text-xs font-semibold ${

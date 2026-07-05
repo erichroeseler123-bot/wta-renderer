@@ -1,5 +1,26 @@
 import type { HelicopterTour } from "@/lib/helicopterTours";
 
+export function getProductOneLiner(tour: { title?: string | null; category?: string | null; port?: string | null }) {
+  const title = (tour.title || "").toLowerCase();
+  const category = (tour.category || "").toLowerCase();
+  const port = (tour.port || "juneau").toLowerCase();
+  const portName = port.charAt(0).toUpperCase() + port.slice(1);
+  
+  if (title.includes("trek") || title.includes("walk") || title.includes("hike")) {
+    return `Ice trekking and guided glacier walks optimized for active cruise days in ${portName}.`;
+  }
+  if (title.includes("dog") || title.includes("sled") || title.includes("mush")) {
+    return `Premium glacier flightseeing and husky dog sledding tailored to fit your ${portName} timetable.`;
+  }
+  if (title.includes("helicopter") || title.includes("flight") || category.includes("air")) {
+    return `Helicopter flightseeing and glacier landing built for a shorter ${portName} port window.`;
+  }
+  if (title.includes("whale") || title.includes("watching") || category.includes("whale")) {
+    return `Auke Bay marine wildlife and humpback whale watching timed for a safe return to your ship.`;
+  }
+  return `${portName} adventure route with live date availability and safety buffer protections.`;
+}
+
 export function cleanTourDescription(description?: string | null, fallback?: string) {
   const source = String(description || fallback || "")
     .replace(/\$\$/g, "$")

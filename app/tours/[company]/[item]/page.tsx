@@ -519,10 +519,24 @@ export default async function TourDetailPage({
               </div>
             </div>
 
-            <div className="rounded-xl border border-slate-100 bg-slate-50 p-3 text-[10px] text-slate-500 space-y-1">
-              <div>• Secure payment processing via Stripe</div>
-              <div>• Instant operator confirmation on booking</div>
-              <div>• Cruise-day buffer protection guarantee</div>
+            <div className="rounded-2xl border border-sky-100 bg-sky-50/50 p-4 text-[11px] text-slate-700 space-y-2.5">
+              <span className="font-black text-slate-900 uppercase tracking-wider text-[9px] block">WTA Booking Guarantees</span>
+              <div className="flex gap-2">
+                <span>⚡</span>
+                <p className="leading-normal"><strong>Live Inventory:</strong> Calendars connect directly to operator departure schedules.</p>
+              </div>
+              <div className="flex gap-2">
+                <span>🏔️</span>
+                <p className="leading-normal"><strong>Direct Booking:</strong> Placed directly with verified Alaskan operators.</p>
+              </div>
+              <div className="flex gap-2">
+                <span>🛡️</span>
+                <p className="leading-normal"><strong>Safety Buffer:</strong> Enforces 45+ minute return margins before ship departs.</p>
+              </div>
+              <div className="flex gap-2">
+                <span>💳</span>
+                <p className="leading-normal"><strong>Secure Stripe:</strong> Protected checkouts with instant confirmations.</p>
+              </div>
             </div>
           </div>
         </section>

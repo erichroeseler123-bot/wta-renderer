@@ -4,7 +4,7 @@ import { useEffect, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { HelicopterTour } from "@/lib/helicopterTours";
-import { buildTourPriceLabel } from "@/lib/tourSeo";
+import { buildTourPriceLabel, getProductOneLiner } from "@/lib/tourSeo";
 import { canonicalizePortSlug } from "@/lib/dccSatellite";
 import {
   appendWidgetContextToSearchParams,
@@ -166,12 +166,9 @@ export function WidgetCatalog({
                   <h2 className="text-2xl font-black tracking-tight text-slate-900 leading-tight">
                     {tour.title}
                   </h2>
-                  
-                  {!isGenericDescription(tour.description || "") && tour.description && (
-                    <p className="text-xs leading-relaxed text-slate-600 line-clamp-1">
-                      {tour.description}
-                    </p>
-                  )}
+                  <p className="text-xs leading-relaxed text-slate-600 line-clamp-1">
+                    {getProductOneLiner(tour)}
+                  </p>
 
                   {/* Specifications Grid */}
                   <div className="grid grid-cols-3 gap-2 py-2 text-[10px] border-y border-slate-100 my-2">
