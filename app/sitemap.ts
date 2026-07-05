@@ -45,6 +45,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
+  const approvedGuides = [
+    "how-long-does-it-take-to-get-off-the-ship-in-juneau",
+    "how-long-does-it-take-to-get-off-the-ship-in-skagway",
+    "how-long-does-it-take-to-get-off-the-ship-in-ketchikan",
+    "how-long-does-it-take-to-get-off-the-ship-in-sitka",
+    "how-long-does-it-take-to-get-off-the-ship-in-icy-strait-point",
+    "how-long-does-it-take-to-get-off-the-ship-in-haines"
+  ];
+
+  const guideUrls = approvedGuides.map((slug) => ({
+    url: `${baseUrl}/guides/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
   const portUrls = approvedPorts.map((slug) => ({
     url: `${baseUrl}/ports/${slug}`,
     lastModified: new Date(),
@@ -71,8 +87,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.8,
     },
+    {
+      url: `${baseUrl}/guides`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.8,
+    },
     ...portUrls,
     ...categoryUrls,
+    ...guideUrls,
     ...tourUrls,
   ];
 }

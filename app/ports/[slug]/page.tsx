@@ -239,6 +239,16 @@ export default async function PortPage({
             <p className="mt-2 text-sm leading-6 text-slate-600">
               Never book a tour that doesn't leave at least a <strong>45-minute return buffer</strong> before your cruise ship's scheduled all-aboard time (30 minutes prior to departure).
             </p>
+            {["juneau", "skagway", "ketchikan", "sitka", "icy-strait-point", "haines"].includes(slug) && (
+              <div className="mt-3 pt-3 border-t border-sky-100">
+                <Link
+                  href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`}
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-sky-800 hover:text-sky-900 transition"
+                >
+                  Read disembarkation & timing guide for {portTitle} →
+                </Link>
+              </div>
+            )}
           </div>
         </section>
 
