@@ -119,6 +119,9 @@ function getNorthstarDisplayPrice(tour: Pick<HelicopterTour, "company" | "descri
 }
 
 async function loadLiveAvailabilitySummary(company: string, item: number) {
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return { fromPrice: undefined, nextAvailableDate: undefined, hasInventory: null as boolean | null };
+  }
   const appKey = String(process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "").trim();
   const userKey = String(process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "").trim();
 
@@ -193,6 +196,9 @@ function getLiveAvailabilitySummary(company: string, item: number) {
 }
 
 async function loadLiveItemDetails(company: string, item: number): Promise<{ imageGallery: string[] }> {
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return { imageGallery: [] as string[] };
+  }
   const appKey = String(process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "").trim();
   const userKey = String(process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "").trim();
 

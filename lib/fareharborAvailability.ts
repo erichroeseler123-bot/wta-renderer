@@ -100,6 +100,9 @@ async function getFreshFareHarborAvailabilities(
   start: string,
   end: string,
 ) {
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return [];
+  }
   const startDate = parseYmdUTC(start);
   const endDate = parseYmdUTC(end);
   const totalDays = daysBetweenInclusiveUTC(startDate, endDate);

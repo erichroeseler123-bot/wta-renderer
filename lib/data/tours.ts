@@ -74,6 +74,9 @@ function itemToTour(item: any, shortname: string): Tour {
 }
 
 export async function getToursFromFareHarbor(): Promise<Tour[]> {
+  if (process.env.NEXT_PHASE === "phase-production-build") {
+    return [];
+  }
   const companies = [
     'beyondak', 'alaska-galore-juneau-whale-watching', 'akhummer', 
     'alaskatales', 'aktraveladventures', 'exclusivealaska', 
