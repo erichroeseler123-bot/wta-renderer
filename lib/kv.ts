@@ -58,6 +58,10 @@ const localKV: KVClient = {
 };
 
 export async function getKV(): Promise<KVClient | null> {
+  if (process.env.USE_LOCAL_KV === "true" || process.env.NEXT_PUBLIC_USE_LOCAL_KV === "true") {
+    return localKV;
+  }
+
   const vercelUrl = readEnv("KV_REST_API_URL");
   const vercelToken = readEnv("KV_REST_API_TOKEN");
   if (vercelUrl && vercelToken) {

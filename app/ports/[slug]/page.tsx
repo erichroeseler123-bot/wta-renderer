@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { getHelicopterTours } from "@/lib/helicopterTours";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { parseTimeToMinutes, formatMinutesToTime } from "@/lib/timing";
@@ -92,7 +93,22 @@ export default async function PortPage({
 
   const resolvedSearch = await searchParams;
   const getParam = (value: string | string[] | undefined) => Array.isArray(value) ? String(value[0] || "") : String(value || "");
-  const cruiseShip = getParam(resolvedSearch.cruiseShip);
+  
+  // Resolve cookie intent
+  const cookieStore = await cookies();
+  const intentCookie = cookieStore.get("wta_dcc_intent");
+  let dccIntent: any = null;
+  if (intentCookie?.value) {
+    try {
+      dccIntent = JSON.parse(intentCookie.value);
+    } catch (_) {}
+  }
+
+  const cookieShip = dccIntent?.shipName || "";
+  const cookiePort = dccIntent?.port || "";
+  const isPortMatch = !cookiePort || cookiePort.toLowerCase() === slug.toLowerCase();
+  
+  const cruiseShip = getParam(resolvedSearch.cruiseShip) || (isPortMatch ? cookieShip : "");
 
   const info = PORT_INFO[slug];
   const portTitle = slug
