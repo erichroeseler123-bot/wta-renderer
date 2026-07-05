@@ -38,6 +38,9 @@ export default function HomePage() {
         {/* Dynamic Scheduler Form */}
         <div className="pt-4">
           <HomepageForm approvedPorts={APPROVED_PORTS} />
+          <div className="pt-3 text-xs text-slate-500 font-bold">
+            or <Link href="/tours" className="text-sky-800 hover:text-sky-900 underline">check Juneau Live Tour availability</Link> instantly.
+          </div>
         </div>
       </section>
 
@@ -146,14 +149,20 @@ export default function HomePage() {
           ))}
         </div>
 
-        <div className="pt-6 text-center">
-          <Link
-            href="/ships"
-            className="inline-flex rounded-2xl border border-sky-100 bg-sky-50/50 px-6 py-4 hover:shadow-sm transition text-slate-900 font-medium text-sm gap-2 items-center"
-          >
-            <span>🚢 Plan for your specific cruise ship?</span>
-            <span className="font-bold text-sky-800 hover:text-sky-900">Browse Cruise Ships →</span>
-          </Link>
+        <div className="pt-6 max-w-xl mx-auto">
+          <div className="rounded-[2rem] border border-sky-100 bg-sky-50/40 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div className="text-left space-y-1">
+              <span className="inline-block rounded bg-sky-100 px-2 py-0.5 text-[9px] font-black uppercase text-sky-850 tracking-wider">Cruise Planners</span>
+              <h4 className="text-sm font-black text-slate-950">Plan for your specific ship?</h4>
+              <p className="text-xs text-slate-600">Retrieve disembarkation buffer strategies for Edge, Bliss, and more.</p>
+            </div>
+            <Link
+              href="/ships"
+              className="rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition whitespace-nowrap shadow"
+            >
+              Browse Ships
+            </Link>
+          </div>
         </div>
       </section>
     </main>

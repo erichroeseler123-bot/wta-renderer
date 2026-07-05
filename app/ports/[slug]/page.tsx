@@ -226,33 +226,7 @@ export default async function PortPage({
               Enter or confirm your ship timing before relying on this fit. Excursions should leave a 45-minute return buffer before your ship's all-aboard time. You can browse specific timing guidelines for ships like the <Link href="/ships/celebrity-edge" className="font-bold underline">Celebrity Edge</Link> or <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link> in our <Link href="/ships" className="font-bold underline">cruise ship planners directory</Link>.
             </p>
           </section>
-        )}
-
-        {/* The Decision Problem */}
-        <section className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
-          <h2 className="text-2xl font-black tracking-tight text-slate-950">The Port-Day Decision Problem</h2>
-          <p className="mt-4 text-sm leading-7 text-slate-600">
-            {info.problem}
-          </p>
-          <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
-            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">Safety First</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-600">
-              Never book a tour that doesn't leave at least a <strong>45-minute return buffer</strong> before your cruise ship's scheduled all-aboard time (30 minutes prior to departure).
-            </p>
-            {["juneau", "skagway", "ketchikan", "sitka", "icy-strait-point", "haines"].includes(slug) && (
-              <div className="mt-3 pt-3 border-t border-sky-100">
-                <Link
-                  href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`}
-                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-sky-800 hover:text-sky-900 transition"
-                >
-                  Read disembarkation & timing guide for {portTitle} →
-                </Link>
-              </div>
-            )}
-          </div>
-        </section>
-
-        {/* Juneau Excursion Categories */}
+        )}        {/* Juneau Excursion Categories */}
         {slug === "juneau" && (
           <section className="mt-8">
             <div className="border-b border-slate-200 pb-3">
@@ -344,9 +318,9 @@ export default async function PortPage({
                       </div>
                       {tour.timingStatus !== "unknown" && (
                         <div className={`rounded-xl border px-3 py-2 text-xs font-semibold ${
-                          tour.timingStatus === "safe" ? "border-emerald-200 bg-emerald-50 text-emerald-950" :
-                          tour.timingStatus === "tight" ? "border-amber-200 bg-amber-50 text-amber-950" :
-                          "border-rose-200 bg-rose-50 text-rose-950"
+                          tour.timingStatus === "safe" ? "border-emerald-200 bg-emerald-50 text-emerald-955" :
+                          tour.timingStatus === "tight" ? "border-amber-200 bg-amber-50 text-amber-955" :
+                          "border-rose-200 bg-rose-50 text-rose-955"
                         }`}>
                           {tour.timingStatus === "safe" ? "✅ " : tour.timingStatus === "tight" ? "⚠️ " : "❌ "}
                           {tour.timingGuidanceText}
@@ -387,6 +361,30 @@ export default async function PortPage({
               </div>
             </div>
           )}
+        </section>
+
+        {/* The Decision Problem */}
+        <section className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
+          <h2 className="text-2xl font-black tracking-tight text-slate-955">The Port-Day Decision Problem</h2>
+          <p className="mt-4 text-sm leading-7 text-slate-655">
+            {info.problem}
+          </p>
+          <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
+            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">Safety First</h3>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              Never book a tour that doesn't leave at least a <strong>45-minute return buffer</strong> before your cruise ship's scheduled all-aboard time (30 minutes prior to departure).
+            </p>
+            {["juneau", "skagway", "ketchikan", "sitka", "icy-strait-point", "haines"].includes(slug) && (
+              <div className="mt-3 pt-3 border-t border-sky-100">
+                <Link
+                  href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`}
+                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-sky-800 hover:text-sky-900 transition"
+                >
+                  Read disembarkation & timing guide for {portTitle} →
+                </Link>
+              </div>
+            )}
+          </div>
         </section>
 
         {/* Action cards */}

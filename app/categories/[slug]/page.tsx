@@ -264,24 +264,6 @@ export default async function CategoryPage({
       </section>
 
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
-        {/* Timing Problem Card */}
-        <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
-          <h2 className="text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
-            The Port-Day Decision Challenge
-          </h2>
-          <p className="mt-4 text-sm leading-7 text-slate-600">
-            {config.problem}
-          </p>
-          <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
-            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">
-              Timing Guidance
-            </h3>
-            <p className="mt-2 text-sm leading-6 text-slate-700">
-              {config.guidance}
-            </p>
-          </div>
-        </section>
-
         {/* Live Tour Offerings or Honest Fallback */}
         <section className="mt-8 space-y-6">
           <div className="border-b border-slate-200 pb-3 flex justify-between items-center">
@@ -358,6 +340,24 @@ export default async function CategoryPage({
               </div>
             </div>
           )}
+        </section>
+
+        {/* Timing Problem Card */}
+        <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
+          <h2 className="text-xl font-black tracking-tight text-slate-955 sm:text-2xl">
+            The Port-Day Decision Challenge
+          </h2>
+          <p className="mt-4 text-sm leading-7 text-slate-655">
+            {config.problem}
+          </p>
+          <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
+            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">
+              Timing Guidance
+            </h3>
+            <p className="mt-2 text-sm leading-6 text-slate-700">
+              {config.guidance}
+            </p>
+          </div>
         </section>
 
         {/* FAQs */}
