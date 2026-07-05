@@ -426,6 +426,20 @@ export default async function TourDetailPage({
               Operated by <strong className="text-slate-800">{operatorName}</strong> in {portName}, Alaska
             </p>
 
+            {/* Mobile-only CTA and Price right below the operator */}
+            <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 lg:hidden">
+              <div>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Starting Price</span>
+                <span className="text-xl font-black text-slate-900">{safeTour.fromPrice || "Check Price"}</span>
+              </div>
+              <Link
+                href={bookingPageHref}
+                className="flex-1 max-w-[200px] rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
+              >
+                Book Now
+              </Link>
+            </div>
+
             {/* Main Hero Image */}
             <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-stone-200 shadow-md">
               <Image

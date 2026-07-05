@@ -170,9 +170,7 @@ export default async function PortPage({
   }
   if (!qs.get("port")) qs.set("port", slug);
   if (!qs.get("intent")) qs.set("intent", "best-for");
-  if (!qs.get("topic")) qs.set("topic", "shore-excursions");
-
-  return (
+  if (!qs.get("topic")) qs.set("topic", "shore-excursions");  return (
     <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
         <Link
@@ -188,20 +186,22 @@ export default async function PortPage({
             <img
               src={slug === "juneau" ? "/hero/juneau.jpg" : slug === "skagway" ? "/hero/skagway.jpg" : "/hero/ketchikan.png"}
               alt={`${portTitle} Shore Excursions`}
-              className="h-full w-full object-cover opacity-30"
+              className="h-full w-full object-cover opacity-60"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/20 md:bg-gradient-to-r md:from-slate-950/90 md:via-slate-950/60 md:to-transparent" />
           </div>
-          <div className="relative p-8 sm:p-12 max-w-2xl space-y-4">
-            <div className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-sky-300">
-              Port Planner
+          <div className="relative p-6 sm:p-10 max-w-2xl">
+            <div className="max-w-xl rounded-2xl border border-white/10 bg-slate-950/65 p-6 backdrop-blur-md space-y-3">
+              <div className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-sky-300">
+                Port Excursion Dashboard
+              </div>
+              <h1 className="text-3xl font-black uppercase tracking-tight sm:text-4xl leading-tight">
+                {portTitle} Shore Excursions
+              </h1>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Live availability verified against cruise timetables with safety return buffers.
+              </p>
             </div>
-            <h1 className="text-4xl font-black uppercase tracking-tight sm:text-5xl leading-none">
-              {portTitle} Shore Excursions
-            </h1>
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Real-time excursion capacity checked against cruise schedules. Enforcing strict return buffers so you never miss your ship.
-            </p>
           </div>
         </section>
 
@@ -227,65 +227,14 @@ export default async function PortPage({
           </section>
         )}
 
-        {/* Juneau Excursion Categories */}
-        {slug === "juneau" && (
-          <section className="mt-8">
-            <div className="border-b border-slate-200 pb-3">
-              <h2 className="text-2xl font-black tracking-tight text-slate-950">Excursion Categories in Juneau</h2>
-            </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Link
-                href="/categories/juneau-helicopter-tours"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Helicopter Tours</h3>
-                <p className="mt-1 text-xs text-slate-500">Compare icefield flight paths & glacier landings.</p>
-              </Link>
-              <Link
-                href="/categories/glacier-tours"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Glacier Ice Treks</h3>
-                <p className="mt-1 text-xs text-slate-500">Active glacier walks & guided ice climbs.</p>
-              </Link>
-              <Link
-                href="/categories/dog-sledding"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Glacier Dog Sledding</h3>
-                <p className="mt-1 text-xs text-slate-500">Helicopter shuttles to remote musher camps.</p>
-              </Link>
-              <Link
-                href="/categories/whale-watching"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Whale Watching</h3>
-                <p className="mt-1 text-xs text-slate-500">Spot humpback whales in Auke Bay.</p>
-              </Link>
-              <Link
-                href="/categories/mendenhall-glacier"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Mendenhall Glacier</h3>
-                <p className="mt-1 text-xs text-slate-500">Visitor center hikes & lake views.</p>
-              </Link>
-              <Link
-                href="/categories/flightseeing"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Flightseeing</h3>
-                <p className="mt-1 text-xs text-slate-500">Icefield flight paths and floatplanes.</p>
-              </Link>
-            </div>
-          </section>
-        )}
-
-        {/* Live Tour Offerings or Fallback */}
+        {/* Live Tour Offerings or Honest Fallback - Pushed to the top of the content */}
         <section className="mt-8 space-y-6">
           <div className="border-b border-slate-200 pb-3 flex justify-between items-center">
-            <h2 className="text-2xl font-black tracking-tight text-slate-955">Live Shore Excursions</h2>
+            <h2 className="text-2xl font-black tracking-tight text-slate-950">
+              {slug === "juneau" ? "Live Shore Excursions" : `${portTitle} Excursion Planners`}
+            </h2>
             {hasLiveTours && (
-              <span className="rounded bg-sky-105 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
+              <span className="rounded bg-sky-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
                 Verified Capacity
               </span>
             )}
@@ -361,30 +310,97 @@ export default async function PortPage({
               })}
             </div>
           ) : (
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 text-center space-y-4">
-              <p className="text-sm leading-relaxed text-slate-600 max-w-xl mx-auto">
-                We are currently building this port’s excursion list. Select another port or configure your ship timing to check compatible options.
-              </p>
-              <div className="pt-2 flex flex-wrap gap-3 justify-center">
+            <div className="grid gap-6 md:grid-cols-2">
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
+                <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 block">Cruiser Alert</span>
+                <h3 className="text-lg font-bold text-slate-900 leading-snug">Rigid Excursion Timings</h3>
+                <p className="text-xs leading-relaxed text-slate-600">
+                  {slug === "skagway" 
+                    ? "Skagway's railway and helicopter tours operate on rigid timetables. Navigating train transfers and flight durations without overlapping your ship's all-aboard window is a critical challenge." 
+                    : "Ketchikan excursions take place in remote wilderness locations. Selecting the right tour depends directly on tracking precise transfer times to and from the cruise docks safely."}
+                </p>
                 <Link
-                  href={`/plan?${qs.toString()}`}
-                  className="rounded-xl bg-slate-900 px-5 py-3 text-xs font-bold text-white hover:bg-slate-800 transition"
+                  href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`}
+                  className="text-xs font-bold text-sky-850 block hover:underline"
                 >
-                  Configure Timing Guidance
+                  Read disembarkation guide →
                 </Link>
+              </div>
+
+              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
+                <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block">Active Planning</span>
+                <h3 className="text-lg font-bold text-slate-900 leading-snug">Verify Schedule Compatibility</h3>
+                <p className="text-xs leading-relaxed text-slate-600">
+                  {slug === "skagway"
+                    ? " Broadway and Ore docks are walkable, but Railroad Dock requires a 10-15 minute walk. White Pass train departures require prompt gangway clearing."
+                    : "Berths 1-4 sit right downtown. Ward Cove terminal is 7 miles north and requires a mandatory 20-minute shuttle bus downtown, which can add up to 45 minutes of wait time."}
+                </p>
                 <Link
                   href="/tours"
-                  className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition"
+                  className="text-xs font-bold text-sky-850 block hover:underline"
                 >
-                  Browse Live Alaska Tours
+                  Browse all active excursions →
                 </Link>
               </div>
             </div>
           )}
         </section>
 
+        {/* Juneau Excursion Categories - Pushed lower down */}
+        {slug === "juneau" && (
+          <section className="mt-8">
+            <div className="border-b border-slate-200 pb-3">
+              <h2 className="text-2xl font-black tracking-tight text-slate-955">Browse Juneau Categories</h2>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <Link
+                href="/categories/juneau-helicopter-tours"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Helicopter Tours</h3>
+                <p className="mt-1 text-xs text-slate-500">Compare icefield flight paths & glacier landings.</p>
+              </Link>
+              <Link
+                href="/categories/glacier-tours"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Glacier Ice Treks</h3>
+                <p className="mt-1 text-xs text-slate-500">Active glacier walks & guided ice climbs.</p>
+              </Link>
+              <Link
+                href="/categories/dog-sledding"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Glacier Dog Sledding</h3>
+                <p className="mt-1 text-xs text-slate-500">Helicopter shuttles to remote musher camps.</p>
+              </Link>
+              <Link
+                href="/categories/whale-watching"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Whale Watching</h3>
+                <p className="mt-1 text-xs text-slate-500">Spot humpback whales in Auke Bay.</p>
+              </Link>
+              <Link
+                href="/categories/mendenhall-glacier"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Mendenhall Glacier</h3>
+                <p className="mt-1 text-xs text-slate-500">Visitor center hikes & lake views.</p>
+              </Link>
+              <Link
+                href="/categories/flightseeing"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Flightseeing</h3>
+                <p className="mt-1 text-xs text-slate-500">Icefield flight paths and floatplanes.</p>
+              </Link>
+            </div>
+          </section>
+        )}
+
         {/* The Decision Problem */}
-        <section className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
+        <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
           <h2 className="text-2xl font-black tracking-tight text-slate-955">The Port-Day Decision Problem</h2>
           <p className="mt-4 text-sm leading-7 text-slate-600">
             {info.problem}
@@ -414,7 +430,7 @@ export default async function PortPage({
             className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 block"
           >
             <div className="text-[11px] font-black uppercase tracking-[0.18em] text-sky-700">Interactive Chooser</div>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950">Match Excursions to Ship Window</h2>
+            <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-955">Match Excursions to Ship Window</h2>
             <p className="mt-3 text-sm leading-7 text-slate-600">
               Input your cruise line, ship, and date to calculate timing safety buffers and see a scored shortlist of matching tours.
             </p>
@@ -426,7 +442,7 @@ export default async function PortPage({
             className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 block"
           >
             <div className="text-[11px] font-black uppercase tracking-[0.18em] text-sky-700">Browse Catalog</div>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-950">View All Excursions</h2>
+            <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-955">View All Excursions</h2>
             <p className="mt-3 text-sm leading-7 text-slate-600">
               Explore the complete catalog of excursions, view operator details, and check live availability directly on the calendar.
             </p>

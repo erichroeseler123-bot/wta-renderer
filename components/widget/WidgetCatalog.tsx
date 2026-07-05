@@ -172,13 +172,26 @@ export function WidgetCatalog({
                       {tour.description}
                     </p>
                   )}
-                  
-                  <div className="text-xs font-semibold text-slate-500">
-                    {tour.fromPrice && tour.nextAvailableDate
-                      ? `${priceLabel} • Next available ${tour.nextAvailableDate}`
-                      : tour.nextAvailableDate
-                        ? `Next available ${tour.nextAvailableDate}`
-                        : priceLabel}
+
+                  {/* Specifications Grid */}
+                  <div className="grid grid-cols-3 gap-2 py-2 text-[10px] border-y border-slate-100 my-2">
+                    <div>
+                      <span className="text-slate-400 block font-bold uppercase tracking-wider text-[8px]">Duration</span>
+                      <span className="font-extrabold text-slate-800">{(() => {
+                        const m = (tour.description || "").match(/\b(\d+(?:\.\d+)?)\s*Hours?\b/i);
+                        return m ? `${m[1]} Hours` : "2-3 Hours";
+                      })()}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block font-bold uppercase tracking-wider text-[8px]">From Price</span>
+                      <span className="font-extrabold text-slate-800">{priceLabel}</span>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block font-bold uppercase tracking-wider text-[8px]">Availability</span>
+                      <span className={`font-extrabold ${hasNextAvailability ? "text-emerald-700" : "text-amber-700"}`}>
+                        {hasNextAvailability ? "Live Dates" : "Check Calendar"}
+                      </span>
+                    </div>
                   </div>
                 </div>
                 

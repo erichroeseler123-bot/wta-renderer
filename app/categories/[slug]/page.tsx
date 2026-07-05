@@ -350,12 +350,12 @@ export default async function CategoryPage({
         </section>
 
         {/* Timing Problem Card */}
-        <section className="mt-8 grid gap-6 md:grid-cols-2">
+        <section className="mt-8 grid gap-6 md:grid-cols-3">
           <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
               Good For
             </h3>
-            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+            <p className="mt-2 text-xs leading-relaxed text-slate-655">
               Ideal for cruisers seeking premium glacier views, flightseeing thrills, and direct schedule checks.
             </p>
           </div>
@@ -363,8 +363,16 @@ export default async function CategoryPage({
             <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
               Watch Out
             </h3>
-            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+            <p className="mt-2 text-xs leading-relaxed text-slate-655">
               Weather cancellations can occur. Always check operator refund rules and schedule early departures.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+              Timing Note
+            </h3>
+            <p className="mt-2 text-xs leading-relaxed text-slate-655">
+              Maintain a minimum 45-minute return buffer (60 minutes for flights) before your ship's scheduled all-aboard time.
             </p>
           </div>
         </section>
