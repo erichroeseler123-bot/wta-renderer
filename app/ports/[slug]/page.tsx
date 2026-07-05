@@ -4,17 +4,12 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { getHelicopterTours } from "@/lib/helicopterTours";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
-import { parseTimeToMinutes, formatMinutesToTime } from "@/lib/timing";
+import { parseTimeToMinutes } from "@/lib/timing";
 
 const APPROVED_PORTS = [
   "juneau",
   "skagway",
-  "ketchikan",
-  "sitka",
-  "icy-strait-point",
-  "haines",
-  "seward",
-  "whittier"
+  "ketchikan"
 ];
 
 const PORT_INFO: Record<string, { title: string; description: string; problem: string }> = {
@@ -32,32 +27,12 @@ const PORT_INFO: Record<string, { title: string; description: string; problem: s
     title: "Ketchikan Cruise Port Excursions | Welcome To Alaska Tours",
     description: "Compare Ketchikan rainforest tours, kayak adventures, and wilderness excursions that sync with your port schedule.",
     problem: "Ketchikan is known for sudden weather changes and remote wilderness excursions. Selecting the right tour depends on tracking precise transfer times to and from the cruise docks safely."
-  },
-  sitka: {
-    title: "Sitka Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Choose Sitka wildlife tours, marine excursions, and historic sights tailored to your cruise ship arrival and departure.",
-    problem: "Sitka's cruise docks are located outside the main town area, meaning travelers factor in shuttle transfer times when aligning excursion end times with their ship's all-aboard deadline."
-  },
-  "icy-strait-point": {
-    title: "Icy Strait Point Excursions | Welcome To Alaska Tours",
-    description: "Find Icy Strait Point ziprider, whale watching, and native heritage tours that fit your ship's port day timeline.",
-    problem: "Icy Strait Point offers high-adventure excursions but limited time blocks. Ensuring your whale watching or ziprider trip doesn't conflict with ship timing is critical for a stress-free day."
-  },
-  haines: {
-    title: "Haines Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Discover Haines rafting, wildlife, and cultural excursions that align with your cruise ship schedule.",
-    problem: "Haines often requires ferry transfers if your ship is docked in Skagway, or has limited local tour slots. Timing your excursions requires tracking both ferry and ship schedules carefully."
-  },
-  seward: {
-    title: "Seward Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Plan your Seward fjord cruises, glacier tours, and hiking trips matching your ship's departure timing.",
-    problem: "Seward serves as a major turnaround port where travelers are either embarking, disembarking, or visiting for a single port day. Coordinating land transfers and boat tours is highly timing-sensitive."
-  },
-  whittier: {
-    title: "Whittier Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Compare Whittier glacier cruises and tunnel-dependent excursions that safely fit your cruise schedule.",
-    problem: "Whittier is accessed via a single-lane shared tunnel with strict hourly opening schedules. Miscalculating tunnel transit times can lead to missing your tour or your ship's all-aboard time."
   }
+};
+
+const isGenericDescription = (desc: string) => {
+  const d = desc.toLowerCase();
+  return d.includes("cruise-friendly") || d.includes("memorable day in port") || d.includes("without wasting time");
 };
 
 export async function generateMetadata({
@@ -198,26 +173,34 @@ export default async function PortPage({
   if (!qs.get("topic")) qs.set("topic", "shore-excursions");
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#eef7ff_0%,#f8fafc_42%,#ffffff_100%)] text-slate-950">
+    <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
         <Link
           href="/ports"
-          className="inline-flex rounded-xl border border-sky-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-white"
+          className="inline-flex rounded-xl border border-sky-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-50 transition"
         >
           Back to ports
         </Link>
 
         {/* Hero Section */}
-        <section className="mt-6 overflow-hidden rounded-[2rem] border border-sky-100 bg-[linear-gradient(135deg,#082f49_0%,#0f172a_42%,#134e4a_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.14)] sm:p-8">
-          <div className="max-w-3xl">
-            <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-100">
-              Port Guide
+        <section className="relative mt-6 overflow-hidden rounded-[2.5rem] bg-slate-950 text-white shadow-lg">
+          <div className="absolute inset-0">
+            <img
+              src={slug === "juneau" ? "/hero/juneau.jpg" : slug === "skagway" ? "/hero/skagway.jpg" : "/hero/ketchikan.png"}
+              alt={`${portTitle} Shore Excursions`}
+              className="h-full w-full object-cover opacity-30"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+          </div>
+          <div className="relative p-8 sm:p-12 max-w-2xl space-y-4">
+            <div className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest text-sky-300">
+              Port Planner
             </div>
-            <h1 className="mt-4 text-4xl font-black tracking-tight sm:text-5xl">
+            <h1 className="text-4xl font-black uppercase tracking-tight sm:text-5xl leading-none">
               {portTitle} Shore Excursions
             </h1>
-            <p className="mt-2 text-sm text-white/80 max-w-2xl mx-auto">
-              **Port-Day Fit** checks. Real-time availability verified against ship arrival and all-aboard deadlines. Strict **45-minute return buffer** enforced.
+            <p className="text-sm text-slate-300 leading-relaxed">
+              Real-time excursion capacity checked against cruise schedules. Enforcing strict return buffers so you never miss your ship.
             </p>
           </div>
         </section>
@@ -248,7 +231,7 @@ export default async function PortPage({
         {slug === "juneau" && (
           <section className="mt-8">
             <div className="border-b border-slate-200 pb-3">
-              <h2 className="text-2xl font-black tracking-tight text-slate-955">Excursion Categories in Juneau</h2>
+              <h2 className="text-2xl font-black tracking-tight text-slate-950">Excursion Categories in Juneau</h2>
             </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <Link
@@ -297,12 +280,12 @@ export default async function PortPage({
           </section>
         )}
 
-        {/* Live Tour Offerings or Honest Fallback */}
+        {/* Live Tour Offerings or Fallback */}
         <section className="mt-8 space-y-6">
           <div className="border-b border-slate-200 pb-3 flex justify-between items-center">
             <h2 className="text-2xl font-black tracking-tight text-slate-955">Live Shore Excursions</h2>
             {hasLiveTours && (
-              <span className="rounded bg-sky-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
+              <span className="rounded bg-sky-105 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
                 Verified Capacity
               </span>
             )}
@@ -349,7 +332,9 @@ export default async function PortPage({
                           </div>
                         </div>
 
-                        <p className="text-xs text-slate-600 line-clamp-3">{tour.description}</p>
+                        {!isGenericDescription(tour.description || "") && tour.description && (
+                          <p className="text-xs text-slate-600 line-clamp-3">{tour.description}</p>
+                        )}
                       </div>
                       {tour.timingStatus !== "unknown" && (
                         <div className={`rounded-xl border px-3 py-2 text-xs font-semibold ${
@@ -378,7 +363,7 @@ export default async function PortPage({
           ) : (
             <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 text-center space-y-4">
               <p className="text-sm leading-relaxed text-slate-600 max-w-xl mx-auto">
-                We are building this port’s live excursion set. Currently, our live FareHarbor integration only offers active products in Juneau. Start with our timing guidance tool or check live availability in Juneau.
+                We are currently building this port’s excursion list. Select another port or configure your ship timing to check compatible options.
               </p>
               <div className="pt-2 flex flex-wrap gap-3 justify-center">
                 <Link
@@ -401,7 +386,7 @@ export default async function PortPage({
         {/* The Decision Problem */}
         <section className="mt-6 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
           <h2 className="text-2xl font-black tracking-tight text-slate-955">The Port-Day Decision Problem</h2>
-          <p className="mt-4 text-sm leading-7 text-slate-655">
+          <p className="mt-4 text-sm leading-7 text-slate-600">
             {info.problem}
           </p>
           <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
@@ -409,7 +394,7 @@ export default async function PortPage({
             <p className="mt-2 text-sm leading-6 text-slate-700">
               Never book a tour that doesn't leave at least a <strong>45-minute return buffer</strong> before your cruise ship's scheduled all-aboard time (30 minutes prior to departure).
             </p>
-            {["juneau", "skagway", "ketchikan", "sitka", "icy-strait-point", "haines"].includes(slug) && (
+            {["juneau", "skagway", "ketchikan"].includes(slug) && (
               <div className="mt-3 pt-3 border-t border-sky-100">
                 <Link
                   href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`}

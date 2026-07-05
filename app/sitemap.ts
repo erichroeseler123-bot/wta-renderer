@@ -21,12 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const approvedPorts = [
     "juneau",
     "skagway",
-    "ketchikan",
-    "sitka",
-    "icy-strait-point",
-    "haines",
-    "seward",
-    "whittier"
+    "ketchikan"
   ];
 
   const approvedCategories = [
@@ -48,10 +43,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const approvedGuides = [
     "how-long-does-it-take-to-get-off-the-ship-in-juneau",
     "how-long-does-it-take-to-get-off-the-ship-in-skagway",
-    "how-long-does-it-take-to-get-off-the-ship-in-ketchikan",
-    "how-long-does-it-take-to-get-off-the-ship-in-sitka",
-    "how-long-does-it-take-to-get-off-the-ship-in-icy-strait-point",
-    "how-long-does-it-take-to-get-off-the-ship-in-haines"
+    "how-long-does-it-take-to-get-off-the-ship-in-ketchikan"
   ];
 
   const guideUrls = approvedGuides.map((slug) => ({

@@ -7,9 +7,6 @@ const APPROVED_SLUGS = [
   "how-long-does-it-take-to-get-off-the-ship-in-juneau",
   "how-long-does-it-take-to-get-off-the-ship-in-skagway",
   "how-long-does-it-take-to-get-off-the-ship-in-ketchikan",
-  "how-long-does-it-take-to-get-off-the-ship-in-sitka",
-  "how-long-does-it-take-to-get-off-the-ship-in-icy-strait-point",
-  "how-long-does-it-take-to-get-off-the-ship-in-haines",
 ];
 
 type TourType = {
@@ -114,81 +111,6 @@ const GUIDE_CONFIGS: Record<string, GuideConfig> = {
       {
         question: "Is there anything to do at the Ward Cove dock?",
         answer: "Ward Cove features a large indoor terminal with retail, history displays, and restrooms, but the primary sights and tour connections are in downtown Ketchikan.",
-      },
-    ],
-  },
-  "how-long-does-it-take-to-get-off-the-ship-in-sitka": {
-    slug: "how-long-does-it-take-to-get-off-the-ship-in-sitka",
-    portSlug: "sitka",
-    portName: "Sitka",
-    title: "How Long to Get Off Cruise Ship in Sitka",
-    metaTitle: "How Long Does It Take to Get Off the Cruise Ship in Sitka? | WTA",
-    metaDescription: "Sitka cruise ship disembarkation timing, Halibut Point Marine shuttle guide, tendering details, and tour safety margins.",
-    headline: "How Long Does It Take to Get Off the Cruise Ship in Sitka?",
-    intro: "Sitka offers a unique, wild cruise stop, but its disembarkation logistics involve a 5-mile shuttle transit or occasional tendering that passengers must plan around.",
-    quickAnswer: "Expect 30 to 45 minutes. The cruise dock is 5 miles outside town, requiring a 10-15 minute shuttle ride. If your ship tenders, allow 45 to 60 minutes.",
-    dockingDetails: "Most ships dock at the Halibut Point Marine Terminal. A free shuttle bus transports guests to Harrigan Centennial Hall downtown. If the dock is full, ships anchor in the bay and tender guests to Centennial Hall via boat.",
-    gangwayTime: "Gangways open 20 minutes after arrival. For docking, shuttle bus loading starts immediately. For tendering, elite loyalty members and ship-booked tours get tender priority, causing delays for independent guests.",
-    transitToTours: "Almost all independent whale-watching and marine wildlife tours depart from the Crescent Harbor or downtown docks near Centennial Hall, where the shuttle drops you off.",
-    timingRule: "Allow at least a 60-minute buffer from ship arrival before your tour departs. If your ship tenders, make it 75 minutes.",
-    faqs: [
-      {
-        question: "Is Sitka a tender port?",
-        answer: "Usually no, as most ships dock at Halibut Point. However, if more than two ships are in port, additional ships will anchor and tender.",
-      },
-      {
-        question: "How much does the Sitka shuttle cost?",
-        answer: "The shuttle bus from Halibut Point Marine Terminal to Centennial Hall downtown is completely free and runs continuously.",
-      },
-    ],
-  },
-  "how-long-does-it-take-to-get-off-the-ship-in-icy-strait-point": {
-    slug: "how-long-does-it-take-to-get-off-the-ship-in-icy-strait-point",
-    portSlug: "icy-strait-point",
-    portName: "Icy Strait Point",
-    title: "How Long to Get Off Cruise Ship in Icy Strait Point",
-    metaTitle: "How Long Does It Take to Get Off the Cruise Ship in Icy Strait Point? | WTA",
-    metaDescription: "Icy Strait Point disembarkation timings, Wilderness Landing vs Adventure Landing, gondola transfers, and timing guides.",
-    headline: "How Long Does It Take to Get Off the Cruise Ship in Icy Strait Point?",
-    intro: "Icy Strait Point is a private, native-owned cruise destination in Hoonah. It is highly streamlined for cruise traffic, but its double-dock layout requires a quick transit check.",
-    quickAnswer: "Generally 15 to 25 minutes. Walking off either pier is quick, but transferring between the two terminals requires a ride on the Trans-Porter gondola.",
-    dockingDetails: "The port has two piers: Adventure Landing (near the old cannery) and Wilderness Landing. Wilderness Landing requires riding a free, high-speed gondola (the Trans-Porter) to reach the main cannery area where most tours check in.",
-    gangwayTime: "Piers are purpose-built for modern ships, enabling fast gangway clearance within 15 minutes of port authority approval.",
-    transitToTours: "Excursions depart from either the Wilderness Departure Center or the Adventure Center. Check your tour ticket to see which terminal zone your operator uses.",
-    timingRule: "A 30-minute buffer is usually sufficient to exit the ship and walk to the tour centers. Add 15 minutes if you need to ride the Trans-Porter gondola.",
-    faqs: [
-      {
-        question: "Is Icy Strait Point a tender port?",
-        answer: "No, all ships dock at one of the two modern deep-water piers.",
-      },
-      {
-        question: "How long is the gondola ride between terminals?",
-        answer: "The Trans-Porter gondola ride takes only 3 minutes, but queue lines can form if multiple large ships are in port.",
-      },
-    ],
-  },
-  "how-long-does-it-take-to-get-off-the-ship-in-haines": {
-    slug: "how-long-does-it-take-to-get-off-the-ship-in-haines",
-    portSlug: "haines",
-    portName: "Haines",
-    title: "How Long to Get Off Cruise Ship in Haines",
-    metaTitle: "How Long Does It Take to Get Off the Cruise Ship in Haines? | WTA",
-    metaDescription: "Haines disembarkation guide, PC dock walking paths, tendering details, and tour check-in timing.",
-    headline: "How Long Does It Take to Get Off the Cruise Ship in Haines?",
-    intro: "Haines is a quiet, authentic Alaska town. Docks are located close to downtown, making Haines one of the easiest ports for disembarkation.",
-    quickAnswer: "15 to 20 minutes. Walking from the ship to the town center takes less than 10 minutes along a flat, scenic path.",
-    dockingDetails: "Ships dock at the Port Chilkoot Dock (PC Dock), situated right at Fort William H. Seward. Occasional large ships anchor and tender to the same pier.",
-    gangwayTime: "Very rapid gangway setup. The lack of port congestion means you can walk off with almost no queues.",
-    transitToTours: "Most local rafting and wildlife tours meet directly at the end of the PC Dock or pick up from the Port Chilkoot Parade Grounds.",
-    timingRule: "A 30-minute buffer is highly safe for Haines independent tours, as walk times are negligible.",
-    faqs: [
-      {
-        question: "Is Haines a tender port?",
-        answer: "Typically no, ships dock at the PC Dock. Tendering is only used as a backup when the pier is occupied by another vessel.",
-      },
-      {
-        question: "Can I walk to Fort Seward from the ship?",
-        answer: "Yes, Fort Seward is directly adjacent to the PC Dock. You will walk right through it on your way into Haines.",
       },
     ],
   },
@@ -388,7 +310,7 @@ export default async function GuideSlugPage({
           ) : (
             <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 text-center space-y-4">
               <p className="text-sm leading-relaxed text-slate-600 max-w-2xl mx-auto">
-                Live inventory for this port is still being expanded. Use this guide to understand timing, disembarkation, and to configure your port-day fit.
+                Live excursions list for this port is currently being verified. Configure your ship timing below to calculate compatible safety buffers.
               </p>
               <div className="pt-2 flex flex-wrap gap-3 justify-center">
                 <Link
@@ -413,7 +335,7 @@ export default async function GuideSlugPage({
           <h2 className="text-sm font-black uppercase tracking-wider text-rose-800">
             Critical Safety Rule
           </h2>
-          <p className="mt-3 text-base font-bold text-slate-950">
+          <p className="mt-3 text-base font-bold text-slate-955">
             {config.timingRule}
           </p>
           <p className="mt-2 text-xs text-slate-600">

@@ -38,6 +38,11 @@ type CategoryConfig = {
   matchFilter: (tour: TourType) => boolean;
 };
 
+const isGenericDescription = (desc: string) => {
+  const d = desc.toLowerCase();
+  return d.includes("cruise-friendly") || d.includes("memorable day in port") || d.includes("without wasting time");
+};
+
 const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   "juneau-helicopter-tours": {
     slug: "juneau-helicopter-tours",
@@ -112,12 +117,12 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     slug: "whale-watching",
     title: "Whale Watching Tours",
     metaTitle: "Juneau Whale Watching Tours | Cruise Shore Day Guidelines",
-    metaDescription: "Plan your Juneau whale watching excursion. Review timing, transit logistics, and port-day fit details. (Live inventory expanding soon).",
+    metaDescription: "Plan your Juneau whale watching excursion. Review timing, transit logistics, and port-day fit details.",
     headline: "Juneau Whale Watching Excursions",
     intro: "Witness Humpback whales feeding in the cold waters of Auke Bay. Whale watching is a must-do in Juneau, offering a near-100% sighting guarantee during the summer season.",
     problem: "Whale watching boats depart from Auke Bay Harbor, located a 25-minute drive from the cruise ship docks. Shuttle transit times must be accounted for to prevent missing your ship.",
     guidance: "Always confirm if your tour price includes round-trip shuttle transportation from the cruise docks. Ensure your tour return leaves a 45-minute buffer before your ship's scheduled all-aboard time.",
-    matchFilter: () => false, // No live inventory in local snapshot
+    matchFilter: () => false,
     faqs: [
       {
         question: "Where do whale watching tours depart in Juneau?",
@@ -264,10 +269,10 @@ export default async function CategoryPage({
       </section>
 
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
-        {/* Live Tour Offerings or Honest Fallback */}
+        {/* Live Tour Offerings or Fallback */}
         <section className="mt-8 space-y-6">
           <div className="border-b border-slate-200 pb-3 flex justify-between items-center">
-            <h2 className="text-xl font-black tracking-tight text-slate-950 sm:text-2xl">
+            <h2 className="text-xl font-black tracking-tight text-slate-955 sm:text-2xl">
               Category Shore Excursions
             </h2>
             {hasLiveTours && (
@@ -296,12 +301,14 @@ export default async function CategoryPage({
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
                         {tour.category || config.title}
                       </span>
-                      <h3 className="text-lg font-black tracking-tight text-slate-900">
+                      <h3 className="text-lg font-black tracking-tight text-slate-900 leading-tight">
                         {tour.title}
                       </h3>
-                      <p className="text-xs text-slate-600 line-clamp-3">
-                        {tour.description}
-                      </p>
+                      {!isGenericDescription(tour.description || "") && tour.description && (
+                        <p className="text-xs text-slate-650 line-clamp-1">
+                          {tour.description}
+                        </p>
+                      )}
                     </div>
 
                     <div className="pt-4 flex items-center justify-between border-t border-slate-100">
@@ -322,7 +329,7 @@ export default async function CategoryPage({
           ) : (
             <div className="rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8 text-center space-y-4">
               <p className="text-sm leading-relaxed text-slate-600 max-w-2xl mx-auto">
-                Live inventory for this category is still being expanded. Use this page to understand timing, port-day fit, and current available Alaska options.
+                Live excursions for this category are currently being verified. Configure your ship timing below to calculate compatible safety buffers.
               </p>
               <div className="pt-2 flex flex-wrap gap-3 justify-center">
                 <Link
@@ -343,6 +350,25 @@ export default async function CategoryPage({
         </section>
 
         {/* Timing Problem Card */}
+        <section className="mt-8 grid gap-6 md:grid-cols-2">
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+              Good For
+            </h3>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+              Ideal for cruisers seeking premium glacier views, flightseeing thrills, and direct schedule checks.
+            </p>
+          </div>
+          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h3 className="text-sm font-black text-slate-900 uppercase tracking-wider">
+              Watch Out
+            </h3>
+            <p className="mt-2 text-xs leading-relaxed text-slate-600">
+              Weather cancellations can occur. Always check operator refund rules and schedule early departures.
+            </p>
+          </div>
+        </section>
+
         <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
           <h2 className="text-xl font-black tracking-tight text-slate-955 sm:text-2xl">
             All-Aboard Sync Mappings
@@ -389,7 +415,7 @@ export default async function CategoryPage({
               Destination Guide
             </span>
             <span className="mt-2 text-sm font-bold text-slate-900 block">
-              Juneau Cruise Port day Guide
+              Juneau Cruise Port Day Guide
             </span>
           </Link>
           <Link

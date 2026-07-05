@@ -32,16 +32,13 @@ const SHIP_CONFIGS: Record<string, ShipConfig> = {
     name: "Celebrity Edge",
     line: "Celebrity Cruises",
     timingRisk: "Standard risk. Wind and low ceilings can shift glacier landing times.",
-    disembarkNote: "Docks downtown. 15-20 min walk-off. Sitka visits tender.",
+    disembarkNote: "Docks downtown. 15-20 min walk-off.",
     bookingStatus: "Active for Juneau helicopter flightseeing and dog sledding.",
     ctaUrl: "/ports/juneau?cruiseShip=Celebrity+Edge",
     ports: [
       { name: "Juneau", slug: "juneau", note: "Franklin Street docks. 15-min walk-off.", hasGuide: true },
       { name: "Skagway", slug: "skagway", note: "Railroad Dock. Long walk to town gate.", hasGuide: true },
       { name: "Ketchikan", slug: "ketchikan", note: "Downtown berths. Instant walk-off.", hasGuide: true },
-      { name: "Sitka", slug: "sitka", note: "Tendering or Halibut Point shuttle.", hasGuide: true },
-      { name: "Icy Strait Point", slug: "icy-strait-point", note: "Wilderness Landing gondola transit.", hasGuide: true },
-      { name: "Haines", slug: "haines", note: "PC Dock. Very short walk to Fort Seward.", hasGuide: true },
     ],
     faqs: [
       {
@@ -66,9 +63,6 @@ const SHIP_CONFIGS: Record<string, ShipConfig> = {
       { name: "Juneau", slug: "juneau", note: "AJ Dock. 5-min shuttle bus downtown.", hasGuide: true },
       { name: "Skagway", slug: "skagway", note: "Broadway or Ore docks. 5-10 min walk.", hasGuide: true },
       { name: "Ketchikan", slug: "ketchikan", note: "Downtown berths. Quick walk-off.", hasGuide: true },
-      { name: "Sitka", slug: "sitka", note: "Halibut Point Marine. 10-min shuttle downtown.", hasGuide: true },
-      { name: "Icy Strait Point", slug: "icy-strait-point", note: "Adventure Landing. Short walk to cannery.", hasGuide: true },
-      { name: "Haines", slug: "haines", note: "Port Chilkoot Dock. Scenic walking path.", hasGuide: true },
     ],
     faqs: [
       {
@@ -93,9 +87,6 @@ const SHIP_CONFIGS: Record<string, ShipConfig> = {
       { name: "Juneau", slug: "juneau", note: "AJ Dock. 5-min shuttle bus downtown.", hasGuide: true },
       { name: "Skagway", slug: "skagway", note: "Ore Dock slides may require shuttles.", hasGuide: true },
       { name: "Ketchikan", slug: "ketchikan", note: "Downtown berths. Quick walk-off.", hasGuide: true },
-      { name: "Sitka", slug: "sitka", note: "Tendering or Halibut Point shuttle.", hasGuide: true },
-      { name: "Icy Strait Point", slug: "icy-strait-point", note: "Wilderness Landing gondola transit.", hasGuide: true },
-      { name: "Haines", slug: "haines", note: "PC Dock. Very short walk to Fort Seward.", hasGuide: true },
     ],
     faqs: [
       {
@@ -120,9 +111,6 @@ const SHIP_CONFIGS: Record<string, ShipConfig> = {
       { name: "Juneau", slug: "juneau", note: "Downtown piers. 15-20 min walk-off.", hasGuide: true },
       { name: "Skagway", slug: "skagway", note: "Railroad Dock. Long walk to town gate.", hasGuide: true },
       { name: "Ketchikan", slug: "ketchikan", note: "Ward Cove. 20-min shuttle ride downtown.", hasGuide: true },
-      { name: "Sitka", slug: "sitka", note: "Halibut Point Marine. 10-min shuttle.", hasGuide: true },
-      { name: "Icy Strait Point", slug: "icy-strait-point", note: "Wilderness Landing gondola transit.", hasGuide: true },
-      { name: "Haines", slug: "haines", note: "Port Chilkoot Dock. Scenic walking path.", hasGuide: true },
     ],
     faqs: [
       {
@@ -147,9 +135,6 @@ const SHIP_CONFIGS: Record<string, ShipConfig> = {
       { name: "Juneau", slug: "juneau", note: "Franklin Street. Rapid walk-off.", hasGuide: true },
       { name: "Skagway", slug: "skagway", note: "Broadway or Ore docks. 5-10 min walk.", hasGuide: true },
       { name: "Ketchikan", slug: "ketchikan", note: "Downtown berths. Quick walk-off.", hasGuide: true },
-      { name: "Sitka", slug: "sitka", note: "Halibut Point Marine. 10-min shuttle.", hasGuide: true },
-      { name: "Icy Strait Point", slug: "icy-strait-point", note: "Adventure Landing. Short walk to cannery.", hasGuide: true },
-      { name: "Haines", slug: "haines", note: "Port Chilkoot Dock. Scenic walking path.", hasGuide: true },
     ],
     faqs: [
       {
@@ -222,7 +207,7 @@ export default async function ShipSlugPage({
       {/* Hero section */}
       <section className="relative bg-slate-900 text-white py-12 px-6 sm:px-8">
         <div className="mx-auto max-w-5xl">
-          <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-100">
+          <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200">
             {config.line}
           </div>
           <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
@@ -234,7 +219,7 @@ export default async function ShipSlugPage({
           <div className="mt-6 flex flex-wrap gap-3">
             <Link
               href={config.ctaUrl}
-              className="rounded-xl bg-cyan-500 px-4 py-2.5 text-xs font-bold text-slate-950 hover:bg-cyan-400 transition"
+              className="rounded-xl bg-cyan-500 px-4 py-2.5 text-xs font-bold text-slate-955 hover:bg-cyan-400 transition"
             >
               Check Juneau Timing
             </Link>
@@ -346,7 +331,7 @@ export default async function ShipSlugPage({
 
         {/* FAQ Section (lower on page) */}
         <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8">
-          <h2 className="text-lg font-black tracking-tight text-slate-950">
+          <h2 className="text-lg font-black tracking-tight text-slate-955">
             Frequently Asked Questions
           </h2>
           <div className="mt-4 divide-y divide-slate-100">

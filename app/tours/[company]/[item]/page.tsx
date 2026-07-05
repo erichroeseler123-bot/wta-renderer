@@ -16,6 +16,11 @@ import { notFound } from "next/navigation";
 import StageTelemetry from "@/app/components/plan/StageTelemetry";
 import Link from "next/link";
 
+const isGenericDescription = (desc: string) => {
+  const d = desc.toLowerCase();
+  return d.includes("cruise-friendly") || d.includes("memorable day in port") || d.includes("without wasting time");
+};
+
 function getOperatorDisplayName(company: string): string {
   const mapping: Record<string, string> = {
     beyondak: "Beyond Alaska",
@@ -140,7 +145,11 @@ export default async function TourDetailPage({
   const skipText = getWhoShouldSkip(safeTour.title, activityLevel, ageConstraint);
 
   const heroSrc = safeTour.image && String(safeTour.image).trim() ? safeTour.image : "/hero/juneau.jpg";
-  const description = cleanTourDescription(safeTour.description, "Alaska excursion.");
+  let description = cleanTourDescription(safeTour.description, "Alaska excursion.");
+  if (isGenericDescription(description)) {
+    description = "Experience a premier excursion during your port day in Alaska. Review live departures and availability below to secure your booking.";
+  }
+
   const seoData = {
     "@context": "https://schema.org",
     "@type": "TouristTrip",
@@ -252,12 +261,12 @@ export default async function TourDetailPage({
       icon: "Safe",
     },
     tight: {
-      border: "border-amber-200 bg-amber-50 text-amber-950",
+      border: "border-amber-200 bg-amber-50 text-amber-955",
       title: "⚠️ Tight return window",
       icon: "Tight",
     },
     unsafe: {
-      border: "border-rose-200 bg-rose-50 text-rose-950",
+      border: "border-rose-200 bg-rose-50 text-rose-955",
       title: "❌ Excursion timing warning",
       icon: "Unsafe",
     },
@@ -292,7 +301,7 @@ export default async function TourDetailPage({
               <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold text-sky-800 uppercase tracking-wide">
                 {categoryName}
               </span>
-              <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">
+              <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl leading-tight">
                 {safeTour.title}
               </h1>
               <p className="mt-1 text-sm font-medium text-slate-500">
@@ -301,7 +310,7 @@ export default async function TourDetailPage({
             </div>
 
             {/* Hero Image */}
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-stone-200">
+            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-stone-200 shadow-sm">
               <img
                 src={heroSrc}
                 alt={safeTour.title}
@@ -333,9 +342,9 @@ export default async function TourDetailPage({
             <hr className="border-slate-200" />
 
             {/* Description */}
-            <div>
+            <div className="prose max-w-none">
               <h2 className="text-xl font-black tracking-tight text-slate-900">Tour Overview</h2>
-              <p className="mt-3 text-sm leading-7 text-slate-600">
+              <p className="mt-3 text-sm leading-relaxed text-slate-655">
                 {description}
               </p>
             </div>
@@ -357,7 +366,7 @@ export default async function TourDetailPage({
             {/* Timing Safeguard warning */}
             <div className={`rounded-2xl border p-5 ${timingConfig.border}`}>
               <h3 className="text-sm font-black uppercase tracking-wider">{timingConfig.title}</h3>
-              <p className="mt-2 text-sm leading-6">
+              <p className="mt-2 text-sm leading-6 text-slate-900">
                 {timingGuidanceText}
               </p>
             </div>
@@ -375,7 +384,7 @@ export default async function TourDetailPage({
             <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Next Available Date</span>
               <span className="mt-1 font-bold text-slate-900 block text-sm">
-                {hasNextAvailability ? safeTour.nextAvailableDate : "Check calendar for current departures"}
+                {hasNextAvailability ? safeTour.nextAvailableDate : "Check calendar for departures"}
               </span>
             </div>
 

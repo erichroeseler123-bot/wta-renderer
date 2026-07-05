@@ -16,26 +16,11 @@ const GUIDES = [
     title: "How Long to Get Off the Cruise Ship in Ketchikan",
     description: "Ketchikan downtown berths 1-4 walkability vs Ward Cove (NCL) 7-mile transit shuttle lines, check-in logistics, and safety buffers.",
   },
-  {
-    slug: "how-long-does-it-take-to-get-off-the-ship-in-sitka",
-    title: "How Long to Get Off the Cruise Ship in Sitka",
-    description: "Sitka disembarkation guide. Halibut Point Marine shuttle buses to Centennial Hall, tendering procedures, and Crescent Harbor wildlife tour transit.",
-  },
-  {
-    slug: "how-long-does-it-take-to-get-off-the-ship-in-icy-strait-point",
-    title: "How Long to Get Off the Cruise Ship in Icy Strait Point",
-    description: "Icy Strait Point private Hoonah destination layouts, Adventure Landing cannery walk vs Wilderness Landing Trans-Porter gondola queues.",
-  },
-  {
-    slug: "how-long-does-it-take-to-get-off-the-ship-in-haines",
-    title: "How Long to Get Off the Cruise Ship in Haines",
-    description: "Port Chilkoot Dock disembarkation, walking paths to Parade Grounds, Fort Seward sights, and local rafting tour arrival timings.",
-  },
 ];
 
 export const metadata = {
-  title: "Alaska Cruise Port timing Guides | Welcome To Alaska Tours",
-  description: "Check disembarkation schedules, dock walk distances, tendering times, and excursion timing buffers for all major Alaska ports.",
+  title: "Alaska Cruise Port Timing Guides | Welcome To Alaska Tours",
+  description: "Check disembarkation schedules, dock walk distances, tendering times, and excursion timing buffers for Juneau, Skagway, and Ketchikan.",
   alternates: {
     canonical: "https://welcometoalaskatours.com/guides",
   },
@@ -54,18 +39,18 @@ export default function GuidesIndexPage() {
           <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl max-w-3xl mx-auto leading-tight">
             Alaska Cruise Port Timing Guides
           </h1>
-          <p className="text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base text-slate-655 max-w-2xl mx-auto leading-relaxed">
             Excursion scheduling is all about timing buffers. Compare disembarkation processes, dock layouts, and walking times to guarantee you never miss your ship.
           </p>
         </section>
 
         {/* Guides List */}
-        <section className="grid gap-6 md:grid-cols-2">
+        <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {GUIDES.map((guide) => (
             <Link
               key={guide.slug}
               href={`/guides/${guide.slug}`}
-              className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
+              className="rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
             >
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
                 Timing Guide
@@ -76,18 +61,19 @@ export default function GuidesIndexPage() {
               <p className="text-xs leading-5 text-slate-600 block">
                 {guide.description}
               </p>
-              <span className="text-xs font-bold text-sky-800 block hover:text-sky-900 pt-2 border-t border-slate-100">
-                Read Guide →
+              <span className="text-xs font-bold text-sky-805 block hover:text-sky-900 pt-4 border-t border-slate-100 flex justify-between items-center">
+                <span>Read Guide</span>
+                <span>→</span>
               </span>
             </Link>
           ))}
         </section>
 
         {/* Navigation Action Links */}
-        <section className="pt-8 border-t border-slate-200 grid gap-4 sm:grid-cols-3">
+        <section className="pt-8 border-t border-slate-205 grid gap-4 sm:grid-cols-3">
           <Link
             href="/ports"
-            className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm hover:shadow transition block"
+            className="rounded-2xl border border-slate-205 bg-white p-5 text-center shadow-sm hover:shadow transition block"
           >
             <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block">
               Port Guides
@@ -98,7 +84,7 @@ export default function GuidesIndexPage() {
           </Link>
           <Link
             href="/tours"
-            className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm hover:shadow transition block"
+            className="rounded-2xl border border-slate-205 bg-white p-5 text-center shadow-sm hover:shadow transition block"
           >
             <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block">
               Full Catalog
@@ -109,7 +95,7 @@ export default function GuidesIndexPage() {
           </Link>
           <Link
             href="/plan"
-            className="rounded-2xl border border-slate-200 bg-white p-5 text-center shadow-sm hover:shadow transition block"
+            className="rounded-2xl border border-slate-205 bg-white p-5 text-center shadow-sm hover:shadow transition block"
           >
             <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block">
               Timing Tool
