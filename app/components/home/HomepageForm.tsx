@@ -87,7 +87,7 @@ export default function HomepageForm({
         type="submit"
         className="w-full rounded-2xl bg-slate-900 py-3.5 text-center text-sm font-black text-white hover:bg-slate-800 transition"
       >
-        Verify Schedule & Match Excursions
+        Find Matching Excursions
       </button>
     </form>
   );

@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import CartButton from "./CartButton";
+import { useCart } from "./CartContext";
 
 export default function StickyCartBar() {
   const pathname = usePathname();
+  const { count } = useCart();
 
-  // Hide the sticky checkout bar on checkout and checkout success routes
-  if (pathname === "/checkout" || pathname === "/checkout/success") {
+  // Hide the sticky checkout bar on checkout/success routes OR if the cart is empty
+  if (pathname === "/checkout" || pathname === "/checkout/success" || count === 0) {
     return null;
   }
 

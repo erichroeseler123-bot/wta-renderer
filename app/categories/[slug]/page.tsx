@@ -378,7 +378,7 @@ export default async function CategoryPage({
           </p>
           <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
             <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">
-              Dispatcher Buffer Rule
+              Cruise Safety Buffer Rule
             </h3>
             <p className="mt-2 text-sm leading-6 text-slate-700">
               {config.guidance}

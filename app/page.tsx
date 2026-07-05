@@ -19,40 +19,43 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-slate-950 py-20 text-white sm:py-28">
+      <section className="relative min-h-[75vh] flex items-center overflow-hidden bg-slate-950 text-white py-16 sm:py-24">
         <div className="absolute inset-0">
           <img
             src="/images/home-hero.jpg"
-            alt="Alaska landscape"
-            className="h-full w-full object-cover opacity-25"
+            alt="Alaska Cruise Port Excursions"
+            className="h-full w-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-slate-950/90 to-slate-950" />
+          {/* Transparent gradient to fade out on the right on desktop, and fade out at the top on mobile */}
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/20 md:bg-gradient-to-r md:from-slate-950/85 md:via-slate-950/50 md:to-transparent" />
         </div>
         
-        <div className="relative mx-auto max-w-5xl px-6 text-center space-y-6">
-          <div className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-sky-300">
-            Logistical Port-Day Fit
-          </div>
-          <h1 className="text-4xl font-black uppercase tracking-tight sm:text-6xl md:text-7xl leading-[0.9] text-white">
-            Alaska excursions that fit your port day.
-          </h1>
-          <p className="mx-auto max-w-2xl text-base leading-relaxed text-slate-300 sm:text-lg">
-            Real-time port safety checks, direct schedule synchronization, and strict return buffers so you never miss your ship.
-          </p>
+        <div className="relative mx-auto w-full max-w-5xl px-6">
+          <div className="max-w-2xl rounded-[2.5rem] border border-white/10 bg-slate-950/65 p-6 md:p-8 backdrop-blur-md shadow-2xl space-y-6">
+            <div className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-sky-300">
+              Juneau • Skagway • Ketchikan
+            </div>
+            <h1 className="text-3xl font-black uppercase tracking-tight sm:text-5xl lg:text-6xl leading-[0.95] text-white">
+              Alaska excursions that fit your port day.
+            </h1>
+            <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
+              Choose your port, compare live excursions, and keep enough time to get back to your ship.
+            </p>
 
-          <div className="pt-6 flex flex-col sm:flex-row gap-4 justify-center items-center">
-            <a
-              href="#ports"
-              className="w-full sm:w-auto inline-flex min-h-12 items-center justify-center rounded-2xl bg-cyan-400 px-8 py-3 text-sm font-black uppercase tracking-wider text-slate-950 hover:bg-cyan-300 transition shadow-lg"
-            >
-              Start with your port
-            </a>
-            <Link
-              href="/tours"
-              className="w-full sm:w-auto inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-8 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/25 transition backdrop-blur"
-            >
-              Browse live tours
-            </Link>
+            <div className="pt-2 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+              <a
+                href="#ports"
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-cyan-400 px-8 py-3 text-sm font-black uppercase tracking-wider text-slate-950 hover:bg-cyan-300 transition shadow-lg text-center"
+              >
+                Start with your port
+              </a>
+              <Link
+                href="/tours"
+                className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-8 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/25 transition backdrop-blur text-center"
+              >
+                Browse live tours
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -64,21 +67,21 @@ export default function HomePage() {
             <div className="pt-6 md:pt-0 md:pl-6 first:pl-0 flex items-start gap-4 flex-col md:flex-row">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 font-black text-sm">1</span>
               <div>
-                <h3 className="font-bold text-slate-100">Choose Port</h3>
+                <h3 className="font-bold text-slate-100">Choose your port</h3>
                 <p className="mt-1 text-xs text-slate-400">Select Juneau, Skagway, or Ketchikan to see compatible excursions.</p>
               </div>
             </div>
             <div className="pt-6 md:pt-0 md:pl-6 flex items-start gap-4 flex-col md:flex-row">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 font-black text-sm">2</span>
               <div>
-                <h3 className="font-bold text-slate-100">Check Timing</h3>
+                <h3 className="font-bold text-slate-100">Check your timing</h3>
                 <p className="mt-1 text-xs text-slate-400">Excursions are automatically cross-referenced with your ship's port times.</p>
               </div>
             </div>
             <div className="pt-6 md:pt-0 md:pl-6 flex items-start gap-4 flex-col md:flex-row">
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/20 text-cyan-300 font-black text-sm">3</span>
               <div>
-                <h3 className="font-bold text-slate-100">Book Live Availability</h3>
+                <h3 className="font-bold text-slate-100">Book live availability</h3>
                 <p className="mt-1 text-xs text-slate-400">Secure your seats directly with direct operator inventory integration.</p>
               </div>
             </div>
@@ -89,7 +92,7 @@ export default function HomePage() {
       {/* Dynamic Scheduler Form */}
       <section className="mx-auto max-w-4xl px-6 py-12">
         <div className="rounded-[2.5rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <h2 className="text-xl font-black text-center text-slate-900 tracking-tight">Search Port Departures</h2>
+          <h2 className="text-xl font-black text-center text-slate-900 tracking-tight">Find Excursions for Your Port Day</h2>
           <div className="mt-6">
             <HomepageForm approvedPorts={APPROVED_PORTS} />
           </div>
