@@ -241,19 +241,27 @@ export default function CheckoutClient() {
               </label>
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-4">
-              <CardElement
-                options={{
-                  hidePostalCode: true,
-                  style: {
-                    base: {
-                      fontSize: "16px",
-                      color: "#0f172a",
-                      "::placeholder": { color: "#64748b" },
-                    },
-                  },
-                }}
-              />
+            <div className="space-y-1">
+              <label className="text-sm font-semibold text-slate-700 block">
+                Credit card details
+                <span className="block text-xs font-normal text-slate-500">
+                  Payments are processed securely.
+                </span>
+                <div className="mt-1.5 rounded-xl border border-slate-300 bg-white p-3 shadow-sm">
+                  <CardElement
+                    options={{
+                      hidePostalCode: true,
+                      style: {
+                        base: {
+                          fontSize: "16px",
+                          color: "#0f172a",
+                          "::placeholder": { color: "#64748b" },
+                        },
+                      },
+                    }}
+                  />
+                </div>
+              </label>
             </div>
 
             {turnstileSiteKey ? (

@@ -16,19 +16,19 @@ export default async function ToursPage() {
       <JsonLd data={itemListSchema} />
       <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-sky-850">
+          <div className="inline-flex rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-sky-400">
             Tour Catalog
           </div>
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl leading-tight">
+          <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl leading-tight">
             Live Shore Excursion Catalog
           </h1>
-          <p className="text-sm text-slate-600 max-w-xl mx-auto">
+          <p className="text-sm text-slate-300 max-w-xl mx-auto">
             Directly connected to local operator flight and landing calendars. Verify timing compatibility with your cruise schedule.
           </p>
         </div>
 
-        <div className="rounded-[2rem] border border-sky-100 bg-sky-50/30 p-6">
-          <h2 className="text-xs font-black uppercase tracking-[0.16em] text-sky-850">
+        <div className="rounded-[2.5rem] border border-white/10 bg-white/[0.05] p-6">
+          <h2 className="text-xs font-black uppercase tracking-[0.16em] text-sky-400">
             Browse Excursion Categories
           </h2>
           <div className="mt-4 flex flex-wrap gap-2">

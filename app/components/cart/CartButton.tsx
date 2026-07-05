@@ -16,7 +16,7 @@ export default function CartButton() {
       <span className="mr-2" aria-hidden="true">🛒</span>
       Cart
       {count > 0 ? (
-        <span className="ml-2 inline-flex min-w-[1.5rem] items-center justify-center rounded-full bg-cyan-300 px-2 py-0.5 text-xs font-bold text-slate-900">
+        <span className="absolute -top-1.5 -right-1.5 inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full bg-cyan-300 px-1 text-[10px] font-bold text-slate-900 shadow-sm border border-white">
           {count}
         </span>
       ) : null}
