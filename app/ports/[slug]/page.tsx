@@ -242,6 +242,59 @@ export default async function PortPage({
           </div>
         </section>
 
+        {/* Juneau Excursion Categories */}
+        {slug === "juneau" && (
+          <section className="mt-8">
+            <div className="border-b border-slate-200 pb-3">
+              <h2 className="text-2xl font-black tracking-tight text-slate-950">Excursion Categories in Juneau</h2>
+            </div>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <Link
+                href="/categories/juneau-helicopter-tours"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Helicopter Tours</h3>
+                <p className="mt-1 text-xs text-slate-500">Compare icefield flight paths & glacier landings.</p>
+              </Link>
+              <Link
+                href="/categories/glacier-tours"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Glacier Ice Treks</h3>
+                <p className="mt-1 text-xs text-slate-500">Active glacier walks & guided ice climbs.</p>
+              </Link>
+              <Link
+                href="/categories/dog-sledding"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Glacier Dog Sledding</h3>
+                <p className="mt-1 text-xs text-slate-500">Helicopter shuttles to remote musher camps.</p>
+              </Link>
+              <Link
+                href="/categories/whale-watching"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Whale Watching</h3>
+                <p className="mt-1 text-xs text-slate-500">Spot humpback whales in Auke Bay.</p>
+              </Link>
+              <Link
+                href="/categories/mendenhall-glacier"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Mendenhall Glacier</h3>
+                <p className="mt-1 text-xs text-slate-500">Visitor center hikes & lake views.</p>
+              </Link>
+              <Link
+                href="/categories/flightseeing"
+                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
+              >
+                <h3 className="font-bold text-slate-900">Flightseeing</h3>
+                <p className="mt-1 text-xs text-slate-500">Icefield flight paths and floatplanes.</p>
+              </Link>
+            </div>
+          </section>
+        )}
+
         {/* Live Tour Offerings or Honest Fallback */}
         <section className="mt-8 space-y-6">
           <div className="border-b border-slate-200 pb-3 flex justify-between items-center">

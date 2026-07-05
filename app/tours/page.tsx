@@ -1,3 +1,4 @@
+import Link from "next/link";
 import FAQSection from "@/app/components/faq/FAQSection";
 import JsonLd from "@/components/seo/JsonLd";
 import { WidgetCatalog } from "@/components/widget/WidgetCatalog";
@@ -13,6 +14,51 @@ export default async function ToursPage() {
   return (
     <>
       <JsonLd data={itemListSchema} />
+      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6">
+        <div className="rounded-[2rem] border border-sky-100 bg-sky-50/30 p-6">
+          <h2 className="text-xs font-black uppercase tracking-[0.16em] text-sky-850">
+            Browse Excursion Categories
+          </h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href="/categories/juneau-helicopter-tours"
+              className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition"
+            >
+              Helicopter Tours
+            </Link>
+            <Link
+              href="/categories/glacier-tours"
+              className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition"
+            >
+              Glacier Tours
+            </Link>
+            <Link
+              href="/categories/dog-sledding"
+              className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition"
+            >
+              Glacier Dog Sledding
+            </Link>
+            <Link
+              href="/categories/whale-watching"
+              className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition"
+            >
+              Whale Watching
+            </Link>
+            <Link
+              href="/categories/mendenhall-glacier"
+              className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition"
+            >
+              Mendenhall Glacier
+            </Link>
+            <Link
+              href="/categories/flightseeing"
+              className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition"
+            >
+              Flightseeing
+            </Link>
+          </div>
+        </div>
+      </div>
       <WidgetCatalog tours={tours} mode="tours" />
       <FAQSection
         title="Alaska Shore Excursion Tour FAQs"

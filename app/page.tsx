@@ -65,6 +65,65 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Category Grid */}
+      <section className="mx-auto max-w-5xl px-4 py-8 sm:px-6 space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">Browse by Excursion Category</h2>
+          <p className="text-sm text-slate-600">Select a category page to learn about port-day transit timing and excursions.</p>
+        </div>
+
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <Link
+            href="/categories/juneau-helicopter-tours"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-2"
+          >
+            <h3 className="text-lg font-black text-slate-950 block">Helicopter Tours</h3>
+            <p className="text-xs leading-5 text-slate-600 block">Compare glacier landing helicopter packages, safety buffer requirements, and local icefield flight paths.</p>
+            <span className="text-xs font-bold text-sky-800 block hover:text-sky-900">Browse Helicopter Tours →</span>
+          </Link>
+          <Link
+            href="/categories/glacier-tours"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-2"
+          >
+            <h3 className="text-lg font-black text-slate-950 block">Glacier Ice Hikes</h3>
+            <p className="text-xs leading-5 text-slate-600 block">Plan active ice walking and glacier hikes. Learn about safety outfitting transit durations in Juneau.</p>
+            <span className="text-xs font-bold text-sky-800 block hover:text-sky-900">Browse Glacier Hikes →</span>
+          </Link>
+          <Link
+            href="/categories/dog-sledding"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-2"
+          >
+            <h3 className="text-lg font-black text-slate-950 block">Glacier Dog Sledding</h3>
+            <p className="text-xs leading-5 text-slate-600 block">Ultimate dog mushing summer camps. Fly by helicopter to high-altitude icefields and guide husky teams.</p>
+            <span className="text-xs font-bold text-sky-800 block hover:text-sky-900">Browse Dog Sledding →</span>
+          </Link>
+          <Link
+            href="/categories/whale-watching"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-2"
+          >
+            <h3 className="text-lg font-black text-slate-950 block">Whale Watching</h3>
+            <p className="text-xs leading-5 text-slate-600 block">Witness humpback whale bubble-net feeding departures in Auke Bay. Calculate Auke Bay harbor shuttle times.</p>
+            <span className="text-xs font-bold text-sky-800 block hover:text-sky-900">Browse Whale Watching →</span>
+          </Link>
+          <Link
+            href="/categories/mendenhall-glacier"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-2"
+          >
+            <h3 className="text-lg font-black text-slate-950 block">Mendenhall Glacier</h3>
+            <p className="text-xs leading-5 text-slate-600 block">Juneau's crown jewel. Find visitor center bus guides, photo walks, and helicopter glacier ice walks.</p>
+            <span className="text-xs font-bold text-sky-800 block hover:text-sky-900">Browse Mendenhall Tours →</span>
+          </Link>
+          <Link
+            href="/categories/flightseeing"
+            className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-2"
+          >
+            <h3 className="text-lg font-black text-slate-950 block">Flightseeing</h3>
+            <p className="text-xs leading-5 text-slate-600 block">Floatplane excursions and icefield flight paths. Track mountain visibility ceilings and flight buffer rules.</p>
+            <span className="text-xs font-bold text-sky-800 block hover:text-sky-900">Browse Flightseeing →</span>
+          </Link>
+        </div>
+      </section>
+
       {/* Port Chooser Grid */}
       <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 space-y-6">
         <div className="text-center space-y-2">

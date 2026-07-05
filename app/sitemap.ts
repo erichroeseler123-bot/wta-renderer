@@ -29,6 +29,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     "whittier"
   ];
 
+  const approvedCategories = [
+    "juneau-helicopter-tours",
+    "glacier-tours",
+    "dog-sledding",
+    "whale-watching",
+    "mendenhall-glacier",
+    "flightseeing"
+  ];
+
+  const categoryUrls = approvedCategories.map((slug) => ({
+    url: `${baseUrl}/categories/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.8,
+  }));
+
   const portUrls = approvedPorts.map((slug) => ({
     url: `${baseUrl}/ports/${slug}`,
     lastModified: new Date(),
@@ -56,6 +72,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.8,
     },
     ...portUrls,
+    ...categoryUrls,
     ...tourUrls,
   ];
 }
