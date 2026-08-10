@@ -5,129 +5,116 @@ import HomepageForm from "@/app/components/home/HomepageForm";
 export const metadata: Metadata = {
   title: "Alaska Cruise Port Excursions | Welcome To Alaska Tours",
   description:
-    "Match Alaska shore excursions to your cruise port day. Choose your port, check live availability, and compare excursions against your ship timing with Return Buffer safety guidelines.",
+    "Find Alaska shore excursions for your cruise port day. Start with your port and ship timing, then compare excursions and booking calendars for Juneau, Skagway, and Ketchikan.",
   alternates: { canonical: "https://welcometoalaskatours.com" },
 };
 
 const APPROVED_PORTS = [
-  { slug: "juneau", title: "Juneau", image: "/hero/juneau.jpg", description: "Mendenhall Glacier flights, helicopter dog sledding, and whale watching." },
-  { slug: "skagway", title: "Skagway", image: "/hero/skagway.jpg", description: "White Pass & Yukon Route train rides, scooter tours, and glacier helicopter trips." },
-  { slug: "ketchikan", title: "Ketchikan", image: "/hero/ketchikan.png", description: "Rainforest hikes, kayaking wilderness adventures, and Totem Bight state parks." }
+  { slug: "juneau", title: "Juneau", image: "/hero/juneau.jpg", description: "Glacier flights, dog sledding, whale watching, and Mendenhall experiences." },
+  { slug: "skagway", title: "Skagway", image: "/hero/skagway.jpg", description: "Plan around White Pass, Yukon, sightseeing, and adventure options." },
+  { slug: "ketchikan", title: "Ketchikan", image: "/hero/ketchikan.png", description: "Explore rainforest, wildlife, flightseeing, kayaking, and cultural experiences." }
+];
+
+const SHOPPING_PATHS = [
+  { title: "Bucket-list Alaska", description: "Glacier flights, dog sledding, and flightseeing for travelers planning a once-in-a-lifetime port day.", href: "/categories/juneau-helicopter-tours", cta: "See bucket-list tours" },
+  { title: "Wildlife & whales", description: "Start with wildlife-focused options when seeing Alaska animals matters more than adrenaline.", href: "/categories/whale-watching", cta: "See wildlife options" },
+  { title: "Glaciers without guessing", description: "Compare glacier-focused experiences and use your ship timing to narrow what can fit your day.", href: "/categories/mendenhall-glacier", cta: "See glacier options" },
+  { title: "See Alaska from the air", description: "Browse helicopter and flightseeing experiences when scenery is the main event.", href: "/categories/flightseeing", cta: "See flightseeing" },
 ];
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
-      {/* Hero Section */}
       <section className="relative min-h-[75vh] flex items-center overflow-hidden bg-slate-950 text-white py-16 sm:py-24">
         <div className="absolute inset-0">
           <img
             src="/images/home-hero.jpg"
-            alt="Alaska Cruise Port Excursions"
+            alt="Alaska cruise port scenery"
             className="h-full w-full object-cover"
           />
-          {/* Transparent gradient to fade out on the right on desktop, and fade out at the top on mobile */}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/20 md:bg-gradient-to-r md:from-slate-950/85 md:via-slate-950/50 md:to-transparent" />
         </div>
-        
+
         <div className="relative mx-auto w-full max-w-5xl px-6">
           <div className="max-w-2xl rounded-[2.5rem] border border-white/10 bg-slate-950/65 p-6 md:p-8 backdrop-blur-md shadow-2xl space-y-6">
             <div className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-sky-300">
               Juneau • Skagway • Ketchikan
             </div>
             <h1 className="text-3xl font-black uppercase tracking-tight sm:text-5xl lg:text-6xl leading-[0.95] text-white">
-              Find Alaska excursions that fit your ship schedule.
+              What can you do while your ship is in port?
             </h1>
             <p className="text-base leading-relaxed text-slate-200 sm:text-lg">
-              Choose your port, compare live excursions, and keep enough time to get back to your ship.
+              Start with your Alaska port day and ship timing. Then compare excursions, durations, and booking calendars without piecing the day together across a dozen tabs.
             </p>
 
             <div className="pt-2 flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
               <a
-                href="#ports"
+                href="#find-your-port-day"
                 className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-cyan-400 px-8 py-3 text-sm font-black uppercase tracking-wider text-slate-950 hover:bg-cyan-300 transition shadow-lg text-center"
               >
-                Start with your port
+                Find tours for my port day
               </a>
               <Link
                 href="/tours"
                 className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-8 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/25 transition backdrop-blur text-center"
               >
-                Browse live tours
+                Browse excursions
               </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Trust Cards Section */}
       <section className="bg-sky-50 border-y border-sky-100 py-12">
         <div className="mx-auto max-w-5xl px-6">
           <h2 className="text-center text-2xl font-black text-slate-900 tracking-tight">
-            Why Cruisers Book with WTA
+            Built Around the Cruise Day
           </h2>
-          <p className="mt-2 text-center text-xs text-slate-600">
-            The premier timing safety engine for independent Alaska excursions.
+          <p className="mt-2 text-center text-sm text-slate-600 max-w-2xl mx-auto">
+            Welcome To Alaska Tours helps you compare independent excursions against the time you actually have in port. Always confirm final meeting and all-aboard details before booking.
           </p>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">⚡</div>
-                <h3 className="mt-4 font-black text-slate-900 text-sm">Live Availability</h3>
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  Direct connection to real-time local operator calendars.
-                </p>
-              </div>
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">🛳️</div>
+              <h3 className="mt-4 font-black text-slate-900 text-sm">Start With Your Ship</h3>
+              <p className="mt-2 text-xs text-slate-500 leading-relaxed">Use your port and schedule as the starting point instead of browsing tours with no timing context.</p>
             </div>
-
-            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">🏔️</div>
-                <h3 className="mt-4 font-black text-slate-900 text-sm">Real Operators</h3>
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  Run by fully licensed and top-rated local Alaskan outfits.
-                </p>
-              </div>
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">🧭</div>
+              <h3 className="mt-4 font-black text-slate-900 text-sm">Compare the Day</h3>
+              <p className="mt-2 text-xs text-slate-500 leading-relaxed">Review duration, departure information, operator notes, and posted booking availability together.</p>
             </div>
-
-            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">🛡️</div>
-                <h3 className="mt-4 font-black text-slate-900 text-sm">Cruise Return Buffer</h3>
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  Strict 45-minute return safety margins applied automatically.
-                </p>
-              </div>
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">⏱️</div>
+              <h3 className="mt-4 font-black text-slate-900 text-sm">Return-Time Guidance</h3>
+              <p className="mt-2 text-xs text-slate-500 leading-relaxed">Use timing guidance to identify tours that appear comfortable, tight, or incompatible with your port window.</p>
             </div>
-
-            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm flex flex-col justify-between">
-              <div>
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">💳</div>
-                <h3 className="mt-4 font-black text-slate-900 text-sm">Secure Checkout</h3>
-                <p className="mt-2 text-xs text-slate-500 leading-relaxed">
-                  Protected payments processed securely via Stripe.
-                </p>
-              </div>
+            <div className="rounded-3xl border border-sky-100 bg-white p-6 shadow-sm">
+              <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sky-100 text-sky-800 text-lg">📅</div>
+              <h3 className="mt-4 font-black text-slate-900 text-sm">Open the Live Calendar</h3>
+              <p className="mt-2 text-xs text-slate-500 leading-relaxed">When a tour is bookable, continue to its booking calendar to confirm current dates, times, pricing, and capacity.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Dynamic Scheduler Form */}
-      <section className="mx-auto max-w-4xl px-6 py-12">
+      <section id="find-your-port-day" className="mx-auto max-w-4xl px-6 py-12 scroll-mt-6">
         <div className="rounded-[2.5rem] border border-slate-200 bg-white p-6 sm:p-8 shadow-sm">
-          <h2 className="text-xl font-black text-center text-slate-900 tracking-tight">Find Excursions for Your Port Day</h2>
+          <div className="text-center max-w-2xl mx-auto">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Best place to start</div>
+            <h2 className="mt-2 text-2xl font-black text-slate-900 tracking-tight">Show Me What Fits My Port Day</h2>
+            <p className="mt-2 text-sm text-slate-600">Choose your port and ship details first. The goal is to narrow the shopping problem before you fall in love with a tour that does not fit your schedule.</p>
+          </div>
           <div className="mt-6">
             <HomepageForm approvedPorts={APPROVED_PORTS} />
           </div>
         </div>
       </section>
 
-      {/* Port Chooser Grid (Featured Cards) */}
       <section id="ports" className="mx-auto max-w-5xl px-6 py-12 space-y-8 scroll-mt-6">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900">Featured Alaska Ports</h2>
-          <p className="text-sm text-slate-600">We focus on three primary ports to maintain verified schedules and timing rules.</p>
+          <h2 className="text-3xl font-black tracking-tight text-slate-900">Shop by Alaska Port</h2>
+          <p className="text-sm text-slate-600">Start with the stop on your itinerary. Juneau currently has the deepest live booking inventory; Skagway and Ketchikan are useful planning hubs as inventory expands.</p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -138,23 +125,14 @@ export default function HomePage() {
               className="group overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm hover:shadow-md transition hover:-translate-y-1 block flex flex-col justify-between"
             >
               <div className="aspect-[16/10] w-full overflow-hidden relative">
-                <img
-                  src={port.image}
-                  alt={port.title}
-                  className="h-full w-full object-cover group-hover:scale-105 transition duration-500"
-                />
+                <img src={port.image} alt={port.title} className="h-full w-full object-cover group-hover:scale-105 transition duration-500" />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 to-transparent" />
-                <span className="absolute bottom-4 left-4 rounded-xl bg-slate-950/70 px-3 py-1.5 text-xs font-black uppercase text-white tracking-widest backdrop-blur-sm">
-                  {port.title}
-                </span>
+                <span className="absolute bottom-4 left-4 rounded-xl bg-slate-950/70 px-3 py-1.5 text-xs font-black uppercase text-white tracking-widest backdrop-blur-sm">{port.title}</span>
               </div>
               <div className="p-6 space-y-2 flex-grow flex flex-col justify-between">
-                <div>
-                  <p className="text-xs text-slate-600 leading-relaxed">{port.description}</p>
-                </div>
-                <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-xs font-black uppercase text-sky-850 tracking-wider">
-                  <span>Explore Port Excursions</span>
-                  <span>→</span>
+                <p className="text-xs text-slate-600 leading-relaxed">{port.description}</p>
+                <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-xs font-black uppercase text-sky-800 tracking-wider">
+                  <span>Plan This Port Day</span><span>→</span>
                 </div>
               </div>
             </Link>
@@ -162,53 +140,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Category Grid (Featured Categories) */}
       <section className="mx-auto max-w-5xl px-6 py-12 space-y-8">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
-          <h2 className="text-3xl font-black tracking-tight text-slate-900">Excursion Categories</h2>
-          <p className="text-sm text-slate-600">Compare specialized activities and verify transit buffers.</p>
+          <h2 className="text-3xl font-black tracking-tight text-slate-900">Not Sure What You Want Yet?</h2>
+          <p className="text-sm text-slate-600">Shop by the kind of Alaska day you want, then check whether it fits your ship.</p>
         </div>
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <Link
-            href="/categories/juneau-helicopter-tours"
-            className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
-          >
-            <h3 className="text-lg font-black text-slate-950">Helicopter Tours</h3>
-            <p className="text-xs leading-relaxed text-slate-600">Compare glacier landing helicopter packages, safety buffer requirements, and local icefield flight paths.</p>
-            <span className="text-xs font-bold text-sky-800 block">Browse Helicopter Tours →</span>
-          </Link>
-          <Link
-            href="/categories/glacier-tours"
-            className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
-          >
-            <h3 className="text-lg font-black text-slate-955">Glacier Ice Hikes</h3>
-            <p className="text-xs leading-relaxed text-slate-600">Plan active ice walking and glacier hikes. Learn about safety outfitting transit durations in Juneau.</p>
-            <span className="text-xs font-bold text-sky-800 block">Browse Glacier Hikes →</span>
-          </Link>
-          <Link
-            href="/categories/dog-sledding"
-            className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
-          >
-            <h3 className="text-lg font-black text-slate-955">Glacier Dog Sledding</h3>
-            <p className="text-xs leading-relaxed text-slate-600">Ultimate dog mushing summer camps. Fly by helicopter to high-altitude icefields and guide husky teams.</p>
-            <span className="text-xs font-bold text-sky-800 block">Browse Dog Sledding →</span>
-          </Link>
-        </div>
-
-        <div className="pt-6 max-w-xl mx-auto">
-          <div className="rounded-[2rem] border border-sky-100 bg-sky-50/40 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
-            <div className="text-left space-y-1">
-              <span className="inline-block rounded bg-sky-100 px-2 py-0.5 text-[9px] font-black uppercase text-sky-850 tracking-wider">Cruise Planners</span>
-              <h4 className="text-sm font-black text-slate-950">Plan for your specific ship?</h4>
-              <p className="text-xs text-slate-600">Retrieve disembarkation buffer strategies for Edge, Bliss, and more.</p>
-            </div>
-            <Link
-              href="/ships"
-              className="rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition whitespace-nowrap shadow"
-            >
-              Browse Ships
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {SHOPPING_PATHS.map((path) => (
+            <Link key={path.title} href={path.href} className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block">
+              <h3 className="text-lg font-black text-slate-950">{path.title}</h3>
+              <p className="mt-2 text-xs leading-relaxed text-slate-600">{path.description}</p>
+              <span className="mt-4 text-xs font-bold text-sky-800 block">{path.cta} →</span>
             </Link>
+          ))}
+        </div>
+
+        <div className="pt-6 max-w-2xl mx-auto">
+          <div className="rounded-[2rem] border border-sky-100 bg-sky-50/60 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+            <div className="text-left space-y-1">
+              <span className="inline-block rounded bg-sky-100 px-2 py-0.5 text-[9px] font-black uppercase text-sky-800 tracking-wider">Cruise planners</span>
+              <h4 className="text-sm font-black text-slate-950">Already know your ship?</h4>
+              <p className="text-xs text-slate-600">Go straight to ship-specific planning and use the port window as your filter.</p>
+            </div>
+            <Link href="/ships" className="rounded-xl bg-slate-900 px-4 py-2.5 text-xs font-bold text-white hover:bg-slate-800 transition whitespace-nowrap shadow">Browse Ships</Link>
           </div>
         </div>
       </section>
