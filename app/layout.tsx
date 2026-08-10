@@ -4,6 +4,7 @@ import CartDrawer from "@/app/components/cart/CartDrawer";
 import StickyCartBar from "@/app/components/cart/StickyCartBar";
 import CartProvider from "@/app/components/cart/CartContext";
 import BackForwardRefresh from "@/app/BackForwardRefresh";
+import IntentTracker from "@/app/components/analytics/IntentTracker";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/tourSeo";
 
@@ -53,6 +54,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <JsonLd data={websiteSchema} />
         <CartProvider>
           <BackForwardRefresh />
+          <IntentTracker />
           {children}
           <StickyCartBar />
           <CartDrawer />
