@@ -26,6 +26,22 @@ const TRIP_STYLES = [
   { icon: "✨", title: "Private / premium", text: "Private charters and bigger once-in-a-lifetime splurges." },
 ];
 
+const POPULAR_SEARCHES = [
+  ["Juneau whale watching", "/juneau/whale-watching"],
+  ["Mendenhall Glacier tours", "/juneau/mendenhall-glacier-tours"],
+  ["Juneau helicopter tours", "/juneau/helicopter-tours"],
+  ["Juneau dog sledding", "/juneau/dog-sledding"],
+  ["Juneau fishing charters", "/juneau/fishing"],
+  ["Ketchikan bear tours", "/ketchikan/bear-tours"],
+  ["Misty Fjords tours", "/ketchikan/misty-fjords"],
+  ["Ketchikan kayaking", "/ketchikan/kayaking"],
+  ["Ketchikan adventure tours", "/ketchikan/adventure-tours"],
+  ["Skagway helicopter tours", "/skagway/helicopter-tours"],
+  ["Skagway Gold Rush tours", "/skagway/gold-rush-tours"],
+  ["Skagway dog sledding", "/skagway/dog-sledding"],
+  ["Skagway adventure tours", "/skagway/adventure-tours"],
+] as const;
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900">
@@ -99,6 +115,21 @@ export default function HomePage() {
               <span className="mt-4 block text-xs font-black text-sky-800">Choose in the finder →</span>
             </a>
           ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-6xl px-6 py-12">
+        <div className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Popular Alaska excursion searches</div>
+          <h2 className="mt-2 text-3xl font-black tracking-tight text-slate-950">Start with exactly what you want to do</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-600">These shopping pages pull together the connected tours for one specific port-day idea, then hand you into the four-choice finder or live calendar.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            {POPULAR_SEARCHES.map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm font-black text-slate-800 hover:border-sky-300 hover:bg-sky-50 hover:text-sky-900">
+                {label} →
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
