@@ -22,7 +22,7 @@ export const dccEntityToWtaProduct: Record<string, { company: string; itemPk: nu
 export const companyToPort: Record<string, string> = {
   beyondak: "juneau",
   "alaska-galore-juneau-whale-watching": "juneau",
-  akhummer: "juneau",
+  akhummer: "ketchikan",
   alaskatales: "juneau",
   aktraveladventures: "juneau",
   exclusivealaska: "juneau",
@@ -43,7 +43,28 @@ export const companyToPort: Record<string, string> = {
   wingsairways: "juneau",
 };
 
-export function inferPortFromCompany(company: string): string | null {
+// Some FareHarbor companies sell inventory in more than one Alaska port.
+// Item-level overrides keep those products in the correct storefront and preserve
+// the right port attribution through timing checks and checkout.
+export const itemToPort: Record<string, string> = {
+  // Alaska Travel Adventures — Ketchikan
+  "aktraveladventures:311655": "ketchikan",
+  "aktraveladventures:311664": "ketchikan",
+  "aktraveladventures:311666": "ketchikan",
+  "aktraveladventures:311669": "ketchikan",
+  "aktraveladventures:311677": "ketchikan",
+
+  // Alaska Travel Adventures — Skagway
+  "aktraveladventures:340207": "skagway",
+  "aktraveladventures:343971": "skagway",
+};
+
+export function inferPortFromCompany(company: string, itemPk?: number | string | null): string | null {
   const key = String(company || "").trim().toLowerCase();
+  const item = Number(itemPk || 0);
+  if (key && item > 0) {
+    const itemPort = itemToPort[`${key}:${item}`];
+    if (itemPort) return itemPort;
+  }
   return companyToPort[key] || null;
 }
