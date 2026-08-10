@@ -7,51 +7,51 @@ import { getProductOneLiner } from "@/lib/tourSeo";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { parseTimeToMinutes } from "@/lib/timing";
 
-const APPROVED_PORTS = [
-  "juneau",
-  "skagway",
-  "ketchikan"
-];
+const APPROVED_PORTS = ["juneau", "skagway", "ketchikan"];
 
 const PORT_INFO: Record<string, { title: string; description: string; problem: string }> = {
   juneau: {
     title: "Juneau Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Find the best Juneau glacier helicopter, dog sledding, or whale watching tours that fit your ship's port day window.",
-    problem: "Juneau is a busy port day with tight excursion time slots. Booking a glacier helicopter tour or whale watch requires careful alignment with your ship's all-aboard time to guarantee a safe return."
+    description: "Compare Juneau whale watching, glacier, dog sledding, flightseeing, and active shore excursions for your cruise day.",
+    problem: "Juneau has a large excursion menu, so the challenge is choosing the experience that fits your group, budget, and time in port without turning the day into a spreadsheet.",
   },
   skagway: {
     title: "Skagway Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Plan your Skagway shore excursions, train rides, and active tours based on your cruise ship's port day timetable.",
-    problem: "Skagway's railway and helicopter tours operate on rigid schedules. Navigating train transfer timing and tour durations without overlapping your ship's all-aboard window is a common cruise challenge."
+    description: "Compare Skagway helicopter, dog sledding, scooter, and active shore excursions for your cruise day.",
+    problem: "Skagway has a mix of structured departures and self-directed experiences. The best choice depends on how much of your port day you want to commit and how active you want the day to feel.",
   },
   ketchikan: {
     title: "Ketchikan Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Compare Ketchikan rainforest tours, kayak adventures, and wilderness excursions that sync with your port schedule.",
-    problem: "Ketchikan is known for sudden weather changes and remote wilderness excursions. Selecting the right tour depends on tracking precise transfer times to and from the cruise docks safely."
-  }
+    description: "Compare Ketchikan rainforest, wildlife, kayak, flightseeing, fishing, and wilderness shore excursions.",
+    problem: "Ketchikan offers everything from quick downtown-friendly experiences to remote wilderness trips. The best choice depends on weather tolerance, activity level, budget, and available port time.",
+  },
 };
 
-const isGenericDescription = (desc: string) => {
-  const d = desc.toLowerCase();
-  return d.includes("cruise-friendly") || d.includes("memorable day in port") || d.includes("without wasting time");
-};
+function priceDollars(value?: string) {
+  const match = String(value || "").match(/\$\s*([0-9,]+)/);
+  if (!match) return null;
+  const dollars = Number(match[1].replace(/,/g, ""));
+  return Number.isFinite(dollars) ? dollars : null;
+}
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+function durationHours(description?: string) {
+  const text = String(description || "");
+  const match = text.match(/\b(\d+(?:\.\d+)?)\s*(?:-|to)?\s*(?:\d+(?:\.\d+)?\s*)?Hours?\b/i);
+  return match ? Number(match[1]) : 0;
+}
+
+function searchable(tour: { title: string; description?: string; category?: string }) {
+  return `${tour.title} ${tour.description || ""} ${tour.category || ""}`.toLowerCase();
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  if (!APPROVED_PORTS.includes(slug)) {
-    return {};
-  }
+  if (!APPROVED_PORTS.includes(slug)) return {};
   const info = PORT_INFO[slug];
   return {
     title: info.title,
     description: info.description,
-    alternates: {
-      canonical: `https://welcometoalaskatours.com/ports/${slug}`
-    }
+    alternates: { canonical: `https://welcometoalaskatours.com/ports/${slug}` },
   };
 }
 
@@ -63,39 +63,29 @@ export default async function PortPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { slug } = await params;
-  if (!APPROVED_PORTS.includes(slug)) {
-    notFound();
-  }
+  if (!APPROVED_PORTS.includes(slug)) notFound();
 
   const resolvedSearch = await searchParams;
   const getParam = (value: string | string[] | undefined) => Array.isArray(value) ? String(value[0] || "") : String(value || "");
-  
-  // Resolve cookie intent
+
   const cookieStore = await cookies();
   const intentCookie = cookieStore.get("wta_dcc_intent");
   let dccIntent: any = null;
   if (intentCookie?.value) {
-    try {
-      dccIntent = JSON.parse(intentCookie.value);
-    } catch (_) {}
+    try { dccIntent = JSON.parse(intentCookie.value); } catch {}
   }
 
   const cookieShip = dccIntent?.shipName || "";
   const cookiePort = dccIntent?.port || "";
   const isPortMatch = !cookiePort || cookiePort.toLowerCase() === slug.toLowerCase();
-  
   const cruiseShip = getParam(resolvedSearch.cruiseShip) || (isPortMatch ? cookieShip : "");
 
   const info = PORT_INFO[slug];
-  const portTitle = slug
-    .split("-")
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
-    .join(" ");
+  const portTitle = slug.charAt(0).toUpperCase() + slug.slice(1);
 
-  // Resolve ship timings
-  let shipArrival: string | undefined = getParam(resolvedSearch.arrivalTime);
-  let shipDeparture: string | undefined = getParam(resolvedSearch.departureTime);
-  let shipWindow: string | undefined = shipArrival && shipDeparture ? `${shipArrival} - ${shipDeparture}` : undefined;
+  let shipArrival = getParam(resolvedSearch.arrivalTime) || undefined;
+  let shipDeparture = getParam(resolvedSearch.departureTime) || undefined;
+  let shipWindow = shipArrival && shipDeparture ? `${shipArrival} - ${shipDeparture}` : undefined;
 
   if (!shipArrival && !shipDeparture && cruiseShip && CRUISE_ITINERARY_HINTS[cruiseShip as CruiseShipName]) {
     const hint = CRUISE_ITINERARY_HINTS[cruiseShip as CruiseShipName]!;
@@ -109,61 +99,79 @@ export default async function PortPage({
     }
   }
 
-  // Resolve tours for this port
   const allTours = await getHelicopterTours().catch(() => []);
-  const portTours = allTours.filter((t) => t.port === slug);
-  const hasLiveTours = portTours.length > 0;
+  const portTours = allTours.filter((tour) => tour.port === slug);
 
   const evaluatedTours = portTours.map((tour) => {
-    // Parse duration from description
-    const durationMatch = String(tour.description || "").match(/\b(\d+(?:\.\d+)?)\s*Hours?\b/i);
-    const durationHours = durationMatch ? parseFloat(durationMatch[1]) : 0;
-    const durationMinutes = Math.round(durationHours * 60);
+    const hours = durationHours(tour.description);
+    const durationMinutes = Math.round(hours * 60);
+    let timingStatus: "fits" | "tight" | "unknown" = "unknown";
+    let timingGuidanceText = "Check the tour calendar against your ship's actual all-aboard time.";
 
-    let timingStatus: "safe" | "tight" | "unsafe" | "unknown" = "unknown";
-    let timingGuidanceText = "Enter or confirm your ship timing before relying on this fit.";
-
-    if (shipArrival && shipDeparture) {
-      if (durationMinutes > 0) {
-        const arrMin = parseTimeToMinutes(shipArrival);
-        const depMin = parseTimeToMinutes(shipDeparture);
-        if (arrMin !== null && depMin !== null) {
-          const allAboardMin = depMin - 30;
-          const earliestSafeStart = arrMin + 45;
-          const latestSafeStart = allAboardMin - durationMinutes - 45;
-
-          if (latestSafeStart >= earliestSafeStart) {
-            timingStatus = "safe";
-            timingGuidanceText = "Appears to fit your port window with a return buffer.";
-          } else if (allAboardMin - arrMin >= durationMinutes) {
-            timingStatus = "tight";
-            timingGuidanceText = "This may be tight. Confirm your ship’s all-aboard time before booking.";
-          } else {
-            timingStatus = "unsafe";
-            timingGuidanceText = "This may not fit your ship schedule with the recommended return buffer.";
-          }
+    if (shipArrival && shipDeparture && durationMinutes > 0) {
+      const arrMin = parseTimeToMinutes(shipArrival);
+      const depMin = parseTimeToMinutes(shipDeparture);
+      if (arrMin !== null && depMin !== null) {
+        const usableWindow = depMin - arrMin - 120;
+        if (usableWindow >= durationMinutes) {
+          timingStatus = "fits";
+          timingGuidanceText = "The listed duration appears workable within this port window, subject to the actual departure time and meeting details.";
+        } else {
+          timingStatus = "tight";
+          timingGuidanceText = "The listed duration looks tight for this port window. Verify the exact departure and return time before booking.";
         }
       }
     }
 
-    return {
-      ...tour,
-      timingStatus,
-      timingGuidanceText,
-      // Priority: safe (3) > tight (2) > unknown (1) > unsafe (0)
-      priority: timingStatus === "safe" ? 3 : timingStatus === "tight" ? 2 : timingStatus === "unknown" ? 1 : 0,
-    };
+    return { ...tour, hours, timingStatus, timingGuidanceText };
   });
 
-  // Sort evaluated tours: safer matches first
-  if (shipArrival && shipDeparture) {
-    evaluatedTours.sort((a, b) => b.priority - a.priority);
-  }
+  const firstTimerTerms: Record<string, string[]> = {
+    juneau: ["whale", "mendenhall", "glacier", "best of juneau", "dog sled"],
+    skagway: ["glacier", "dog sled", "gold rush"],
+    ketchikan: ["misty fjords", "rainforest", "totem", "duck tour", "bear", "kayak"],
+  };
 
-  // Resolve ship timings
-  let shipArrivalResolved: string | undefined = shipArrival;
-  let shipDepartureResolved: string | undefined = shipDeparture;
-  let shipWindowResolved: string | undefined = shipWindow;
+  const groups = [
+    {
+      title: "Best for first-time visitors",
+      blurb: `A fast starting point if this is your first cruise stop in ${portTitle}.`,
+      tours: evaluatedTours.filter((tour) => firstTimerTerms[slug].some((term) => searchable(tour).includes(term))).slice(0, 6),
+    },
+    {
+      title: "Under $200",
+      blurb: "Lower-cost choices that still feel like a real Alaska port-day experience.",
+      tours: evaluatedTours.filter((tour) => {
+        const price = priceDollars(tour.fromPrice);
+        return price !== null && price < 200;
+      }).sort((a, b) => (priceDollars(a.fromPrice) || 99999) - (priceDollars(b.fromPrice) || 99999)).slice(0, 6),
+    },
+    {
+      title: "Wildlife",
+      blurb: "Whales, bears, rainforest wildlife, and marine-life experiences.",
+      tours: evaluatedTours.filter((tour) => /(whale|bear|wildlife|orca|salmon)/i.test(searchable(tour))).slice(0, 6),
+    },
+    {
+      title: "Bucket-list Alaska",
+      blurb: "The big-ticket, tell-everyone-about-it experiences.",
+      tours: evaluatedTours.filter((tour) => /(helicopter|dog sled|flightseeing|seaplane|misty fjords|glacier|bear viewing)/i.test(searchable(tour))).sort((a, b) => (priceDollars(b.fromPrice) || 0) - (priceDollars(a.fromPrice) || 0)).slice(0, 6),
+    },
+    {
+      title: "Families & easier days",
+      blurb: "Experiences that read as broadly accessible, all-ages, scenic, or less strenuous in the operator descriptions.",
+      tours: evaluatedTours.filter((tour) => /(all ages|family|visitor center|salmon bake|duck tour|wildlife sanctuary|sightseeing|lighthouse|feast)/i.test(searchable(tour))).slice(0, 6),
+    },
+    {
+      title: "Shorter port-day options",
+      blurb: "Useful when you do not want one excursion to consume the entire stop.",
+      tours: evaluatedTours.filter((tour) => tour.hours > 0 && tour.hours <= 3.5).sort((a, b) => a.hours - b.hours).slice(0, 6),
+    },
+    {
+      title: "Premium & private",
+      blurb: "Private charters and premium experiences for groups willing to spend more for exclusivity.",
+      tours: evaluatedTours.filter((tour) => /private|charter/i.test(searchable(tour)) || (priceDollars(tour.fromPrice) || 0) >= 700).sort((a, b) => (priceDollars(b.fromPrice) || 0) - (priceDollars(a.fromPrice) || 0)).slice(0, 6),
+    },
+  ].filter((group) => group.tours.length > 0);
 
   const qs = new URLSearchParams();
   for (const [key, value] of Object.entries(resolvedSearch)) {
@@ -171,284 +179,96 @@ export default async function PortPage({
   }
   if (!qs.get("port")) qs.set("port", slug);
   if (!qs.get("intent")) qs.set("intent", "best-for");
-  if (!qs.get("topic")) qs.set("topic", "shore-excursions");  return (
-    <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
-      <div className="mx-auto max-w-5xl px-4 py-8 sm:px-6 sm:py-10">
-        <Link
-          href="/ports"
-          className="inline-flex rounded-xl border border-sky-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-50 transition"
-        >
-          Back to ports
-        </Link>
+  if (!qs.get("topic")) qs.set("topic", "shore-excursions");
 
-        {/* Hero Section */}
+  const TourCard = ({ tour }: { tour: (typeof evaluatedTours)[number] }) => {
+    const tourQs = new URLSearchParams(qs.toString());
+    tourQs.set("productSlug", tour.slug);
+    return (
+      <Link href={`/tours/${tour.company}/${tour.pk}?${tourQs.toString()}`} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+        <div className="aspect-[16/10] overflow-hidden bg-slate-100">
+          <img src={tour.image || (slug === "juneau" ? "/hero/juneau.jpg" : slug === "skagway" ? "/hero/skagway.jpg" : "/hero/ketchikan.png")} alt={tour.title} className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" />
+        </div>
+        <div className="p-4">
+          <div className="text-[10px] font-black uppercase tracking-[0.14em] text-sky-700">{tour.category || `${portTitle} excursion`}</div>
+          <h3 className="mt-1 text-base font-black leading-snug text-slate-950">{tour.title}</h3>
+          <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-600">{getProductOneLiner(tour)}</p>
+          <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-3">
+            <span className="font-black text-slate-950">{tour.fromPrice || "Check price"}</span>
+            <span className="text-xs font-bold text-sky-700">View tour →</span>
+          </div>
+        </div>
+      </Link>
+    );
+  };
+
+  return (
+    <main className="min-h-screen bg-slate-50 pb-20 text-slate-900">
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
+        <Link href="/ports" className="inline-flex rounded-xl border border-sky-200 bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-slate-50">Back to ports</Link>
+
         <section className="relative mt-6 overflow-hidden rounded-[2.5rem] bg-slate-950 text-white shadow-lg">
           <div className="absolute inset-0">
-            <img
-              src={slug === "juneau" ? "/hero/juneau.jpg" : slug === "skagway" ? "/hero/skagway.jpg" : "/hero/ketchikan.png"}
-              alt={`${portTitle} Shore Excursions`}
-              className="h-full w-full object-cover opacity-60"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/20 md:bg-gradient-to-r md:from-slate-950/90 md:via-slate-950/60 md:to-transparent" />
+            <img src={slug === "juneau" ? "/hero/juneau.jpg" : slug === "skagway" ? "/hero/skagway.jpg" : "/hero/ketchikan.png"} alt={`${portTitle} Shore Excursions`} className="h-full w-full object-cover opacity-55" />
+            <div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-slate-950/20" />
           </div>
-          <div className="relative p-6 sm:p-10 max-w-2xl">
-            <div className="max-w-xl rounded-2xl border border-white/10 bg-slate-950/65 p-6 backdrop-blur-md space-y-3">
-              <div className="inline-flex rounded-full border border-sky-400/30 bg-sky-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-sky-300">
-                Port Excursion Dashboard
-              </div>
-              <h1 className="text-3xl font-black uppercase tracking-tight sm:text-4xl leading-tight">
-                {portTitle} Shore Excursions
-              </h1>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Live availability verified against cruise timetables with safety return buffers.
-              </p>
-            </div>
+          <div className="relative max-w-3xl p-7 sm:p-12">
+            <div className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300">{portTours.length} excursion choices</div>
+            <h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">What should you do in {portTitle}?</h1>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-slate-200">Start with the kind of day you want. We grouped the available FareHarbor inventory so you do not have to compare every tour one by one.</p>
           </div>
         </section>
 
-        {/* Cruise Day timing helper panel */}
-        {cruiseShip && shipWindowResolved ? (
-          <section className="mt-6 rounded-[2rem] border border-sky-200 bg-sky-50/50 p-6 shadow-sm">
-            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-850">
-              All-Aboard Sync Resolved
-            </h3>
-            <p className="mt-2 text-xs leading-5 text-slate-700">
-              **{cruiseShip}** is scheduled in {portTitle}: **{shipArrivalResolved} - {shipDepartureResolved}** ({shipWindowResolved}).
-              Required return safety margin is **45+ minutes** prior to ship's scheduled all-aboard time.
-            </p>
+        {cruiseShip && shipWindow ? (
+          <section className="mt-6 rounded-2xl border border-sky-200 bg-sky-50 p-5">
+            <div className="text-xs font-black uppercase tracking-[0.14em] text-sky-800">Your port window</div>
+            <p className="mt-2 text-sm text-slate-700"><strong>{cruiseShip}</strong>: {shipWindow}. Tour-duration fit shown on this page is guidance only; confirm the exact meeting, departure, and return times on the live calendar.</p>
           </section>
         ) : (
-          <section className="mt-6 rounded-[2rem] border border-slate-200 bg-slate-50 p-6 shadow-sm">
-            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-slate-700">
-              All-Aboard Sync Required
-            </h3>
-            <p className="mt-2 text-xs leading-5 text-slate-600">
-              Confirm ship timings to calculate **Port-Day Fit**. Excursions must leave a **45-minute return buffer** before ship's all-aboard time. Read ship-specific guides for <Link href="/ships/celebrity-edge" className="font-bold underline">Celebrity Edge</Link> or <Link href="/ships/norwegian-bliss" className="font-bold underline">Norwegian Bliss</Link> in our <Link href="/ships" className="font-bold underline">planners directory</Link>.
-            </p>
+          <section className="mt-6 flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.14em] text-slate-600">Know your ship?</div>
+              <p className="mt-1 text-sm text-slate-600">Add your ship timing to narrow these choices to your actual port day.</p>
+            </div>
+            <Link href={`/plan?${qs.toString()}`} className="rounded-xl bg-slate-950 px-5 py-3 text-center text-xs font-bold text-white">Match my port day</Link>
           </section>
         )}
 
-        {/* Live Tour Offerings or Honest Fallback - Pushed to the top of the content */}
-        <section className="mt-8 space-y-6">
-          <div className="border-b border-slate-200 pb-3 flex justify-between items-center">
-            <h2 className="text-2xl font-black tracking-tight text-slate-950">
-              {slug === "juneau" ? "Live Shore Excursions" : `${portTitle} Excursion Planners`}
-            </h2>
-            {hasLiveTours && (
-              <span className="rounded bg-sky-100 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
-                Verified Capacity
-              </span>
-            )}
-          </div>
-
-          {hasLiveTours ? (
-            <div className="grid gap-6 md:grid-cols-2">
-              {evaluatedTours.map((tour) => {
-                const tourQs = new URLSearchParams(qs.toString());
-                tourQs.set("productSlug", tour.slug);
-
-                return (
-                  <div
-                    key={tour.pk}
-                    className="rounded-[2rem] border border-slate-200 bg-white overflow-hidden shadow-[0_18px_60px_rgba(15,23,42,0.08)] flex flex-col justify-between"
-                  >
-                    <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-slate-100">
-                      <img
-                        src={tour.image || "/hero/juneau.jpg"}
-                        alt={tour.title}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div className="p-6 space-y-4 flex-grow flex flex-col justify-between">
-                      <div className="space-y-2">
-                        <div className="flex justify-between items-center">
-                          <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
-                            {tour.category || "Juneau Excursion"}
-                          </span>
-                          <span className="rounded bg-sky-50 px-1.5 py-0.5 text-[9px] font-bold text-sky-850">
-                            Verified Capacity
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-black tracking-tight text-slate-900">{tour.title}</h3>
-                        
-                        <div className="grid grid-cols-2 gap-2 py-2 text-[11px] border-y border-slate-100 my-2">
-                          <div>
-                            <span className="text-slate-500 block">Duration</span>
-                            <span className="font-black text-slate-900">Check detail</span>
-                          </div>
-                          <div>
-                            <span className="text-slate-500 block">Safety Buffer</span>
-                            <span className="font-black text-rose-800">45+ min required</span>
-                          </div>
-                        </div>
-
-                        <p className="text-xs text-slate-655 line-clamp-2">
-                          {getProductOneLiner(tour)}
-                        </p>
-                      </div>
-                      {tour.timingStatus !== "unknown" && (
-                        <div className={`rounded-xl border px-3 py-2 text-xs font-semibold ${
-                          tour.timingStatus === "safe" ? "border-emerald-200 bg-emerald-50 text-emerald-955" :
-                          tour.timingStatus === "tight" ? "border-amber-200 bg-amber-50 text-amber-955" :
-                          "border-rose-200 bg-rose-50 text-rose-955"
-                        }`}>
-                          {tour.timingStatus === "safe" ? "✅ " : tour.timingStatus === "tight" ? "⚠️ " : "❌ "}
-                          {tour.timingGuidanceText}
-                        </div>
-                      )}
-                      <div className="pt-4 flex items-center justify-between border-t border-slate-100">
-                        <span className="text-lg font-black text-slate-900">{tour.fromPrice || "Check Price"}</span>
-                        <Link
-                          href={`/tours/${tour.company}/${tour.pk}?${tourQs.toString()}`}
-                          className="rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
-                        >
-                          View Excursion
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <div className="grid gap-6 md:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-wider text-amber-600 block">Cruiser Alert</span>
-                <h3 className="text-lg font-bold text-slate-900 leading-snug">Rigid Excursion Timings</h3>
-                <p className="text-xs leading-relaxed text-slate-600">
-                  {slug === "skagway" 
-                    ? "Skagway's railway and helicopter tours operate on rigid timetables. Navigating train transfers and flight durations without overlapping your ship's all-aboard window is a critical challenge." 
-                    : "Ketchikan excursions take place in remote wilderness locations. Selecting the right tour depends directly on tracking precise transfer times to and from the cruise docks safely."}
-                </p>
-                <Link
-                  href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`}
-                  className="text-xs font-bold text-sky-850 block hover:underline"
-                >
-                  Read disembarkation guide →
-                </Link>
+        <section className="mt-8 space-y-10">
+          {groups.map((group) => (
+            <div key={group.title}>
+              <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <h2 className="text-2xl font-black tracking-tight text-slate-950">{group.title}</h2>
+                  <p className="mt-1 text-sm text-slate-600">{group.blurb}</p>
+                </div>
               </div>
-
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm space-y-3">
-                <span className="text-[10px] font-black uppercase tracking-wider text-sky-700 block">Active Planning</span>
-                <h3 className="text-lg font-bold text-slate-900 leading-snug">Verify Schedule Compatibility</h3>
-                <p className="text-xs leading-relaxed text-slate-600">
-                  {slug === "skagway"
-                    ? " Broadway and Ore docks are walkable, but Railroad Dock requires a 10-15 minute walk. White Pass train departures require prompt gangway clearing."
-                    : "Berths 1-4 sit right downtown. Ward Cove terminal is 7 miles north and requires a mandatory 20-minute shuttle bus downtown, which can add up to 45 minutes of wait time."}
-                </p>
-                <Link
-                  href="/tours"
-                  className="text-xs font-bold text-sky-850 block hover:underline"
-                >
-                  Browse all active excursions →
-                </Link>
+              <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                {group.tours.map((tour) => <TourCard key={`${group.title}-${tour.company}-${tour.pk}`} tour={tour} />)}
               </div>
             </div>
-          )}
+          ))}
         </section>
 
-        {/* Juneau Excursion Categories - Pushed lower down */}
-        {slug === "juneau" && (
-          <section className="mt-8">
-            <div className="border-b border-slate-200 pb-3">
-              <h2 className="text-2xl font-black tracking-tight text-slate-955">Browse Juneau Categories</h2>
+        <section className="mt-12 rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <div className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">Still deciding?</div>
+              <h2 className="mt-2 text-2xl font-black text-slate-950">See every {portTitle} excursion</h2>
+              <p className="mt-2 max-w-2xl text-sm text-slate-600">The groups above are shortcuts, not exclusions. Browse the full port inventory if you want to compare every available option.</p>
             </div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <Link
-                href="/categories/juneau-helicopter-tours"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Helicopter Tours</h3>
-                <p className="mt-1 text-xs text-slate-500">Compare icefield flight paths & glacier landings.</p>
-              </Link>
-              <Link
-                href="/categories/glacier-tours"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Glacier Ice Treks</h3>
-                <p className="mt-1 text-xs text-slate-500">Active glacier walks & guided ice climbs.</p>
-              </Link>
-              <Link
-                href="/categories/dog-sledding"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Glacier Dog Sledding</h3>
-                <p className="mt-1 text-xs text-slate-500">Helicopter shuttles to remote musher camps.</p>
-              </Link>
-              <Link
-                href="/categories/whale-watching"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Whale Watching</h3>
-                <p className="mt-1 text-xs text-slate-500">Spot humpback whales in Auke Bay.</p>
-              </Link>
-              <Link
-                href="/categories/mendenhall-glacier"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Mendenhall Glacier</h3>
-                <p className="mt-1 text-xs text-slate-500">Visitor center hikes & lake views.</p>
-              </Link>
-              <Link
-                href="/categories/flightseeing"
-                className="rounded-2xl border border-slate-200 bg-white p-5 hover:-translate-y-1 transition duration-200 shadow-sm hover:shadow block"
-              >
-                <h3 className="font-bold text-slate-900">Flightseeing</h3>
-                <p className="mt-1 text-xs text-slate-500">Icefield flight paths and floatplanes.</p>
-              </Link>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/tours" className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold text-slate-800">Full catalog</Link>
+              <Link href={`/plan?${qs.toString()}`} className="rounded-xl bg-slate-950 px-5 py-3 text-xs font-bold text-white">Help me choose</Link>
             </div>
-          </section>
-        )}
-
-        {/* The Decision Problem */}
-        <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] sm:p-8">
-          <h2 className="text-2xl font-black tracking-tight text-slate-955">The Port-Day Decision Problem</h2>
-          <p className="mt-4 text-sm leading-7 text-slate-600">
-            {info.problem}
-          </p>
-          <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50 px-5 py-4">
-            <h3 className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">Safety First</h3>
-            <p className="mt-2 text-sm leading-6 text-slate-700">
-              Never book a tour that doesn't leave at least a <strong>45-minute return buffer</strong> before your cruise ship's scheduled all-aboard time (30 minutes prior to departure).
-            </p>
-            {["juneau", "skagway", "ketchikan"].includes(slug) && (
-              <div className="mt-3 pt-3 border-t border-sky-100">
-                <Link
-                  href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`}
-                  className="inline-flex items-center text-xs font-bold uppercase tracking-wider text-sky-800 hover:text-sky-900 transition"
-                >
-                  Read disembarkation & timing guide for {portTitle} →
-                </Link>
-              </div>
-            )}
           </div>
         </section>
 
-        {/* Action cards */}
-        <section className="mt-8 grid gap-5 md:grid-cols-2">
-          <Link
-            href={`/plan?${qs.toString()}`}
-            className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 block"
-          >
-            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-sky-700">Interactive Chooser</div>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-955">Match Excursions to Ship Window</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-600">
-              Input your cruise line, ship, and date to calculate timing safety buffers and see a scored shortlist of matching tours.
-            </p>
-            <div className="mt-5 text-sm font-black uppercase tracking-[0.12em] text-cyan-700">Launch chooser</div>
-          </Link>
-
-          <Link
-            href="/tours"
-            className="rounded-[2rem] border border-slate-200 bg-white p-6 shadow-[0_18px_60px_rgba(15,23,42,0.08)] transition hover:-translate-y-1 block"
-          >
-            <div className="text-[11px] font-black uppercase tracking-[0.18em] text-sky-700">Browse Catalog</div>
-            <h2 className="mt-3 text-2xl font-black tracking-tight text-slate-955">View All Excursions</h2>
-            <p className="mt-3 text-sm leading-7 text-slate-600">
-              Explore the complete catalog of excursions, view operator details, and check live availability directly on the calendar.
-            </p>
-            <div className="mt-5 text-sm font-black uppercase tracking-[0.12em] text-cyan-700">Browse tours</div>
-          </Link>
+        <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8">
+          <h2 className="text-xl font-black text-slate-950">Planning your {portTitle} port day</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-600">{info.problem}</p>
+          <p className="mt-3 text-sm leading-7 text-slate-600">Use the operator's live calendar and your cruise line's current all-aboard instructions as the final source for timing. Build in comfortable extra time rather than relying on the shortest possible connection.</p>
+          <Link href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`} className="mt-4 inline-block text-xs font-black uppercase tracking-wider text-sky-800">Read the {portTitle} timing guide →</Link>
         </section>
       </div>
     </main>
