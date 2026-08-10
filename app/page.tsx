@@ -11,8 +11,8 @@ export const metadata: Metadata = {
 
 const APPROVED_PORTS = [
   { slug: "juneau", title: "Juneau", image: "/hero/juneau.jpg", description: "Glacier flights, dog sledding, whale watching, and Mendenhall experiences." },
-  { slug: "skagway", title: "Skagway", image: "/hero/skagway.jpg", description: "Plan around White Pass, Yukon, sightseeing, and adventure options." },
-  { slug: "ketchikan", title: "Ketchikan", image: "/hero/ketchikan.png", description: "Explore rainforest, wildlife, flightseeing, kayaking, and cultural experiences." }
+  { slug: "skagway", title: "Skagway", image: "/hero/skagway.jpg", description: "White Pass-area sightseeing, helicopter experiences, gold-rush history, and active adventures." },
+  { slug: "ketchikan", title: "Ketchikan", image: "/hero/ketchikan.png", description: "Rainforest, wildlife, flightseeing, kayaking, bear viewing, and cultural experiences." }
 ];
 
 const SHOPPING_PATHS = [
@@ -114,7 +114,7 @@ export default function HomePage() {
       <section id="ports" className="mx-auto max-w-5xl px-6 py-12 space-y-8 scroll-mt-6">
         <div className="text-center space-y-2 max-w-2xl mx-auto">
           <h2 className="text-3xl font-black tracking-tight text-slate-900">Shop by Alaska Port</h2>
-          <p className="text-sm text-slate-600">Start with the stop on your itinerary. Juneau currently has the deepest live booking inventory; Skagway and Ketchikan are useful planning hubs as inventory expands.</p>
+          <p className="text-sm text-slate-600">Start with the stop on your itinerary, then compare the excursions currently connected for Juneau, Skagway, or Ketchikan.</p>
         </div>
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
