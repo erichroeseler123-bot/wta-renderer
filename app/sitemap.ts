@@ -35,61 +35,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }));
 
   const approvedPorts = ['juneau', 'skagway', 'ketchikan'];
-  const approvedCategories = [
-    'juneau-helicopter-tours',
-    'glacier-tours',
-    'dog-sledding',
-    'whale-watching',
-    'mendenhall-glacier',
-    'flightseeing',
-  ];
-  const approvedGuides = [
-    'how-long-does-it-take-to-get-off-the-ship-in-juneau',
-    'how-long-does-it-take-to-get-off-the-ship-in-skagway',
-    'how-long-does-it-take-to-get-off-the-ship-in-ketchikan',
-  ];
-  const approvedShips = [
-    'celebrity-edge',
-    'royal-princess',
-    'discovery-princess',
-    'norwegian-bliss',
-    'koningsdam',
-  ];
+  const approvedCategories = ['juneau-helicopter-tours','glacier-tours','dog-sledding','whale-watching','mendenhall-glacier','flightseeing'];
+  const approvedGuides = ['how-long-does-it-take-to-get-off-the-ship-in-juneau','how-long-does-it-take-to-get-off-the-ship-in-skagway','how-long-does-it-take-to-get-off-the-ship-in-ketchikan'];
+  const approvedShips = ['celebrity-edge','royal-princess','discovery-princess','norwegian-bliss','koningsdam'];
 
-  const portUrls = approvedPorts.map((slug) => ({
-    url: `${baseUrl}/ports/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
-
-  const moneyPageUrls = MONEY_PAGES.map((slug) => ({
-    url: `${baseUrl}/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.9,
-  }));
-
-  const categoryUrls = approvedCategories.map((slug) => ({
-    url: `${baseUrl}/categories/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
-  const guideUrls = approvedGuides.map((slug) => ({
-    url: `${baseUrl}/guides/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
-
-  const shipUrls = approvedShips.map((slug) => ({
-    url: `${baseUrl}/ships/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }));
+  const portUrls = approvedPorts.map((slug) => ({ url: `${baseUrl}/ports/${slug}`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 }));
+  const moneyPageUrls = MONEY_PAGES.map((slug) => ({ url: `${baseUrl}/${slug}`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 }));
+  const categoryUrls = approvedCategories.map((slug) => ({ url: `${baseUrl}/categories/${slug}`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.8 }));
+  const guideUrls = approvedGuides.map((slug) => ({ url: `${baseUrl}/guides/${slug}`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.7 }));
+  const shipUrls = approvedShips.map((slug) => ({ url: `${baseUrl}/ships/${slug}`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.7 }));
 
   const corePages = [
     ['', 'weekly', 1],
@@ -99,15 +53,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/ships', 'weekly', 0.6],
     ['/about', 'monthly', 0.5],
     ['/contact-us', 'monthly', 0.5],
+    ['/privacy', 'yearly', 0.3],
+    ['/terms', 'yearly', 0.3],
   ] as const;
 
   return [
-    ...corePages.map(([path, changeFrequency, priority]) => ({
-      url: `${baseUrl}${path}`,
-      lastModified: new Date(),
-      changeFrequency,
-      priority,
-    })),
+    ...corePages.map(([path, changeFrequency, priority]) => ({ url: `${baseUrl}${path}`, lastModified: new Date(), changeFrequency, priority })),
     ...portUrls,
     ...moneyPageUrls,
     ...categoryUrls,
