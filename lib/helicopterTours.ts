@@ -201,7 +201,7 @@ function normalizeTour(
   ).trim();
   const slugSource = String(tour.slug || title || "").trim();
   const slug = slugSource ? slugify(slugSource) : "";
-  const port = inferPortFromCompany(company) || "";
+  const port = inferPortFromCompany(company, pk) || "";
 
   if (!isPublicExcursion(pk, title, company, port)) return null;
 
@@ -259,7 +259,7 @@ export const getHelicopterToursSnapshot = unstable_cache(
       return portCompare || a.title.localeCompare(b.title);
     });
   },
-  ["alaska-tours-snapshot-v2"],
+  ["alaska-tours-snapshot-v3"],
   { revalidate: 1800 },
 );
 
@@ -292,7 +292,7 @@ export const getHelicopterTours = unstable_cache(
       return portCompare || a.title.localeCompare(b.title);
     });
   },
-  ["alaska-tours-v2"],
+  ["alaska-tours-v3"],
   { revalidate: 1800 },
 );
 
