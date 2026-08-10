@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function Footer() {
   return (
     <footer className="bg-white border-t border-slate-100 py-12 px-6">
@@ -13,6 +15,14 @@ export default function Footer() {
             >
               907-723-8908
             </a>
+            <div className="mt-3 flex flex-wrap justify-center gap-x-4 gap-y-2 text-xs font-bold text-slate-500 md:justify-start">
+              <Link href="/about" className="hover:text-sky-700">About</Link>
+              <Link href="/contact-us" className="hover:text-sky-700">Contact</Link>
+              <Link href="/tours" className="hover:text-sky-700">Tours</Link>
+              <Link href="/ports" className="hover:text-sky-700">Ports</Link>
+              <Link href="/privacy" className="hover:text-sky-700">Privacy</Link>
+              <Link href="/terms" className="hover:text-sky-700">Terms</Link>
+            </div>
           </div>
           <div className="text-[10px] text-slate-300 uppercase tracking-tighter text-center md:text-right">
             Imagery provided by <a href="https://unsplash.com" className="underline">Unsplash</a>.
