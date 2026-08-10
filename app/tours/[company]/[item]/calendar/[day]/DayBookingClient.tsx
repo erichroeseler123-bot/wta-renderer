@@ -8,7 +8,7 @@ import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { canonicalizePortSlug } from "@/lib/dccSatellite";
 import { parseWidgetInitContext } from "@/lib/widgetContext";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
-import { evaluatePortDayFit, formatMinutesToTime } from "@/lib/timing";
+import { evaluatePortDayFit } from "@/lib/timing";
 
 export type SlotRate = {
   pk: number;
@@ -74,10 +74,9 @@ export default function DayBookingClient({
     }));
   }, [selected]);
 
-  // Resolve Cruise Ship and Window
   const cruiseShip = sp.get("cruiseShip") || undefined;
   const hint = cruiseShip ? CRUISE_ITINERARY_HINTS[cruiseShip as CruiseShipName] : undefined;
-  const port = inferPortFromCompany(company);
+  const port = inferPortFromCompany(company, item);
   const matchedHint = hint && hint.portSlug === port ? hint : undefined;
 
   let shipArrival: string | undefined = undefined;
@@ -128,7 +127,7 @@ export default function DayBookingClient({
         cruiseShipSlug: sp.get("cruiseShipSlug") || undefined,
         timeOfDay: sp.get("timeOfDay") || undefined,
         budgetTier: sp.get("budgetTier") || undefined,
-        portSlug: widgetContext.portSlug || canonicalizePortSlug(inferPortFromCompany(company)) || undefined,
+        portSlug: widgetContext.portSlug || canonicalizePortSlug(inferPortFromCompany(company, item)) || undefined,
         productSlug: widgetContext.productSlug || undefined,
         requestedLane: sp.get("requestedLane") || undefined,
         resolvedLane: sp.get("resolvedLane") || sp.get("lane") || undefined,
@@ -144,7 +143,6 @@ export default function DayBookingClient({
     open();
   }
 
-  // Evaluate selected slot timing
   const selectedEval = useMemo(() => {
     if (!selected) return null;
     const timeStr = selected.start_at.slice(11, 16);
