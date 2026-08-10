@@ -4,7 +4,7 @@ import { getHelicopterToursSnapshot, type HelicopterTour } from "@/lib/helicopte
 import { sanitizeTours } from "@/lib/tourSeo";
 
 export const metadata: Metadata = {
-  title: "Choose Your Best Alaska Shore Excursion | Welcome To Alaska Tours",
+  title: "Choose Your Best Alaska Shore Excursion",
   description:
     "Choose Juneau, Skagway, or Ketchikan, tell us what kind of Alaska day you want, and get a four-tour shortlist from connected excursion inventory.",
   alternates: { canonical: "https://welcometoalaskatours.com/plan" },
