@@ -5,7 +5,7 @@ export function getProductOneLiner(tour: { title?: string | null; category?: str
   const category = (tour.category || "").toLowerCase();
   const port = (tour.port || "juneau").toLowerCase();
   const portName = port.charAt(0).toUpperCase() + port.slice(1);
-  
+
   if (title.includes("trek") || title.includes("walk") || title.includes("hike")) {
     return `Ice trekking and guided glacier walks optimized for active cruise days in ${portName}.`;
   }
@@ -16,9 +16,9 @@ export function getProductOneLiner(tour: { title?: string | null; category?: str
     return `Helicopter flightseeing and glacier landing built for a shorter ${portName} port window.`;
   }
   if (title.includes("whale") || title.includes("watching") || category.includes("whale")) {
-    return `Auke Bay marine wildlife and humpback whale watching timed for a safe return to your ship.`;
+    return `Marine wildlife and whale watching timed for a safe return during your ${portName} port day.`;
   }
-  return `${portName} adventure route with live date availability and safety buffer protections.`;
+  return `${portName} adventure route with live date availability and cruise-day timing guidance.`;
 }
 
 export function cleanTourDescription(description?: string | null, fallback?: string) {
@@ -68,14 +68,21 @@ export function sanitizeTours<T extends Pick<HelicopterTour, "description">>(tou
 export function buildOrganizationSchema() {
   return {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": "TravelAgency",
+    "@id": "https://welcometoalaskatours.com/#organization",
     name: "Welcome To Alaska Tours",
     url: "https://welcometoalaskatours.com",
+    telephone: "+1-907-723-8908",
+    email: "hello@welcometoalaskatours.com",
     logo: "https://welcometoalaskatours.com/apple-touch-icon.png",
-    sameAs: [
-      "https://www.welcometoalaskatours.com",
-      "https://wta-ui.vercel.app",
-    ],
+    areaServed: ["Juneau, Alaska", "Skagway, Alaska", "Ketchikan, Alaska"],
+    contactPoint: {
+      "@type": "ContactPoint",
+      telephone: "+1-907-723-8908",
+      contactType: "customer service",
+      areaServed: "US",
+      availableLanguage: "English",
+    },
   };
 }
 
@@ -83,18 +90,20 @@ export function buildWebsiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": "https://welcometoalaskatours.com/#website",
     name: "Welcome To Alaska Tours",
     url: "https://welcometoalaskatours.com",
     inLanguage: "en-US",
     publisher: {
-      "@type": "Organization",
-      name: "Welcome To Alaska Tours",
-      url: "https://welcometoalaskatours.com",
+      "@id": "https://welcometoalaskatours.com/#organization",
     },
   };
 }
 
-export function buildTourFaqs(tour: Pick<HelicopterTour, "title">) {
+export function buildTourFaqs(tour: Pick<HelicopterTour, "title" | "port">) {
+  const port = String(tour.port || "Alaska");
+  const portName = port.charAt(0).toUpperCase() + port.slice(1);
+
   return [
     {
       question: `How do I check live availability for ${tour.title}?`,
@@ -102,14 +111,14 @@ export function buildTourFaqs(tour: Pick<HelicopterTour, "title">) {
         "Open the booking calendar to review currently posted dates and departure times before checkout.",
     },
     {
-      question: `Is ${tour.title} suitable for a Juneau cruise day?`,
+      question: `Is ${tour.title} suitable for a ${portName} cruise day?`,
       answer:
-        "Match the tour date and timing to your port schedule and leave enough buffer to return to the ship comfortably.",
+        `Match the tour date and timing to your ${portName} port schedule and leave enough buffer to return to the ship comfortably.`,
     },
     {
       question: `What should I review before booking ${tour.title}?`,
       answer:
-        "Check the published duration, age notes, pricing, and live availability on the booking page before confirming.",
+        "Check the published duration, age notes, pricing, meeting details, and live availability on the booking page before confirming.",
     },
   ];
 }
@@ -149,7 +158,7 @@ export function buildTourItemListSchema(
   return {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "Juneau helicopter tours",
+    name: "Alaska shore excursions in Juneau, Skagway, and Ketchikan",
     numberOfItems: tours.length,
     itemListElement: tours.map((tour, index) => ({
       "@type": "ListItem",
