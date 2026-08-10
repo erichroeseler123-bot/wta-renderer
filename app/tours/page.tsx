@@ -11,20 +11,44 @@ export default async function ToursPage() {
   const tours = sanitizeTours(await getHelicopterTours());
   const itemListSchema = buildTourItemListSchema(tours);
 
+  const portCounts = tours.reduce<Record<string, number>>((counts, tour) => {
+    const port = String(tour.port || "").toLowerCase();
+    if (port) counts[port] = (counts[port] || 0) + 1;
+    return counts;
+  }, {});
+
   return (
     <>
       <JsonLd data={itemListSchema} />
       <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 space-y-6">
         <div className="text-center space-y-2">
           <div className="inline-flex rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-sky-400">
-            Alaska Excursion Catalog
+            Juneau • Skagway • Ketchikan
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl leading-tight">
             Browse Alaska Shore Excursions
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl mx-auto">
-            Compare the bookable inventory currently available on Welcome To Alaska Tours, then use your ship and port timing to decide what fits your cruise day.
+            Compare the Alaska excursions already available through our FareHarbor operator network, then use your ship, port, and date to narrow the list to your cruise day.
           </p>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-3">
+          {[
+            ["juneau", "Juneau"],
+            ["skagway", "Skagway"],
+            ["ketchikan", "Ketchikan"],
+          ].map(([slug, label]) => (
+            <Link
+              key={slug}
+              href={`/ports/${slug}`}
+              className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 text-white hover:bg-white/[0.09] transition"
+            >
+              <div className="text-xs font-black uppercase tracking-wider text-cyan-300">{label}</div>
+              <div className="mt-1 text-2xl font-black">{portCounts[slug] || 0}</div>
+              <div className="text-xs text-slate-400">excursions in the catalog</div>
+            </Link>
+          ))}
         </div>
 
         <div className="rounded-[2.5rem] border border-white/10 bg-white/[0.05] p-6">
@@ -34,7 +58,7 @@ export default async function ToursPage() {
                 Shop by experience
               </h2>
               <p className="mt-1 text-xs text-slate-400">
-                Juneau currently has the deepest live booking inventory. These category pages also help you compare the broader Alaska excursion landscape as inventory expands.
+                Start with the kind of Alaska day you want, or go straight to your port page to compare the options available there.
               </p>
             </div>
             <Link href="/#find-your-port-day" className="text-xs font-bold text-cyan-300 hover:text-cyan-200">
@@ -42,9 +66,9 @@ export default async function ToursPage() {
             </Link>
           </div>
           <div className="mt-4 flex flex-wrap gap-2">
-            <Link href="/categories/juneau-helicopter-tours" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Helicopter Tours</Link>
+            <Link href="/categories/juneau-helicopter-tours" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Juneau Helicopter Tours</Link>
             <Link href="/categories/glacier-tours" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Glacier Tours</Link>
-            <Link href="/categories/dog-sledding" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Glacier Dog Sledding</Link>
+            <Link href="/categories/dog-sledding" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Dog Sledding</Link>
             <Link href="/categories/whale-watching" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Whale Watching</Link>
             <Link href="/categories/mendenhall-glacier" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Mendenhall Glacier</Link>
             <Link href="/categories/flightseeing" className="rounded-xl border border-sky-200 bg-white px-3 py-1.5 text-xs font-bold text-sky-950 hover:bg-sky-50 transition">Flightseeing</Link>
@@ -56,19 +80,19 @@ export default async function ToursPage() {
         title="Alaska Shore Excursion Tour FAQs"
         faqs={[
           {
-            question: "What can I book on Welcome To Alaska Tours right now?",
+            question: "What can I book on Welcome To Alaska Tours?",
             answer:
-              "The live catalog currently has its strongest bookable inventory in Juneau, especially helicopter, glacier, dog sledding, and related experiences. Skagway and Ketchikan are also part of the cruise-day planning experience while additional bookable inventory is added.",
+              "The catalog includes excursions from FareHarbor operators serving Juneau, Skagway, and Ketchikan, including whale watching, glacier experiences, helicopter and seaplane tours, dog sledding, fishing, wildlife, kayaking, rainforest adventures, sightseeing, and other port-day activities.",
           },
           {
             question: "Can I browse tours before picking a date?",
             answer:
-              "Yes. You can compare tour and category pages first, then open the booking calendar to confirm current dates, times, pricing, and capacity.",
+              "Yes. Browse the catalog, port pages, or activity categories first, then open a tour's booking calendar to confirm current dates, times, pricing, and capacity.",
           },
           {
             question: "How should I choose the right tour for a cruise day?",
             answer:
-              "Start with your port, ship timing, and all-aboard window. Then compare tour duration, meeting details, operator notes, and the live booking calendar before checkout.",
+              "Start with your port, ship timing, and all-aboard window. Then compare duration, meeting details, operator notes, and the live booking calendar before checkout.",
           },
         ]}
       />
