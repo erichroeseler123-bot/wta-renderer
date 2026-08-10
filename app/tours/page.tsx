@@ -2,13 +2,63 @@ import Link from "next/link";
 import FAQSection from "@/app/components/faq/FAQSection";
 import JsonLd from "@/components/seo/JsonLd";
 import { WidgetCatalog } from "@/components/widget/WidgetCatalog";
-import { getHelicopterTours } from "@/lib/helicopterTours";
+import { getHelicopterTours, type HelicopterTour } from "@/lib/helicopterTours";
+import { getFareHarborNextAvailability } from "@/lib/fareharborAvailability";
 import { buildTourItemListSchema, sanitizeTours } from "@/lib/tourSeo";
 
 export const dynamic = "force-dynamic";
 
+async function enrichWithLiveInventory(tours: HelicopterTour[]) {
+  const batchSize = 8;
+  const enriched: HelicopterTour[] = [];
+
+  for (let index = 0; index < tours.length; index += batchSize) {
+    const batch = tours.slice(index, index + batchSize);
+    const rows = await Promise.all(
+      batch.map(async (tour): Promise<HelicopterTour> => {
+        try {
+          const nextAvailableDate = await getFareHarborNextAvailability(
+            tour.company,
+            String(tour.pk),
+          );
+          return {
+            ...tour,
+            nextAvailableDate: nextAvailableDate || undefined,
+            hasInventory: Boolean(nextAvailableDate),
+          };
+        } catch (error) {
+          console.error(
+            `Unable to check FareHarbor inventory for ${tour.company}:${tour.pk}`,
+            error,
+          );
+          return { ...tour, hasInventory: null };
+        }
+      }),
+    );
+    enriched.push(...rows);
+  }
+
+  return enriched.sort((a, b) => {
+    const inventoryRank = (tour: HelicopterTour) =>
+      tour.hasInventory === true ? 0 : tour.hasInventory === null ? 1 : 2;
+    const inventoryCompare = inventoryRank(a) - inventoryRank(b);
+    if (inventoryCompare !== 0) return inventoryCompare;
+
+    const portCompare = a.port.localeCompare(b.port);
+    if (portCompare !== 0) return portCompare;
+
+    if (a.nextAvailableDate && b.nextAvailableDate) {
+      const dateCompare = a.nextAvailableDate.localeCompare(b.nextAvailableDate);
+      if (dateCompare !== 0) return dateCompare;
+    }
+
+    return a.title.localeCompare(b.title);
+  });
+}
+
 export default async function ToursPage() {
-  const tours = sanitizeTours(await getHelicopterTours());
+  const catalogTours = sanitizeTours(await getHelicopterTours());
+  const tours = await enrichWithLiveInventory(catalogTours);
   const itemListSchema = buildTourItemListSchema(tours);
 
   const portCounts = tours.reduce<Record<string, number>>((counts, tour) => {
@@ -16,6 +66,8 @@ export default async function ToursPage() {
     if (port) counts[port] = (counts[port] || 0) + 1;
     return counts;
   }, {});
+
+  const liveCount = tours.filter((tour) => tour.hasInventory === true).length;
 
   return (
     <>
@@ -29,8 +81,13 @@ export default async function ToursPage() {
             Browse Alaska Shore Excursions
           </h1>
           <p className="text-sm text-slate-300 max-w-2xl mx-auto">
-            Compare the Alaska excursions already available through our FareHarbor operator network, then use your ship, port, and date to narrow the list to your cruise day.
+            Compare Alaska excursions from our FareHarbor operator network. Tours with live dates are shown first so you can get to bookable options faster.
           </p>
+          {liveCount > 0 && (
+            <p className="text-xs font-bold uppercase tracking-[0.14em] text-emerald-300">
+              {liveCount} tours currently showing live dates
+            </p>
+          )}
         </div>
 
         <div className="grid gap-3 sm:grid-cols-3">
@@ -83,6 +140,11 @@ export default async function ToursPage() {
             question: "What can I book on Welcome To Alaska Tours?",
             answer:
               "The catalog includes excursions from FareHarbor operators serving Juneau, Skagway, and Ketchikan, including whale watching, glacier experiences, helicopter and seaplane tours, dog sledding, fishing, wildlife, kayaking, rainforest adventures, sightseeing, and other port-day activities.",
+          },
+          {
+            question: "Why are some tours shown after the live options?",
+            answer:
+              "Tours with confirmed live dates in the next 90 days are shown first. A tour with no posted live dates can still be viewed, but it is placed after currently bookable options to reduce dead ends.",
           },
           {
             question: "Can I browse tours before picking a date?",
