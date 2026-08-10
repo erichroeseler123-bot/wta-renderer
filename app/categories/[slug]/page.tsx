@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getHelicopterTours } from "@/lib/helicopterTours";
 import { sanitizeTours } from "@/lib/tourSeo";
+import Breadcrumbs from "@/app/components/seo/Breadcrumbs";
+import JsonLd from "@/components/seo/JsonLd";
 
 const APPROVED_CATEGORIES = [
   "juneau-helicopter-tours",
@@ -112,10 +114,45 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const rawTours = await getHelicopterTours().catch(() => []);
   const tours = (sanitizeTours(rawTours) as TourType[]).filter(config.matchFilter);
 
+  const categoryUrl = `https://welcometoalaskatours.com/categories/${slug}`;
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://welcometoalaskatours.com/" },
+      { "@type": "ListItem", position: 2, name: "Tours", item: "https://welcometoalaskatours.com/tours" },
+      { "@type": "ListItem", position: 3, name: config.title, item: categoryUrl },
+    ],
+  };
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: config.headline,
+    numberOfItems: tours.length,
+    itemListElement: tours.map((tour, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      name: tour.title,
+      url: `https://welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`,
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
+      <JsonLd data={breadcrumbSchema} />
+      <JsonLd data={itemListSchema} />
+
       <section className="bg-slate-950 px-6 py-12 text-white">
         <div className="mx-auto max-w-5xl">
+          <div className="[&_nav]:mb-5 [&_nav]:text-white/65 [&_nav_a]:hover:text-white [&_nav_span]:text-white/80">
+            <Breadcrumbs
+              items={[
+                { href: "/", label: "Home" },
+                { href: "/tours", label: "Tours" },
+                { label: config.title },
+              ]}
+            />
+          </div>
           <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200">
             {config.title}
           </div>
