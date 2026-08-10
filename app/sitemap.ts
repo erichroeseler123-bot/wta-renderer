@@ -91,37 +91,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.7,
   }));
 
+  const corePages = [
+    ['', 'weekly', 1],
+    ['/tours', 'weekly', 0.8],
+    ['/ports', 'weekly', 0.9],
+    ['/guides', 'weekly', 0.6],
+    ['/ships', 'weekly', 0.6],
+    ['/about', 'monthly', 0.5],
+    ['/contact-us', 'monthly', 0.5],
+  ] as const;
+
   return [
-    {
-      url: baseUrl,
+    ...corePages.map(([path, changeFrequency, priority]) => ({
+      url: `${baseUrl}${path}`,
       lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/tours`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/ports`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/guides`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/ships`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    },
+      changeFrequency,
+      priority,
+    })),
     ...portUrls,
     ...moneyPageUrls,
     ...categoryUrls,
