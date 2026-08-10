@@ -55,7 +55,7 @@ export async function GET(req: Request) {
 
     let tours = await loadTours();
     if (port) {
-      tours = tours.filter((t) => inferPortFromCompany(t.company) === port);
+      tours = tours.filter((t) => inferPortFromCompany(t.company, t.pk) === port);
     }
     if (category) {
       tours = tours.filter((t) => normalize(t.category || "Adventures") === category);
