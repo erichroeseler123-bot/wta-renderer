@@ -7,21 +7,22 @@ import BackForwardRefresh from "@/app/BackForwardRefresh";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/tourSeo";
 
+const siteDescription =
+  "Plan Alaska cruise shore excursions in Juneau, Skagway, and Ketchikan. Compare connected tours by port and trip style, then open the booking calendar for current departures, pricing, and capacity.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://welcometoalaskatours.com"),
   title: {
-    default: "Welcome to Alaska Tours | Excursions, Guides & Local Planners",
+    default: "Welcome to Alaska Tours | Alaska Shore Excursion Planner",
     template: "%s | Welcome to Alaska Tours",
   },
-  description:
-    "Plan your Alaska cruise shore excursions in Juneau, Skagway, and Ketchikan. Secure direct bookings, local guides, and real-time port compatibility synchronization.",
+  description: siteDescription,
   alternates: {
     canonical: "./",
   },
   openGraph: {
-    title: "Welcome to Alaska Tours | Excursions, Guides & Local Planners",
-    description:
-      "Plan your Alaska cruise shore excursions in Juneau, Skagway, and Ketchikan. Secure direct bookings, local guides, and real-time port compatibility synchronization.",
+    title: "Welcome to Alaska Tours | Alaska Shore Excursion Planner",
+    description: siteDescription,
     url: "./",
     siteName: "Welcome to Alaska Tours",
     locale: "en_US",
@@ -29,9 +30,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Welcome to Alaska Tours | Excursions, Guides & Local Planners",
-    description:
-      "Plan your Alaska cruise shore excursions in Juneau, Skagway, and Ketchikan. Secure direct bookings, local guides, and real-time port compatibility synchronization.",
+    title: "Welcome to Alaska Tours | Alaska Shore Excursion Planner",
+    description: siteDescription,
   },
 };
 
