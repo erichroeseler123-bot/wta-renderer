@@ -1,14 +1,30 @@
 import { MetadataRoute } from 'next';
 import { getHelicopterTours } from '@/lib/helicopterTours';
 
+const MONEY_PAGES = [
+  'juneau/whale-watching',
+  'juneau/mendenhall-glacier-tours',
+  'juneau/helicopter-tours',
+  'juneau/dog-sledding',
+  'juneau/fishing',
+  'ketchikan/bear-tours',
+  'ketchikan/misty-fjords',
+  'ketchikan/kayaking',
+  'ketchikan/adventure-tours',
+  'skagway/helicopter-tours',
+  'skagway/gold-rush-tours',
+  'skagway/dog-sledding',
+  'skagway/adventure-tours',
+];
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://welcometoalaskatours.com';
-  
+
   let tours: any[] = [];
   try {
     tours = await getHelicopterTours();
   } catch (e) {
-    console.error("Failed to load helicopter tours for sitemap", e);
+    console.error('Failed to load tours for sitemap', e);
   }
 
   const tourUrls = tours.map((tour) => ({
@@ -18,20 +34,41 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const approvedPorts = [
-    "juneau",
-    "skagway",
-    "ketchikan"
+  const approvedPorts = ['juneau', 'skagway', 'ketchikan'];
+  const approvedCategories = [
+    'juneau-helicopter-tours',
+    'glacier-tours',
+    'dog-sledding',
+    'whale-watching',
+    'mendenhall-glacier',
+    'flightseeing',
+  ];
+  const approvedGuides = [
+    'how-long-does-it-take-to-get-off-the-ship-in-juneau',
+    'how-long-does-it-take-to-get-off-the-ship-in-skagway',
+    'how-long-does-it-take-to-get-off-the-ship-in-ketchikan',
+  ];
+  const approvedShips = [
+    'celebrity-edge',
+    'royal-princess',
+    'discovery-princess',
+    'norwegian-bliss',
+    'koningsdam',
   ];
 
-  const approvedCategories = [
-    "juneau-helicopter-tours",
-    "glacier-tours",
-    "dog-sledding",
-    "whale-watching",
-    "mendenhall-glacier",
-    "flightseeing"
-  ];
+  const portUrls = approvedPorts.map((slug) => ({
+    url: `${baseUrl}/ports/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
+
+  const moneyPageUrls = MONEY_PAGES.map((slug) => ({
+    url: `${baseUrl}/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }));
 
   const categoryUrls = approvedCategories.map((slug) => ({
     url: `${baseUrl}/categories/${slug}`,
@@ -40,39 +77,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.8,
   }));
 
-  const approvedGuides = [
-    "how-long-does-it-take-to-get-off-the-ship-in-juneau",
-    "how-long-does-it-take-to-get-off-the-ship-in-skagway",
-    "how-long-does-it-take-to-get-off-the-ship-in-ketchikan"
-  ];
-
   const guideUrls = approvedGuides.map((slug) => ({
     url: `${baseUrl}/guides/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
-    priority: 0.8,
+    priority: 0.7,
   }));
-
-  const approvedShips = [
-    "celebrity-edge",
-    "royal-princess",
-    "discovery-princess",
-    "norwegian-bliss",
-    "koningsdam"
-  ];
 
   const shipUrls = approvedShips.map((slug) => ({
     url: `${baseUrl}/ships/${slug}`,
     lastModified: new Date(),
     changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }));
-
-  const portUrls = approvedPorts.map((slug) => ({
-    url: `${baseUrl}/ports/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
+    priority: 0.7,
   }));
 
   return [
@@ -92,21 +108,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/ports`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
-      priority: 0.8,
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/guides`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
-      priority: 0.8,
+      priority: 0.6,
     },
     {
       url: `${baseUrl}/ships`,
       lastModified: new Date(),
       changeFrequency: 'weekly' as const,
-      priority: 0.8,
+      priority: 0.6,
     },
     ...portUrls,
+    ...moneyPageUrls,
     ...categoryUrls,
     ...guideUrls,
     ...shipUrls,
