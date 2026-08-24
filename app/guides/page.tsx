@@ -2,6 +2,11 @@ import Link from "next/link";
 
 const GUIDES = [
   {
+    slug: "juneau-whale-watching-vs-mendenhall",
+    title: "Juneau Whale Watching vs Mendenhall Glacier",
+    description: "A side-by-side cruise-day decision guide: choose wildlife, glacier scenery, or a combination based on your group and actual ship window.",
+  },
+  {
     slug: "how-long-does-it-take-to-get-off-the-ship-in-juneau",
     title: "How Long to Get Off the Cruise Ship in Juneau",
     description: "Juneau disembarkation times, Franklin Street vs AJ Dock shuttle logistics, Mt. Roberts Tramway tour pickup walking guides, and critical timing buffers.",
@@ -19,8 +24,8 @@ const GUIDES = [
 ];
 
 export const metadata = {
-  title: "Alaska Cruise Port Timing Guides | Welcome To Alaska Tours",
-  description: "Check disembarkation schedules, dock walk distances, tendering times, and excursion timing buffers for Juneau, Skagway, and Ketchikan.",
+  title: "Alaska Cruise Planning Guides | Welcome To Alaska Tours",
+  description: "Compare Alaska cruise-port decisions, excursion choices, dock logistics, disembarkation timing, and safety buffers for Juneau, Skagway, and Ketchikan.",
   alternates: {
     canonical: "https://welcometoalaskatours.com/guides",
   },
@@ -30,21 +35,18 @@ export default function GuidesIndexPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef7ff_0%,#f8fafc_42%,#ffffff_100%)] text-slate-900 pb-20">
       <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 space-y-8">
-        
-        {/* Header */}
         <section className="text-center space-y-4">
           <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-sky-800">
             Resource Directory
           </div>
           <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl max-w-3xl mx-auto leading-tight">
-            Alaska Cruise Port Timing Guides
+            Alaska Cruise Planning Guides
           </h1>
           <p className="text-base text-slate-655 max-w-2xl mx-auto leading-relaxed">
-            Excursion scheduling is all about timing buffers. Compare disembarkation processes, dock layouts, and walking times to guarantee you never miss your ship.
+            Make the big port-day decisions first, then check dock logistics, excursion timing, and return buffers before you book.
           </p>
         </section>
 
-        {/* Guides List */}
         <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {GUIDES.map((guide) => (
             <Link
@@ -53,7 +55,7 @@ export default function GuidesIndexPage() {
               className="rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
             >
               <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
-                Timing Guide
+                Planning Guide
               </span>
               <h2 className="text-xl font-black text-slate-950 block leading-tight">
                 {guide.title}
@@ -69,7 +71,6 @@ export default function GuidesIndexPage() {
           ))}
         </section>
 
-        {/* Navigation Action Links */}
         <section className="pt-8 border-t border-slate-205 grid gap-4 sm:grid-cols-3">
           <Link
             href="/ports"
@@ -105,7 +106,6 @@ export default function GuidesIndexPage() {
             </span>
           </Link>
         </section>
-
       </div>
     </main>
   );
