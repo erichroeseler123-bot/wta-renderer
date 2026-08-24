@@ -36,7 +36,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const approvedPorts = ['juneau', 'skagway', 'ketchikan'];
   const approvedCategories = ['juneau-helicopter-tours','glacier-tours','dog-sledding','whale-watching','mendenhall-glacier','flightseeing'];
-  const approvedGuides = ['how-long-does-it-take-to-get-off-the-ship-in-juneau','how-long-does-it-take-to-get-off-the-ship-in-skagway','how-long-does-it-take-to-get-off-the-ship-in-ketchikan'];
+  const approvedGuides = ['juneau-whale-watching-vs-mendenhall','how-long-does-it-take-to-get-off-the-ship-in-juneau','how-long-does-it-take-to-get-off-the-ship-in-skagway','how-long-does-it-take-to-get-off-the-ship-in-ketchikan'];
   const approvedShips = ['celebrity-edge','royal-princess','discovery-princess','norwegian-bliss','koningsdam'];
 
   const portUrls = approvedPorts.map((slug) => ({ url: `${baseUrl}/ports/${slug}`, lastModified: new Date(), changeFrequency: 'weekly' as const, priority: 0.9 }));
