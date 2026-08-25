@@ -87,6 +87,7 @@ export default async function Page({
   const { company, item } = await params;
   const sp = await searchParams;
   const getParam = (value: string | undefined) => String(value || "");
+  const canonicalProductKey = `${company}/${item}`;
 
   const requestedDate = sp.date && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : "";
   let month = sp.month ?? "";
@@ -122,13 +123,31 @@ export default async function Page({
     allDays.push(d.toISOString().slice(0, 10));
   }
 
+  const carriedContext = new URLSearchParams();
+  Object.entries(sp).forEach(([key, value]) => {
+    if (value && key !== "month") carriedContext.set(key, value);
+  });
+  if (!carriedContext.get("productSlug")) carriedContext.set("productSlug", canonicalProductKey);
+
+  const monthHref = (targetMonth: string) => {
+    const query = new URLSearchParams(carriedContext);
+    query.set("month", targetMonth);
+    return `/tours/${company}/${item}/calendar?${query.toString()}`;
+  };
+
+  const dayHref = (day: string) => {
+    const query = new URLSearchParams(carriedContext);
+    query.set("date", day);
+    return `/tours/${company}/${item}/calendar/${day}?${query.toString()}`;
+  };
+
   const telemetryPayload = {
     event: "calendar_start" as const,
     path: `/tours/${company}/${item}/calendar`,
     requestedLane: getParam(sp.requestedLane) || undefined,
     resolvedLane: getParam(sp.resolvedLane) || getParam((sp as any).lane) || undefined,
     degradedFallback: getParam(sp.degradedFallback) === "true" ? true : getParam(sp.degradedFallback) === "false" ? false : undefined,
-    productSlug: `${company}/${item}`,
+    productSlug: getParam(sp.productSlug) || canonicalProductKey,
     rank: getParam(sp.rank) ? Number(getParam(sp.rank)) : undefined,
     port: getParam(sp.port) || undefined,
     topic: getParam((sp as any).topic) || undefined,
@@ -170,7 +189,7 @@ export default async function Page({
         <div className="mt-6 rounded-[2rem] border border-sky-100 bg-white/95 p-4 shadow-sm sm:p-5">
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <Link
-              href={`/tours/${company}/${item}/calendar?month=${prevMonth}`}
+              href={monthHref(prevMonth)}
               className="inline-flex justify-center rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-sm font-semibold text-sky-900 hover:bg-sky-100"
             >
               Previous Month
@@ -179,7 +198,7 @@ export default async function Page({
               {monthLabel}
             </div>
             <Link
-              href={`/tours/${company}/${item}/calendar?month=${nextMonth}`}
+              href={monthHref(nextMonth)}
               className="inline-flex justify-center rounded-xl border border-sky-200 bg-sky-50 px-4 py-2 text-sm font-semibold text-sky-900 hover:bg-sky-100"
             >
               Next Month
@@ -201,7 +220,7 @@ export default async function Page({
               return (
                 <Link
                   key={day}
-                  href={`/tours/${company}/${item}/calendar/${day}`}
+                  href={dayHref(day)}
                   className={[
                     "rounded-2xl border p-3 transition md:text-center",
                     slots.length
