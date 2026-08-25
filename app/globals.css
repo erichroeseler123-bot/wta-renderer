@@ -94,3 +94,108 @@ body {
 .link {
   @apply text-white/80 hover:text-white underline decoration-white/20 hover:decoration-white/40;
 }
+
+/* --- Alaska homepage: turn experience tiles into photographic cards --- */
+#experiences div[class*="lg:grid-cols-4"] {
+  gap: 10px;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  min-height: 360px;
+  flex-direction: column;
+  justify-content: flex-end;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,.13);
+  border-radius: 28px;
+  background-color: #0a302c;
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 22px 50px rgba(0,0,0,.22);
+  transition: transform .35s ease, box-shadow .35s ease;
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgba(3,22,20,.08) 20%, rgba(3,22,20,.34) 50%, rgba(3,22,20,.94) 100%);
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 30px 70px rgba(0,0,0,.32);
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group > div:first-child {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group > div:first-child > span:first-child {
+  display: none;
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group > div:first-child > span:last-child {
+  border: 1px solid rgba(255,255,255,.22);
+  border-radius: 999px;
+  background: rgba(3,22,20,.44);
+  padding: 7px 9px;
+  color: rgba(255,255,255,.72);
+  backdrop-filter: blur(10px);
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group h3 {
+  margin-top: 0;
+  font-size: 1.65rem;
+  line-height: 1;
+  text-shadow: 0 2px 18px rgba(0,0,0,.38);
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group p {
+  max-width: 24rem;
+  color: rgba(255,255,255,.76);
+  text-shadow: 0 2px 15px rgba(0,0,0,.45);
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group > span:last-child {
+  color: #d7ff76;
+}
+
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(1) {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/1/1c/Humpback_whale_breaching_in_southeast_alaska.jpg");
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(2) {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/0/04/Mendenhall_Glacier.jpg");
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(3) {
+  background-image: url("/media/juneau-aerial.png");
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(4) {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/c/c6/Sled_dogs.jpg");
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(5) {
+  background-image: url("https://upload.wikimedia.org/wikipedia/commons/a/a4/Novice_fisherman_with_a_chum_salmon_taken_at_Alexander_Creek%2C_Matanuska-Susitna_Borough%2C_Alaska.jpg");
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(6) {
+  background-image: url("/hero/ketchikan.png");
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(7) {
+  background-image: url("/hero/skagway.jpg");
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(8) {
+  background-image: url("/hero/juneau.jpg");
+}
+
+@media (max-width: 639px) {
+  #experiences div[class*="lg:grid-cols-4"] > a.group {
+    min-height: 300px;
+  }
+}
