@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import PlanTelemetry from "@/app/components/plan/PlanTelemetry";
 import { getHelicopterToursSnapshot, type HelicopterTour } from "@/lib/helicopterTours";
 import { sanitizeTours } from "@/lib/tourSeo";
 import {
@@ -39,15 +40,35 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
   const style = normalizeTripStyle(readParam(params.topic) || readParam(params.subtype));
   const ship = readParam(params.cruiseShip).trim();
   const date = readParam(params.date).trim();
+  const sourcePage = readParam(params.sourcePage).trim() || "/";
   const styleCopy = STYLE_COPY[style];
 
   const allTours = sanitizeTours(await getHelicopterToursSnapshot()) as HelicopterTour[];
   const portTours = allTours.filter((tour) => tour.port === port);
   const { recommendations, exactCount } = buildAlaskaTourShortlist(portTours, style, 4);
   const portLabel = titleCase(port);
+  const degradedFallback = style !== "best-overall" && exactCount < recommendations.length;
 
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#ecfeff_0%,#f8fafc_35%,#ffffff_100%)] text-slate-950">
+      <PlanTelemetry
+        base={{
+          requestedLane: style,
+          resolvedLane: style,
+          degradedFallback,
+          reason: degradedFallback
+            ? "Direct matches were supplemented with the strongest overall port-day alternatives."
+            : "The shortlist resolved from the requested Alaska trip style.",
+          port,
+          topic: style,
+          sourcePage,
+        }}
+        impressions={recommendations.map((recommendation, index) => ({
+          productSlug: `${recommendation.tour.company}/${recommendation.tour.slug}`,
+          rank: index + 1,
+        }))}
+      />
+
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
         <Link href="/#find-your-port-day" className="text-sm font-bold text-sky-800 hover:text-sky-950">← Change my choices</Link>
 
@@ -81,8 +102,23 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
         ) : (
           <section className="mt-6 grid gap-5 lg:grid-cols-2">
             {recommendations.map((recommendation, index) => {
-              const detailHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}?from=plan&rank=${index + 1}&sourcePage=/plan&port=${port}&topic=${style}`;
-              const calendarHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}/calendar?from=plan&rank=${index + 1}&sourcePage=/plan&port=${port}&topic=${style}${date ? `&date=${encodeURIComponent(date)}` : ""}${ship ? `&cruiseShip=${encodeURIComponent(ship)}` : ""}`;
+              const productKey = `${recommendation.tour.company}/${recommendation.tour.slug}`;
+              const contextParams = new URLSearchParams({
+                from: "plan",
+                rank: String(index + 1),
+                sourcePage: "/plan",
+                port,
+                topic: style,
+                productSlug: productKey,
+                requestedLane: style,
+                resolvedLane: style,
+                degradedFallback: String(degradedFallback),
+              });
+              const detailHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}?${contextParams.toString()}`;
+              const calendarParams = new URLSearchParams(contextParams);
+              if (date) calendarParams.set("date", date);
+              if (ship) calendarParams.set("cruiseShip", ship);
+              const calendarHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}/calendar?${calendarParams.toString()}`;
 
               return (
                 <article key={`${recommendation.tour.company}-${recommendation.tour.pk}`} className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
@@ -112,8 +148,26 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
                     </div>
 
                     <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                      <Link href={detailHref} className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-black text-slate-900 hover:bg-slate-50">See details</Link>
-                      <Link href={calendarHref} className="rounded-xl bg-sky-700 px-4 py-3 text-center text-sm font-black text-white hover:bg-sky-800">Check live calendar →</Link>
+                      <Link
+                        href={detailHref}
+                        data-plan-click
+                        data-product-slug={productKey}
+                        data-rank={index + 1}
+                        data-next-step="detail"
+                        className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-black text-slate-900 hover:bg-slate-50"
+                      >
+                        See details
+                      </Link>
+                      <Link
+                        href={calendarHref}
+                        data-plan-click
+                        data-product-slug={productKey}
+                        data-rank={index + 1}
+                        data-next-step="calendar"
+                        className="rounded-xl bg-sky-700 px-4 py-3 text-center text-sm font-black text-white hover:bg-sky-800"
+                      >
+                        Check live calendar →
+                      </Link>
                     </div>
                   </div>
                 </article>
