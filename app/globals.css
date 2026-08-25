@@ -199,3 +199,169 @@ body {
     min-height: 300px;
   }
 }
+
+/* --- Alaska homepage warm orange photo refresh --- */
+main[class*="bg-[#f4f0e7]"] {
+  --ak-orange: #ff8a3d;
+  --ak-orange-light: #ffb77f;
+  --ak-ink: #1b1714;
+  --ak-ink-soft: #2c231d;
+  --ak-cream: #f4ede4;
+  --ak-paper: #fffaf4;
+  --ak-muted: #765f50;
+  background: var(--ak-cream) !important;
+  color: #2b211b !important;
+}
+
+/* Trade the deep greens for charcoal / espresso. */
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#082522]"],
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#0a312e]"],
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#0a302c]"] {
+  background-color: var(--ak-ink) !important;
+}
+
+/* Trade lime green for warm orange. */
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#d7ff76]"],
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#8ebc3d]"] {
+  background-color: var(--ak-orange) !important;
+}
+main[class*="bg-[#f4f0e7]"] [class*="text-[#d7ff76]"] {
+  color: var(--ak-orange-light) !important;
+}
+main[class*="bg-[#f4f0e7]"] [class*="border-[#d7ff76]"] {
+  border-color: rgba(255,138,61,.32) !important;
+}
+
+/* Warm up the mint / sage surfaces and body copy. */
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#cfe7e2]"] { background-color: #ead7c8 !important; }
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#e8f2ee]"] { background-color: #f3e2d6 !important; }
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#f4f0e7]"] { background-color: var(--ak-cream) !important; }
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#fffdf8]"] { background-color: var(--ak-paper) !important; }
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#f5f2e9]"] { background-color: #f7efe6 !important; }
+main[class*="bg-[#f4f0e7]"] [class*="bg-[#f7ffd8]"] { background-color: rgba(255,247,239,.9) !important; }
+
+main[class*="bg-[#f4f0e7]"] [class*="text-[#082522]"] { color: #2b211b !important; }
+main[class*="bg-[#f4f0e7]"] [class*="text-[#163a34]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#163d37]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#365030]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#3a522f]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#456019]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#48651d]"] {
+  color: #4b3021 !important;
+}
+main[class*="bg-[#f4f0e7]"] [class*="text-[#2d5a54]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#426962]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#46706a]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#4b6e68]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#496762]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#53726d]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#55706c]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#57706c]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#5d7773]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#6b817d]"],
+main[class*="bg-[#f4f0e7]"] [class*="text-[#6c817d]"] {
+  color: var(--ak-muted) !important;
+}
+main[class*="bg-[#f4f0e7]"] [class*="text-[#81a29a]"] { color: #b77c54 !important; }
+main[class*="bg-[#f4f0e7]"] [class*="text-[#82938f]"] { color: #9a8170 !important; }
+main[class*="bg-[#f4f0e7]"] [class*="text-[#b9d7cd]"] { color: #dfb79c !important; }
+
+main[class*="bg-[#f4f0e7]"] select:focus,
+main[class*="bg-[#f4f0e7]"] input:focus {
+  --tw-ring-color: rgba(255,138,61,.35) !important;
+}
+
+/* New hero image with warmer neutral overlays. */
+main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:first-child {
+  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Glacier_Bay_National_Park_and_Preserve_GLBA3434.jpg");
+  background-position: center 48%;
+  background-size: cover;
+}
+main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:first-child > img {
+  opacity: 0;
+}
+main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:nth-child(2) {
+  background: linear-gradient(90deg, rgba(25,16,10,.96) 0%, rgba(25,16,10,.82) 42%, rgba(25,16,10,.47) 67%, rgba(25,16,10,.18) 100%) !important;
+}
+main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:nth-child(3) {
+  background: linear-gradient(0deg, rgba(20,13,9,.92) 0%, transparent 48%) !important;
+}
+
+/* Make the three decision cards photographic instead of flat blocks. */
+main[class*="bg-[#f4f0e7]"] a[href="/ports"].group {
+  background-image: linear-gradient(180deg, rgba(22,14,9,.18), rgba(22,14,9,.88)), url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Misty_Fjords-Tongass-AES-011_%2852502715136%29.jpg") !important;
+  background-position: center 48%;
+  background-size: cover;
+}
+main[class*="bg-[#f4f0e7]"] a[href="/ships"].group {
+  background-image: linear-gradient(180deg, rgba(22,14,9,.18), rgba(22,14,9,.9)), url("https://commons.wikimedia.org/wiki/Special:Redirect/file/At_the_face_of_a_glacier_%282f5124b0-1dd8-b71c-0781-3e60dc7694e5%29.jpg") !important;
+  background-position: center;
+  background-size: cover;
+  color: white !important;
+}
+main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group {
+  background-image: linear-gradient(180deg, rgba(22,14,9,.16), rgba(22,14,9,.88)), url("https://commons.wikimedia.org/wiki/Special:Redirect/file/The_face_of_Johns_Hopkins_Glacier_%283d2a695c-b635-453f-9ea9-07f1dc2ae590%29.jpg") !important;
+  background-position: center;
+  background-size: cover;
+  color: white !important;
+}
+main[class*="bg-[#f4f0e7]"] a[href="/ports"].group p,
+main[class*="bg-[#f4f0e7]"] a[href="/ships"].group p,
+main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group p {
+  color: rgba(255,255,255,.72) !important;
+}
+main[class*="bg-[#f4f0e7]"] a[href="/ports"].group [class*="text-[10px]"],
+main[class*="bg-[#f4f0e7]"] a[href="/ships"].group [class*="text-[10px]"],
+main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group [class*="text-[10px]"] {
+  color: var(--ak-orange-light) !important;
+}
+
+/* Fresh port photography. */
+#ports a.group > div:first-child {
+  background-position: center;
+  background-size: cover;
+}
+#ports a.group > div:first-child > img {
+  opacity: 0;
+}
+#ports a.group:nth-child(1) > div:first-child {
+  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Mendenhall_Glacier%2C_Juneau.jpg");
+}
+#ports a.group:nth-child(2) > div:first-child {
+  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/KLGO_downtown_Skagway_%2835572184472%29.jpg");
+}
+#ports a.group:nth-child(3) > div:first-child {
+  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Ketchikan_waterfront_and_cruise_ships_in_port.JPG");
+}
+
+/* Warm the experience section itself and change its CTA accent to orange. */
+#experiences {
+  background-color: var(--ak-ink) !important;
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group {
+  background-color: #211a15;
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group::before {
+  background: linear-gradient(180deg, rgba(24,15,10,.07) 20%, rgba(24,15,10,.32) 50%, rgba(20,13,9,.95) 100%);
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group > div:first-child > span:last-child {
+  background: rgba(20,13,9,.48);
+}
+#experiences div[class*="lg:grid-cols-4"] > a.group > span:last-child {
+  color: var(--ak-orange-light);
+}
+
+/* Make the large popular-search panel warm instead of neon. */
+#popular-searches > div {
+  background: linear-gradient(135deg, #efb98f 0%, #f6d5be 56%, #f8e5d8 100%) !important;
+}
+
+/* Refresh the final photographic CTA as well. */
+main[class*="bg-[#f4f0e7]"] div:has(> img[alt="Juneau Alaska scenery"]) {
+  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Misty_Fjords-Tongass-AES-011_%2852502715136%29.jpg");
+  background-position: center 44%;
+  background-size: cover;
+}
+main[class*="bg-[#f4f0e7]"] img[alt="Juneau Alaska scenery"] {
+  opacity: 0;
+}
