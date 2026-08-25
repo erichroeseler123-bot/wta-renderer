@@ -64,7 +64,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
           sourcePage,
         }}
         impressions={recommendations.map((recommendation, index) => ({
-          productSlug: `${recommendation.tour.company}/${recommendation.tour.pk}`,
+          productSlug: `${recommendation.tour.company}/${recommendation.tour.slug}`,
           rank: index + 1,
         }))}
       />
@@ -102,7 +102,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
         ) : (
           <section className="mt-6 grid gap-5 lg:grid-cols-2">
             {recommendations.map((recommendation, index) => {
-              const productKey = `${recommendation.tour.company}/${recommendation.tour.pk}`;
+              const productKey = `${recommendation.tour.company}/${recommendation.tour.slug}`;
               const contextParams = new URLSearchParams({
                 from: "plan",
                 rank: String(index + 1),
