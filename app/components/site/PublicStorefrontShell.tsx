@@ -19,13 +19,31 @@ function shouldSkipChrome(pathname: string) {
   );
 }
 
+function routeClass(pathname: string) {
+  if (pathname === "/tours") return "wta-route-tours-index";
+  if (/^\/tours\/[^/]+\/[^/]+\/calendar/.test(pathname)) return "wta-route-calendar";
+  if (/^\/tours\/[^/]+\/[^/]+/.test(pathname)) return "wta-route-tour-detail";
+  if (pathname === "/ports") return "wta-route-ports-index";
+  if (pathname.startsWith("/ports/")) return "wta-route-port-detail";
+  if (pathname.startsWith("/categories/")) return "wta-route-category";
+  if (pathname === "/guides") return "wta-route-guides-index";
+  if (pathname.startsWith("/guides/")) return "wta-route-guide-detail";
+  if (/^\/(juneau|skagway|ketchikan)\//.test(pathname)) return "wta-route-topic";
+  if (pathname === "/about") return "wta-route-about";
+  if (pathname === "/contact" || pathname === "/contact-us") return "wta-route-contact";
+  if (pathname === "/plan") return "wta-route-plan";
+  if (pathname === "/date-search") return "wta-route-date-search";
+  if (pathname.startsWith("/checkout")) return "wta-route-checkout";
+  return "wta-route-standard";
+}
+
 export default function PublicStorefrontShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
   if (shouldSkipChrome(pathname)) return <>{children}</>;
 
   return (
-    <div className="wta-storefront min-h-screen bg-[#f4ede4] text-[#2b211b]">
+    <div className={`wta-storefront ${routeClass(pathname)} min-h-screen bg-[#f4ede4] text-[#2b211b]`}>
       <header className="wta-site-header sticky top-0 z-50 border-b border-white/10 bg-[#1b1714]/95 text-white shadow-[0_10px_35px_rgba(27,23,20,.18)] backdrop-blur-xl">
         <div className="mx-auto flex h-[78px] max-w-7xl items-center justify-between gap-5 px-4 sm:px-6 lg:px-8">
           <Link href="/" className="group inline-flex min-w-0 items-center gap-3">
