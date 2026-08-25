@@ -1,5 +1,6 @@
 import "./globals.css";
 import "./storefront.css";
+import "./home-cleanup.css";
 import type { Metadata, Viewport } from "next";
 import CartDrawer from "@/app/components/cart/CartDrawer";
 import StickyCartBar from "@/app/components/cart/StickyCartBar";
