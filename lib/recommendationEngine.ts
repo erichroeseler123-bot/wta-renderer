@@ -51,6 +51,14 @@ export function buildRecommendationShortlist<TCandidate, TMeta = unknown>({
     });
 
   const exact = scored.filter((item) => item.exactMatch);
+  if (safeLimit === 0) {
+    return {
+      recommendations: [],
+      exactCount: exact.length,
+      scored,
+    };
+  }
+
   const recommendations: RankedRecommendation<TCandidate, TMeta>[] = [];
   const selectedKeys = new Set<string>();
 
