@@ -5,10 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/build-tours.cjs && next build",
+    "build": "tsx scripts/test-recommendation-engine.ts && node scripts/build-tours.cjs && next build",
     "start": "next start",
     "lint": "eslint",
-    "fmt": "prettier --write ."
+    "fmt": "prettier --write .",
+    "test:recommendations": "tsx scripts/test-recommendation-engine.ts"
   },
   "dependencies": {
     "@stripe/react-stripe-js": "^5.6.0",
