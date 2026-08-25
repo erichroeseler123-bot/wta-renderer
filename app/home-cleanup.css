@@ -1,0 +1,21 @@
+/* Homepage-only cleanup: the public home experience is port + experience led, not ship led. */
+main[class*="bg-[#f4f0e7]"] nav a[href="/ships"],
+main[class*="bg-[#f4f0e7]"] a[href="/ships"].group {
+  display: none !important;
+}
+
+main[class*="bg-[#f4f0e7]"] > section:has(a[href="/ships"].inline-flex) {
+  display: none !important;
+}
+
+main[class*="bg-[#f4f0e7]"] section:has(a[href="/ships"].group) > div > div:first-child > p {
+  display: none !important;
+}
+
+main[class*="bg-[#f4f0e7]"] section:has(a[href="/ships"].group) div[class*="lg:grid-cols-3"] {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+main[class*="bg-[#f4f0e7]"] > section:has(a[href="/ships"].inline-flex) + section details:nth-child(3) {
+  display: none !important;
+}

@@ -1,0 +1,266 @@
+/* Shared public storefront theme. Deliberately scoped under .wta-storefront so admin/widget UI is untouched. */
+.wta-storefront {
+  --ak-orange: #ff8a3d;
+  --ak-orange-soft: #ffb77f;
+  --ak-orange-pale: #f8d7c1;
+  --ak-ink: #1b1714;
+  --ak-ink-soft: #2c231d;
+  --ak-cream: #f4ede4;
+  --ak-paper: #fffaf4;
+  --ak-paper-soft: #f8efe6;
+  --ak-muted: #765f50;
+  --ak-line: rgba(83, 57, 39, 0.14);
+  background: var(--ak-cream);
+  color: #2b211b;
+}
+
+.wta-storefront-content,
+.wta-storefront-content > main,
+.wta-storefront-content main[class*="bg-slate-50"],
+.wta-storefront-content main[class*="bg-white"],
+.wta-storefront-content main[class*="bg-[linear-gradient"] {
+  background-color: var(--ak-cream) !important;
+  color: #2b211b !important;
+}
+
+/* Warm legacy blue/slate surfaces into the homepage palette. */
+.wta-storefront-content [class*="bg-white"] { background-color: var(--ak-paper) !important; }
+.wta-storefront-content [class*="bg-slate-50"] { background-color: var(--ak-paper-soft) !important; }
+.wta-storefront-content [class*="bg-slate-100"] { background-color: #efe2d8 !important; }
+.wta-storefront-content [class*="bg-slate-900"],
+.wta-storefront-content [class*="bg-slate-950"] { background-color: var(--ak-ink) !important; }
+.wta-storefront-content [class*="bg-sky-50"],
+.wta-storefront-content [class*="bg-cyan-50"] { background-color: #fbe8da !important; }
+.wta-storefront-content [class*="bg-sky-100"],
+.wta-storefront-content [class*="bg-cyan-100"] { background-color: #f7d8c2 !important; }
+.wta-storefront-content [class*="bg-cyan-300"],
+.wta-storefront-content [class*="bg-cyan-400"],
+.wta-storefront-content [class*="bg-sky-700"],
+.wta-storefront-content [class*="bg-sky-800"] {
+  background-color: var(--ak-orange) !important;
+  color: var(--ak-ink) !important;
+}
+
+.wta-storefront-content [class*="text-slate-950"],
+.wta-storefront-content [class*="text-slate-900"],
+.wta-storefront-content [class*="text-slate-800"] { color: #2b211b !important; }
+.wta-storefront-content [class*="text-slate-700"],
+.wta-storefront-content [class*="text-slate-600"],
+.wta-storefront-content [class*="text-slate-500"] { color: var(--ak-muted) !important; }
+.wta-storefront-content [class*="text-sky-"],
+.wta-storefront-content [class*="text-cyan-"] { color: #c85d1f !important; }
+
+.wta-storefront-content [class*="border-slate-100"],
+.wta-storefront-content [class*="border-slate-200"],
+.wta-storefront-content [class*="border-slate-205"],
+.wta-storefront-content [class*="border-stone-200"],
+.wta-storefront-content [class*="border-sky-100"],
+.wta-storefront-content [class*="border-sky-200"],
+.wta-storefront-content [class*="border-cyan-"] {
+  border-color: var(--ak-line) !important;
+}
+
+/* Preserve semantic inventory / warning states, but warm neutral timing panels. */
+.wta-storefront-content [class*="border-emerald"],
+.wta-storefront-content [class*="border-amber"],
+.wta-storefront-content [class*="border-rose"] {
+  border-width: 1px;
+}
+
+/* Global public typography and premium card behavior. */
+.wta-storefront-content h1,
+.wta-storefront-content h2,
+.wta-storefront-content h3 {
+  letter-spacing: -0.035em;
+}
+
+.wta-storefront-content article[class*="rounded"],
+.wta-storefront-content a[class*="rounded"][class*="bg-white"],
+.wta-storefront-content section[class*="rounded"][class*="bg-white"],
+.wta-storefront-content div[class*="rounded"][class*="bg-white"] {
+  border-color: var(--ak-line) !important;
+  box-shadow: 0 18px 55px rgba(43, 33, 27, 0.07);
+}
+
+.wta-storefront-content article[class*="rounded"] {
+  transition: transform .28s ease, box-shadow .28s ease;
+}
+.wta-storefront-content article[class*="rounded"]:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 26px 70px rgba(43, 33, 27, 0.12);
+}
+
+.wta-storefront-content img {
+  image-rendering: auto;
+}
+
+/* Buttons: charcoal primary, orange action. */
+.wta-storefront-content a[class*="bg-slate-900"],
+.wta-storefront-content a[class*="bg-slate-950"],
+.wta-storefront-content button[class*="bg-slate-900"],
+.wta-storefront-content button[class*="bg-slate-950"] {
+  background-color: var(--ak-ink) !important;
+  color: white !important;
+  border-radius: 999px !important;
+}
+.wta-storefront-content a[class*="bg-cyan-"],
+.wta-storefront-content a[class*="bg-sky-700"],
+.wta-storefront-content button[class*="bg-cyan-"],
+.wta-storefront-content button[class*="bg-sky-700"] {
+  background-color: var(--ak-orange) !important;
+  color: var(--ak-ink) !important;
+  border-radius: 999px !important;
+}
+
+/* Tours index: turn the old utility intro into a photographic homepage-style hero. */
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:first-child {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  border-radius: 3rem;
+  padding: 64px 28px;
+  background-image: linear-gradient(100deg, rgba(27,23,20,.94), rgba(27,23,20,.62), rgba(27,23,20,.28)), url("/images/home-hero.jpg");
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 28px 80px rgba(27,23,20,.18);
+}
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:first-child h1,
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:first-child p { color: white !important; }
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:first-child p { opacity: .78; }
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:first-child > div:first-child {
+  border-color: rgba(255,183,127,.45) !important;
+  background: rgba(27,23,20,.42) !important;
+  color: var(--ak-orange-soft) !important;
+  backdrop-filter: blur(10px);
+}
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:nth-child(2) > a {
+  overflow: hidden;
+  position: relative;
+  min-height: 126px;
+  border-radius: 1.75rem !important;
+  color: white !important;
+  background-color: var(--ak-ink) !important;
+}
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:nth-child(2) > a:nth-child(1) { background-image: linear-gradient(rgba(27,23,20,.66),rgba(27,23,20,.78)), url("/hero/juneau.jpg"); background-size:cover; background-position:center; }
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:nth-child(2) > a:nth-child(2) { background-image: linear-gradient(rgba(27,23,20,.66),rgba(27,23,20,.78)), url("/hero/skagway.jpg"); background-size:cover; background-position:center; }
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:nth-child(2) > a:nth-child(3) { background-image: linear-gradient(rgba(27,23,20,.66),rgba(27,23,20,.78)), url("/hero/ketchikan.png"); background-size:cover; background-position:center; }
+.wta-route-tours-index .wta-storefront-content > div:first-child > div:nth-child(2) > a * { color: white !important; }
+.wta-route-tours-index .wta-storefront-content main article img { transition: transform .55s ease; }
+.wta-route-tours-index .wta-storefront-content main article:hover img { transform: scale(1.035); }
+
+/* Port directory hero and cards. */
+.wta-route-ports-index .wta-storefront-content main > div > section:first-child {
+  background-image: linear-gradient(100deg, rgba(27,23,20,.95), rgba(27,23,20,.58), rgba(27,23,20,.22)), url("/hero/ketchikan.png") !important;
+  background-position: center 45% !important;
+  background-size: cover !important;
+  border: 0 !important;
+  box-shadow: 0 28px 80px rgba(27,23,20,.18) !important;
+}
+.wta-route-ports-index .wta-storefront-content main > div > section:nth-child(2) > a {
+  border-radius: 2.5rem !important;
+  box-shadow: 0 22px 65px rgba(43,33,27,.10) !important;
+}
+.wta-route-ports-index .wta-storefront-content main > div > section:nth-child(2) > a img {
+  transition: transform .65s ease;
+}
+
+/* Port detail / category / focused topic heroes use the same warm cinematic treatment. */
+.wta-route-port-detail .wta-storefront-content main > div > section[class*="bg-slate-950"],
+.wta-route-category .wta-storefront-content main > section:first-of-type,
+.wta-route-topic .wta-storefront-content main > section:first-of-type {
+  background-color: var(--ak-ink) !important;
+  color: white !important;
+}
+.wta-route-category .wta-storefront-content main > section:first-of-type {
+  background-image: linear-gradient(100deg, rgba(27,23,20,.95), rgba(27,23,20,.60), rgba(27,23,20,.28)), url("/hero/juneau.jpg") !important;
+  background-size: cover !important;
+  background-position: center 42% !important;
+  padding-top: 78px !important;
+  padding-bottom: 78px !important;
+}
+.wta-route-topic .wta-storefront-content main > section:first-of-type {
+  background-image: linear-gradient(100deg, rgba(27,23,20,.95), rgba(27,23,20,.60), rgba(27,23,20,.22)), url("/images/home-hero.jpg") !important;
+  background-size: cover !important;
+  background-position: center !important;
+}
+.wta-route-category .wta-storefront-content main > section:first-of-type [class*="text-cyan"],
+.wta-route-topic .wta-storefront-content main > section:first-of-type [class*="text-cyan"] { color: var(--ak-orange-soft) !important; }
+
+/* Individual tour page: same warm paper + orange purchase path. */
+.wta-route-tour-detail .wta-storefront-content main {
+  max-width: 1180px !important;
+  background: var(--ak-cream) !important;
+}
+.wta-route-tour-detail .wta-storefront-content main > section:first-of-type > div:first-child > div[class*="aspect"] {
+  border: 0 !important;
+  border-radius: 2.5rem !important;
+  box-shadow: 0 28px 80px rgba(43,33,27,.15) !important;
+}
+.wta-route-tour-detail .wta-storefront-content main > section:first-of-type > div:last-child {
+  border-radius: 2.5rem !important;
+  border-color: var(--ak-line) !important;
+  background: var(--ak-paper) !important;
+  box-shadow: 0 24px 70px rgba(43,33,27,.10) !important;
+}
+.wta-route-tour-detail .wta-storefront-content main > section:first-of-type a[class*="bg-slate-900"] {
+  background: var(--ak-orange) !important;
+  color: var(--ak-ink) !important;
+}
+
+/* Guides become photographic editorial cards rather than blue utility pages. */
+.wta-route-guides-index .wta-storefront-content main {
+  background: var(--ak-cream) !important;
+}
+.wta-route-guides-index .wta-storefront-content main > div > section:first-child {
+  position: relative;
+  overflow: hidden;
+  border-radius: 3rem;
+  padding: 72px 28px;
+  background-image: linear-gradient(100deg, rgba(27,23,20,.94), rgba(27,23,20,.58), rgba(27,23,20,.24)), url("/hero/skagway.jpg");
+  background-position: center;
+  background-size: cover;
+  box-shadow: 0 28px 80px rgba(27,23,20,.16);
+}
+.wta-route-guides-index .wta-storefront-content main > div > section:first-child h1,
+.wta-route-guides-index .wta-storefront-content main > div > section:first-child p { color: white !important; }
+.wta-route-guides-index .wta-storefront-content main > div > section:first-child > div:first-child {
+  color: var(--ak-orange-soft) !important;
+  border-color: rgba(255,183,127,.35) !important;
+  background: rgba(27,23,20,.42) !important;
+}
+.wta-route-guides-index .wta-storefront-content main > div > section:nth-child(2) > a:first-child { background-image: linear-gradient(rgba(255,250,244,.94),rgba(255,250,244,.98)), url("/hero/juneau.jpg"); background-size:cover; }
+
+/* About / contact get an image-led identity rather than floating dark boxes. */
+.wta-route-about .wta-storefront-content main > div:first-child {
+  overflow: hidden;
+  border: 0 !important;
+  border-radius: 3rem !important;
+  padding: 48px !important;
+  background-image: linear-gradient(110deg, rgba(27,23,20,.96), rgba(27,23,20,.78)), url("/hero/juneau.jpg") !important;
+  background-size: cover !important;
+  background-position: center !important;
+  box-shadow: 0 28px 80px rgba(27,23,20,.18) !important;
+}
+.wta-route-about .wta-storefront-content main > div:first-child [class*="text-cyan"] { color: var(--ak-orange-soft) !important; }
+.wta-route-about .wta-storefront-content main > div:first-child [class*="bg-cyan"] { background: rgba(255,138,61,.14) !important; }
+.wta-route-contact .wta-storefront-content main { background: var(--ak-cream) !important; }
+
+/* Calendar, planning and checkout retain their functional layouts but use storefront colors. */
+.wta-route-calendar .wta-storefront-content,
+.wta-route-plan .wta-storefront-content,
+.wta-route-date-search .wta-storefront-content,
+.wta-route-checkout .wta-storefront-content {
+  background: var(--ak-cream) !important;
+}
+
+@media (max-width: 767px) {
+  .wta-route-tours-index .wta-storefront-content > div:first-child > div:first-child,
+  .wta-route-guides-index .wta-storefront-content main > div > section:first-child {
+    border-radius: 2rem;
+    padding: 48px 20px;
+  }
+  .wta-route-about .wta-storefront-content main > div:first-child {
+    border-radius: 2rem !important;
+    padding: 28px !important;
+  }
+}
