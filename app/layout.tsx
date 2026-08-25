@@ -1,10 +1,12 @@
 import "./globals.css";
+import "./storefront.css";
 import type { Metadata, Viewport } from "next";
 import CartDrawer from "@/app/components/cart/CartDrawer";
 import StickyCartBar from "@/app/components/cart/StickyCartBar";
 import CartProvider from "@/app/components/cart/CartContext";
 import BackForwardRefresh from "@/app/BackForwardRefresh";
 import IntentTracker from "@/app/components/analytics/IntentTracker";
+import PublicStorefrontShell from "@/app/components/site/PublicStorefrontShell";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/tourSeo";
 
@@ -44,7 +46,7 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
-  themeColor: "#0F172A",
+  themeColor: "#1b1714",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -59,7 +61,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartProvider>
           <BackForwardRefresh />
           <IntentTracker />
-          {children}
+          <PublicStorefrontShell>{children}</PublicStorefrontShell>
           <StickyCartBar />
           <CartDrawer />
         </CartProvider>
