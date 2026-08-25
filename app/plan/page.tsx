@@ -64,7 +64,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
           sourcePage,
         }}
         impressions={recommendations.map((recommendation, index) => ({
-          productSlug: recommendation.tour.slug,
+          productSlug: `${recommendation.tour.company}/${recommendation.tour.pk}`,
           rank: index + 1,
         }))}
       />
@@ -102,8 +102,23 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
         ) : (
           <section className="mt-6 grid gap-5 lg:grid-cols-2">
             {recommendations.map((recommendation, index) => {
-              const detailHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}?from=plan&rank=${index + 1}&sourcePage=/plan&port=${port}&topic=${style}`;
-              const calendarHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}/calendar?from=plan&rank=${index + 1}&sourcePage=/plan&port=${port}&topic=${style}${date ? `&date=${encodeURIComponent(date)}` : ""}${ship ? `&cruiseShip=${encodeURIComponent(ship)}` : ""}`;
+              const productKey = `${recommendation.tour.company}/${recommendation.tour.pk}`;
+              const contextParams = new URLSearchParams({
+                from: "plan",
+                rank: String(index + 1),
+                sourcePage: "/plan",
+                port,
+                topic: style,
+                productSlug: productKey,
+                requestedLane: style,
+                resolvedLane: style,
+                degradedFallback: String(degradedFallback),
+              });
+              const detailHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}?${contextParams.toString()}`;
+              const calendarParams = new URLSearchParams(contextParams);
+              if (date) calendarParams.set("date", date);
+              if (ship) calendarParams.set("cruiseShip", ship);
+              const calendarHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}/calendar?${calendarParams.toString()}`;
 
               return (
                 <article key={`${recommendation.tour.company}-${recommendation.tour.pk}`} className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_18px_60px_rgba(15,23,42,0.08)]">
@@ -136,7 +151,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
                       <Link
                         href={detailHref}
                         data-plan-click
-                        data-product-slug={recommendation.tour.slug}
+                        data-product-slug={productKey}
                         data-rank={index + 1}
                         data-next-step="detail"
                         className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-black text-slate-900 hover:bg-slate-50"
@@ -146,7 +161,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
                       <Link
                         href={calendarHref}
                         data-plan-click
-                        data-product-slug={recommendation.tour.slug}
+                        data-product-slug={productKey}
                         data-rank={index + 1}
                         data-next-step="calendar"
                         className="rounded-xl bg-sky-700 px-4 py-3 text-center text-sm font-black text-white hover:bg-sky-800"
