@@ -88,6 +88,14 @@ export default function PublicStorefrontShell({ children }: { children: React.Re
             <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#ffb77f]">Welcome to Alaska Tours</div>
             <div className="mt-2 max-w-xl text-2xl font-black tracking-[-0.035em] sm:text-3xl">Juneau · Skagway · Ketchikan</div>
             <p className="mt-3 max-w-xl text-sm leading-6 text-white/55">Compare the kind of Alaska day you want, then use the live operator calendar for current departures, pricing and capacity.</p>
+            <a
+              href="https://cruisepromenade.com/?utm_source=welcometoalaskatours&utm_medium=referral&utm_campaign=early-access"
+              target="_blank"
+              rel="noreferrer"
+              className="mt-4 inline-flex text-xs font-black text-[#ffb77f] transition hover:text-white"
+            >
+              Planning the whole cruise? Try the free Cruise Promenade group planner ↗
+            </a>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-3 text-xs font-bold text-white/65 md:justify-end">
             <Link href="/ports" className="hover:text-white">Ports</Link>
