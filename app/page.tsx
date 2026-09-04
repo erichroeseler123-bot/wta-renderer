@@ -160,17 +160,17 @@ export default function HomePage() {
               </div>
 
               <h1 className="mt-7 max-w-4xl text-[3.45rem] font-black leading-[.86] tracking-[-0.055em] text-white sm:text-7xl lg:text-[6.4rem]">
-                Pick the
-                <span className="block text-[#d7ff76]">Alaska day.</span>
+                Pick your
+                <span className="block text-[#d7ff76]">Alaska excursion.</span>
               </h1>
               <p className="mt-6 max-w-xl text-lg font-medium leading-7 text-white/78 sm:text-xl sm:leading-8">
-                Tell us your port and the kind of day you want. We&apos;ll narrow a huge excursion catalog to four choices actually worth comparing.
+                Compare Juneau, Skagway and Ketchikan shore excursions by port and experience. We&apos;ll narrow the catalog to four choices actually worth comparing.
               </p>
 
               <div className="mt-8 flex flex-wrap gap-3 text-[10px] font-black uppercase tracking-[0.16em] text-white/70">
                 <span className="rounded-full border border-white/20 bg-black/10 px-4 py-2 backdrop-blur-sm">Live booking calendars</span>
                 <span className="rounded-full border border-white/20 bg-black/10 px-4 py-2 backdrop-blur-sm">Cruise-day planning</span>
-                <span className="rounded-full border border-white/20 bg-black/10 px-4 py-2 backdrop-blur-sm">Independent guide</span>
+                <span className="rounded-full border border-white/20 bg-black/10 px-4 py-2 backdrop-blur-sm">Provider &amp; terms shown before booking</span>
               </div>
             </div>
 
