@@ -7,6 +7,7 @@ const MONEY_PAGES = [
   'juneau/helicopter-tours',
   'juneau/dog-sledding',
   'juneau/fishing',
+  'juneau/gold-panning',
   'ketchikan/bear-tours',
   'ketchikan/misty-fjords',
   'ketchikan/kayaking',

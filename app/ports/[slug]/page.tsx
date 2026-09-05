@@ -29,11 +29,12 @@ const PORT_INFO: Record<string, { title: string; description: string; problem: s
 
 const MONEY_LINKS: Record<string, Array<{ href: string; title: string; text: string }>> = {
   juneau: [
+    { href: "/juneau/fishing", title: "Fishing charters", text: "Compare guided salmon, halibut, combination and private fishing trips." },
+    { href: "/juneau/helicopter-tours", title: "Helicopter tours & prices", text: "Compare glacier landings, guided walks, treks and dog sledding flights." },
+    { href: "/juneau/gold-panning", title: "Gold panning", text: "Hands-on gold panning, mining history and salmon-bake combinations." },
     { href: "/juneau/whale-watching", title: "Whale watching", text: "Compare small-boat, sightseeing and glacier-combination whale tours." },
     { href: "/juneau/mendenhall-glacier-tours", title: "Mendenhall Glacier", text: "Sightseeing, paddling, hiking and combination excursions." },
-    { href: "/juneau/helicopter-tours", title: "Helicopter tours", text: "Glacier landings, trekking and scenic flightseeing." },
     { href: "/juneau/dog-sledding", title: "Dog sledding", text: "Summer camps and helicopter-accessed glacier dog experiences." },
-    { href: "/juneau/fishing", title: "Fishing charters", text: "Salmon, halibut, combination trips and private charters." },
   ],
   ketchikan: [
     { href: "/ketchikan/bear-tours", title: "Bear tours", text: "Rainforest, remote viewing and flightseeing bear experiences." },

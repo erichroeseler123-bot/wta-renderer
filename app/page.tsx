@@ -43,13 +43,15 @@ const TRIP_STYLES = [
 ];
 
 const POPULAR_SEARCHES = [
-  ["Juneau whale watching", "/juneau/whale-watching"],
-  ["Mendenhall Glacier tours", "/juneau/mendenhall-glacier-tours"],
-  ["Juneau helicopter tours", "/juneau/helicopter-tours"],
-  ["Juneau dog sledding", "/juneau/dog-sledding"],
   ["Juneau fishing charters", "/juneau/fishing"],
+  ["Juneau helicopter tour prices", "/juneau/helicopter-tours"],
+  ["Misty Fjords tours from Ketchikan", "/ketchikan/misty-fjords"],
+  ["Alaska gold panning tours", "/juneau/gold-panning"],
+  ["Ketchikan cruise port guide", "/ports/ketchikan"],
+  ["Mendenhall Glacier tours", "/juneau/mendenhall-glacier-tours"],
+  ["Juneau whale watching", "/juneau/whale-watching"],
+  ["Juneau dog sledding", "/juneau/dog-sledding"],
   ["Ketchikan bear tours", "/ketchikan/bear-tours"],
-  ["Misty Fjords tours", "/ketchikan/misty-fjords"],
   ["Ketchikan kayaking", "/ketchikan/kayaking"],
   ["Ketchikan adventure tours", "/ketchikan/adventure-tours"],
   ["Skagway helicopter tours", "/skagway/helicopter-tours"],
