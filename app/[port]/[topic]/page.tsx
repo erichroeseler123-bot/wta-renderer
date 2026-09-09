@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getHelicopterToursSnapshot, type HelicopterTour } from "@/lib/helicopterTours";
 import { sanitizeTours } from "@/lib/tourSeo";
+import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
+import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 
 type PageConfig = {
   port: "juneau" | "ketchikan" | "skagway";
@@ -103,13 +105,22 @@ export default async function MoneyPage({ params }: { params: Promise<{ port: st
   const portTitle = config.port.charAt(0).toUpperCase() + config.port.slice(1);
   const chooserHref = `/plan?port=${config.port}&topic=${encodeURIComponent(config.chooserTopic)}&sourcePage=/${config.port}/${config.topic}`;
   const canonical = `https://welcometoalaskatours.com/${config.port}/${config.topic}`;
+  const geoFact = getAlaskaGeoFact(config.port, config.topic);
+
+  const combinedFaqs = [
+    ...(config.faqs || []),
+    ...(geoFact?.faqSchema || []).filter(
+      (gf) => !(config.faqs || []).some((cf) => cf.question.toLowerCase() === gf.question.toLowerCase())
+    ),
+  ];
+
   const schemas = [
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "Alaska Tours", item: "https://welcometoalaskatours.com" },
       { "@type": "ListItem", position: 2, name: `${portTitle} excursions`, item: `https://welcometoalaskatours.com/ports/${config.port}` },
       { "@type": "ListItem", position: 3, name: config.h1, item: canonical },
     ] },
-    ...(config.faqs?.length ? [{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: config.faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) }] : []),
+    ...(combinedFaqs.length ? [{ "@context": "https://schema.org", "@type": "FAQPage", mainEntity: combinedFaqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) }] : []),
   ];
 
   return (
@@ -127,6 +138,11 @@ export default async function MoneyPage({ params }: { params: Promise<{ port: st
           </div>
         </div>
       </section>
+
+      {/* DIRECT ANSWER CARD FOR GOOGLE AI OVERVIEWS */}
+      <div className="mx-auto max-w-6xl px-6 pt-8">
+        <GeoDirectAnswerCard fact={geoFact} />
+      </div>
 
       {config.decisionPoints?.length ? (
         <section className="mx-auto max-w-6xl px-6 pt-12">

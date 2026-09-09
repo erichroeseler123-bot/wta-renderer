@@ -6,6 +6,8 @@ import { getHelicopterTours } from "@/lib/helicopterTours";
 import { getProductOneLiner } from "@/lib/tourSeo";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { parseTimeToMinutes } from "@/lib/timing";
+import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
+import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 
 const APPROVED_PORTS = ["juneau", "skagway", "ketchikan"];
 
@@ -171,6 +173,8 @@ export default async function PortPage({ params, searchParams }: { params: Promi
     );
   };
 
+  const geoFact = getAlaskaGeoFact(slug);
+
   return (
     <main className="min-h-screen bg-slate-50 pb-20 text-slate-900">
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
@@ -180,6 +184,9 @@ export default async function PortPage({ params, searchParams }: { params: Promi
           <div className="absolute inset-0"><img src={slug === "juneau" ? "/hero/juneau.jpg" : slug === "skagway" ? "/hero/skagway.jpg" : "/hero/ketchikan.png"} alt={`${portTitle} Shore Excursions`} className="h-full w-full object-cover opacity-55" /><div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-slate-950/20" /></div>
           <div className="relative max-w-3xl p-7 sm:p-12"><div className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300">{portTours.length} excursion choices</div><h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">What should you do in {portTitle}?</h1><p className="mt-4 max-w-2xl text-sm leading-6 text-slate-200">Start with the kind of day you want. We grouped the available FareHarbor inventory so you do not have to compare every tour one by one.</p></div>
         </section>
+
+        {/* DIRECT ANSWER CARD FOR GOOGLE AI OVERVIEWS */}
+        <GeoDirectAnswerCard fact={geoFact} />
 
         <section className="mt-6 rounded-[2rem] border border-sky-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Shop {portTitle} by experience</div>

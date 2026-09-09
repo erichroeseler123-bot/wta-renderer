@@ -2,6 +2,11 @@ import Link from "next/link";
 
 const GUIDES = [
   {
+    slug: "cruise-ship-vs-independent-alaska-excursions",
+    title: "Independent vs Cruise Ship Excursions",
+    description: "Compare pricing, group sizes, back-to-ship guarantees, and port logistics between independent operators and ship tours.",
+  },
+  {
     slug: "juneau-whale-watching-vs-mendenhall",
     title: "Juneau Whale Watching vs Mendenhall Glacier",
     description: "A side-by-side cruise-day decision guide: choose wildlife, glacier scenery, or a combination based on your group and actual ship window.",
