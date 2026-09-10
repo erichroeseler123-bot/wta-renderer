@@ -1,0 +1,413 @@
+{
+  "test_run_timestamp": "2026-09-10T20:59:44.067Z",
+  "property_name": "Welcome to Alaska Tours",
+  "repository": "https://github.com/erichroeseler123-bot/wta-renderer.git",
+  "local_repository_path": "C:/Users/erich/Documents/Projects/wta-renderer",
+  "production_branch": "main",
+  "tested_deployment": "dpl_XfizmeSqYFkr8KCamNw2JN8CkBF1",
+  "vercel_project": "wta-ui",
+  "canonical_domain": "https://welcometoalaskatours.com",
+  "security_mode": "NORMAL_CHROME_SECURITY",
+  "checks": {
+    "internal_test_suites": {
+      "pass": true,
+      "total": 5,
+      "passed": [
+        "dccSatellite",
+        "cacheTiming",
+        "widgetContext",
+        "recommendationEngine",
+        "geoFacts"
+      ],
+      "failed": []
+    },
+    "seo": {
+      "pass": true,
+      "total_pages_checked": 17,
+      "pages": [
+        {
+          "path": "/",
+          "status": 200,
+          "title": "Alaska Cruise Port Excursions | Welcome To Alaska Tours",
+          "description": "Choose Juneau, Skagway, or Ketchikan, tell us what kind of Alaska day you want, and narrow the connected shore-excursion catalog to a four-tour shortlist.",
+          "canonical": "https://welcometoalaskatours.com",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        },
+        {
+          "path": "/ports",
+          "status": 200,
+          "title": "Choose Your Alaska Port | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Explore our directory of Juneau, Skagway, and Ketchikan cruise ports. Review port-specific timing challenges, return buffer guidelines, and verify excursion compatibility.",
+          "canonical": "https://welcometoalaskatours.com/ports",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        },
+        {
+          "path": "/ports/juneau",
+          "status": 200,
+          "title": "Juneau Cruise Port Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Compare Juneau whale watching, glacier, dog sledding, flightseeing, and active shore excursions for your cruise day.",
+          "canonical": "https://welcometoalaskatours.com/ports/juneau",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/ports/ketchikan",
+          "status": 200,
+          "title": "Ketchikan Cruise Port Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Compare Ketchikan rainforest, wildlife, kayak, flightseeing, fishing, and wilderness shore excursions.",
+          "canonical": "https://welcometoalaskatours.com/ports/ketchikan",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/ports/skagway",
+          "status": 200,
+          "title": "Skagway Cruise Port Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Compare Skagway helicopter, dog sledding, scooter, and active shore excursions for your cruise day.",
+          "canonical": "https://welcometoalaskatours.com/ports/skagway",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/juneau/whale-watching",
+          "status": 200,
+          "title": "Juneau Whale Watching Tours for Cruise Passengers | Welcome to Alaska Tours",
+          "description": "Compare connected Juneau whale watching excursions, then open the live calendar to check current departures, pricing and capacity.",
+          "canonical": "https://welcometoalaskatours.com/juneau/whale-watching",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/juneau/mendenhall-glacier-tours",
+          "status": 200,
+          "title": "Mendenhall Glacier Tours from Juneau Cruise Port | Welcome to Alaska Tours",
+          "description": "Compare Mendenhall Glacier excursions connected to the Juneau catalog, including sightseeing, paddling, hiking and combination tours.",
+          "canonical": "https://welcometoalaskatours.com/juneau/mendenhall-glacier-tours",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/juneau/helicopter-tours",
+          "status": 200,
+          "title": "Juneau Helicopter Tours: Prices &amp; Glacier Trips (2026) | Welcome to Alaska Tours",
+          "description": "Compare Juneau helicopter tour prices, glacier landings, guided walks, treks and dog sledding flights. Check current operator calendars for your cruise day.",
+          "canonical": "https://welcometoalaskatours.com/juneau/helicopter-tours",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/ketchikan/misty-fjords",
+          "status": 200,
+          "title": "Misty Fjords Tours from Ketchikan: Compare Your Options | Welcome to Alaska Tours",
+          "description": "Compare Misty Fjords flightseeing, boat and expedition-style tours from Ketchikan, with current prices and live calendars for cruise passengers.",
+          "canonical": "https://welcometoalaskatours.com/ketchikan/misty-fjords",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/skagway/helicopter-tours",
+          "status": 200,
+          "title": "Skagway Helicopter Tours and Glacier Flightseeing | Welcome to Alaska Tours",
+          "description": "Compare connected Skagway helicopter excursions and glacier flightseeing, then check live calendars for current departures.",
+          "canonical": "https://welcometoalaskatours.com/skagway/helicopter-tours",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/guides/cruise-ship-vs-independent-alaska-excursions",
+          "status": 200,
+          "title": "Booking Alaska Shore Excursions: Independent vs Cruise Ship (2026 Guide)",
+          "description": "Honest comparison between booking independent Alaska excursions vs cruise ship tours. Compare pricing markups, group sizes, back-to-ship guarantees, and port docking realities.",
+          "canonical": "https://welcometoalaskatours.com/guides/cruise-ship-vs-independent-alaska-excursions",
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
+          "pass": true
+        },
+        {
+          "path": "/ships/celebrity-edge",
+          "status": 200,
+          "title": "Celebrity Edge Alaska Shore Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Plan independent Alaska shore excursions for Celebrity Edge. Compare Juneau, Skagway, and Ketchikan tours and check live operator calendars against your current ship schedule.",
+          "canonical": "https://welcometoalaskatours.com/ships/celebrity-edge",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        },
+        {
+          "path": "/categories/juneau-helicopter-tours",
+          "status": 200,
+          "title": "Juneau Helicopter Shore Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Compare Juneau helicopter tours, glacier landings, dog sledding flights, and live booking calendars for your cruise port day.",
+          "canonical": "https://welcometoalaskatours.com/categories/juneau-helicopter-tours",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        },
+        {
+          "path": "/about",
+          "status": 200,
+          "title": "About Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Learn how Welcome To Alaska Tours helps cruise travelers compare shore excursions in Juneau, Skagway, and Ketchikan using live operator availability and cruise-day timing guidance.",
+          "canonical": "https://welcometoalaskatours.com/about",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        },
+        {
+          "path": "/contact-us",
+          "status": 200,
+          "title": "Contact Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Contact Welcome To Alaska Tours for help comparing cruise shore excursions in Juneau, Skagway, and Ketchikan. Call 907-723-8908 or email hello@welcometoalaskatours.com.",
+          "canonical": "https://welcometoalaskatours.com/contact-us",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        },
+        {
+          "path": "/privacy",
+          "status": 200,
+          "title": "Privacy Policy | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Privacy information for Welcome To Alaska Tours, including booking, contact, analytics, and payment data handling.",
+          "canonical": "https://welcometoalaskatours.com/privacy",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        },
+        {
+          "path": "/terms",
+          "status": 200,
+          "title": "Terms of Use | Welcome To Alaska Tours | Welcome to Alaska Tours",
+          "description": "Terms for using Welcome To Alaska Tours and booking independently operated Alaska excursions.",
+          "canonical": "https://welcometoalaskatours.com/terms",
+          "hasGeoCard": false,
+          "hasDirectAnswer": false,
+          "pass": true
+        }
+      ]
+    },
+    "schema": {
+      "pass": true,
+      "checked_pages": [
+        {
+          "path": "/",
+          "expectedTypes": [
+            "WebSite",
+            "Organization"
+          ],
+          "discoveredTypes": [
+            "TravelAgency",
+            "WebSite",
+            "FAQPage"
+          ],
+          "totalSchemas": 3,
+          "pass": true
+        },
+        {
+          "path": "/juneau/whale-watching",
+          "expectedTypes": [
+            "TouristAttraction",
+            "FAQPage",
+            "BreadcrumbList"
+          ],
+          "discoveredTypes": [
+            "TravelAgency",
+            "WebSite",
+            "BreadcrumbList",
+            "FAQPage"
+          ],
+          "totalSchemas": 4,
+          "pass": true
+        },
+        {
+          "path": "/guides/cruise-ship-vs-independent-alaska-excursions",
+          "expectedTypes": [
+            "FAQPage",
+            "BreadcrumbList"
+          ],
+          "discoveredTypes": [
+            "TravelAgency",
+            "WebSite",
+            "Article",
+            "FAQPage"
+          ],
+          "totalSchemas": 4,
+          "pass": true
+        },
+        {
+          "path": "/ports/juneau",
+          "expectedTypes": [
+            "ItemList",
+            "BreadcrumbList"
+          ],
+          "discoveredTypes": [
+            "TravelAgency",
+            "WebSite",
+            "BreadcrumbList",
+            "TouristDestination"
+          ],
+          "totalSchemas": 4,
+          "pass": true
+        },
+        {
+          "path": "/tours/beyondak/195602",
+          "expectedTypes": [
+            "TouristTrip",
+            "Product",
+            "FAQPage",
+            "BreadcrumbList"
+          ],
+          "discoveredTypes": [
+            "TravelAgency",
+            "WebSite",
+            "TouristTrip",
+            "BreadcrumbList",
+            "Product",
+            "FAQPage"
+          ],
+          "totalSchemas": 7,
+          "pass": true
+        }
+      ]
+    },
+    "sitemap_and_robots": {
+      "pass": true,
+      "robots": {
+        "status": 200,
+        "hasAllowAll": true,
+        "hasSitemapDeclaration": true,
+        "pass": true
+      },
+      "sitemap": {
+        "status": 200,
+        "total_urls": 135,
+        "sample_urls": [
+          "https://welcometoalaskatours.com",
+          "https://welcometoalaskatours.com/tours",
+          "https://welcometoalaskatours.com/ports",
+          "https://welcometoalaskatours.com/guides",
+          "https://welcometoalaskatours.com/ships",
+          "https://welcometoalaskatours.com/about",
+          "https://welcometoalaskatours.com/contact-us",
+          "https://welcometoalaskatours.com/privacy",
+          "https://welcometoalaskatours.com/terms",
+          "https://welcometoalaskatours.com/ports/juneau"
+        ],
+        "hasPorts": true,
+        "hasMoneyPages": true,
+        "hasGuides": true,
+        "pass": true
+      }
+    },
+    "factual_public_feeds": {
+      "pass": true,
+      "agent_json": {
+        "status": 200,
+        "spec": "dcc-site-contract",
+        "version": "1.0",
+        "dcc_id": "dcc:site:welcome-to-alaska-tours",
+        "machine_endpoints": {
+          "agent": "https://www.welcometoalaskatours.com/agent.json",
+          "llms": "https://www.welcometoalaskatours.com/llms.txt",
+          "sitemap": "https://www.welcometoalaskatours.com/sitemap.xml",
+          "portfolio_graph": "https://www.destinationcommandcenter.com/api/public/portfolio-feed",
+          "truth_record": "https://www.destinationcommandcenter.com/api/public/truth-feed?id=welcome-to-alaska-tours"
+        },
+        "inference_rules_count": 4,
+        "pass": true
+      },
+      "llms_txt": {
+        "status": 200,
+        "hasCanonical": true,
+        "hasDccId": true,
+        "hasAuthorityBoundary": true,
+        "hasInferenceRules": true,
+        "pass": true
+      }
+    },
+    "booking_handoff": {
+      "pass": true,
+      "tour_detail": {
+        "status": 200,
+        "hasCalendarLink": true,
+        "hasOperatorAttribution": true,
+        "hasBookNowButton": true
+      },
+      "calendar_route": {
+        "status": 200,
+        "rendered_cleanly": true
+      }
+    },
+    "measurement": {
+      "pass": true,
+      "plan_events_api": {
+        "status": 200,
+        "accepted": true
+      },
+      "dcc_satellite_contract": {
+        "satellite_id": "welcome-to-alaska",
+        "supported_events": [
+          "handoff_viewed",
+          "lead_captured",
+          "booking_started",
+          "booking_completed",
+          "forwarded_to_partner",
+          "accepted_from_partner"
+        ],
+        "tested_and_verified": true
+      }
+    },
+    "browser_journey": {
+      "pass": true,
+      "steps": [
+        {
+          "step": "1_homepage",
+          "url": "https://welcometoalaskatours.com/",
+          "title": "Alaska Cruise Port Excursions | Welcome To Alaska Tours",
+          "pass": true
+        },
+        {
+          "step": "2_port_hub",
+          "url": "https://welcometoalaskatours.com/ports/juneau",
+          "h1": "What should you do in Juneau?",
+          "pass": true
+        },
+        {
+          "step": "3_direct_answer_page",
+          "url": "https://welcometoalaskatours.com/juneau/whale-watching",
+          "hasCard": true,
+          "cardSnippet": "⚡ DIRECT CRUISE ANSWER • ALASKA LOCAL INTEL\nHow much does whale watching in Juneau cost and how does it work with cruise",
+          "screenshot": "C:/Users/erich/Documents/Projects/wta-renderer/reports/screenshots/wta-juneau-whale-watching-verified.png",
+          "pass": true
+        },
+        {
+          "step": "4_tour_detail",
+          "url": "https://welcometoalaskatours.com/tours/beyondak/195602",
+          "h1": "Mendenhall Glacier Guided Hike",
+          "hasBookNow": true,
+          "pass": true
+        },
+        {
+          "step": "5_tour_calendar",
+          "url": "https://welcometoalaskatours.com/tours/beyondak/195602/calendar",
+          "calendarMounted": true,
+          "screenshot": "C:/Users/erich/Documents/Projects/wta-renderer/reports/screenshots/wta-tour-calendar-verified.png",
+          "pass": true
+        }
+      ]
+    }
+  },
+  "overall_pass": true,
+  "status": "PASSED"
+}

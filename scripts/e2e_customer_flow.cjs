@@ -2,7 +2,10 @@ const { chromium } = require('playwright');
 
 (async () => {
   const base = 'https://welcometoalaskatours.com';
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({
+    executablePath: process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe',
+    headless: true,
+  });
   const page = await browser.newPage();
   const steps = [];
   const ok = (step, detail='') => steps.push({ step, status: 'PASS', detail });
