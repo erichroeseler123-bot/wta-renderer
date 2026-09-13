@@ -6,6 +6,6 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
     },
-    sitemap: "https://welcometoalaskatours.com/sitemap.xml",
+    sitemap: "https://www.welcometoalaskatours.com/sitemap.xml",
   };
 }

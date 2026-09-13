@@ -124,7 +124,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: config.metaTitle,
     description: config.metaDescription,
-    alternates: { canonical: `https://welcometoalaskatours.com/guides/${slug}` },
+    alternates: { canonical: `https://www.welcometoalaskatours.com/guides/${slug}` },
   };
 }
 

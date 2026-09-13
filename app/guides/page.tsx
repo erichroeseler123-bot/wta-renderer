@@ -2,14 +2,54 @@ import Link from "next/link";
 
 const GUIDES = [
   {
-    slug: "cruise-ship-vs-independent-alaska-excursions",
-    title: "Independent vs Cruise Ship Excursions",
-    description: "Compare pricing, group sizes, back-to-ship guarantees, and port logistics between independent operators and ship tours.",
+    slug: "best-shore-excursions-in-juneau",
+    title: "Best Shore Excursions in Juneau",
+    description: "Top picks for cruise passengers: whale watching, Mendenhall Glacier, helicopter landings, dog sledding, and fishing charters.",
+  },
+  {
+    slug: "how-to-get-to-mendenhall-glacier-from-cruise-port",
+    title: "How to Get to Mendenhall Glacier from Cruise Port",
+    description: "Transport comparison: commercial shuttles, combos, taxi/rideshare shortages, and USFS permit restrictions.",
   },
   {
     slug: "juneau-whale-watching-vs-mendenhall",
     title: "Juneau Whale Watching vs Mendenhall Glacier",
     description: "A side-by-side cruise-day decision guide: choose wildlife, glacier scenery, or a combination based on your group and actual ship window.",
+  },
+  {
+    slug: "best-things-to-do-in-skagway-4-6-hours",
+    title: "Best Things to Do in Skagway in 4 to 6 Hours",
+    description: "Maximize a short port call: helicopter icefield flights, Liarsville camp, electric scooters, and historic Broadway without missing all-aboard.",
+  },
+  {
+    slug: "first-time-in-ketchikan-shore-excursions",
+    title: "First Time in Ketchikan Shore Excursions",
+    description: "Essential first-timer guide: Misty Fjords seaplanes, coastal bear viewing, sea kayaking, Creek Street, and Ward Cove logistics.",
+  },
+  {
+    slug: "how-much-do-alaska-shore-excursions-cost",
+    title: "How Much Do Alaska Shore Excursions Cost?",
+    description: "2026 pricing transparency across all categories, saving 20–40% booking independent vs cruise ship markups.",
+  },
+  {
+    slug: "what-happens-if-my-alaska-tour-runs-late",
+    title: "What Happens If My Alaska Tour Runs Late?",
+    description: "Strict cruise-safety buffers: tour end time + 45 min <= all-aboard, traffic-free port routes, and back-to-ship guarantees.",
+  },
+  {
+    slug: "easy-alaska-shore-excursions",
+    title: "Best Easy Alaska Shore Excursions",
+    description: "Low-walking, scenic, and accessible excursions in Juneau, Skagway, and Ketchikan for seniors and multigenerational families.",
+  },
+  {
+    slug: "private-premium-alaska-shore-excursions",
+    title: "Private & Premium Alaska Shore Excursions",
+    description: "VIP charters: private 6-pack whale watching, private glacier helicopters, luxury vans, and custom timing.",
+  },
+  {
+    slug: "cruise-ship-vs-independent-alaska-excursions",
+    title: "Independent vs Cruise Ship Excursions",
+    description: "Compare pricing, group sizes, back-to-ship guarantees, and port logistics between independent operators and ship tours.",
   },
   {
     slug: "how-long-does-it-take-to-get-off-the-ship-in-juneau",
@@ -32,7 +72,7 @@ export const metadata = {
   title: "Alaska Cruise Planning Guides | Welcome To Alaska Tours",
   description: "Compare Alaska cruise-port decisions, excursion choices, dock logistics, disembarkation timing, and safety buffers for Juneau, Skagway, and Ketchikan.",
   alternates: {
-    canonical: "https://welcometoalaskatours.com/guides",
+    canonical: "https://www.welcometoalaskatours.com/guides",
   },
 };
 

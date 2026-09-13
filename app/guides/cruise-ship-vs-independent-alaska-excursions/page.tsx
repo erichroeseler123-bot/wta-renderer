@@ -3,7 +3,7 @@ import Link from "next/link";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
 import { ALASKA_GEO_FACTS } from "@/lib/alaskaGeoFacts";
 
-const canonical = "https://welcometoalaskatours.com/guides/cruise-ship-vs-independent-alaska-excursions";
+const canonical = "https://www.welcometoalaskatours.com/guides/cruise-ship-vs-independent-alaska-excursions";
 
 export const metadata: Metadata = {
   title: "Booking Alaska Shore Excursions: Independent vs Cruise Ship (2026 Guide)",

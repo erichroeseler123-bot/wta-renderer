@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const canonical = "https://welcometoalaskatours.com/guides/juneau-whale-watching-vs-mendenhall";
+const canonical = "https://www.welcometoalaskatours.com/guides/juneau-whale-watching-vs-mendenhall";
 
 export const metadata: Metadata = {
   title: "Juneau Whale Watching vs Mendenhall Glacier: Which Should You Choose?",

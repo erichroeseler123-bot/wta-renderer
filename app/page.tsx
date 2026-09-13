@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   title: "Alaska Cruise Port Excursions | Welcome To Alaska Tours",
   description:
     "Choose Juneau, Skagway, or Ketchikan, tell us what kind of Alaska day you want, and narrow the connected shore-excursion catalog to a four-tour shortlist.",
-  alternates: { canonical: "https://welcometoalaskatours.com" },
+  alternates: { canonical: "https://www.welcometoalaskatours.com" },
 };
 
 const APPROVED_PORTS = [
@@ -32,32 +32,43 @@ const APPROVED_PORTS = [
 ];
 
 const TRIP_STYLES = [
-  { icon: "🐋", title: "Wildlife & whales", text: "Whales, bears, rainforest and wildlife-focused experiences." },
-  { icon: "🧊", title: "Glaciers", text: "Glacier views, icefields, Mendenhall, hikes and paddles." },
-  { icon: "🚁", title: "Flightseeing", text: "Helicopters, seaplanes and Alaska scenery from the air." },
-  { icon: "🐕", title: "Dog sledding", text: "Huskies, glacier camps and sled-dog experiences." },
-  { icon: "🎣", title: "Fishing", text: "Salmon, halibut and private fishing charters." },
-  { icon: "🛶", title: "Adventure", text: "Kayaks, canoes, Jeeps, UTVs, ziplines, hiking and snorkeling." },
-  { icon: "☕", title: "Easy day", text: "Lower-friction sightseeing and simpler-paced choices." },
-  { icon: "✨", title: "Private / premium", text: "Private charters and bigger once-in-a-lifetime splurges." },
+  { icon: "🐋", title: "Wildlife & whales", text: "Whales, bears, rainforest and wildlife-focused experiences.", href: "/juneau/whale-watching" },
+  { icon: "🧊", title: "Glaciers", text: "Glacier views, icefields, Mendenhall, hikes and paddles.", href: "/juneau/mendenhall-glacier-tours" },
+  { icon: "🚁", title: "Flightseeing", text: "Helicopters, seaplanes and Alaska scenery from the air.", href: "/juneau/helicopter-tours" },
+  { icon: "🐕", title: "Dog sledding", text: "Huskies, glacier camps and sled-dog experiences.", href: "/juneau/dog-sledding" },
+  { icon: "🎣", title: "Fishing", text: "Salmon, halibut and private fishing charters.", href: "/juneau/fishing" },
+  { icon: "🛶", title: "Adventure", text: "Kayaks, canoes, Jeeps, UTVs, ziplines, hiking and snorkeling.", href: "/ketchikan/adventure-tours" },
+  { icon: "☕", title: "Easy day", text: "Lower-friction sightseeing and simpler-paced choices.", href: "/guides/easy-alaska-shore-excursions" },
+  { icon: "✨", title: "Private / premium", text: "Private charters and bigger once-in-a-lifetime splurges.", href: "/guides/private-premium-alaska-shore-excursions" },
 ];
 
 const POPULAR_SEARCHES = [
-  ["Juneau fishing charters", "/juneau/fishing"],
-  ["Juneau helicopter tour prices", "/juneau/helicopter-tours"],
-  ["Misty Fjords tours from Ketchikan", "/ketchikan/misty-fjords"],
-  ["Alaska gold panning tours", "/juneau/gold-panning"],
-  ["Ketchikan cruise port guide", "/ports/ketchikan"],
-  ["Mendenhall Glacier tours", "/juneau/mendenhall-glacier-tours"],
   ["Juneau whale watching", "/juneau/whale-watching"],
+  ["Mendenhall Glacier tours", "/juneau/mendenhall-glacier-tours"],
+  ["Juneau helicopter tour prices", "/juneau/helicopter-tours"],
+  ["Juneau glacier ice treks", "/juneau/glacier-tours"],
   ["Juneau dog sledding", "/juneau/dog-sledding"],
+  ["Juneau fishing charters", "/juneau/fishing"],
+  ["Alaska gold panning tours", "/juneau/gold-panning"],
+  ["Easy Juneau excursions", "/juneau/easy-shore-excursions"],
+  ["Misty Fjords floatplanes", "/ketchikan/misty-fjords"],
   ["Ketchikan bear tours", "/ketchikan/bear-tours"],
+  ["Ketchikan wildlife & eagles", "/ketchikan/wildlife-tours"],
   ["Ketchikan kayaking", "/ketchikan/kayaking"],
   ["Ketchikan adventure tours", "/ketchikan/adventure-tours"],
+  ["Easy Ketchikan tours", "/ketchikan/easy-shore-excursions"],
   ["Skagway helicopter tours", "/skagway/helicopter-tours"],
   ["Skagway Gold Rush tours", "/skagway/gold-rush-tours"],
   ["Skagway dog sledding", "/skagway/dog-sledding"],
   ["Skagway adventure tours", "/skagway/adventure-tours"],
+  ["Easy Skagway tours", "/skagway/easy-shore-excursions"],
+  ["Best Juneau shore excursions", "/guides/best-shore-excursions-in-juneau"],
+  ["Getting to Mendenhall Glacier", "/guides/how-to-get-to-mendenhall-glacier-from-cruise-port"],
+  ["Whales vs Mendenhall", "/guides/juneau-whale-watching-vs-mendenhall"],
+  ["Skagway in 4 to 6 hours", "/guides/best-things-to-do-in-skagway-4-6-hours"],
+  ["First time in Ketchikan", "/guides/first-time-in-ketchikan-shore-excursions"],
+  ["Alaska excursion costs", "/guides/how-much-do-alaska-shore-excursions-cost"],
+  ["What if tour runs late?", "/guides/what-happens-if-my-alaska-tour-runs-late"],
 ] as const;
 
 const HOME_FAQS = [
@@ -276,15 +287,15 @@ export default function HomePage() {
 
           <div className="mt-12 grid gap-px overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
             {TRIP_STYLES.map((style, index) => (
-              <a key={style.title} href="#find-your-port-day" className="group min-h-[240px] bg-[#0a302c] p-6 transition hover:bg-[#0d3a35]">
+              <Link key={style.title} href={style.href} className="group min-h-[240px] bg-[#0a302c] p-6 transition hover:bg-[#0d3a35]">
                 <div className="flex items-start justify-between">
                   <span className="text-3xl">{style.icon}</span>
                   <span className="text-[10px] font-black tracking-[0.18em] text-white/25">0{index + 1}</span>
                 </div>
                 <h3 className="mt-10 text-xl font-black tracking-tight text-white">{style.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-white/55">{style.text}</p>
-                <span className="mt-6 block text-xs font-black uppercase tracking-[0.13em] text-[#d7ff76] opacity-80 transition group-hover:translate-x-1 group-hover:opacity-100">Choose this vibe →</span>
-              </a>
+                <span className="mt-6 block text-xs font-black uppercase tracking-[0.13em] text-[#d7ff76] opacity-80 transition group-hover:translate-x-1 group-hover:opacity-100">Explore this vibe →</span>
+              </Link>
             ))}
           </div>
         </div>

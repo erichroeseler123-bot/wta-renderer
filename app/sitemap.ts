@@ -8,18 +8,26 @@ const MONEY_PAGES = [
   'juneau/dog-sledding',
   'juneau/fishing',
   'juneau/gold-panning',
+  'juneau/glacier-tours',
+  'juneau/easy-shore-excursions',
+  'juneau/private-tours',
   'ketchikan/bear-tours',
   'ketchikan/misty-fjords',
   'ketchikan/kayaking',
   'ketchikan/adventure-tours',
+  'ketchikan/wildlife-tours',
+  'ketchikan/easy-shore-excursions',
+  'ketchikan/private-tours',
   'skagway/helicopter-tours',
   'skagway/gold-rush-tours',
   'skagway/dog-sledding',
   'skagway/adventure-tours',
+  'skagway/easy-shore-excursions',
+  'skagway/private-tours',
 ];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://welcometoalaskatours.com';
+  const baseUrl = 'https://www.welcometoalaskatours.com';
 
   let tours: any[] = [];
   try {
@@ -38,8 +46,16 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const approvedPorts = ['juneau', 'skagway', 'ketchikan'];
   const approvedCategories = ['juneau-helicopter-tours','glacier-tours','dog-sledding','whale-watching','mendenhall-glacier','flightseeing'];
   const approvedGuides = [
-    'cruise-ship-vs-independent-alaska-excursions',
+    'best-shore-excursions-in-juneau',
+    'how-to-get-to-mendenhall-glacier-from-cruise-port',
     'juneau-whale-watching-vs-mendenhall',
+    'best-things-to-do-in-skagway-4-6-hours',
+    'first-time-in-ketchikan-shore-excursions',
+    'how-much-do-alaska-shore-excursions-cost',
+    'what-happens-if-my-alaska-tour-runs-late',
+    'easy-alaska-shore-excursions',
+    'private-premium-alaska-shore-excursions',
+    'cruise-ship-vs-independent-alaska-excursions',
     'how-long-does-it-take-to-get-off-the-ship-in-juneau',
     'how-long-does-it-take-to-get-off-the-ship-in-skagway',
     'how-long-does-it-take-to-get-off-the-ship-in-ketchikan',

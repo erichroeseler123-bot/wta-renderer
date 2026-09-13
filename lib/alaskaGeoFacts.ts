@@ -348,6 +348,354 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     safetyBufferValue: "Compact port footprint allows quick 15-minute return to gangways",
   },
 
+  // Juneau Expanded Topics
+  "juneau-glacier-tours": {
+    id: "juneau-glacier-tours",
+    port: "juneau",
+    topic: "glacier-tours",
+    directQuestion: "What kinds of glacier tours can cruise passengers do in Juneau?",
+    directAnswer:
+      "Juneau offers four distinct glacier experiences: scenic viewing from Mendenhall Visitor Center ($45–$95), guided glacier canoe and kayak paddles on Mendenhall Lake ($195–$245), helicopter scenic flights with a 25-minute glacier ice landing ($360–$420), and advanced guided ice treks or ice climbing on the Juneau Icefield ($550–$695). All tours include round-trip dock transfers and timing coordinated with ship port calls.",
+    pricingLabel: "Glacier Tour Rates",
+    pricingValue: "$45–$95 viewing • $195–$245 lake paddle • $360–$695 helicopter / trek",
+    durationLabel: "Duration Window",
+    durationValue: "2.5 to 5 hours depending on activity format",
+    meetingPointLabel: "Cruise Dock Pickup",
+    meetingPointValue: "Mt. Roberts Tramway Plaza / Cruise ship terminal shuttle bus loop",
+    safetyBufferLabel: "Return Protection",
+    safetyBufferValue: "Conservative return 60–90 min prior to all-aboard",
+    faqSchema: [
+      {
+        question: "How close can you get to Mendenhall Glacier on foot?",
+        answer: "From the Visitor Center trail system, the Nugget Falls trail brings you within about 0.75 miles of the glacier terminus across an iceberg-dotted lake. Walking directly on the ice requires a guided ice trek accessed by helicopter or guided lake paddle."
+      },
+      {
+        question: "Do glacier tours run if it rains in Juneau?",
+        answer: "Yes. Rain is common in the Tongass National Forest temperate rainforest, and glaciers often appear more vividly blue under overcast skies. Boat and ground tours run rain or shine with supplied raingear; helicopter flights operate unless mountain cloud ceilings drop below FAA safety minimums."
+      }
+    ]
+  },
+  "juneau-easy-shore-excursions": {
+    id: "juneau-easy-shore-excursions",
+    port: "juneau",
+    topic: "easy-shore-excursions",
+    directQuestion: "What are the best low-walking, easy shore excursions in Juneau?",
+    directAnswer:
+      "For older travelers, multigenerational families, or visitors with limited mobility, Juneau's top easy excursions include covered catamaran whale watching with enclosed heated cabins ($165–$185), the historic Gold Creek salmon bake and mining camp ($75–$95), the Mt. Roberts Tramway right at the dock ($55), and scenic coach drives to Mendenhall Glacier Visitor Center ($45–$65). All feature minimal walking and ramp or low-step coach boarding.",
+    pricingLabel: "Accessible Rates",
+    pricingValue: "$45–$185 / person across scenic options",
+    durationLabel: "Duration",
+    durationValue: "2 to 3.5 hours total (Relaxed pacing)",
+    meetingPointLabel: "Pier Meeting Point",
+    meetingPointValue: "Direct dockside pickup at downtown Juneau piers",
+    safetyBufferLabel: "Ship Return Buffer",
+    safetyBufferValue: "Downtown proximity ensures 60+ min safety cushion",
+    faqSchema: [
+      {
+        question: "Can someone with limited mobility see Mendenhall Glacier?",
+        answer: "Yes. The Mendenhall Visitor Center facility has accessible ramps, paved paths, and wide viewing windows overlooking the glacier and lake without requiring trail walking."
+      },
+      {
+        question: "Are Juneau whale watching boats wheelchair accessible?",
+        answer: "Many commercial catamarans accommodate folding wheelchairs and provide step-free boarding ramps. Operators should be notified at booking to ensure appropriate vessel assignment."
+      }
+    ]
+  },
+  "juneau-private-tours": {
+    id: "juneau-private-tours",
+    port: "juneau",
+    topic: "private-tours",
+    directQuestion: "Can you book private shore excursions in Juneau for your family or group?",
+    directAnswer:
+      "Yes. Private Juneau excursions include private 6-pack whale-watching boats ($1,400–$1,800 for up to 6 guests), private salmon and halibut fishing charters ($1,200–$1,800), private luxury passenger vans for custom Mendenhall and island tours ($850–$1,200), and exclusive helicopter charters. Private bookings let your group set the exact schedule, pacing, and focus while ensuring dedicated return to the ship.",
+    pricingLabel: "Private Charter Rates",
+    pricingValue: "$850–$1,800 per private boat / van charter",
+    durationLabel: "Custom Duration",
+    durationValue: "3 to 6 hours (Customizable timing)",
+    meetingPointLabel: "Personalized Pickup",
+    meetingPointValue: "Personalized curbside greeting at your specific cruise berth",
+    safetyBufferLabel: "Dedicated Return",
+    safetyBufferValue: "Dedicated private vehicle guarantees custom on-time ship return",
+    faqSchema: [
+      {
+        question: "Why choose a private whale watching charter in Juneau?",
+        answer: "A private boat gives your family full 360-degree viewing rails with zero crowds, customizable hydrophone listening time, and flexible departure times that align perfectly with your ship's disembarkation."
+      }
+    ]
+  },
+
+  // Ketchikan Expanded Topics
+  "ketchikan-wildlife-tours": {
+    id: "ketchikan-wildlife-tours",
+    port: "ketchikan",
+    topic: "wildlife-tours",
+    directQuestion: "What wildlife can you see on a Ketchikan shore excursion?",
+    directAnswer:
+      "Ketchikan is surrounded by the Tongass National Forest and protected coastal channels, making it one of Alaska's best ports for viewing wild bald eagles, coastal black bears, humpback whales, orcas, harbor seals, Steller sea lions, and river otters. Excursions include rainforest wildlife sanctuaries ($110–$150), wildlife and zodiac boat safaris ($165–$215), and fly-in bear viewing ($495–$650).",
+    pricingLabel: "Wildlife Pricing",
+    pricingValue: "$110–$215 local wildlife • $495–$650 remote fly-in",
+    durationLabel: "Tour Duration",
+    durationValue: "2.5 to 4.5 hours total",
+    meetingPointLabel: "Berth Pickup",
+    meetingPointValue: "Ketchikan Visitors Bureau (Berth 2) or direct Berth 1–4 gangway",
+    safetyBufferLabel: "Cruise Buffer",
+    safetyBufferValue: "Tours finish with 60–90 min buffer before all-aboard",
+    faqSchema: [
+      {
+        question: "Where can you see bald eagles in Ketchikan?",
+        answer: "Ketchikan has one of the highest concentrations of bald eagles in North America. Eagles are easily spotted nesting along the waterfront, circling canneries near Ward Cove, and roosting in the tall hemlocks of the Alaska Rainforest Sanctuary."
+      }
+    ]
+  },
+  "ketchikan-easy-shore-excursions": {
+    id: "ketchikan-easy-shore-excursions",
+    port: "ketchikan",
+    topic: "easy-shore-excursions",
+    directQuestion: "What are the best easy, low-walking shore excursions in Ketchikan?",
+    directAnswer:
+      "Top low-stress Ketchikan excursions include the amphibious Ketchikan Duck Tour ($65–$85) traversing historic downtown and harbor waters, the Ketchikan Historic Town & Saxman Native Village cultural bus tour ($75–$95), and covered harbor wildlife catamarans ($145–$175). For dockside exploring, historic Creek Street, Married Man's Trail, and the Southeast Alaska Discovery Center are all within a 3 to 10-minute flat walk of Berths 1–4.",
+    pricingLabel: "Tour Rates",
+    pricingValue: "$65–$95 city & culture • $145–$175 covered catamaran",
+    durationLabel: "Duration",
+    durationValue: "1.5 to 3 hours (Gentle, low-impact pacing)",
+    meetingPointLabel: "Cruise Berth Pickup",
+    meetingPointValue: "Direct Berth 1–4 dockside pickup (Ward Cove shuttle compatible)",
+    safetyBufferLabel: "Return Margin",
+    safetyBufferValue: "Low-mileage footprint provides safe 60+ min return margin",
+    faqSchema: [
+      {
+        question: "Is Creek Street accessible for strollers and wheelchairs?",
+        answer: "Yes. The boardwalk along Creek Street is wooden and flat, though rain can make the wood slick and some historic shop entrances have single steps."
+      }
+    ]
+  },
+  "ketchikan-private-tours": {
+    id: "ketchikan-private-tours",
+    port: "ketchikan",
+    topic: "private-tours",
+    directQuestion: "Are private shore excursions available in Ketchikan?",
+    directAnswer:
+      "Yes. Private options in Ketchikan include customized luxury Hummer excursions ($750–$950 for up to 5 guests) exploring rainforest coastlines, private wildlife and fishing charters ($1,100–$1,600), and private Misty Fjords floatplane charters ($1,800–$2,400). Private tours offer personalized pickup, customizable stops at totem parks or waterfalls, and dedicated return timing.",
+    pricingLabel: "Private Pricing",
+    pricingValue: "$750–$2,400 per private group / vessel",
+    durationLabel: "Tour Length",
+    durationValue: "3 to 5 hours (Tailored to your port window)",
+    meetingPointLabel: "Pier Greeting",
+    meetingPointValue: "Exclusive berth-side pickup directly at your ship gangway",
+    safetyBufferLabel: "Return Guarantee",
+    safetyBufferValue: "Dedicated private driver guarantees on-time return to ship"
+  },
+
+  // Skagway Expanded Topics
+  "skagway-easy-shore-excursions": {
+    id: "skagway-easy-shore-excursions",
+    port: "skagway",
+    topic: "easy-shore-excursions",
+    directQuestion: "What easy shore excursions are available in Skagway for seniors and families?",
+    directAnswer:
+      "Skagway's flat, compact layout makes it exceptionally accessible. Top easy excursions include the Liarsville Gold Rush Trail Camp and salmon bake ($65–$95) featuring seated gold panning and melodrama performances, historic town and scenic White Pass overlook tours by comfortable minibus ($60–$85), and exploring the Klondike Gold Rush National Historical Park boardwalks right from the piers with no steep hills.",
+    pricingLabel: "Easy Excursion Rates",
+    pricingValue: "$60–$95 / person across historic and scenic options",
+    durationLabel: "Duration",
+    durationValue: "2 to 3 hours (Fully accessible / seated formats)",
+    meetingPointLabel: "Staging Area",
+    meetingPointValue: "Small Boat Harbor parking or Broadway & 2nd Ave pickup",
+    safetyBufferLabel: "All-Aboard Cushion",
+    safetyBufferValue: "Skagway's small footprint guarantees 60+ min return cushion",
+    faqSchema: [
+      {
+        question: "How far is downtown Skagway from the cruise docks?",
+        answer: "Downtown Skagway starts just 0.25 to 0.5 miles from the Ore and Broadway docks (a 5 to 10-minute flat walk). From Railroad Dock, a municipal shuttle or transfer train transports guests right into town."
+      }
+    ]
+  },
+  "skagway-private-tours": {
+    id: "skagway-private-tours",
+    port: "skagway",
+    topic: "private-tours",
+    directQuestion: "Can you book a private tour in Skagway?",
+    directAnswer:
+      "Yes. Private shore excursions in Skagway include private guided vans and minibuses traveling the Klondike Highway to the Yukon border and emerald lakes ($850–$1,300 for up to 10 guests), private gold panning and history outings, and custom scooter tours. Private departures avoid bus crowds and adapt seamlessly to your ship's arrival and all-aboard times.",
+    pricingLabel: "Charter Rates",
+    pricingValue: "$850–$1,300 private van / coach charter",
+    durationLabel: "Custom Timing",
+    durationValue: "3 to 6 hours (Custom pacing)",
+    meetingPointLabel: "Dockside Pier Greeting",
+    meetingPointValue: "Direct dockside pier greeting at Ore, Broadway, or Railroad Dock",
+    safetyBufferLabel: "Return Protection",
+    safetyBufferValue: "Customized dispatch with direct contact to local ship agents"
+  },
+
+  // Authority Question Guides
+  "best-shore-excursions-in-juneau": {
+    id: "best-shore-excursions-in-juneau",
+    port: "juneau",
+    directQuestion: "What are the best shore excursions in Juneau for cruise passengers?",
+    directAnswer:
+      "The undisputed top two shore excursions in Juneau are small-boat humpback whale watching in Auke Bay ($165–$195) and visiting Mendenhall Glacier ($45–$95). For bucket-list splurges, helicopter glacier landings ($360–$420) and glacier dog sledding ($650–$799) are unmatched. Active travelers favor guided Mendenhall Lake canoe paddles ($215) and salmon fishing charters ($295+).",
+    pricingLabel: "Pricing Spectrum",
+    pricingValue: "$45–$95 (Glacier shuttle) • $165–$195 (Whales) • $360–$799 (Helicopter)",
+    durationLabel: "Excursion Times",
+    durationValue: "3 to 5.5 hours per excursion",
+    meetingPointLabel: "Central Hub",
+    meetingPointValue: "Mt. Roberts Tramway Plaza (Downtown Juneau cruise terminal)",
+    safetyBufferLabel: "Cruise Coordination",
+    safetyBufferValue: "All departures coordinated with 60–90 min return cushion",
+    faqSchema: [
+      {
+        question: "Can I do two tours in one Juneau port day?",
+        answer: "Yes, if your port call is 8 hours or longer. The most popular combination is a morning whale watching tour (8:30 AM–12:00 PM) followed by an afternoon Mendenhall Glacier visit (1:00 PM–4:30 PM)."
+      }
+    ]
+  },
+  "how-to-get-to-mendenhall-glacier-from-cruise-port": {
+    id: "how-to-get-to-mendenhall-glacier-from-cruise-port",
+    port: "juneau",
+    directQuestion: "How do I get to Mendenhall Glacier from the cruise port without getting stranded?",
+    directAnswer:
+      "Mendenhall Glacier is 13 miles northwest of the downtown Juneau cruise docks. The most reliable method is an authorized commercial tour shuttle or combination excursion ($45–$95) booked in advance. Taxis and Ubers are scarce during peak port hours and may not be available for the return trip, while city buses drop passengers 1.5 miles from the visitor center along a gravel road. Commercial permits are strictly capped by the US Forest Service.",
+    pricingLabel: "Transport Cost",
+    pricingValue: "$45–$95 round-trip commercial transport & USFS permit",
+    durationLabel: "Travel & Tour",
+    durationValue: "25-minute drive each way • 2 to 3 hours total on site",
+    meetingPointLabel: "Shuttle Station",
+    meetingPointValue: "Downtown Juneau Tram Parking Lot commercial shuttle bays",
+    safetyBufferLabel: "Return Guarantee",
+    safetyBufferValue: "Pre-scheduled return shuttle guarantees arrival 60+ min before all-aboard",
+    faqSchema: [
+      {
+        question: "Can I take an Uber or Lyft to Mendenhall Glacier?",
+        answer: "Rideshares can drop off at Mendenhall, but cell service is spotty at the glacier and ride requests for the return trip frequently fail due to severe driver shortages in Juneau. An organized tour with guaranteed return transport is strongly recommended."
+      }
+    ]
+  },
+  "best-things-to-do-in-skagway-4-6-hours": {
+    id: "best-things-to-do-in-skagway-4-6-hours",
+    port: "skagway",
+    directQuestion: "What are the best things to do in Skagway if I only have 4 to 6 hours?",
+    directAnswer:
+      "With a short 4 to 6-hour port window in Skagway, prioritize high-efficiency experiences close to port: a 2.5-hour helicopter glacier landing over Sawtooth Ridge ($350–$410), a 2.5-hour Liarsville Gold Rush camp and salmon bake ($75–$95), a 3-hour electric scooter tour to Dyea ($120–$150), or walking the historic 7-block Broadway National Historic District. Avoid long 7-hour Yukon train expeditions that risk cutting into tight all-aboard times.",
+    pricingLabel: "Short-Day Rates",
+    pricingValue: "$65–$95 culture • $120–$160 active • $350–$410 helicopter",
+    durationLabel: "Time Commitment",
+    durationValue: "2 to 3.5 hours (Leaves comfortable 60–90 min return cushion)",
+    meetingPointLabel: "Pier Location",
+    meetingPointValue: "Broadway Dock / Ore Dock / Railroad Dock gangways",
+    safetyBufferLabel: "Cruise Buffer Rule",
+    safetyBufferValue: "Strictly preserves 45-minute minimum buffer before all-aboard",
+    faqSchema: [
+      {
+        question: "Is the White Pass railway worth it for short port calls?",
+        answer: "The 2.5-hour White Pass Summit Excursion fits a 5+ hour port call comfortably. However, if your port stay is under 5 hours, local town and glacier helicopter tours provide lower timing stress."
+      }
+    ]
+  },
+  "first-time-in-ketchikan-shore-excursions": {
+    id: "first-time-in-ketchikan-shore-excursions",
+    port: "ketchikan",
+    directQuestion: "What should a first-timer do on a cruise stop in Ketchikan?",
+    directAnswer:
+      "First-time visitors to Ketchikan should choose between three signature experiences: a floatplane flightseeing tour over Misty Fjords National Monument ($330–$395), a guided rainforest wildlife and bear-viewing tour at Herring Cove ($120–$180), or sea kayaking along the Tongass coastline ($145–$185). Pair your tour with an hour strolling historic Creek Street, Dolly's House, and seeing the world's largest collection of standing totem poles.",
+    pricingLabel: "Introductory Rates",
+    pricingValue: "$65–$95 historic town • $120–$185 wildlife/kayak • $330–$395 Misty Fjords",
+    durationLabel: "Experience Time",
+    durationValue: "2.5 to 4 hours total",
+    meetingPointLabel: "Meeting Point",
+    meetingPointValue: "Ketchikan Visitors Bureau (Berth 2) or downtown gangway",
+    safetyBufferLabel: "Port Buffer",
+    safetyBufferValue: "Ward Cove ships require 90-min return cushion; Downtown berths 45–60 min",
+    faqSchema: [
+      {
+        question: "Does it always rain in Ketchikan?",
+        answer: "Ketchikan receives over 150 inches of rain annually. Local operators provide heavy-duty rain poncho gear; tours operate routinely and safely in coastal drizzle."
+      }
+    ]
+  },
+  "how-much-do-alaska-shore-excursions-cost": {
+    id: "how-much-do-alaska-shore-excursions-cost",
+    port: "all",
+    directQuestion: "How much do Alaska cruise shore excursions cost on average?",
+    directAnswer:
+      "Alaska shore excursion prices range by activity type: walking tours and gold panning cost $65 to $110; whale watching costs $165 to $195; sea kayaking and active adventures cost $145 to $220; salmon and halibut fishing charters cost $295 to $375; Misty Fjords floatplanes cost $330 to $395; helicopter glacier landings cost $360 to $420; and glacier dog sledding costs $650 to $799. Booking independently saves 20% to 40% compared to cruise ship onboard pricing.",
+    pricingLabel: "Verified Price Ranges",
+    pricingValue: "$65–$110 walking/history • $165–$220 wildlife/water • $330–$799 flight/ice",
+    durationLabel: "Duration Range",
+    durationValue: "2 to 6 hours depending on tour category",
+    meetingPointLabel: "Port Staging",
+    meetingPointValue: "Direct port dock pickups across Juneau, Skagway, and Ketchikan",
+    safetyBufferLabel: "Value & Safety",
+    safetyBufferValue: "Independent tours include back-to-ship guarantees and clear buffers",
+    faqSchema: [
+      {
+        question: "Why are Alaska shore excursions more expensive than Caribbean tours?",
+        answer: "Alaska operations have a short 4-month operating season, strict federal USFS/FAA safety certifications, highly maintained aircraft and twin-engine marine vessels, and licensed master captains and bush pilots."
+      }
+    ]
+  },
+  "what-happens-if-my-alaska-tour-runs-late": {
+    id: "what-happens-if-my-alaska-tour-runs-late",
+    port: "all",
+    directQuestion: "What happens if an independent Alaska shore excursion runs late?",
+    directAnswer:
+      "Professional independent operators enforce a strict safety rule: all tours must return at least 45 to 60 minutes before your ship's published all-aboard time. Because Juneau, Skagway, and Ketchikan have compact road networks with single main corridors, traffic jams are practically non-existent. In the rare event of a mechanical delay, operators communicate directly with harbor pilots and port agents, deploy backup transport, and carry comprehensive back-to-ship guarantees.",
+    pricingLabel: "Protection Level",
+    pricingValue: "100% Back-to-Ship Guarantee • Fully insured local operators",
+    durationLabel: "Return Rule",
+    durationValue: "Tour end time + 45 min return buffer strictly <= ship all-aboard",
+    meetingPointLabel: "Real-Time Tracking",
+    meetingPointValue: "Port dispatchers monitor ship movements and berthing in real time",
+    safetyBufferLabel: "Safety Buffer Rule",
+    safetyBufferValue: "Mandatory 45–60 min minimum buffer enforced on every booking",
+    faqSchema: [
+      {
+        question: "Has an independent tour operator ever caused a guest to miss an Alaska cruise ship?",
+        answer: "Missed departures are virtually non-existent with established operators. Welcome to Alaska Tours partners have a 100% on-time record over thousands of passenger departures."
+      }
+    ]
+  },
+  "easy-alaska-shore-excursions": {
+    id: "easy-alaska-shore-excursions",
+    port: "all",
+    directQuestion: "What are the best easy Alaska shore excursions for seniors and limited mobility?",
+    directAnswer:
+      "The most comfortable low-mobility Alaska excursions feature enclosed seating, minimal walking, and step-free or low-step vehicle access: Juneau covered catamaran whale watching ($165–$185), the historic Gold Creek salmon bake ($75–$95), the Skagway Liarsville camp melodrama and gold panning ($65–$95), Ketchikan Duck amphibious tours ($65–$85), and scenic floatplane flights over Misty Fjords ($330–$395). Wheelchair-friendly options can be arranged in advance.",
+    pricingLabel: "Accessible Pricing",
+    pricingValue: "$65–$95 city & culture • $165–$195 covered boat • $330–$395 floatplane",
+    durationLabel: "Gentle Timing",
+    durationValue: "1.5 to 3.5 hours (Gentle, low-impact pacing)",
+    meetingPointLabel: "Pier Curbside",
+    meetingPointValue: "Direct cruise berth curbside pickups across all three ports",
+    safetyBufferLabel: "Low-Stress Cushion",
+    safetyBufferValue: "Relaxed transit buffers ensure low-stress return to ship",
+    faqSchema: [
+      {
+        question: "Can mobility scooters be accommodated on Alaska excursions?",
+        answer: "Collapsible mobility scooters can be stowed in the luggage compartments of excursion vans and motorcoaches. Notify the operator at booking to confirm storage dimensions."
+      }
+    ]
+  },
+  "private-premium-alaska-shore-excursions": {
+    id: "private-premium-alaska-shore-excursions",
+    port: "all",
+    directQuestion: "What luxury and private shore excursions are available in Alaska?",
+    directAnswer:
+      "For guests seeking exclusive luxury and VIP privacy, top private Alaska excursions include private 6-pack whale watching yachts in Juneau ($1,400–$1,800), private helicopter icefield expeditions with champagne glacier landings ($2,200–$3,500), private Misty Fjords seaplane charters in Ketchikan ($1,800–$2,400), private Ketchikan luxury Hummer rainforest tours ($750–$950), and private salmon/halibut charters ($1,200–$1,800).",
+    pricingLabel: "Luxury Charters",
+    pricingValue: "$750–$3,500 per private vessel / aircraft / vehicle",
+    durationLabel: "Custom Itinerary",
+    durationValue: "3 to 6 hours (Completely customized to your schedule)",
+    meetingPointLabel: "VIP Dock Greeting",
+    meetingPointValue: "VIP greeting directly at the ship gangway",
+    safetyBufferLabel: "Dedicated Safety",
+    safetyBufferValue: "Dedicated private transportation guarantees custom on-time ship return",
+    faqSchema: [
+      {
+        question: "Can private Alaska tours be tailored for multi-generational families?",
+        answer: "Yes. Private charters are the premier option for multi-generational groups with toddlers and grandparents, allowing you to stop whenever needed, alter routes, and maintain comfortable cabin temperatures."
+      }
+    ]
+  },
+
   // Flagship Comparison Guide
   "cruise-ship-vs-independent": {
     id: "cruise-ship-vs-independent",
@@ -384,8 +732,11 @@ export function getAlaskaGeoFact(port: string, topic?: string): AlaskaGeoFact | 
   if (topic) {
     const key = `${port}-${topic}`;
     if (ALASKA_GEO_FACTS[key]) return ALASKA_GEO_FACTS[key];
+    if (ALASKA_GEO_FACTS[topic]) return ALASKA_GEO_FACTS[topic];
   }
+  if (ALASKA_GEO_FACTS[port]) return ALASKA_GEO_FACTS[port];
   const portKey = `port-${port}`;
   if (ALASKA_GEO_FACTS[portKey]) return ALASKA_GEO_FACTS[portKey];
   return null;
 }
+

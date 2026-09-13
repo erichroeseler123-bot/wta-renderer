@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   title: "Choose Your Alaska Port | Welcome To Alaska Tours",
   description:
     "Explore our directory of Juneau, Skagway, and Ketchikan cruise ports. Review port-specific timing challenges, return buffer guidelines, and verify excursion compatibility.",
-  alternates: { canonical: "https://welcometoalaskatours.com/ports" },
+  alternates: { canonical: "https://www.welcometoalaskatours.com/ports" },
 };
 
 const PORTS = [

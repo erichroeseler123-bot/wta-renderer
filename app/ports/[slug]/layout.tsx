@@ -31,7 +31,7 @@ export default async function PortLayout({
   const port = PORTS[slug];
   if (!port) notFound();
 
-  const canonical = `https://welcometoalaskatours.com/ports/${slug}`;
+  const canonical = `https://www.welcometoalaskatours.com/ports/${slug}`;
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -40,13 +40,13 @@ export default async function PortLayout({
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://welcometoalaskatours.com/",
+        item: "https://www.welcometoalaskatours.com/",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Ports",
-        item: "https://welcometoalaskatours.com/ports",
+        item: "https://www.welcometoalaskatours.com/ports",
       },
       {
         "@type": "ListItem",

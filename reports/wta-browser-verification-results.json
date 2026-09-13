@@ -1,5 +1,5 @@
 {
-  "test_run_timestamp": "2026-09-10T20:59:44.067Z",
+  "test_run_timestamp": "2026-09-10T21:01:34.514Z",
   "property_name": "Welcome to Alaska Tours",
   "repository": "https://github.com/erichroeseler123-bot/wta-renderer.git",
   "local_repository_path": "C:/Users/erich/Documents/Projects/wta-renderer",
@@ -291,7 +291,7 @@
       },
       "sitemap": {
         "status": 200,
-        "total_urls": 135,
+        "total_urls": 134,
         "sample_urls": [
           "https://welcometoalaskatours.com",
           "https://welcometoalaskatours.com/tours",

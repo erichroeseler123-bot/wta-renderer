@@ -31,24 +31,32 @@ const PORT_INFO: Record<string, { title: string; description: string; problem: s
 
 const MONEY_LINKS: Record<string, Array<{ href: string; title: string; text: string }>> = {
   juneau: [
-    { href: "/juneau/fishing", title: "Fishing charters", text: "Compare guided salmon, halibut, combination and private fishing trips." },
-    { href: "/juneau/helicopter-tours", title: "Helicopter tours & prices", text: "Compare glacier landings, guided walks, treks and dog sledding flights." },
-    { href: "/juneau/gold-panning", title: "Gold panning", text: "Hands-on gold panning, mining history and salmon-bake combinations." },
     { href: "/juneau/whale-watching", title: "Whale watching", text: "Compare small-boat, sightseeing and glacier-combination whale tours." },
     { href: "/juneau/mendenhall-glacier-tours", title: "Mendenhall Glacier", text: "Sightseeing, paddling, hiking and combination excursions." },
+    { href: "/juneau/glacier-tours", title: "Glacier tours & icefield treks", text: "Icefield flights, crampon treks, lake paddles, and ice walking." },
+    { href: "/juneau/helicopter-tours", title: "Helicopter tours & prices", text: "Compare glacier landings, guided walks, treks and dog sledding flights." },
     { href: "/juneau/dog-sledding", title: "Dog sledding", text: "Summer camps and helicopter-accessed glacier dog experiences." },
+    { href: "/juneau/fishing", title: "Fishing charters", text: "Compare guided salmon, halibut, combination and private fishing trips." },
+    { href: "/juneau/gold-panning", title: "Gold panning", text: "Hands-on gold panning, mining history and salmon-bake combinations." },
+    { href: "/juneau/easy-shore-excursions", title: "Easy shore excursions", text: "Comfortable, low-walking tours: covered catamarans and scenic drives." },
+    { href: "/juneau/private-tours", title: "Private charters", text: "Exclusive private whale-watching boats, fishing charters, and vans." },
   ],
   ketchikan: [
-    { href: "/ketchikan/bear-tours", title: "Bear tours", text: "Rainforest, remote viewing and flightseeing bear experiences." },
     { href: "/ketchikan/misty-fjords", title: "Misty Fjords", text: "Flightseeing and expedition-style ways to see the monument." },
+    { href: "/ketchikan/bear-tours", title: "Bear tours", text: "Rainforest, remote viewing and flightseeing bear experiences." },
+    { href: "/ketchikan/wildlife-tours", title: "Wildlife & eagle tours", text: "Coastal eagles, marine mammal safaris, and rainforest sanctuaries." },
     { href: "/ketchikan/kayaking", title: "Kayaking & canoe", text: "Sea kayaking, canoe and paddling excursions." },
     { href: "/ketchikan/adventure-tours", title: "Adventure tours", text: "UTVs, Jeeps, ziplines, kayaks, snorkeling and more active days." },
+    { href: "/ketchikan/easy-shore-excursions", title: "Easy shore excursions", text: "Ketchikan Duck tour, historic town trolley, and totem parks." },
+    { href: "/ketchikan/private-tours", title: "Private charters", text: "Luxury Hummer rainforest tours, private wildlife boats, and seaplanes." },
   ],
   skagway: [
     { href: "/skagway/helicopter-tours", title: "Helicopter tours", text: "Glacier-focused flightseeing and landing experiences." },
     { href: "/skagway/gold-rush-tours", title: "Gold Rush tours", text: "Liarsville, history, salmon bake and Gold Rush-themed experiences." },
     { href: "/skagway/dog-sledding", title: "Dog sledding", text: "Helicopter-accessed glacier dog experiences." },
     { href: "/skagway/adventure-tours", title: "Adventure tours", text: "Scooters, glacier flights and active port-day options." },
+    { href: "/skagway/easy-shore-excursions", title: "Easy shore excursions", text: "Liarsville Gold Rush camp, historic town tours, and scenic overlooks." },
+    { href: "/skagway/private-tours", title: "Private charters", text: "Custom private vans to the Yukon border and historic outings." },
   ],
 };
 
@@ -78,7 +86,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   if (!APPROVED_PORTS.includes(slug)) return {};
   const info = PORT_INFO[slug];
-  return { title: info.title, description: info.description, alternates: { canonical: `https://welcometoalaskatours.com/ports/${slug}` } };
+  return { title: info.title, description: info.description, alternates: { canonical: `https://www.welcometoalaskatours.com/ports/${slug}` } };
 }
 
 export default async function PortPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<Record<string, string | string[] | undefined>> }) {

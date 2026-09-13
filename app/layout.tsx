@@ -14,12 +14,12 @@ import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/tourSeo";
 const siteDescription =
   "Plan Alaska cruise shore excursions in Juneau, Skagway, and Ketchikan. Compare connected tours by port and trip style, then open the booking calendar for current departures, pricing, and capacity.";
 
-const socialImage = "https://welcometoalaskatours.com/hero/juneau.jpg";
+const socialImage = "https://www.welcometoalaskatours.com/hero/juneau.jpg";
 const CRUISE_PROMENADE =
   "https://cruisepromenade.com/?utm_source=welcometoalaskatours&utm_medium=referral&utm_campaign=alaska_cruise_planning";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://welcometoalaskatours.com"),
+  metadataBase: new URL("https://www.welcometoalaskatours.com"),
   title: {
     default: "Welcome to Alaska Tours | Alaska Shore Excursion Planner",
     template: "%s | Welcome to Alaska Tours",
