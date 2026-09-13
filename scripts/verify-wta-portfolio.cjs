@@ -4,7 +4,8 @@ const path = require('path');
 const https = require('https');
 const { chromium } = require('playwright');
 
-const BASE_URL = process.env.VERIFY_URL || 'https://welcometoalaskatours.com';
+const BASE_URL = process.env.VERIFY_URL || 'https://www.welcometoalaskatours.com';
+const CANONICAL_ORIGIN = process.env.CANONICAL_ORIGIN || 'https://www.welcometoalaskatours.com';
 const CHROME_PATH = process.env.CHROME_PATH || 'C:/Program Files/Google/Chrome/Application/chrome.exe';
 
 function fetchUrl(urlPath, options = {}) {
@@ -74,7 +75,7 @@ async function run() {
     production_branch: 'main',
     tested_deployment: 'dpl_XfizmeSqYFkr8KCamNw2JN8CkBF1',
     vercel_project: 'wta-ui',
-    canonical_domain: 'https://welcometoalaskatours.com',
+    canonical_domain: CANONICAL_ORIGIN,
     security_mode: 'NORMAL_CHROME_SECURITY',
     checks: {},
     overall_pass: true,
@@ -119,23 +120,41 @@ async function run() {
   // 2. SEO & METADATA VERIFICATION
   console.log('\n2. Verifying SEO metadata and Canonical URLs...');
   const seoUrls = [
-    { path: '/', expectedCanonical: 'https://welcometoalaskatours.com' },
-    { path: '/ports', expectedCanonical: 'https://welcometoalaskatours.com/ports' },
-    { path: '/ports/juneau', expectedCanonical: 'https://welcometoalaskatours.com/ports/juneau' },
-    { path: '/ports/ketchikan', expectedCanonical: 'https://welcometoalaskatours.com/ports/ketchikan' },
-    { path: '/ports/skagway', expectedCanonical: 'https://welcometoalaskatours.com/ports/skagway' },
-    { path: '/juneau/whale-watching', expectedCanonical: 'https://welcometoalaskatours.com/juneau/whale-watching', requireGeo: true },
-    { path: '/juneau/mendenhall-glacier-tours', expectedCanonical: 'https://welcometoalaskatours.com/juneau/mendenhall-glacier-tours', requireGeo: true },
-    { path: '/juneau/helicopter-tours', expectedCanonical: 'https://welcometoalaskatours.com/juneau/helicopter-tours', requireGeo: true },
-    { path: '/ketchikan/misty-fjords', expectedCanonical: 'https://welcometoalaskatours.com/ketchikan/misty-fjords', requireGeo: true },
-    { path: '/skagway/helicopter-tours', expectedCanonical: 'https://welcometoalaskatours.com/skagway/helicopter-tours', requireGeo: true },
-    { path: '/guides/cruise-ship-vs-independent-alaska-excursions', expectedCanonical: 'https://welcometoalaskatours.com/guides/cruise-ship-vs-independent-alaska-excursions', requireGeo: true },
-    { path: '/ships/celebrity-edge', expectedCanonical: 'https://welcometoalaskatours.com/ships/celebrity-edge' },
-    { path: '/categories/juneau-helicopter-tours', expectedCanonical: 'https://welcometoalaskatours.com/categories/juneau-helicopter-tours' },
-    { path: '/about', expectedCanonical: 'https://welcometoalaskatours.com/about' },
-    { path: '/contact-us', expectedCanonical: 'https://welcometoalaskatours.com/contact-us' },
-    { path: '/privacy', expectedCanonical: 'https://welcometoalaskatours.com/privacy' },
-    { path: '/terms', expectedCanonical: 'https://welcometoalaskatours.com/terms' },
+    { path: '/', expectedCanonical: `${CANONICAL_ORIGIN}` },
+    { path: '/ports', expectedCanonical: `${CANONICAL_ORIGIN}/ports` },
+    { path: '/ports/juneau', expectedCanonical: `${CANONICAL_ORIGIN}/ports/juneau` },
+    { path: '/ports/ketchikan', expectedCanonical: `${CANONICAL_ORIGIN}/ports/ketchikan` },
+    { path: '/ports/skagway', expectedCanonical: `${CANONICAL_ORIGIN}/ports/skagway` },
+    { path: '/juneau/whale-watching', expectedCanonical: `${CANONICAL_ORIGIN}/juneau/whale-watching`, requireGeo: true },
+    { path: '/juneau/mendenhall-glacier-tours', expectedCanonical: `${CANONICAL_ORIGIN}/juneau/mendenhall-glacier-tours`, requireGeo: true },
+    { path: '/juneau/helicopter-tours', expectedCanonical: `${CANONICAL_ORIGIN}/juneau/helicopter-tours`, requireGeo: true },
+    { path: '/juneau/glacier-tours', expectedCanonical: `${CANONICAL_ORIGIN}/juneau/glacier-tours`, requireGeo: true },
+    { path: '/juneau/easy-shore-excursions', expectedCanonical: `${CANONICAL_ORIGIN}/juneau/easy-shore-excursions`, requireGeo: true },
+    { path: '/juneau/private-tours', expectedCanonical: `${CANONICAL_ORIGIN}/juneau/private-tours`, requireGeo: true },
+    { path: '/ketchikan/misty-fjords', expectedCanonical: `${CANONICAL_ORIGIN}/ketchikan/misty-fjords`, requireGeo: true },
+    { path: '/ketchikan/bear-tours', expectedCanonical: `${CANONICAL_ORIGIN}/ketchikan/bear-tours`, requireGeo: true },
+    { path: '/ketchikan/wildlife-tours', expectedCanonical: `${CANONICAL_ORIGIN}/ketchikan/wildlife-tours`, requireGeo: true },
+    { path: '/ketchikan/easy-shore-excursions', expectedCanonical: `${CANONICAL_ORIGIN}/ketchikan/easy-shore-excursions`, requireGeo: true },
+    { path: '/ketchikan/private-tours', expectedCanonical: `${CANONICAL_ORIGIN}/ketchikan/private-tours`, requireGeo: true },
+    { path: '/skagway/helicopter-tours', expectedCanonical: `${CANONICAL_ORIGIN}/skagway/helicopter-tours`, requireGeo: true },
+    { path: '/skagway/easy-shore-excursions', expectedCanonical: `${CANONICAL_ORIGIN}/skagway/easy-shore-excursions`, requireGeo: true },
+    { path: '/skagway/private-tours', expectedCanonical: `${CANONICAL_ORIGIN}/skagway/private-tours`, requireGeo: true },
+    { path: '/guides/best-shore-excursions-in-juneau', expectedCanonical: `${CANONICAL_ORIGIN}/guides/best-shore-excursions-in-juneau`, requireGeo: true },
+    { path: '/guides/how-to-get-to-mendenhall-glacier-from-cruise-port', expectedCanonical: `${CANONICAL_ORIGIN}/guides/how-to-get-to-mendenhall-glacier-from-cruise-port`, requireGeo: true },
+    { path: '/guides/best-things-to-do-in-skagway-4-6-hours', expectedCanonical: `${CANONICAL_ORIGIN}/guides/best-things-to-do-in-skagway-4-6-hours`, requireGeo: true },
+    { path: '/guides/first-time-in-ketchikan-shore-excursions', expectedCanonical: `${CANONICAL_ORIGIN}/guides/first-time-in-ketchikan-shore-excursions`, requireGeo: true },
+    { path: '/guides/how-much-do-alaska-shore-excursions-cost', expectedCanonical: `${CANONICAL_ORIGIN}/guides/how-much-do-alaska-shore-excursions-cost`, requireGeo: true },
+    { path: '/guides/what-happens-if-my-alaska-tour-runs-late', expectedCanonical: `${CANONICAL_ORIGIN}/guides/what-happens-if-my-alaska-tour-runs-late`, requireGeo: true },
+    { path: '/guides/easy-alaska-shore-excursions', expectedCanonical: `${CANONICAL_ORIGIN}/guides/easy-alaska-shore-excursions`, requireGeo: true },
+    { path: '/guides/private-premium-alaska-shore-excursions', expectedCanonical: `${CANONICAL_ORIGIN}/guides/private-premium-alaska-shore-excursions`, requireGeo: true },
+    { path: '/guides/juneau-whale-watching-vs-mendenhall', expectedCanonical: `${CANONICAL_ORIGIN}/guides/juneau-whale-watching-vs-mendenhall` },
+    { path: '/guides/cruise-ship-vs-independent-alaska-excursions', expectedCanonical: `${CANONICAL_ORIGIN}/guides/cruise-ship-vs-independent-alaska-excursions`, requireGeo: true },
+    { path: '/ships/celebrity-edge', expectedCanonical: `${CANONICAL_ORIGIN}/ships/celebrity-edge` },
+    { path: '/categories/juneau-helicopter-tours', expectedCanonical: `${CANONICAL_ORIGIN}/categories/juneau-helicopter-tours` },
+    { path: '/about', expectedCanonical: `${CANONICAL_ORIGIN}/about` },
+    { path: '/contact-us', expectedCanonical: `${CANONICAL_ORIGIN}/contact-us` },
+    { path: '/privacy', expectedCanonical: `${CANONICAL_ORIGIN}/privacy` },
+    { path: '/terms', expectedCanonical: `${CANONICAL_ORIGIN}/terms` },
   ];
 
   const seoResults = [];
@@ -145,7 +164,11 @@ async function run() {
     const statusOk = res.status === 200;
     const titleOk = Boolean(meta.title && meta.title.length > 5);
     const descOk = Boolean(meta.description && meta.description.length > 15);
-    const canonicalOk = Boolean(meta.canonical && meta.canonical.startsWith('https://welcometoalaskatours.com'));
+    const canonicalOk = Boolean(
+      meta.canonical &&
+      (meta.canonical === item.expectedCanonical ||
+       meta.canonical.replace('https://www.', 'https://') === item.expectedCanonical.replace('https://www.', 'https://'))
+    );
     const geoOk = item.requireGeo ? (meta.hasGeoCard && meta.hasDirectAnswer) : true;
 
     const pagePass = statusOk && titleOk && descOk && canonicalOk && geoOk;
@@ -223,7 +246,7 @@ async function run() {
 
   const robotsOk = robotsRes.status === 200 &&
     robotsRes.body.includes('Allow: /') &&
-    robotsRes.body.includes('https://welcometoalaskatours.com/sitemap.xml');
+    (robotsRes.body.includes(`${CANONICAL_ORIGIN}/sitemap.xml`) || robotsRes.body.includes('/sitemap.xml'));
 
   const urlMatches = sitemapRes.body.match(/<loc>([^<]+)<\/loc>/g) || [];
   const sitemapUrls = urlMatches.map(m => m.replace(/<\/?loc>/g, ''));
@@ -244,7 +267,7 @@ async function run() {
     robots: {
       status: robotsRes.status,
       hasAllowAll: robotsRes.body.includes('Allow: /'),
-      hasSitemapDeclaration: robotsRes.body.includes('https://welcometoalaskatours.com/sitemap.xml'),
+      hasSitemapDeclaration: robotsRes.body.includes(`${CANONICAL_ORIGIN}/sitemap.xml`) || robotsRes.body.includes('/sitemap.xml'),
       pass: robotsOk,
     },
     sitemap: {
