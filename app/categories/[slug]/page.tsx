@@ -42,50 +42,50 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
   "juneau-helicopter-tours": {
     title: "Juneau Helicopter Tours",
     headline: "Juneau Helicopter Tours & Glacier Landings",
-    metaTitle: "Juneau Helicopter Shore Excursions | Welcome To Alaska Tours",
-    metaDescription: "Compare Juneau helicopter tours, glacier landings, dog sledding flights, and live booking calendars for your cruise port day.",
-    intro: "Compare helicopter and air-tour options serving Juneau, then open the operator calendar to confirm the departure that works for your ship day.",
+    metaTitle: "Juneau Helicopter Tours: Glacier Landings, Treks & Prices (2026)",
+    metaDescription: "Compare Juneau helicopter tour prices, glacier landings on Herbert and Norris Glaciers, guided ice walks, and glacier dog sledding with 100% weather refunds.",
+    intro: "Experience the Juneau Icefield from the air. Compare scenic glacier landing flights, guided crampon ice walks (NorthStar / TEMSCO style), and helicopter dog sledding camps departing with cruise dock transfers.",
     matchFilter: (tour) =>
       tour.port === "juneau" && (tour.category === "Air Tours" || has(tour, "helicopter")),
   },
   "glacier-tours": {
     title: "Glacier Tours",
     headline: "Alaska Glacier Tours & Guided Adventures",
-    metaTitle: "Alaska Glacier Shore Excursions | Welcome To Alaska Tours",
-    metaDescription: "Browse glacier hikes, walks, paddling trips, flightseeing, and other glacier-focused Alaska shore excursions.",
-    intro: "Glacier days range from easy scenic viewing to active hikes, paddles, flightseeing, and ice treks. Compare the actual operator products before choosing the best fit.",
+    metaTitle: "Alaska Glacier Tours: Mendenhall, Icefield Treks & Paddles (2026)",
+    metaDescription: "Compare Alaska glacier excursions across Juneau and Skagway: Mendenhall Visitor Center, lake canoe paddles, helicopter ice landings, and guided crampon treks.",
+    intro: "Glacier days range from easy scenic viewing to active hikes, lake paddles, helicopter landings, and ice treks. Compare connected operator products across Juneau and Skagway.",
     matchFilter: (tour) => tour.category === "Hiking & Glaciers" || has(tour, "glacier"),
   },
   "dog-sledding": {
     title: "Dog Sledding",
     headline: "Alaska Dog Sledding Shore Excursions",
-    metaTitle: "Alaska Dog Sledding Tours | Welcome To Alaska Tours",
-    metaDescription: "Compare Alaska dog sledding excursions, including glacier dog sledding and summer camp experiences.",
-    intro: "Browse the dog sledding products already in the Alaska operator network, including helicopter-access glacier camps and ground-based summer camp experiences.",
+    metaTitle: "Alaska Dog Sledding Tours: Glacier Flights & Summer Camps (2026)",
+    metaDescription: "Compare Alaska dog sledding excursions: helicopter glacier snow camps on the Juneau Icefield and Denver Glacier vs rainforest wheeled summer camps.",
+    intro: "Browse authentic Alaska dog sledding excursions: high-altitude helicopter flights to glacier snow camps and accessible rainforest summer camps with Iditarod mushers and husky puppies.",
     matchFilter: (tour) => tour.category === "Dog Sledding" || has(tour, "dog") || has(tour, "sled"),
   },
   "whale-watching": {
     title: "Whale Watching",
     headline: "Alaska Whale Watching Shore Excursions",
-    metaTitle: "Alaska Whale Watching Tours | Welcome To Alaska Tours",
-    metaDescription: "Compare whale watching tours, small-boat trips, private charters, and whale-and-glacier combinations for Alaska cruise port days.",
-    intro: "Compare small-boat whale watches, larger vessels, private charters, kayak experiences, and whale-and-glacier combinations from the operators already available in the catalog.",
+    metaTitle: "Alaska Whale Watching Tours: Mendenhall Combos & Small Boats (2026)",
+    metaDescription: "Compare Alaska whale watching excursions: guaranteed humpback sightings in Auke Bay, small-boat wilderness charters, and 5-hour Mendenhall Glacier combos.",
+    intro: "Compare small-boat whale watches, covered heated catamarans, private charters, and 5-hour Whale Watching + Mendenhall Glacier combination tours departing with cruise dock transfers.",
     matchFilter: (tour) => tour.category === "Whale Watching" || has(tour, "whale"),
   },
   "mendenhall-glacier": {
     title: "Mendenhall Glacier",
     headline: "Mendenhall Glacier Excursions",
-    metaTitle: "Mendenhall Glacier Shore Excursions | Welcome To Alaska Tours",
-    metaDescription: "Browse Mendenhall Glacier hikes, paddling trips, whale-and-glacier combinations, helicopter experiences, and guided tours.",
-    intro: "Mendenhall Glacier can be experienced in very different ways. Compare guided hikes, lake paddles, float trips, whale-and-glacier combinations, and air tours before choosing one.",
+    metaTitle: "Mendenhall Glacier Tours from Cruise Port: Shuttles, Canoes & Hikes (2026)",
+    metaDescription: "Compare Mendenhall Glacier tours from the Juneau cruise port: authorized commercial shuttles, lake canoe paddles, Nugget Falls walks, and whale combos.",
+    intro: "Mendenhall Glacier is 13 miles from downtown Juneau. Compare authorized commercial shuttles, lake canoe paddles, guided hikes, and whale watching combination tours.",
     matchFilter: (tour) => has(tour, "mendenhall"),
   },
   "flightseeing": {
     title: "Flightseeing",
     headline: "Alaska Helicopter, Seaplane & Flightseeing Tours",
-    metaTitle: "Alaska Flightseeing Tours | Welcome To Alaska Tours",
-    metaDescription: "Compare Alaska helicopter, seaplane, glacier landing, and Misty Fjords flightseeing excursions.",
-    intro: "Browse helicopter, seaplane, glacier-landing, and remote wilderness flightseeing products across the Alaska operator catalog.",
+    metaTitle: "Alaska Flightseeing Tours: Helicopters, Seaplanes & Misty Fjords (2026)",
+    metaDescription: "Compare Alaska flightseeing excursions: Juneau helicopter glacier landings, Misty Fjords floatplanes in Ketchikan, and Skagway glacier flights with weather refund protections.",
+    intro: "Browse helicopter, seaplane, glacier-landing, and remote wilderness flightseeing products across Juneau, Ketchikan, and Skagway with complete cruise-day timing coordination.",
     matchFilter: (tour) =>
       tour.category === "Air Tours" || has(tour, "flight") || has(tour, "helicopter") || has(tour, "seaplane"),
   },
@@ -102,7 +102,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   return {
     title: config.metaTitle,
     description: config.metaDescription,
-    alternates: { canonical: `https://welcometoalaskatours.com/categories/${slug}` },
+    alternates: { canonical: `https://www.welcometoalaskatours.com/categories/${slug}` },
   };
 }
 
@@ -114,13 +114,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
   const rawTours = await getHelicopterTours().catch(() => []);
   const tours = (sanitizeTours(rawTours) as TourType[]).filter(config.matchFilter);
 
-  const categoryUrl = `https://welcometoalaskatours.com/categories/${slug}`;
+  const categoryUrl = `https://www.welcometoalaskatours.com/categories/${slug}`;
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://welcometoalaskatours.com/" },
-      { "@type": "ListItem", position: 2, name: "Tours", item: "https://welcometoalaskatours.com/tours" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.welcometoalaskatours.com/" },
+      { "@type": "ListItem", position: 2, name: "Tours", item: "https://www.welcometoalaskatours.com/tours" },
       { "@type": "ListItem", position: 3, name: config.title, item: categoryUrl },
     ],
   };
@@ -133,7 +133,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       "@type": "ListItem",
       position: index + 1,
       name: tour.title,
-      url: `https://welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`,
+      url: `https://www.welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`,
     })),
   };
 

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Terms of Use | Welcome To Alaska Tours",
   description: "Terms for using Welcome To Alaska Tours and booking independently operated Alaska excursions.",
-  alternates: { canonical: "https://welcometoalaskatours.com/terms" },
+  alternates: { canonical: "https://www.welcometoalaskatours.com/terms" },
 };
 
 export default function TermsPage() {

@@ -66,6 +66,16 @@ const GUIDES = [
     title: "How Long to Get Off the Cruise Ship in Ketchikan",
     description: "Ketchikan downtown berths 1-4 walkability vs Ward Cove (NCL) 7-mile transit shuttle lines, check-in logistics, and safety buffers.",
   },
+  {
+    slug: "best-alaska-cruise-ports-for-bird-watching",
+    title: "Best Alaska Cruise Ports for Bird Watching",
+    description: "Port-by-port birding guide: coastal walking spots in Juneau, Ketchikan, and Skagway, key species, seasonal flyway timing, and excursion tips.",
+  },
+  {
+    slug: "alaska-nature-by-cruise-port",
+    title: "Alaska Nature by Cruise Port: Birds, Northern Lights & Whale Sightings",
+    description: "Complete port-by-port nature guide for Juneau, Ketchikan, Skagway, Sitka, and Icy Strait Point with realistic seasonal sighting calendars and cruise logistics.",
+  },
 ];
 
 export const metadata = {

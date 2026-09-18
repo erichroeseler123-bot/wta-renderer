@@ -168,7 +168,7 @@ export async function generateMetadata({
     title: `${config.name} Alaska Shore Excursions | Welcome To Alaska Tours`,
     description: `Plan independent Alaska shore excursions for ${config.name}. Compare Juneau, Skagway, and Ketchikan tours and check live operator calendars against your current ship schedule.`,
     alternates: {
-      canonical: `https://welcometoalaskatours.com/ships/${slug}`,
+      canonical: `https://www.welcometoalaskatours.com/ships/${slug}`,
     },
   };
 }
@@ -184,7 +184,7 @@ export default async function ShipSlugPage({
   }
 
   const config = SHIP_CONFIGS[slug];
-  const pageUrl = `https://welcometoalaskatours.com/ships/${slug}`;
+  const pageUrl = `https://www.welcometoalaskatours.com/ships/${slug}`;
 
   const faqSchema = {
     "@context": "https://schema.org",
@@ -203,8 +203,8 @@ export default async function ShipSlugPage({
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://welcometoalaskatours.com/" },
-      { "@type": "ListItem", position: 2, name: "Ships", item: "https://welcometoalaskatours.com/ships" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.welcometoalaskatours.com/" },
+      { "@type": "ListItem", position: 2, name: "Ships", item: "https://www.welcometoalaskatours.com/ships" },
       { "@type": "ListItem", position: 3, name: config.name, item: pageUrl },
     ],
   };
@@ -215,7 +215,7 @@ export default async function ShipSlugPage({
     name: `${config.name} Alaska Shore Excursion Planner`,
     url: pageUrl,
     description: `Independent Alaska shore excursion planning for ${config.name}, with links to connected Juneau, Skagway, and Ketchikan tour inventory.`,
-    isPartOf: { "@type": "WebSite", name: "Welcome To Alaska Tours", url: "https://welcometoalaskatours.com" },
+    isPartOf: { "@type": "WebSite", name: "Welcome To Alaska Tours", url: "https://www.welcometoalaskatours.com" },
   };
 
   return (

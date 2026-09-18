@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy | Welcome To Alaska Tours",
   description: "Privacy information for Welcome To Alaska Tours, including booking, contact, analytics, and payment data handling.",
-  alternates: { canonical: "https://welcometoalaskatours.com/privacy" },
+  alternates: { canonical: "https://www.welcometoalaskatours.com/privacy" },
 };
 
 export default function PrivacyPage() {

@@ -13,7 +13,7 @@ const SHIPS = [
 export const metadata = {
   title: "Alaska Cruise Ship Excursion Planners | Welcome To Alaska Tours",
   description: "Browse Alaska shore-excursion planning pages for selected cruise ships, then compare connected Juneau, Skagway, and Ketchikan tours with live operator calendars.",
-  alternates: { canonical: "https://welcometoalaskatours.com/ships" },
+  alternates: { canonical: "https://www.welcometoalaskatours.com/ships" },
 };
 
 export default function ShipsIndexPage() {
@@ -26,7 +26,7 @@ export default function ShipsIndexPage() {
       "@type": "ListItem",
       position: index + 1,
       name: `${ship.name} Alaska excursion planner`,
-      url: `https://welcometoalaskatours.com/ships/${ship.slug}`,
+      url: `https://www.welcometoalaskatours.com/ships/${ship.slug}`,
     })),
   };
 
@@ -34,8 +34,8 @@ export default function ShipsIndexPage() {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
     itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: "https://welcometoalaskatours.com/" },
-      { "@type": "ListItem", position: 2, name: "Ships", item: "https://welcometoalaskatours.com/ships" },
+      { "@type": "ListItem", position: 1, name: "Home", item: "https://www.welcometoalaskatours.com/" },
+      { "@type": "ListItem", position: 2, name: "Ships", item: "https://www.welcometoalaskatours.com/ships" },
     ],
   };
 

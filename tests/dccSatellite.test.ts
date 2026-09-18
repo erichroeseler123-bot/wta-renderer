@@ -127,7 +127,7 @@ test("emitDccSatelliteEvent posts to DCC when endpoint is configured", async () 
   const previousToken = process.env.DCC_WTA_WEBHOOK_TOKEN;
   const previousEnabled = process.env.DCC_CALLBACKS_ENABLED;
   const originalFetch = global.fetch;
-  let body: Record<string, unknown> | null = null;
+  let body: any = null;
 
   process.env.DCC_CALLBACK_URL = "https://destinationcommandcenter.com/api/internal/satellite-handoffs/events";
   process.env.DCC_WTA_WEBHOOK_TOKEN = "test-token";
@@ -199,7 +199,7 @@ test("emitDccSatelliteEvent preserves widget handoffId and callback payload shap
   const previousToken = process.env.DCC_WTA_WEBHOOK_TOKEN;
   const previousEnabled = process.env.DCC_CALLBACKS_ENABLED;
   const originalFetch = global.fetch;
-  let body: Record<string, unknown> | null = null;
+  let body: any = null;
 
   process.env.DCC_CALLBACK_URL = "https://destinationcommandcenter.com/api/internal/satellite-handoffs/events";
   process.env.DCC_WTA_WEBHOOK_TOKEN = "test-token";
@@ -285,7 +285,7 @@ test("emitDccSatelliteEvent preserves partner object for cross-network forwards"
   const previousToken = process.env.DCC_WTA_WEBHOOK_TOKEN;
   const previousEnabled = process.env.DCC_CALLBACKS_ENABLED;
   const originalFetch = global.fetch;
-  let body: Record<string, unknown> | null = null;
+  let body: any = null;
 
   process.env.DCC_CALLBACK_URL = "https://www.destinationcommandcenter.com/api/internal/satellite-handoffs/events";
   process.env.DCC_WTA_WEBHOOK_TOKEN = "test-token";

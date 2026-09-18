@@ -15,7 +15,7 @@ export default function TestimonialsSection({
     "@context": "https://schema.org",
     "@type": "Organization",
     name: "Welcome To Alaska Tours",
-    url: "https://welcometoalaskatours.com",
+    url: "https://www.welcometoalaskatours.com",
     aggregateRating: {
       "@type": "AggregateRating",
       ratingValue: avg,

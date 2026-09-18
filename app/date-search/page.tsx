@@ -17,13 +17,13 @@ export const metadata: Metadata = {
     follow: true,
   },
   alternates: {
-    canonical: "https://welcometoalaskatours.com/date-search",
+    canonical: "https://www.welcometoalaskatours.com/date-search",
   },
   openGraph: {
     title: "Juneau Helicopter Tours By Date | Welcome To Alaska Tours",
     description:
       "Choose one date and compare Juneau helicopter departures across operators.",
-    url: "https://welcometoalaskatours.com/date-search",
+    url: "https://www.welcometoalaskatours.com/date-search",
     type: "website",
   },
 };

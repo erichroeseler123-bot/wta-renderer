@@ -479,6 +479,77 @@ export const guides: Guide[] = [
       { question: "How many excursions should I do in one day?", answer: "For most first-timers, one major tour is enough." },
     ],
   },
+  {
+    slug: "best-alaska-cruise-ports-for-bird-watching",
+    title: "Best Alaska Cruise Ports for Bird Watching",
+    description:
+      "A port-by-port guide to bird watching in Juneau, Ketchikan, and Skagway for cruise passengers: key species, walking routes from the docks, seasonal windows, and excursion tips.",
+    topic: "wildlife",
+    targetKeyword: "best alaska cruise ports for bird watching",
+    publishedAt,
+    updatedAt: publishedAt,
+    readMinutes: 7,
+    intro:
+      "Southeast Alaska sits directly along the Pacific Flyway, offering cruise passengers exceptional opportunities to observe bald eagles, alcids, waterfowl, and forest passerines right from port.",
+    sections: [
+      section("Top Port Highlights", [
+        "Juneau: Mendenhall Wetlands refuge and Auke Bay pelagic feeding zones.",
+        "Ketchikan: High-density bald eagle nesting, Ward Lake rainforest, and Clover Pass sea kayaking.",
+        "Skagway: Yakutania Point coastal walk from pier and Taiya River estuary in Dyea.",
+      ]),
+      section("Cruise-Day Logistics & Viewing Ethics", [
+        "Combine self-guided dock walks with marine wildlife or kayaking excursions.",
+        "Maintain 100+ yard buffers from active bald eagle nests and avoid audio call playback.",
+        "May–June peaks for migration; August–September peaks for salmon run eagle aggregations.",
+      ]),
+    ],
+    faqs: [
+      {
+        question: "Can I see bald eagles near the cruise docks?",
+        answer: "Yes, bald eagles are abundant and frequently perch along harbor pilings and shoreline spruce trees in Ketchikan and Juneau.",
+      },
+      {
+        question: "Are dedicated bird-watching tours available in cruise ports?",
+        answer: "Dedicated birding tours are rare, but small-boat whale watching and sea kayaking excursions put you in prime marine bird habitats with naturalists.",
+      },
+    ],
+  },
+  {
+    slug: "alaska-nature-by-cruise-port",
+    title: "Alaska Nature by Cruise Port: Bird Watching, Northern Lights & Whales",
+    description:
+      "Port-by-port guide for Alaska cruise travelers covering bird watching, aurora borealis viewing realities, and whale watching across Juneau, Ketchikan, Skagway, Sitka, and Icy Strait Point.",
+    topic: "wildlife",
+    targetKeyword: "alaska nature by cruise port",
+    publishedAt,
+    updatedAt: publishedAt,
+    readMinutes: 9,
+    intro:
+      "Plan your Alaska cruise around realistic port-by-port wildlife viewing and natural phenomenon windows, from nutrient-rich whale feeding grounds to migratory bird flyways and late-season dark sky opportunities.",
+    sections: [
+      section("Port-by-Port Strengths", [
+        "Juneau: Premier humpback whale feeding grounds in Auke Bay and extensive coastal waterfowl at Mendenhall Wetlands.",
+        "Ketchikan: Highest bald eagle nesting density, temperate rainforest birding, and coastal marine kayaking.",
+        "Skagway: Glacial river valley birding at Yakutania Point and the best darkness corridors for late-August aurora viewing.",
+        "Icy Strait Point & Sitka: World-class whale bubble-net feeding at Point Adolphus and pelagic seabirds in Sitka Sound.",
+      ]),
+      section("Viewing Realities & Timing Rules", [
+        "Whale sightings: Highly likely on dedicated small-boat tours (May–September), but individual behaviors vary daily.",
+        "Northern lights: Incompatible with May–July midnight sun; only possible on late August and September sailings away from ship deck lighting.",
+        "Bird watching: Excellent all season right from cruise docks, town trails, and wilderness excursions.",
+      ]),
+    ],
+    faqs: [
+      {
+        question: "Can you see northern lights on an Alaska cruise in June or July?",
+        answer: "No. Southeast Alaska experiences 18 to 22 hours of functional daylight and nautical twilight from May through July, making the sky too bright to see auroras.",
+      },
+      {
+        question: "Which port is best for seeing whales on an Alaska cruise?",
+        answer: "Juneau (Auke Bay/Favorite Channel) and Icy Strait Point (Point Adolphus) offer the highest concentration of seasonal humpback feeding activity on dedicated boat tours.",
+      },
+    ],
+  },
 ];
 
 export function getGuideBySlug(slug: string) {

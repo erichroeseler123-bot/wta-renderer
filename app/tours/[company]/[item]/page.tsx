@@ -158,7 +158,7 @@ export async function generateMetadata({
     title,
     description,
     alternates: {
-      canonical: `https://welcometoalaskatours.com/tours/${company}/${item}`,
+      canonical: `https://www.welcometoalaskatours.com/tours/${company}/${item}`,
     },
     openGraph: {
       title,

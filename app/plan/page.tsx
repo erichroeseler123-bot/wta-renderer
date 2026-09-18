@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: "Choose Your Best Alaska Shore Excursion",
   description:
     "Choose Juneau, Skagway, or Ketchikan, tell us what kind of Alaska day you want, and get a four-tour shortlist from connected excursion inventory.",
-  alternates: { canonical: "https://welcometoalaskatours.com/plan" },
+  alternates: { canonical: "https://www.welcometoalaskatours.com/plan" },
 };
 
 type SearchParams = Promise<Record<string, string | string[] | undefined>>;

@@ -51,7 +51,7 @@ export function buildTourPriceLabel(
 }
 
 export function buildTourUrl(tour: Pick<HelicopterTour, "company" | "pk">) {
-  return `https://welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`;
+  return `https://www.welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`;
 }
 
 export function sanitizeTour<T extends Pick<HelicopterTour, "description">>(tour: T): T {
@@ -69,12 +69,12 @@ export function buildOrganizationSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "TravelAgency",
-    "@id": "https://welcometoalaskatours.com/#organization",
+    "@id": "https://www.welcometoalaskatours.com/#organization",
     name: "Welcome To Alaska Tours",
-    url: "https://welcometoalaskatours.com",
+    url: "https://www.welcometoalaskatours.com",
     telephone: "+1-907-723-8908",
     email: "hello@welcometoalaskatours.com",
-    logo: "https://welcometoalaskatours.com/apple-touch-icon.png",
+    logo: "https://www.welcometoalaskatours.com/apple-touch-icon.png",
     areaServed: ["Juneau, Alaska", "Skagway, Alaska", "Ketchikan, Alaska"],
     contactPoint: {
       "@type": "ContactPoint",
@@ -90,12 +90,12 @@ export function buildWebsiteSchema() {
   return {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "@id": "https://welcometoalaskatours.com/#website",
+    "@id": "https://www.welcometoalaskatours.com/#website",
     name: "Welcome To Alaska Tours",
-    url: "https://welcometoalaskatours.com",
+    url: "https://www.welcometoalaskatours.com",
     inLanguage: "en-US",
     publisher: {
-      "@id": "https://welcometoalaskatours.com/#organization",
+      "@id": "https://www.welcometoalaskatours.com/#organization",
     },
   };
 }
@@ -134,13 +134,13 @@ export function buildTourBreadcrumbSchema(
         "@type": "ListItem",
         position: 1,
         name: "Home",
-        item: "https://welcometoalaskatours.com/",
+        item: "https://www.welcometoalaskatours.com/",
       },
       {
         "@type": "ListItem",
         position: 2,
         name: "Tours",
-        item: "https://welcometoalaskatours.com/tours",
+        item: "https://www.welcometoalaskatours.com/tours",
       },
       {
         "@type": "ListItem",

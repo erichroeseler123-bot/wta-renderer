@@ -19,7 +19,7 @@ export async function generateMetadata({
         follow: true,
       },
       alternates: {
-        canonical: "https://welcometoalaskatours.com/tours",
+        canonical: "https://www.welcometoalaskatours.com/tours",
       },
     };
   }

@@ -100,7 +100,7 @@ export default function CruiseShipVsIndependentGuide() {
     publisher: {
       "@type": "Organization",
       name: "Welcome To Alaska Tours",
-      url: "https://welcometoalaskatours.com",
+      url: "https://www.welcometoalaskatours.com",
     },
   };
 

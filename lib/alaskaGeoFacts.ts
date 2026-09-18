@@ -26,11 +26,11 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     topic: "whale-watching",
     directQuestion: "How much does whale watching in Juneau cost and how does it work with cruise schedules?",
     directAnswer:
-      "Juneau whale watching excursions typically cost $165 to $195 per person for small-to-midsize passenger boats. Tours last approximately 3 to 3.5 hours total (including 2 to 2.5 hours on the water in Auke Bay). Local independent operators provide round-trip transfers from the downtown Juneau cruise ship terminal (Mt. Roberts Tram plaza) and guarantee on-time return to your ship well ahead of all-aboard.",
+      "Juneau whale watching excursions typically cost $165 to $195 per person for small-to-midsize passenger boats, or $245 to $295 for Whale Watching + Mendenhall Glacier combo tours (5 to 5.5 hours total). Tours last approximately 3 to 3.5 hours total (including 2 to 2.5 hours on the water in Auke Bay). Local independent operators provide round-trip transfers from the downtown Juneau cruise ship terminal (Mt. Roberts Tram plaza) and guarantee on-time return to your ship well ahead of all-aboard.",
     pricingLabel: "Starting Rate",
-    pricingValue: "$165–$195 / person (No cruise line markup)",
+    pricingValue: "$165–$195 / person standalone • $245–$295 with Mendenhall combo",
     durationLabel: "Duration & Water Time",
-    durationValue: "~3.5 hours total (2–2.5h on water)",
+    durationValue: "~3.5 hours standalone (2–2.5h on water) • 5–5.5h combo",
     meetingPointLabel: "Cruise Dock Meeting Point",
     meetingPointValue: "Mt. Roberts Tram Plaza / Berth curbside (Auke Bay shuttle included)",
     safetyBufferLabel: "Ship Return Buffer",
@@ -42,7 +42,37 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
       },
       {
         question: "Can I do whale watching and Mendenhall Glacier on the same port day?",
-        answer: "Yes. Combination excursions commonly package both into a 5-hour itinerary, or you can book consecutive departures provided your ship has at least a 7 to 8-hour port call."
+        answer: "Yes. Combination excursions package both into a 5 to 5.5-hour coordinated itinerary, with 2.5 hours on the water and 1.5 to 2 hours at Mendenhall Glacier Recreation Area, departing and returning directly to the downtown cruise docks."
+      },
+      {
+        question: "What is included in a Juneau whale watching excursion?",
+        answer: "Tours include round-trip motorcoach/van transportation between the cruise docks and Auke Bay marina, a covered heated catamaran with outdoor viewing decks, a naturalist guide, binoculars, complimentary light snacks and hot drinks, and USFS entrance permits on combination tours."
+      }
+    ]
+  },
+  "juneau-whale-watching-vs-mendenhall": {
+    id: "juneau-whale-watching-vs-mendenhall",
+    port: "juneau",
+    topic: "whale-watching-vs-mendenhall",
+    directQuestion: "Should I choose whale watching, Mendenhall Glacier, or a combination tour in Juneau?",
+    directAnswer:
+      "If you have a port call of 6+ hours, book a combined Whale Watching & Mendenhall Glacier excursion ($245–$295, 5–5.5 hours total) to experience both without coordinating separate transit. For shorter port windows (4–5 hours), choose a single focused activity: 3.5-hour Auke Bay whale watching ($165–$195) for guaranteed humpback sightings, or a 2.5–3 hour Mendenhall Glacier shuttle/tour ($45–$95) for walking to Nugget Falls and scenic photo points.",
+    pricingLabel: "Decision Pricing",
+    pricingValue: "$165–$195 Whales • $45–$95 Mendenhall • $245–$295 Combo Tour",
+    durationLabel: "Port Time Required",
+    durationValue: "Combo: 5–5.5h (requires 6.5h+ port call) • Single: 2.5–3.5h",
+    meetingPointLabel: "Cruise Dock Departure",
+    meetingPointValue: "Mt. Roberts Tramway Plaza (Downtown Juneau cruise terminal)",
+    safetyBufferLabel: "All-Aboard Protection",
+    safetyBufferValue: "Enforces tour end time + 45 min <= ship all-aboard formula",
+    faqSchema: [
+      {
+        question: "Is it better to book whale watching and Mendenhall Glacier together or separately?",
+        answer: "Booking a combined tour with one operator is significantly smoother because transportation between the cruise dock, Auke Bay marina, and Mendenhall Glacier is pre-coordinated, saving 45 minutes of transfer friction and guaranteeing USFS recreation area access."
+      },
+      {
+        question: "What happens if our ship arrives late in Juneau?",
+        answer: "Local operators monitor ship docking in real time. If your vessel arrives late, tour departure times are adjusted automatically, or you will be placed on the next available departure with full on-time return protection."
       }
     ]
   },
@@ -224,15 +254,25 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     topic: "adventure-tours",
     directQuestion: "What are the top active adventure shore excursions in Ketchikan?",
     directAnswer:
-      "Ketchikan offers rugged temperate rainforest adventures including off-road UTV/Zodiac expeditions ($195–$250), canopy ziplining over old-growth cedar trees ($160–$199), and cold-water wilderness snorkeling in Mountain Point ($150–$175). All active tours include commercial transportation from the cruise docks, heavy-duty weatherproof gear, and local safety guides.",
+      "Ketchikan offers rugged temperate rainforest adventures including the famous Adventure Kart Expedition ($195–$250) driving custom Tomcar off-road vehicles through Whipple Creek mountain trails, sea kayaking at Clover Pass with Ketchikan Kayak Co ($145–$185), canopy ziplining over old-growth cedar trees ($160–$199), and cold-water wilderness snorkeling in Mountain Point ($150–$175). All active excursions include commercial transport from the cruise docks, heavy-duty raingear, and professional local guides.",
     pricingLabel: "Adventure Rates",
-    pricingValue: "$150–$250 / person depending on vehicle/activity",
+    pricingValue: "$145–$250 / person (Kart, Kayak, Zipline, Snorkel)",
     durationLabel: "Tour Time",
     durationValue: "3–4 hours dock-to-dock",
     meetingPointLabel: "Pier Meeting Point",
-    meetingPointValue: "Ketchikan Cruise Ship Terminal Berth 1–4 pickup zone",
+    meetingPointValue: "Ketchikan Cruise Ship Terminal Berth 1–4 pickup zone (Ward Cove shuttle compatible)",
     safetyBufferLabel: "Cruise Buffer",
-    safetyBufferValue: "Guaranteed ship return cushion of at least 60 minutes",
+    safetyBufferValue: "Guaranteed ship return cushion of at least 60–90 minutes",
+    faqSchema: [
+      {
+        question: "What is the Ketchikan Adventure Kart Expedition?",
+        answer: "The Adventure Kart Expedition is a guided off-road adventure where guests drive 2-person rough-terrain Tomcar utility vehicles along rugged rainforest logging trails, climbing sub-alpine mountain tracks with scenic viewpoints overlooking the Tongass Narrows."
+      },
+      {
+        question: "Do you need a driver's license for Ketchikan adventure kart tours?",
+        answer: "Yes. Drivers must present a valid government-issued driver's license (minimum age typically 16 or 18 with adult passenger). Passengers can ride along with licensed drivers."
+      }
+    ]
   },
 
   // Skagway Core Topics
@@ -242,7 +282,7 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     topic: "helicopter-tours",
     directQuestion: "How do Skagway helicopter glacier tours compare to Juneau?",
     directAnswer:
-      "Skagway helicopter tours fly over the jagged Sawtooth Ridge and dramatic Chilkat Glacier system, costing $350 to $410 per person for an icefield flight with glacier landing. Skagway flights are often less crowded than Juneau and can include guided walking or glacier dog sledding. Flights meet right near the Skagway cruise docks and feature full weather refund guarantees.",
+      "Skagway helicopter tours (operated by certified air carriers like TEMSCO Air Skagway) fly over the jagged Sawtooth Ridge and dramatic Chilkat Glacier system, costing $350 to $410 per person for an icefield flight with glacier landing. Skagway flights are often less crowded than Juneau and can include guided walking or glacier dog sledding. Flights meet right near the Skagway cruise docks and feature full weather refund guarantees.",
     pricingLabel: "Tour Price",
     pricingValue: "$350–$410 / person (Glacier landing included)",
     durationLabel: "Duration",
@@ -288,17 +328,27 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     id: "skagway-adventure-tours",
     port: "skagway",
     topic: "adventure-tours",
-    directQuestion: "What active shore excursions are available in Skagway?",
+    directQuestion: "What active scooter and wilderness shore excursions are available in Skagway?",
     directAnswer:
-      "Active excursions in Skagway include electric scooter and bicycle descents from White Pass ($110–$160), guided Chilkoot Trail hikes with scenic raft floats on the Taiya River ($145–$185), and alpine rock climbing. These small-group excursions depart from near the docks and provide outdoor gear and return shuttles.",
-    pricingLabel: "Adventure Rates",
-    pricingValue: "$110–$185 / person",
+      "Active excursions in Skagway include the Skagway Scooters Gold Rush Adventure and electric scooter rentals ($110–$150) exploring the coastal Dyea Road and Klondike trails, guided White Pass bicycle descents, Taiya River raft floats on the Chilkoot Trail ($145–$185), and alpine rock climbing. Scooter and active tours meet on 2nd Ave or near the cruise docks (5–10 min walk) and provide helmets, raingear, and orientation.",
+    pricingLabel: "Active Excursion Rates",
+    pricingValue: "$110–$150 Scooters • $145–$185 Raft/Hike • $350–$410 Glacier Heli",
     durationLabel: "Duration",
-    durationValue: "3–4 hours",
-    meetingPointLabel: "Pier Meeting",
-    meetingPointValue: "Downtown Skagway tour staging area / Dockside shuttle",
+    durationValue: "2.5 to 4 hours total",
+    meetingPointLabel: "Skagway Staging",
+    meetingPointValue: "2nd Avenue & Broadway (short 5–10 min walk from cruise docks)",
     safetyBufferLabel: "Ship Cushion",
-    safetyBufferValue: "Guaranteed on-time return well before all-aboard",
+    safetyBufferValue: "Guaranteed on-time return well before ship all-aboard",
+    faqSchema: [
+      {
+        question: "How do Skagway scooter tours work for cruise ship passengers?",
+        answer: "Skagway scooter excursions depart from downtown 2nd Avenue, just a short 5-minute walk from the cruise ship docks. Riders explore historic Broadway, scenic coastal viewpoints along Dyea Road, and Gold Rush landmarks on easy-to-ride electric or motorized scooters."
+      },
+      {
+        question: "Is a driver's license required for Skagway scooter rentals and tours?",
+        answer: "Yes. All scooter operators must possess and present a valid government-issued driver's license (must be 18+ or 16+ depending on model). Safety helmets and operating tutorials are included."
+      }
+    ]
   },
 
   // Port Hub Direct Facts
@@ -723,6 +773,70 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
       {
         question: "What happens if my cruise ship misses the port due to weather?",
         answer: "If your cruise ship cancels a port call due to marine weather, mechanical rerouting, or medical emergencies, Welcome to Alaska Tours issues a 100% full refund automatically."
+      }
+    ]
+  },
+
+  // Bird Watching Guide
+  "best-alaska-cruise-ports-for-bird-watching": {
+    id: "best-alaska-cruise-ports-for-bird-watching",
+    port: "all",
+    topic: "bird-watching",
+    directQuestion: "What are the best Alaska cruise ports for bird watching and how can passengers spot species near the docks?",
+    directAnswer:
+      "Top Alaska cruise ports for bird watching include Juneau (Mendenhall Wetlands & Auke Bay waters), Ketchikan (Clover Pass & Ward Lake in the Tongass National Forest), and Skagway (Taiya River estuary & Yakutania Point). Cruise passengers can observe Bald Eagles, Marbled Murrelets, Pigeon Guillemots, Rufous Hummingbirds, and pelagic seabirds via short independent coastal walks from port (15–45 min) or by booking sea kayaking and whale watching boat excursions that navigate active shoreline feeding zones.",
+    pricingLabel: "Cost & Access",
+    pricingValue: "Free independent walks • $125–$195 Sea Kayak / Wildlife excursions",
+    durationLabel: "Time Required",
+    durationValue: "1–2 hours independent coastal walks • 3–4 hours boat/kayak excursions",
+    meetingPointLabel: "Port Proximity",
+    meetingPointValue: "Yakutania Point (walk from Skagway dock) • Tram / Berth shuttles for Juneau & Ketchikan",
+    safetyBufferLabel: "Viewing Ethics",
+    safetyBufferValue: "Maintain 100+ yard eagle buffer • Use binoculars/telephoto • Respect nesting zones",
+    faqSchema: [
+      {
+        question: "Can you see bald eagles directly from Alaska cruise ports?",
+        answer: "Yes. Bald eagles are ubiquitous across Southeast Alaska cruise ports. In Ketchikan and Juneau, dozens of bald eagles regularly perch on harbor pilings, cannery roofs, and shoreline spruce trees within sight of the cruise ship docks."
+      },
+      {
+        question: "Where is the best place to spot seabirds like puffins or murrelets on an Alaska cruise?",
+        answer: "Marbled Murrelets and Pigeon Guillemots are frequently seen feeding in coastal waters during whale watching catamaran trips in Juneau (Auke Bay) and sea kayaking tours in Ketchikan (Clover Pass). For Tufted and Horned Puffins, pelagic excursions near Sitka Sound or Kenai Fjords offer the highest concentration."
+      },
+      {
+        question: "Are there dedicated bird-watching shore excursions in Alaska?",
+        answer: "While standalone commercial birding tours are rare in cruise ports, booking a small-boat whale watching charter, a guided sea kayaking tour, or a rainforest nature walk provides exceptional naturalist guidance and puts you directly in prime coastal and marine bird habitats."
+      }
+    ]
+  },
+
+  // Alaska Nature by Cruise Port Master Guide
+  "alaska-nature-by-cruise-port": {
+    id: "alaska-nature-by-cruise-port",
+    port: "all",
+    topic: "nature",
+    directQuestion: "What wildlife, northern lights, and whale watching can cruise passengers realistically experience in Southeast Alaska ports?",
+    directAnswer:
+      "Across Southeast Alaska cruise ports, Juneau and Icy Strait Point offer the highest seasonal opportunity for humpback whale watching from May through September via dedicated catamaran boat excursions. Ketchikan features North America's densest bald eagle nesting corridors and rainforest wildlife. Northern lights require true night darkness and clear skies, making them seasonally possible only from late August through September on open ship decks at sea (May–July has 18–22 hours of daylight). Sightings and aurora displays depend on solar activity, tides, and weather and are never guaranteed.",
+    pricingLabel: "Nature Excursions",
+    pricingValue: "Free pier walks • $145–$195 Whale/Wildlife boats & Kayak tours",
+    durationLabel: "Time Commitment",
+    durationValue: "1–2 hours independent walks • 3–4.5 hours marine wildlife tours",
+    meetingPointLabel: "Port Meeting Points",
+    meetingPointValue: "Curbside at cruise terminals / Pier walking paths (Yakutania, Ward Lake, Tram)",
+    safetyBufferLabel: "Cruise Buffer & Guarantees",
+    safetyBufferValue: "All excursions enforce 45–60+ min return buffer before all-aboard",
+    faqSchema: [
+      {
+        question: "Can you see the northern lights on a summer Alaska cruise?",
+        answer: "During peak cruise season (May through July), the aurora borealis is virtually invisible due to 18 to 22 hours of daily sunlight and continuous twilight. Northern lights visibility is only realistically possible on late-season sailings from late August through September when true night darkness returns."
+      },
+      {
+        question: "Which Alaska cruise port is best for whale watching?",
+        answer: "Juneau and Icy Strait Point (Hoonah) offer the highest seasonal probability for humpback whale viewing. Nutrient-rich waters around Auke Bay, Favorite Channel, and Point Adolphus host active feeding groups from May through September."
+      },
+      {
+        question: "Are wildlife sightings guaranteed on Alaska shore excursions?",
+        answer: "While reputable Juneau boat operators offer 100% sighting guarantees for humpback whales during the May–September season due to consistent feeding grounds, wild animal behavior in open marine habitats is never completely predictable. Northern lights and specific animal encounters cannot be guaranteed."
       }
     ]
   }

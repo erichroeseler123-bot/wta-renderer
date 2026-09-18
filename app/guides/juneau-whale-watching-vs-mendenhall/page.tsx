@@ -1,54 +1,63 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
+import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
 
 const canonical = "https://www.welcometoalaskatours.com/guides/juneau-whale-watching-vs-mendenhall";
 
 export const metadata: Metadata = {
-  title: "Juneau Whale Watching vs Mendenhall Glacier: Which Should You Choose?",
+  title: "Juneau Whale Watching vs Mendenhall Glacier (or Both? 2026 Cruise Guide)",
   description:
-    "Compare Juneau whale watching and Mendenhall Glacier for a cruise port day. Choose by wildlife priority, walking, weather tolerance, port-call length, and whether a combo tour fits your ship window.",
+    "Whale watching vs Mendenhall Glacier in Juneau: compare standalone trips vs 5-hour combo excursions. Cruise port logistics, timing buffers, USFS permits, and 2026 prices.",
   alternates: { canonical },
   openGraph: {
-    title: "Juneau Whale Watching vs Mendenhall Glacier",
-    description: "A practical cruise-day decision guide for choosing whales, Mendenhall Glacier, or a combination of both in Juneau.",
+    title: "Juneau Whale Watching vs Mendenhall Glacier (or Both? 2026 Cruise Guide)",
+    description: "A practical cruise-day decision guide for choosing whales, Mendenhall Glacier, or a combined tour in Juneau.",
     url: canonical,
     type: "article",
   },
 };
 
 const rows = [
-  ["Best for", "Wildlife and a boat-based Alaska experience", "Glacier scenery, photos, short walks, and a land-based stop"],
-  ["Choose it when", "Seeing whales up close is one of your Alaska priorities", "You want a glacier-focused day or prefer to stay mostly on land"],
-  ["Main variable", "Boat time, sea conditions, departure time, and wildlife activity", "Transportation time, walking choice, weather, and time at the recreation area"],
-  ["Short port call", "Choose a departure with a conservative return buffer", "A focused Mendenhall visit can be simpler than stacking two major activities"],
-  ["Long port call", "Whale watching can anchor the day with flexible downtown time around it", "Mendenhall can be paired with another activity when transfers and return timing work"],
-  ["Combo tour", "Useful when you want both and one operator coordinates the day", "Useful when you want both but do not want to coordinate separate transportation"],
+  ["Best for", "Wildlife and a boat-based Alaska experience", "Glacier scenery, photos, short walks, and a land-based stop", "Seeing both signature Juneau icons on a single port call"],
+  ["Duration & timing", "3 to 3.5 hours total (2–2.5h on water)", "2.5 to 3 hours total (20m drive + 2h on site)", "5 to 5.5 hours total (2.5h water + 1.5–2h glacier)"],
+  ["Typical price", "$165–$195 per adult", "$45–$95 shuttle/tour (USFS pass included)", "$245–$295 combo package"],
+  ["Cruise port fit", "Fits tight 4–5 hour port calls easily", "Fits tight 4–5 hour port calls easily", "Requires comfortable 6.5+ hour port call"],
+  ["Transportation", "Round-trip bus/van from Mt. Roberts Tram plaza to Auke Bay", "Shuttle from Mt. Roberts Tram parking to Visitor Center", "Pre-coordinated shuttle connecting dock, marina, and glacier"],
+  ["Key highlights", "Guaranteed humpbacks, sea lions, eagles, hydrophone listening", "Nugget Falls 2-mile walk, Visitor Center exhibits, photo points", "100% whale guarantee + Mendenhall access without separate bookings"],
 ] as const;
 
 const faqs = [
   {
-    question: "Is whale watching or Mendenhall Glacier better in Juneau?",
-    answer:
-      "Neither is universally better. Choose whale watching if wildlife is the priority. Choose Mendenhall if glacier scenery, walking, or a mostly land-based day matters more. If your ship has a comfortable port window, a well-timed combination can cover both.",
-  },
-  {
     question: "Can I do whale watching and Mendenhall Glacier in the same cruise day?",
     answer:
-      "Often, yes. Combination excursions are common, but the right choice depends on your ship's actual port window, the operator's meeting point, total tour duration, and the return buffer before all-aboard.",
+      "Yes! Combination excursions package both into a single 5 to 5.5-hour tour. You get 2 to 2.5 hours on a whale-watching boat in Auke Bay, followed by 1.5 to 2 hours at Mendenhall Glacier Recreation Area. All transfers between the cruise docks, boat marina, and glacier are pre-coordinated, saving time and eliminating the stress of separate bookings.",
   },
   {
-    question: "Should I still visit Mendenhall if my cruise also visits Glacier Bay?",
+    question: "Is whale watching or Mendenhall Glacier better in Juneau?",
     answer:
-      "That depends on what you want from Juneau. Glacier Bay is a ship-based scenic experience, while a Mendenhall visit can add a land-based viewpoint and walking time. If glacier scenery is already well covered for your group, you may prefer to make wildlife or another Juneau experience the priority.",
+      "Neither is universally better. Choose whale watching if seeing wild marine life up close is your bucket-list priority. Choose Mendenhall if glacier scenery, walking the trail to Nugget Falls, or a mostly land-based day matters more. If your ship has at least 6.5 hours in port, the combination tour gives you both.",
   },
   {
-    question: "What is the safest choice for a short Juneau port call?",
+    question: "How do cruise passengers get to the tour departures?",
     answer:
-      "Choose one major experience that fits comfortably inside the ship window rather than forcing two activities into a tight day. Confirm the operator's meeting instructions and use the cruise line's current all-aboard time as the controlling deadline.",
+      "All major independent Juneau tour operators stage departures directly at the Mt. Roberts Tramway parking lot (490 S Franklin St), less than a 5-minute flat walk from the downtown cruise berths (Franklin, CT, and IVF docks). Passengers docking at the AJ Dock take the $5 port shuttle directly to the tram plaza.",
+  },
+  {
+    question: "What happens if our cruise ship arrives late or misses Juneau?",
+    answer:
+      "Independent operators monitor ship docking schedules in real time. If your vessel arrives late, tour departure times are adjusted. If weather or mechanical issues force your cruise ship to cancel the Juneau port call entirely, Welcome to Alaska Tours automatically issues a 100% full refund.",
+  },
+  {
+    question: "What is included on Whale Watching + Mendenhall combination tours?",
+    answer:
+      "Combo tours include round-trip transfers from the cruise docks, 2 to 2.5 hours on a covered heated catamaran with outdoor viewing decks and a naturalist guide, light snacks and hot beverages, and official US Forest Service admission permits for the Mendenhall Glacier Recreation Area and Visitor Center.",
   },
 ];
 
 export default function JuneauWhalesVsMendenhallGuide() {
+  const geoFact = getAlaskaGeoFact("juneau", "juneau-whale-watching-vs-mendenhall");
+
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -65,7 +74,7 @@ export default function JuneauWhalesVsMendenhallGuide() {
     headline: "Juneau Whale Watching vs Mendenhall Glacier: Which Should You Choose?",
     description: metadata.description,
     datePublished: "2026-08-24",
-    dateModified: "2026-08-24",
+    dateModified: "2026-09-17",
     mainEntityOfPage: canonical,
     publisher: { "@type": "Organization", name: "Welcome To Alaska Tours" },
   };
@@ -78,24 +87,34 @@ export default function JuneauWhalesVsMendenhallGuide() {
       <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
         <div className="mx-auto max-w-5xl">
           <Link href="/ports/juneau" className="text-sm font-bold text-cyan-200 hover:text-white">← Juneau excursions</Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">Juneau decision guide · 2026</div>
-          <h1 className="mt-3 max-w-4xl text-4xl font-black tracking-tight sm:text-6xl">Whale watching vs Mendenhall Glacier: which should you choose?</h1>
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">Juneau Cruise Planning Guide · 2026</div>
+          <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">Whale watching vs Mendenhall Glacier: which should you choose?</h1>
           <p className="mt-5 max-w-3xl text-base leading-7 text-slate-200 sm:text-lg">
-            If you only want one major Juneau excursion, make the decision around the kind of Alaska moment your group cares about most — not around which option appears first in a tour list.
+            Compare Juneau's signature excursions: guaranteed humpback whale watching in Auke Bay, exploring Mendenhall Glacier Recreation Area, or doing both on a coordinated 5-hour combination tour.
           </p>
-          <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-            <Link href="/juneau/whale-watching" className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-cyan-300 px-6 py-3 text-sm font-black uppercase tracking-wider text-slate-950 hover:bg-cyan-200">Compare whale watching →</Link>
-            <Link href="/juneau/mendenhall-glacier-tours" className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/20">Compare Mendenhall tours</Link>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/juneau/whale-watching" className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-cyan-300 px-6 py-3 text-sm font-black uppercase tracking-wider text-slate-950 hover:bg-cyan-200 shadow-md transition">Compare Whale Watching →</Link>
+            <Link href="/juneau/mendenhall-glacier-tours" className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/20 transition">Compare Mendenhall Tours</Link>
           </div>
         </div>
       </section>
 
       <div className="mx-auto max-w-5xl px-6 sm:px-8">
+        {geoFact && (
+          <div className="mt-8">
+            <GeoDirectAnswerCard fact={geoFact} />
+          </div>
+        )}
+
         <section className="mt-8 rounded-[2rem] border border-sky-100 bg-white p-6 shadow-sm sm:p-8">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Quick answer</div>
+          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Quick Decision Framework</div>
           <p className="mt-3 text-xl font-black leading-8 text-slate-950">
-            Pick <span className="text-sky-800">whale watching</span> when wildlife is the bucket-list priority. Pick <span className="text-sky-800">Mendenhall Glacier</span> when your group wants glacier scenery, photos, walking, or a mostly land-based day. Choose a <span className="text-sky-800">combo</span> only when the total itinerary still leaves a comfortable return buffer before your ship's all-aboard time.
+            If your cruise call is <span className="text-sky-800">6.5 hours or longer</span>, book a <span className="text-sky-800">Whale Watching + Mendenhall Glacier combo tour ($245–$295)</span> to see both seamlessly. If your port stay is under 6 hours, pick <span className="text-sky-800">whale watching</span> for guaranteed wildlife or <span className="text-sky-800">Mendenhall Glacier</span> for walking to Nugget Falls and visitor center viewing.
           </p>
+          <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs font-semibold text-amber-900">
+            <strong>Cruise Safety Formula:</strong> We strictly enforce:{" "}
+            <code className="rounded bg-amber-100 px-1 py-0.5 font-mono text-amber-950">tour end time + 45 minutes &le; ship all-aboard time</code>.
+          </div>
         </section>
 
         <section className="mt-10">

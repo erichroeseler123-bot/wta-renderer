@@ -8,24 +8,25 @@ import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { parseTimeToMinutes } from "@/lib/timing";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
+import PortNatureSection from "@/components/ports/PortNatureSection";
 
 const APPROVED_PORTS = ["juneau", "skagway", "ketchikan"];
 
 const PORT_INFO: Record<string, { title: string; description: string; problem: string }> = {
   juneau: {
-    title: "Juneau Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Compare Juneau whale watching, glacier, dog sledding, flightseeing, and active shore excursions for your cruise day.",
-    problem: "Juneau has a large excursion menu, so the challenge is choosing the experience that fits your group, budget, and time in port without turning the day into a spreadsheet.",
+    title: "Juneau Shore Excursions: Whale Watching, Mendenhall & Helicopter Tours (2026)",
+    description: "Compare Juneau whale watching, Mendenhall Glacier combos, helicopter glacier treks, dog sledding, and fishing charters. 100% weather refund and cruise dock pickup.",
+    problem: "Juneau has Alaska's largest excursion menu. The key is coordinating signature highlights like whale watching and Mendenhall Glacier with your ship's specific port window and guaranteed return timing.",
   },
   skagway: {
-    title: "Skagway Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Compare Skagway helicopter, dog sledding, scooter, and active shore excursions for your cruise day.",
-    problem: "Skagway has a mix of structured departures and self-directed experiences. The best choice depends on how much of your port day you want to commit and how active you want the day to feel.",
+    title: "Skagway Shore Excursions: Scooters, Gold Rush, Glacier Flights & Dog Sleds (2026)",
+    description: "Compare Skagway shore excursions: Skagway Scooters Gold Rush adventures, electric rentals to Dyea, TEMSCO helicopter glacier landings, Liarsville, and dog sledding.",
+    problem: "Skagway offers a mix of structured mountain adventures and self-directed explorations. The best choice balances your group's desired activity level with safe all-aboard return buffers.",
   },
   ketchikan: {
-    title: "Ketchikan Cruise Port Excursions | Welcome To Alaska Tours",
-    description: "Compare Ketchikan rainforest, wildlife, kayak, flightseeing, fishing, and wilderness shore excursions.",
-    problem: "Ketchikan offers everything from quick downtown-friendly experiences to remote wilderness trips. The best choice depends on weather tolerance, activity level, budget, and available port time.",
+    title: "Ketchikan Shore Excursions: Adventure Karts, Kayaking, Bears & Misty Fjords (2026)",
+    description: "Compare Ketchikan shore excursions: Adventure Kart Expeditions, Ketchikan Kayak Co sea kayaking, Herring Cove bear viewing, Misty Fjords floatplanes, and Duck tours.",
+    problem: "Ketchikan offers everything from rugged rainforest kart tracks and sea kayaking to tranquil Misty Fjords seaplanes. Match the right excursion to your ship's berth location (Berths 1–4 vs. Ward Cove).",
   },
 };
 
@@ -212,6 +213,9 @@ export default async function PortPage({ params, searchParams }: { params: Promi
         </section>
 
         <section className="mt-12 rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><div className="text-xs font-black uppercase tracking-[0.16em] text-sky-700">Still deciding?</div><h2 className="mt-2 text-2xl font-black text-slate-950">See every {portTitle} excursion</h2><p className="mt-2 max-w-2xl text-sm text-slate-600">The groups above are shortcuts, not exclusions. Browse the full port inventory if you want to compare every available option.</p></div><div className="flex flex-wrap gap-3"><Link href="/tours" className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-xs font-bold text-slate-800">Full catalog</Link><Link href={`/plan?${qs.toString()}`} className="rounded-xl bg-slate-950 px-5 py-3 text-xs font-bold text-white">Help me choose</Link></div></div></section>
+
+        {/* NATURE BY PORT: BIRDS, AURORA & WHALES */}
+        <PortNatureSection portSlug={slug} />
 
         <section className="mt-8 rounded-[2rem] border border-slate-200 bg-white p-6 sm:p-8"><h2 className="text-xl font-black text-slate-950">Planning your {portTitle} port day</h2><p className="mt-3 text-sm leading-7 text-slate-600">{info.problem}</p><p className="mt-3 text-sm leading-7 text-slate-600">Use the operator's live calendar and your cruise line's current all-aboard instructions as the final source for timing. Build in comfortable extra time rather than relying on the shortest possible connection.</p><Link href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${slug}`} className="mt-4 inline-block text-xs font-black uppercase tracking-wider text-sky-800">Read the {portTitle} timing guide →</Link></section>
       </div>

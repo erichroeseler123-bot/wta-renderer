@@ -11,13 +11,13 @@ export const metadata: Metadata = {
     "juneau glacier tours",
   ],
   alternates: {
-    canonical: "https://welcometoalaskatours.com/tours",
+    canonical: "https://www.welcometoalaskatours.com/tours",
   },
   openGraph: {
     title: "Browse Alaska Shore Excursions",
     description:
       "Find cruise-day tours by port and schedule fit with live availability from local operators.",
-    url: "https://welcometoalaskatours.com/tours",
+    url: "https://www.welcometoalaskatours.com/tours",
     type: "website",
   },
   twitter: {

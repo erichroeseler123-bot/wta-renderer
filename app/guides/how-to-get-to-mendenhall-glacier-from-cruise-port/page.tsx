@@ -6,11 +6,12 @@ import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
 const canonical = "https://www.welcometoalaskatours.com/guides/how-to-get-to-mendenhall-glacier-from-cruise-port";
 
 export const metadata: Metadata = {
-  title: "How to Get to Mendenhall Glacier from Juneau Cruise Port",
-  description: "Complete guide on how to get from Juneau cruise docks to Mendenhall Glacier: commercial shuttles, tour buses, taxi shortages, city bus walking distance, and permit limits.",
+  title: "How to Get to Mendenhall Glacier from Juneau Cruise Port (2026 Guide)",
+  description:
+    "How to get from the Juneau cruise docks to Mendenhall Glacier: authorized tour shuttles, transit times (13 miles), taxi shortages, city bus limits, USFS permits, and 2026 tours.",
   alternates: { canonical },
   openGraph: {
-    title: "How to Get to Mendenhall Glacier from Juneau Cruise Port",
+    title: "How to Get to Mendenhall Glacier from Juneau Cruise Port (2026 Guide)",
     description: "Complete guide on how to get from Juneau cruise docks to Mendenhall Glacier: commercial shuttles, tour buses, taxi shortages, city bus walking distance, and permit limits.",
     url: canonical,
     type: "article",
@@ -19,12 +20,24 @@ export const metadata: Metadata = {
 
 const faqs = [
   {
-    "question": "How long do you need at Mendenhall Glacier?",
-    "answer": "Plan for 2 to 2.5 hours on site. This allows 45 minutes to walk to Nugget Falls and back, 30 minutes to explore the Visitor Center exhibits and theatre, and 30 minutes for scenic photographs and trail strolling."
+    question: "How far is Mendenhall Glacier from the Juneau cruise port?",
+    answer: "Mendenhall Glacier is 13 miles northwest of the downtown Juneau cruise docks. Travel time is approximately 20 to 25 minutes by motorcoach, excursion shuttle van, or car along Egan Drive and Glacier Spur Road."
   },
   {
-    "question": "Are there public shuttles without advance reservations?",
-    "answer": "Due to US Forest Service permit caps instituted in recent years, walk-up shuttle ticket booths at the docks frequently sell out early in the morning. Advance reservations are essential."
+    question: "How long do you need at Mendenhall Glacier?",
+    answer: "Plan for 2 to 2.5 hours on site. This allows 45 minutes to walk to Nugget Falls and back (2 miles round-trip on a flat gravel trail), 30 minutes to explore the Visitor Center exhibits and theatre, and 30 minutes for scenic photographs and trail strolling."
+  },
+  {
+    question: "Are there walk-up shuttles at the Juneau cruise docks?",
+    answer: "Due to US Forest Service permit caps instituted in recent years, walk-up shuttle ticket booths at the Mt. Roberts Tramway lot frequently sell out early in the morning on multi-ship days. Booking an authorized tour shuttle or guided excursion in advance is strongly recommended to guarantee access."
+  },
+  {
+    question: "Can I take an Uber, Lyft, or city bus to Mendenhall Glacier?",
+    answer: "Rideshares and taxis can drop off at Mendenhall, but cellular reception at the glacier is spotty and local driver shortages make finding a return ride back to port very difficult. The Juneau Capital Transit city bus drops passengers 1.5 miles from the visitor center, requiring a 3-mile round-trip walk along the highway with no sidewalks."
+  },
+  {
+    question: "What is the best way to combine Mendenhall Glacier with whale watching?",
+    answer: "Book a combined Whale Watching & Mendenhall Glacier excursion (5 to 5.5 hours total). The operator coordinates all transportation directly between the cruise dock, Auke Bay marina, and Mendenhall Glacier, eliminating transfer friction and guaranteeing on-time ship return."
   }
 ];
 
