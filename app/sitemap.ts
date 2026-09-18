@@ -59,6 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'how-long-does-it-take-to-get-off-the-ship-in-juneau',
     'how-long-does-it-take-to-get-off-the-ship-in-skagway',
     'how-long-does-it-take-to-get-off-the-ship-in-ketchikan',
+    'alaska-nature-by-cruise-port',
   ];
   const approvedShips = ['celebrity-edge','royal-princess','discovery-princess','norwegian-bliss','koningsdam'];
 
