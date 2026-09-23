@@ -47,6 +47,11 @@ const GUIDES = [
     description: "VIP charters: private 6-pack whale watching, private glacier helicopters, luxury vans, and custom timing.",
   },
   {
+    slug: "juneau-private-whale-watching-charters",
+    title: "Private Charters for Whale Watching in Juneau, AK",
+    description: "Compare boat sizes (6 to 14+ guests), per-person economics ($193–$338), Auke Bay marina logistics, and back-to-ship timing guarantees.",
+  },
+  {
     slug: "cruise-ship-vs-independent-alaska-excursions",
     title: "Independent vs Cruise Ship Excursions",
     description: "Compare pricing, group sizes, back-to-ship guarantees, and port logistics between independent operators and ship tours.",

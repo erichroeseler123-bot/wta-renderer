@@ -64,7 +64,7 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     meetingPointLabel: "Cruise Dock Departure",
     meetingPointValue: "Mt. Roberts Tramway Plaza (Downtown Juneau cruise terminal)",
     safetyBufferLabel: "All-Aboard Protection",
-    safetyBufferValue: "Enforces tour end time + 45 min <= ship all-aboard formula",
+    safetyBufferValue: "Plan a 45–60 min buffer: tour end time + 45 min <= ship all-aboard",
     faqSchema: [
       {
         question: "Is it better to book whale watching and Mendenhall Glacier together or separately?",
@@ -837,6 +837,38 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
       {
         question: "Are wildlife sightings guaranteed on Alaska shore excursions?",
         answer: "While reputable Juneau boat operators offer 100% sighting guarantees for humpback whales during the May–September season due to consistent feeding grounds, wild animal behavior in open marine habitats is never completely predictable. Northern lights and specific animal encounters cannot be guaranteed."
+      }
+    ]
+  },
+
+  // Juneau Private Whale Charters Guide
+  "juneau-private-whale-watching-charters": {
+    id: "juneau-private-whale-watching-charters",
+    port: "juneau",
+    topic: "private-whale-watching-charters",
+    directQuestion: "How much does a private whale watching charter cost in Juneau AK, and how does it work for cruise passengers?",
+    directAnswer:
+      "Private whale watching charters in Juneau typically cost $1,150 to $2,700 for dedicated whale watching vessels, or $3,500 for private whale watching and Mendenhall Glacier combo charters. For families or small groups of 6 to 14 guests, this equals roughly $190 to $270 per person—comparable to per-passenger cruise ship tickets while providing an exclusive heated boat, dedicated captain and naturalist, 2 full hours exploring Auke Bay and Favorite Channel, and private round-trip transfers directly from the Juneau cruise ship berths.",
+    pricingLabel: "Private Vessel Charter",
+    pricingValue: "$1,150–$2,700 private whale boat • $3,500 whale + Mendenhall combo (up to 14 guests)",
+    durationLabel: "Charter Duration",
+    durationValue: "3.5 hours total (2h on water) • 4.5 hours with Mendenhall Glacier",
+    meetingPointLabel: "Cruise Dock Curbside",
+    meetingPointValue: "Curbside pickup at Juneau cruise ship docks (Mt. Roberts Tram Plaza / Berth gates)",
+    safetyBufferLabel: "Cruise Safety Buffer",
+    safetyBufferValue: "Customized departure; plan a 60–90 min buffer before ship all-aboard",
+    faqSchema: [
+      {
+        question: "How many people can fit on a private whale watching charter in Juneau?",
+        answer: "Most private whale charters in Juneau use custom 6-pack to 14-passenger aluminum catamarans or jet boats. Dedicated private charters from operators like Alaska Tales host up to 14 passengers, while larger custom vessels can accommodate groups up to 49."
+      },
+      {
+        question: "Are whale sightings guaranteed on private Juneau boat charters?",
+        answer: "Operators like Alaska Tales offer a 100% whale sighting guarantee on private charters from May through September, as humpback whales reliably feed across Auke Bay, Lynn Canal, and Favorite Channel."
+      },
+      {
+        question: "Can private whale charters add a stop at Mendenhall Glacier?",
+        answer: "Yes. Combination private charters (such as Alaska Tales' 4.5-hour private tour) include private guided ground transfers, 45 minutes to 1 hour exploring Mendenhall Glacier Recreation Area, and a 2-hour private whale watching boat trip."
       }
     ]
   }

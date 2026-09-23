@@ -1,5 +1,5 @@
 import { MetadataRoute } from 'next';
-import { getHelicopterTours } from '@/lib/helicopterTours';
+import { getHelicopterTours, type HelicopterTour } from '@/lib/helicopterTours';
 
 const MONEY_PAGES = [
   'juneau/whale-watching',
@@ -29,7 +29,7 @@ const MONEY_PAGES = [
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.welcometoalaskatours.com';
 
-  let tours: any[] = [];
+  let tours: HelicopterTour[] = [];
   try {
     tours = await getHelicopterTours();
   } catch (e) {
@@ -59,6 +59,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     'how-long-does-it-take-to-get-off-the-ship-in-juneau',
     'how-long-does-it-take-to-get-off-the-ship-in-skagway',
     'how-long-does-it-take-to-get-off-the-ship-in-ketchikan',
+    'best-alaska-cruise-ports-for-bird-watching',
+    'juneau-private-whale-watching-charters',
     'alaska-nature-by-cruise-port',
   ];
   const approvedShips = ['celebrity-edge','royal-princess','discovery-princess','norwegian-bliss','koningsdam'];
