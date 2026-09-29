@@ -1,5 +1,5 @@
 {
-  "test_run_timestamp": "2026-09-29T12:59:38.604Z",
+  "test_run_timestamp": "2026-09-29T13:35:48.145Z",
   "property_name": "Welcome to Alaska Tours",
   "repository": "https://github.com/erichroeseler123-bot/wta-renderer.git",
   "local_repository_path": "C:/Users/erich/Documents/Projects/wta-renderer",
@@ -99,7 +99,7 @@
           "path": "/juneau/helicopter-tours",
           "status": 200,
           "title": "Juneau Helicopter Tours &amp; Glacier Treks | 2026 Prices &amp; Landings | Welcome to Alaska Tours",
-          "description": "Compare Juneau helicopter tour prices ($388 per person flat rate): glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
+          "description": "Compare Juneau helicopter tour prices ($409 to $429 per person flat rate): glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
           "canonical": "https://www.welcometoalaskatours.com/juneau/helicopter-tours",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
