@@ -92,7 +92,7 @@ const PAGES: PageConfig[] = [
     topic: "helicopter-tours",
     title: "Juneau Helicopter Tours & Glacier Treks | 2026 Prices & Landings",
     h1: "Juneau helicopter tours, glacier treks and prices",
-    description: "Compare Juneau helicopter tour prices from $405 per person: glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
+    description: "Compare Juneau helicopter tour prices ($388 per person flat rate): glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
     intro: "Experience the vast 1,500-square-mile Juneau Icefield from the air. Compare scenic glacier landings (Herbert, Norris, Taku Glaciers), guided ice walks, extended technical glacier treks (NorthStar style), and high-elevation glacier dog sledding camps (TEMSCO & Coastal style) with certified FAA Part 135 air operators and cruise port transfers.",
     chooserTopic: "flightseeing",
     keywords: ["helicopter", "flightseeing", "icefield", "glacier walk", "glacier trek", "dog sledding on the mendenhall", "pilot's choice", "northstar", "coastal"],
@@ -101,12 +101,12 @@ const PAGES: PageConfig[] = [
     decisionTitle: "Choose your Juneau helicopter experience tier",
     decisionIntro: "Price and duration vary based on what you do once the helicopter lands on the Juneau Icefield.",
     decisionPoints: [
-      { title: "Scenic flight + glacier landing ($405–$420)", text: "2.25 to 2.5 hours total (30–35 min flight + 20–25 min walking on glacier ice). Overboots provided. Excellent for all ages and fitness levels. Starting from $405 per person." },
-      { title: "Guided glacier ice walk & trek ($549–$749)", text: "3 to 5.25 hours total. Includes 1 to 3 hours of guided walking or technical ice trekking with crampons, harnesses, and ice axes on deep icefield terrain." },
-      { title: "Helicopter glacier dog sledding ($699–$799)", text: "2.75 to 3 hours total. Fly to a high-elevation glacier snow camp on Herbert or Norris Glacier, meet Alaskan huskies, and ride a real snow dog sled. Starting from $699 per person." },
+      { title: "Scenic flight + glacier landing ($388–$420)", text: "2.25 to 2.5 hours total (30–35 min flight + 20–25 min walking on glacier ice). Overboots provided. Excellent for all ages and fitness levels. $388 per person (flat rate)." },
+      { title: "Guided glacier ice walk & trek ($479–$749)", text: "3 to 5.25 hours total. Includes 1 to 3 hours of guided walking or technical ice trekking with crampons, harnesses, and ice axes on deep icefield terrain." },
+      { title: "Helicopter glacier dog sledding ($699–$839)", text: "2.75 to 3.5 hours total. Fly to a high-elevation glacier snow camp on Herbert or Norris Glacier, meet Alaskan huskies, and ride a real snow dog sled. $699 per person (flat rate)." },
     ],
     faqs: [
-      { question: "How much do Juneau helicopter tours cost?", answer: "Scenic glacier landings start at $405 per person (NorthStar Flightseeing and Glacier Landing) to $409 per person (TEMSCO Mendenhall). Guided ice walks and technical treks range from $549 to $749, and high-altitude helicopter dog sledding on snow starts at $699 to $799. (Note: inquiry-only listings without online fares are excluded from category minimums, and land-based wheeled cart summer camps do not include flights)." },
+      { question: "How much do Juneau helicopter tours cost?", answer: "Scenic glacier landings are $388 per person flat rate (NorthStar Flightseeing and Glacier Landing) to $409 per person flat rate (TEMSCO Mendenhall). Guided ice walks and technical treks range from $479 to $749, and high-altitude helicopter dog sledding on snow starts at $699 to $839 flat rate. (Note: inquiry-only listings without online fares are excluded from category minimums, and land-based wheeled cart summer camps do not include flights)." },
       { question: "What happens if mountain weather cancels my helicopter flight?", answer: "If fog, wind, or low cloud ceilings prevent safe flying, passengers receive an immediate 100% full refund with zero cancellation penalties, or the option to rebook if your port time permits." },
       { question: "How do cruise passengers get to the helicopter base?", answer: "All helicopter tours include round-trip van and shuttle transportation from the downtown Juneau cruise docks (Mt. Roberts Tram plaza) directly to the heliport at Juneau International Airport (JNU)." },
       { question: "Do I need special boots or gear for walking on the glacier?", answer: "No specialty gear needed. The flight base equips all guests with neoprene traction overboots that slip directly over your sneakers or walking shoes. Treks provide crampons and gear." },
@@ -643,19 +643,35 @@ function textFor(tour: HelicopterTour) { return `${tour.title} ${tour.category |
 function priceNumber(value?: string) { const match = String(value || "").match(/\$\s*([0-9][0-9,]*)/); return match ? Number(match[1].replace(/,/g, "")) : null; }
 function durationLabel(value?: string) { const match = String(value || "").match(/(\d+(?:\.\d+)?)\s*hours?/i); return match ? `${match[1]} hours` : "Check tour details"; }
 function parsePriceBasis(tour: HelicopterTour) {
+  const rawPrice = tour.fromPrice || "";
   const desc = tour.description || "";
   const title = tour.title || "";
-  const combined = `${title} ${desc}`;
+  const combined = `${title} ${desc}`.toLowerCase();
 
-  if (/private\s*(?:charter|van|boat)/i.test(combined)) {
-    const num = priceNumber(desc) ?? priceNumber(tour.fromPrice);
-    if (num) return { label: `Private Charter $${num.toLocaleString()}`, num, isSpecific: true };
+  // If already formatted with (Flat Rate) or specific unit
+  if (
+    rawPrice.includes("(Flat Rate)") ||
+    rawPrice.includes("Per Person") ||
+    rawPrice.includes("Per Adult") ||
+    rawPrice.includes("Private Charter")
+  ) {
+    const num = priceNumber(rawPrice);
+    return { label: rawPrice, num, isSpecific: true };
+  }
+
+  if (rawPrice === "Contact for pricing") {
+    return { label: "Contact for pricing", num: null, isSpecific: true };
+  }
+
+  if (/private\s*(?:charter|van|boat|group|hummer)/i.test(combined) || /private/i.test(title)) {
+    const num = priceNumber(desc) ?? priceNumber(rawPrice);
+    if (num) return { label: `$${num.toLocaleString()} Private Charter (Flat Rate)`, num, isSpecific: true };
   }
 
   const adultMatch = desc.match(/\bAdult\s*[:|-]?\s*\$\s*([0-9][0-9,]*)/i);
   if (adultMatch) {
     const num = Number(adultMatch[1].replace(/,/g, ""));
-    return { label: `Adult $${num.toLocaleString()}`, num, isSpecific: true };
+    return { label: `$${num.toLocaleString()} Per Adult (Flat Rate)`, num, isSpecific: true };
   }
 
   const perPersonMatch =
@@ -663,15 +679,15 @@ function parsePriceBasis(tour: HelicopterTour) {
     desc.match(/(?:Per\s*Person|\/person)\s*[:|-]?\s*\$\s*([0-9][0-9,]*)/i);
   if (perPersonMatch) {
     const num = Number(perPersonMatch[1].replace(/,/g, ""));
-    return { label: `$${num.toLocaleString()} Per Person`, num, isSpecific: true };
+    return { label: `$${num.toLocaleString()} Per Person (Flat Rate)`, num, isSpecific: true };
   }
 
-  const fromNum = priceNumber(tour.fromPrice);
-  if (fromNum) {
-    return { label: `From $${fromNum.toLocaleString()}`, num: fromNum, isSpecific: false };
+  const num = priceNumber(rawPrice) ?? priceNumber(desc);
+  if (num) {
+    return { label: `$${num.toLocaleString()} Per Person (Flat Rate)`, num, isSpecific: true };
   }
 
-  return { label: tour.fromPrice || "Check price", num: null, isSpecific: false };
+  return { label: rawPrice || "Check price", num: null, isSpecific: false };
 }
 function configFor(port: string, topic: string) { return PAGES.find((page) => page.port === port && page.topic === topic); }
 
@@ -755,14 +771,13 @@ export default async function MoneyPage({ params }: { params: Promise<{ port: st
       <section className="mx-auto max-w-6xl px-6 py-12">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
           <div><div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Connected inventory</div><h2 className="mt-2 text-3xl font-black tracking-tight">Compare the current catalog</h2></div>
-          <p className="max-w-xl text-sm leading-6 text-slate-600">When an adult or per-person rate is explicitly listed, we show it first. Lower child or family rates may make the operator's starting "from" price lower. Open the live calendar for the exact rate that applies to your party.</p>
+          <p className="max-w-xl text-sm leading-6 text-slate-600">All excursions display verified flat-rate pricing with no hidden checkout fees. Select your departure date and party size to view real-time calendar rates.</p>
         </div>
 
         {displayed.length ? (
           <div className="mt-8 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
             {displayed.map((tour) => {
               const parsed = parsePriceBasis(tour);
-              const lowest = priceNumber(tour.fromPrice);
               const childMatch = (tour.description || "").match(/\bChild\s*[:|-]?\s*\$\s*([0-9][0-9,]*)/i);
               const child = childMatch ? Number(childMatch[1].replace(/,/g, "")) : null;
               return (
@@ -773,8 +788,7 @@ export default async function MoneyPage({ params }: { params: Promise<{ port: st
                     <h3 className="mt-2 text-xl font-black tracking-tight">{tour.title}</h3>
                     <div className="mt-3 flex flex-wrap gap-2 text-xs font-bold text-slate-700">
                       <span className="rounded-full bg-slate-100 px-3 py-2">{parsed.label}</span>
-                      {child ? <span className="rounded-full bg-slate-100 px-3 py-2">Child ${child.toLocaleString()}</span> : null}
-                      {lowest && parsed.num && lowest < parsed.num ? <span className="rounded-full bg-sky-50 px-3 py-2 text-sky-800">Starting from ${lowest.toLocaleString()}</span> : null}
+                      {child ? <span className="rounded-full bg-slate-100 px-3 py-2">Child ${child.toLocaleString()} (Flat Rate)</span> : null}
                       <span className="rounded-full bg-slate-100 px-3 py-2">{durationLabel(tour.description)}</span>
                     </div>
                     <p className="mt-4 line-clamp-3 text-sm leading-6 text-slate-600">{tour.description || "Open the tour details for operator information and booking requirements."}</p>

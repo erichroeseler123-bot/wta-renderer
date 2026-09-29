@@ -19,16 +19,18 @@ async function verify() {
   console.log('Status:', heli.status);
   console.log('CSP allows googletagmanager.com:', heli.headers['content-security-policy']?.includes('googletagmanager.com'));
   console.log('CSP allows google-analytics.com:', heli.headers['content-security-policy']?.includes('google-analytics.com'));
-  console.log('Contains $405 Per Person:', heli.body.includes('$405') && (heli.body.includes('From $405') || heli.body.includes('Per Person')));
-  console.log('Contains stale $388 (should be FALSE):', heli.body.includes('$388') || heli.body.includes('388'));
+  console.log('Contains $388 Per Person (Flat Rate):', heli.body.includes('$388 Per Person (Flat Rate)'));
+  console.log('Contains conflicting $405 (should be FALSE):', heli.body.includes('$405') || heli.body.includes('405.00'));
   console.log('Contains TEMSCO summer camp cart (should be FALSE):', heli.body.includes('temsco-summercamp') || heli.body.includes('213994'));
   console.log('Contains TEMSCO flightseeing $100 (should be FALSE):', heli.body.includes('TEMSCO') && heli.body.includes('$100'));
 
   console.log('\n2. /tours/northstartrekking/405050');
   const ns = await get(`${base}/tours/northstartrekking/405050`);
   console.log('Status:', ns.status);
-  console.log('Contains $405 Per Person:', ns.body.includes('$405') || ns.body.includes('405.00'));
-  console.log('Does not contain $388:', !ns.body.includes('$388'));
+  console.log('Contains $388 Per Person (Flat Rate):', ns.body.includes('$388 Per Person (Flat Rate)'));
+  console.log('Contains 388.00 Offer Schema:', ns.body.includes('"price":"388.00"') || ns.body.includes('388.00'));
+  console.log('Contains conflicting $405 (should be FALSE):', ns.body.includes('$405') || ns.body.includes('405.00'));
+  console.log('Contains Starting Price (should be FALSE):', ns.body.includes('Starting Price'));
 
   console.log('\n3. /juneau/whale-watching');
   const whale = await get(`${base}/juneau/whale-watching`);

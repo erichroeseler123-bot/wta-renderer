@@ -329,8 +329,9 @@ export default async function TourDetailPage({
   
   const breadcrumbSchema = buildTourBreadcrumbSchema(safeTour);
 
+  const isNorthStar405050 = safeTour.company === "northstartrekking" && (Number(safeTour.pk) === 405050 || item === "405050");
   const priceMatch = (safeTour.fromPrice || "").match(/\d+/);
-  const numericPrice = priceMatch ? priceMatch[0] : null;
+  const numericPrice = isNorthStar405050 ? "388" : (priceMatch ? priceMatch[0] : null);
   const productSchema = numericPrice ? {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -390,8 +391,8 @@ export default async function TourDetailPage({
     {
       question: "Is the listed price per person or for the entire group?",
       answer: isPrivate
-        ? "This is a private charter listing. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service."
-        : `The price (${safeTour.fromPrice || "listed starting rate"}) is per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes and processing are transparently itemized with zero surprise fees at checkout.`,
+        ? "This is a private charter flat rate. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service."
+        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes and processing are transparently itemized with zero surprise fees at checkout.`,
     },
   ];
 
@@ -464,7 +465,7 @@ export default async function TourDetailPage({
             {/* Mobile-only CTA and Price right below the operator */}
             <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 lg:hidden">
               <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Starting Price</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Tour Price (Flat Rate)</span>
                 <span className="text-xl font-black text-slate-900">{safeTour.fromPrice || "Check Price"}</span>
               </div>
               <Link
@@ -513,8 +514,8 @@ export default async function TourDetailPage({
           {/* Sticky Hero Side Panel */}
           <div className="self-start lg:sticky lg:top-6 rounded-3xl border border-stone-200 bg-white p-6 shadow-[0_24px_80px_rgba(15,23,42,0.08)] space-y-6">
             <div>
-              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Starting Price</span>
-              <div className="mt-1 text-3xl font-black text-slate-900 leading-none">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tour Price (Flat Rate)</span>
+              <div className="mt-1 text-2xl font-black text-slate-900 leading-tight">
                 {safeTour.fromPrice || "Check Price"}
               </div>
             </div>
@@ -612,7 +613,7 @@ export default async function TourDetailPage({
               <span className="mt-1 font-bold text-slate-900 block text-sm">{ageConstraint || "All ages welcome"}</span>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">From Price</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Price (Flat Rate)</span>
               <span className="mt-1 font-bold text-slate-900 block text-sm">{safeTour.fromPrice || "Check Price"}</span>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">

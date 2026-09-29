@@ -108,9 +108,9 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     topic: "helicopter-tours",
     directQuestion: "How much is a helicopter glacier tour in Juneau and what is included?",
     directAnswer:
-      "Juneau helicopter glacier tours start at $405 to $420 per person for a scenic icefield flight with a 20-to-25 minute walking landing on Herbert, Norris, or Taku Glacier. Premium glacier treks and dog-sledding camps range from $549 to $799+. All tours include shuttle pickup from the cruise docks, glacier overboots, safety briefings, and a 100% full refund if flights are canceled due to mountain weather.",
+      "Juneau helicopter glacier tours start at $388 to $420 per person flat rate for a scenic icefield flight with a 20-to-25 minute walking landing on Herbert, Norris, or Taku Glacier. Premium glacier treks and dog-sledding camps range from $479 to $799+. All tours include shuttle pickup from the cruise docks, glacier overboots, safety briefings, and a 100% full refund if flights are canceled due to mountain weather.",
     pricingLabel: "Glacier Landing Price",
-    pricingValue: "$405–$420 per person (Scenic flight + walk)",
+    pricingValue: "$388–$420 per person (Flat Rate)",
     durationLabel: "Total Tour Window",
     durationValue: "2.25–2.5 hours total (30–35 min flight + ice walk)",
     meetingPointLabel: "Cruise Ship Pickup",

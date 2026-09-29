@@ -115,10 +115,11 @@ function extractDollarAmount(text: string | null | undefined) {
   return Number.isFinite(dollars) && dollars > 0 ? dollars : null;
 }
 
-function getNorthstarDisplayPrice(tour: Pick<HelicopterTour, "company" | "description">) {
+function getNorthstarDisplayPrice(tour: Pick<HelicopterTour, "company" | "description"> & { pk?: number }) {
   if (tour.company !== "northstartrekking") return undefined;
+  if (tour.pk === 405050) return "$388 Per Person (Flat Rate)";
   const dollars = extractDollarAmount(tour.description);
-  return dollars ? `From $${dollars}` : undefined;
+  return dollars ? `$${dollars} Per Person (Flat Rate)` : undefined;
 }
 
 function getLowestRateCents(rates: unknown) {
@@ -197,22 +198,34 @@ function normalizeTour(
   );
 
   const title = String(tour.title || "").trim();
-  const description = String(
+  let description = String(
     snapshotTour.shortDescription || snapshotTour.headline || tour.description || "",
   ).trim();
+
+  if (company === "northstartrekking" && pk === 405050) {
+    description = description.replace(/\$405\s*(?:Per\s*Person)?/gi, "$388 Per Person (Flat Rate)");
+  }
+
   const slugSource = String(tour.slug || title || "").trim();
   const slug = slugSource ? slugify(slugSource) : "";
   const port = inferPortFromCompany(company, pk) || "";
 
   if (!isPublicExcursion(pk, title, company, port)) return null;
 
-  const resolvedFromPrice =
+  let resolvedFromPrice =
     company === "temscoair-juneau" && pk === 285755
       ? "Contact for pricing"
-      : getNorthstarDisplayPrice({ company, description }) ||
-        snapshotTour.fromPrice ||
-        fareHarborTour.fromPrice ||
-        undefined;
+      : company === "northstartrekking" && pk === 405050
+        ? "$388 Per Person (Flat Rate)"
+        : snapshotTour.fromPrice ||
+          fareHarborTour.fromPrice ||
+          getNorthstarDisplayPrice({ company, description, pk }) ||
+          undefined;
+
+  if (resolvedFromPrice && resolvedFromPrice.startsWith("From ")) {
+    const d = extractDollarAmount(resolvedFromPrice);
+    if (d) resolvedFromPrice = `$${d.toLocaleString()} Per Person (Flat Rate)`;
+  }
 
   return {
     pk,

@@ -277,12 +277,17 @@ function getNorthstarDisplayPrice(item, detail) {
     return null;
   }
 
+  const pk = Number(item?.pk || detail?.pk || 0);
+  if (pk === 405050) {
+    return 388;
+  }
+
   const candidates = [
-    detail?.headline,
-    item?.headline,
     detail?.structured_description?.pricing,
     detail?.description,
     item?.description,
+    detail?.headline,
+    item?.headline,
   ];
 
   for (const candidate of candidates) {
@@ -291,6 +296,69 @@ function getNorthstarDisplayPrice(item, detail) {
   }
 
   return null;
+}
+
+function computeTourPriceLabel(shortname, pk, item, detail, rates, fromCents) {
+  if (shortname === "temscoair-juneau" && pk === 285755) {
+    return "Contact for pricing";
+  }
+
+  if (shortname === "northstartrekking" && pk === 405050) {
+    return "$388 Per Person (Flat Rate)";
+  }
+
+  const title = String(detail?.name || item?.name || "").trim();
+  const rawDesc = String(detail?.headline || item?.headline || detail?.description || item?.description || "").trim();
+  const combined = `${title} ${rawDesc}`.toLowerCase();
+
+  const isPrivate =
+    /private\s*(?:charter|van|boat|group|hummer|excursion|trip)/i.test(combined) ||
+    /\bprivate\b/i.test(title) ||
+    /charter\s*option/i.test(rawDesc) ||
+    rates.some((r) => /charter|boat|vehicle|van|group/i.test(r.label));
+
+  let dollars = null;
+  if (shortname === "northstartrekking") {
+    dollars = getNorthstarDisplayPrice({ ...item, company: shortname, pk }, detail ? { ...detail, company: shortname, pk } : null);
+  }
+
+  if (!dollars && fromCents && fromCents > 0) {
+    dollars = Math.floor(fromCents / 100);
+  }
+
+  if (!dollars) {
+    const dMatch = rawDesc.match(/\$\s*([0-9][0-9,]*)/);
+    if (dMatch) dollars = Number(dMatch[1].replace(/,/g, ""));
+  }
+
+  if (!dollars || dollars <= 0) {
+    return "Check Price";
+  }
+
+  const formattedDollars = "$" + dollars.toLocaleString();
+
+  if (isPrivate) {
+    return `${formattedDollars} Private Charter (Flat Rate)`;
+  }
+
+  const hasAdultRate = rates.some((r) => /adult/i.test(r.label));
+  const hasChildRate = rates.some((r) => /child|youth|infant/i.test(r.label));
+  const adultDescMatch = rawDesc.match(/\bAdult\s*[:|-]?\s*\$\s*([0-9][0-9,]*)/i);
+
+  if (hasAdultRate || adultDescMatch || (hasChildRate && !combined.includes("per person"))) {
+    let adultDollars = dollars;
+    if (adultDescMatch) {
+      adultDollars = Number(adultDescMatch[1].replace(/,/g, ""));
+    } else {
+      const adultRate = rates.find((r) => /adult/i.test(r.label));
+      if (adultRate && adultRate.cents > 0) {
+        adultDollars = Math.floor(adultRate.cents / 100);
+      }
+    }
+    return `$${adultDollars.toLocaleString()} Per Adult (Flat Rate)`;
+  }
+
+  return `${formattedDollars} Per Person (Flat Rate)`;
 }
 
 function isWidgetEligibleTour(tour) {
@@ -389,24 +457,21 @@ async function buildTours() {
               fromCents = centsFromText(text) || 0;
             }
 
-            let fromPrice = fromCents > 0 ? `From $${Math.floor(fromCents / 100)}` : "Check Price";
+            let fromPrice = computeTourPriceLabel(shortname, pk, item, detail, rates, fromCents);
 
             if (fromPrice === "Check Price") {
-              fromPrice = await computeFromPriceSafe(shortname, pk, APP_KEY, USER_KEY);
+              const safeFrom = await computeFromPriceSafe(shortname, pk, APP_KEY, USER_KEY);
+              if (safeFrom && safeFrom !== "Check Price") {
+                const dollars = extractDollarAmount(safeFrom);
+                fromPrice = dollars ? `$${dollars.toLocaleString()} Per Person (Flat Rate)` : safeFrom;
+              }
             }
 
-            const northstarDisplayDollars = getNorthstarDisplayPrice(
-              { ...item, company: shortname },
-              detail ? { ...detail, company: shortname } : null,
-            );
-            if (northstarDisplayDollars) {
-              fromPrice = `From $${northstarDisplayDollars}`;
-              rateSummary = String(northstarDisplayDollars);
-            }
-
-            if (shortname === "temscoair-juneau" && pk === 285755) {
-              fromPrice = "Contact for pricing";
-              rateSummary = "";
+            let itemDescription = cleanDescription(item.headline || item.description || "");
+            if (shortname === "northstartrekking" && pk === 405050) {
+              fromPrice = "$388 Per Person (Flat Rate)";
+              itemDescription = itemDescription.replace(/\$405\s*(?:Per\s*Person)?/gi, "$388 Per Person (Flat Rate)");
+              rateSummary = "388";
             }
 
             return {
@@ -416,7 +481,7 @@ async function buildTours() {
                 .toLowerCase()
                 .replace(/[^a-z0-9]+/g, "-")
                 .replace(/^-+|-+$/g, ""),
-              description: cleanDescription(item.headline || item.description || ""),
+              description: itemDescription,
               image: item.hero_image_url || item.image_cdn_url || "",
               company: shortname,
               fromPrice,      // grid-safe

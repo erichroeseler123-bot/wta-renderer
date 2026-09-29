@@ -6,7 +6,7 @@
     "description": "2.5 Hours • All Ages",
     "image": "https://cdn.filestackcontent.com/NPg1gKoCQu6ewj2mnmsQ",
     "company": "coastalhelicopters",
-    "fromPrice": "From $429",
+    "fromPrice": "$429 Per Person (Flat Rate)",
     "rateSummary": "429 • 456 • 579 +3 more",
     "category": "Adventures"
   },
@@ -17,7 +17,7 @@
     "description": "3 Hours • All Ages",
     "image": "https://cdn.filestackcontent.com/MY7gLjORnauQs7dB2dOm",
     "company": "coastalhelicopters",
-    "fromPrice": "From $709",
+    "fromPrice": "$709 Per Person (Flat Rate)",
     "rateSummary": "709 • 756 • 859 +3 more",
     "category": "Dog Sledding"
   },
@@ -28,7 +28,7 @@
     "description": "3.5 Hours • All Ages",
     "image": "https://cdn.filestackcontent.com/qpue1ZqTp62Bj5LGdhC0",
     "company": "coastalhelicopters",
-    "fromPrice": "From $839",
+    "fromPrice": "$839 Per Person (Flat Rate)",
     "rateSummary": "839 • 895 • 989 +3 more",
     "category": "Dog Sledding"
   },
@@ -39,8 +39,8 @@
     "description": "3 Hours & 15 Minutes • Ages 2+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/tvfb2N7fR4iVtjCHko68",
     "company": "northstartrekking",
-    "fromPrice": "From $710",
-    "rateSummary": "710",
+    "fromPrice": "$710 Per Person (Flat Rate)",
+    "rateSummary": "591",
     "category": "Dog Sledding"
   },
   {
@@ -50,8 +50,8 @@
     "description": "3 Hours & 15 Minutes • Age 8+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/B909nF6TQqVuKDz3XLZ6",
     "company": "northstartrekking",
-    "fromPrice": "From $479",
-    "rateSummary": "479",
+    "fromPrice": "$479 Per Person (Flat Rate)",
+    "rateSummary": "399",
     "category": "Air Tours"
   },
   {
@@ -61,8 +61,8 @@
     "description": "4 Hours & 15 Minutes • Age 12+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/cOhoNqnERLmiIhpPY4bu",
     "company": "northstartrekking",
-    "fromPrice": "From $530",
-    "rateSummary": "530",
+    "fromPrice": "$530 Per Person (Flat Rate)",
+    "rateSummary": "439",
     "category": "Air Tours"
   },
   {
@@ -72,19 +72,19 @@
     "description": "3 Hours & 15 Minutes • Age 7+ • Book Now with 25% Deposit",
     "image": "https://cdn.filestackcontent.com/KRVtt607RkKp6bDCU3HO",
     "company": "northstartrekking",
-    "fromPrice": "From $688",
-    "rateSummary": "688",
+    "fromPrice": "$688 Per Person (Flat Rate)",
+    "rateSummary": "550",
     "category": "Air Tours"
   },
   {
     "pk": 405050,
     "title": "Helicopter Flightseeing and Glacier Landing Tour",
     "slug": "helicopter-flightseeing-and-glacier-landing-tour",
-    "description": "$405 Per Person | 2 Hours & 15 Minutes | Activity level: Light",
+    "description": "$388 Per Person (Flat Rate) | 2 Hours & 15 Minutes | Activity level: Light",
     "image": "https://cdn.filestackcontent.com/Oed3sFGxRgSYBj6iP8nu",
     "company": "northstartrekking",
-    "fromPrice": "From $405",
-    "rateSummary": "405",
+    "fromPrice": "$388 Per Person (Flat Rate)",
+    "rateSummary": "388",
     "category": "Air Tours"
   },
   {
@@ -94,8 +94,8 @@
     "description": "4 Hours & 15 Minutes • Age 12+",
     "image": "https://cdn.filestackcontent.com/hc4Dld6oRaOLcxZnVfFz",
     "company": "northstartrekking",
-    "fromPrice": "From $530",
-    "rateSummary": "530",
+    "fromPrice": "$530 Per Person (Flat Rate)",
+    "rateSummary": "479",
     "category": "Air Tours"
   },
   {
@@ -105,7 +105,7 @@
     "description": "Starting at $175 | All Ages | 2 Hours 15 Minutes | Experience the spirit of the Alaskan Gold Rush!",
     "image": "https://cdn.filestackcontent.com/JGIMAlkYQdfzEdjpBb6p",
     "company": "temsco-summercamp-juneau",
-    "fromPrice": "From $175",
+    "fromPrice": "$175 Per Person (Flat Rate)",
     "rateSummary": "175",
     "category": "Dog Sledding"
   },
@@ -116,7 +116,7 @@
     "description": "Starting at $409 | All Ages | 2 Hours 15 Minutes | Bucket List Worthy Adventure!",
     "image": "https://cdn.filestackcontent.com/GyqI6elSXKklaQiP9ULd",
     "company": "temscoair-juneau",
-    "fromPrice": "From $409",
+    "fromPrice": "$409 Per Person (Flat Rate)",
     "rateSummary": "409",
     "category": "Hiking & Glaciers"
   },
@@ -127,7 +127,7 @@
     "description": "Starting at $699 | All Ages | 2 Hours 45 Minutes | Helicopters, Huskies, and Glaciers!",
     "image": "https://cdn.filestackcontent.com/mjmYVT8aSPiQ6M0h9hb5",
     "company": "temscoair-juneau",
-    "fromPrice": "From $699",
+    "fromPrice": "$699 Per Person (Flat Rate)",
     "rateSummary": "699",
     "category": "Dog Sledding"
   },
@@ -138,7 +138,7 @@
     "description": "Starting at $579 | All Ages | 2 Hours 45 Minutes | Two Glacier Landings!",
     "image": "https://cdn.filestackcontent.com/eV3DUI6kQHmVaiUAbIQ3",
     "company": "temscoair-juneau",
-    "fromPrice": "From $579",
+    "fromPrice": "$579 Per Person (Flat Rate)",
     "rateSummary": "579",
     "category": "Adventures"
   }

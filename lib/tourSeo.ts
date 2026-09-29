@@ -37,17 +37,21 @@ function extractDollarAmount(text?: string | null) {
 }
 
 export function buildTourPriceLabel(
-  tour: Pick<HelicopterTour, "company" | "description" | "fromPrice">
+  tour: Pick<HelicopterTour, "company" | "description" | "fromPrice"> & { pk?: number }
 ) {
+  if (tour.company === "northstartrekking" && (tour as any)?.pk === 405050) {
+    return "$388 Per Person (Flat Rate)";
+  }
   const description = cleanTourDescription(tour.description);
   const headlinePrice = extractDollarAmount(description);
 
   if (tour.company === "northstartrekking") {
-    if (headlinePrice) return `From $${headlinePrice}`;
+    if (headlinePrice) return `$${headlinePrice} Per Person (Flat Rate)`;
     if (description.includes("25% Deposit")) return "Check live pricing";
   }
 
-  return tour.fromPrice || "Check live pricing";
+  const p = tour.fromPrice || "Check live pricing";
+  return p.startsWith("From ") ? p.replace(/^From\s+/i, "") + " (Flat Rate)" : p;
 }
 
 export function buildTourUrl(tour: Pick<HelicopterTour, "company" | "pk">) {

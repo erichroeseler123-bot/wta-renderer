@@ -129,7 +129,7 @@ const featuredTours = [
   {
     title: "Whale Watching and Mendenhall Glacier Tour",
     operator: "Alaska Tales",
-    price: "From $199",
+    price: "$199 Per Person (Flat Rate)",
     duration: "5.5 Hours",
     highlights: "100% whale sighting guarantee (Alaska Tales), heated catamaran cabin, 1.5–2h at Mendenhall Glacier with USFS permit.",
     href: "/tours/alaskatales/47296",
@@ -139,7 +139,7 @@ const featuredTours = [
   {
     title: "Mendenhall Lake Canoe Adventure",
     operator: "Alaska Travel Adventures",
-    price: "From $165",
+    price: "$165 Per Person (Flat Rate)",
     duration: "3.5 Hours",
     highlights: "Stable 12-passenger voyageur canoes, paddle right up to Nugget Falls, gear & rain gear provided.",
     href: "/tours/aktraveladventures/311607",
@@ -149,7 +149,7 @@ const featuredTours = [
   {
     title: "Mendenhall Glacier Float Trip",
     operator: "Alaska Travel Adventures",
-    price: "From $124",
+    price: "$124 Per Person (Flat Rate)",
     duration: "3.5 Hours",
     highlights: "Scenic raft float on Mendenhall River starting beneath the glacier, gentle Class II-III rapids.",
     href: "/tours/aktraveladventures/311600",
@@ -159,7 +159,7 @@ const featuredTours = [
   {
     title: "Mendenhall Glacier Guided Hike",
     operator: "Beyond Alaska",
-    price: "From $209",
+    price: "$209 Per Person (Flat Rate)",
     duration: "4.5 Hours",
     highlights: "Small-group guided rainforest trek to elevated glacier overlooks, interpretive naturalist guidance.",
     href: "/tours/beyondak/195602",

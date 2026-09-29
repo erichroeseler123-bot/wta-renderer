@@ -21,7 +21,7 @@ const charterTours = [
   {
     title: "Private Whale Watch",
     operator: "Alaska Galore Juneau Whale Watching",
-    price: "From $1,150",
+    price: "$1,150 Private Charter (Flat Rate)",
     capacity: "Groups up to 49 guests",
     duration: "Approx. 3.5 Hours (2+ hours on water)",
     description: "Only your group and the captain and crew on board! Ideal for extended family groups, reunions, or private cruise parties wanting dedicated vessel charter pricing.",
@@ -33,7 +33,7 @@ const charterTours = [
   {
     title: "Private Charter Whale Watching Tour",
     operator: "Alaska Tales",
-    price: "From $2,700",
+    price: "$2,700 Private Charter (Flat Rate)",
     capacity: "Up to 14 guests (1 flat rate)",
     duration: "3.5 Hours Total (2 Full Hours on Water)",
     description: "A dedicated high-speed heated jetboat with 2 outdoor viewing decks, heated cabin, marine restroom onboard, and private round-trip transportation from the cruise docks. 100% guaranteed whale sightings.",
@@ -45,7 +45,7 @@ const charterTours = [
   {
     title: "Private Charter Whale Watching & Mendenhall Glacier Tour",
     operator: "Alaska Tales",
-    price: "From $3,500",
+    price: "$3,500 Private Charter (Flat Rate)",
     capacity: "Up to 14 guests (1 flat rate)",
     duration: "4.5 Hours Total (Glacier + Water Time)",
     description: "Combines private guided transfer to Mendenhall Glacier (45 minutes on site to view Nugget Falls and the visitor center) followed by a 2-hour private whale watching cruise on Auke Bay. Guaranteed whale sightings.",
@@ -57,7 +57,7 @@ const charterTours = [
   {
     title: "Private Charter • Salmon / Halibut / Whale Watching Combo",
     operator: "Moore Charters",
-    price: "From $2,125",
+    price: "$2,125 Private Charter (Flat Rate)",
     capacity: "Small private group",
     duration: "Half-Day Marine Charter (May 1 – Sept 30)",
     description: "Experience both active sportfishing (salmon or halibut) and world-class whale watching on a dedicated private boat with experienced local Juneau skippers.",
@@ -84,7 +84,7 @@ const faqs = [
   },
   {
     question: "How much does a private whale watching boat charter cost per person in Juneau?",
-    answer: "Private boat charters are priced per vessel, not per seat. Dedicated private jetboat charters cost from $2,700 (or $3,500 including Mendenhall Glacier). When split among a party of 10 to 14 guests, this equals $193 to $270 per person—virtually identical to the $185 to $245 charged per ticket on 100-to-150-passenger cruise ship excursions.",
+    answer: "Private boat charters are priced per vessel, not per seat. Dedicated private jetboat charters are $2,700 flat rate (or $3,500 including Mendenhall Glacier). When split among a party of 10 to 14 guests, this equals $193 to $270 per person—virtually identical to the $185 to $245 charged per ticket on 100-to-150-passenger cruise ship excursions.",
   },
   {
     question: "Are whale sightings guaranteed on private boat charters?",

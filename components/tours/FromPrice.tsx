@@ -25,7 +25,8 @@ export default function FromPrice({
         const j = await res.json();
         if (!alive) return;
         if ((j?.success || j?.ok) && j?.fromDisplay) {
-          setLabel(`From ${j.fromDisplay}`);
+          const display = String(j.fromDisplay || "").trim();
+          setLabel(display.includes("Flat Rate") ? display : `${display} (Flat Rate)`);
         }
       } catch {}
     })();

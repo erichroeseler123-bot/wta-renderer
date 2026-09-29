@@ -57,7 +57,7 @@ function formatDateLabel(date: string) {
 function formatPrice(cents?: number) {
   if (!Number.isFinite(cents) || !cents || cents <= 0) return null;
   const dollars = cents / 100;
-  return dollars % 1 === 0 ? `From $${dollars.toFixed(0)}` : `From $${dollars.toFixed(2)}`;
+  return dollars % 1 === 0 ? `$${dollars.toFixed(0)} Per Person (Flat Rate)` : `$${dollars.toFixed(2)} Per Person (Flat Rate)`;
 }
 
 function normalizeCompanyLabel(company: string) {

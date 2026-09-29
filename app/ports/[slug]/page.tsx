@@ -174,8 +174,8 @@ export default async function PortPage({ params, searchParams }: { params: Promi
           <h3 className="mt-1 text-base font-black leading-snug text-slate-950">{tour.title}</h3>
           <p className="mt-2 line-clamp-2 text-xs leading-5 text-slate-600">{getProductOneLiner(tour)}</p>
           <div className="mt-4 border-t border-slate-100 pt-3">
-            <div className="flex items-center justify-between gap-3"><span className="font-black text-slate-950">{adult ? `Adult $${adult.toLocaleString()}` : (tour.fromPrice || "Check price")}</span><span className="text-xs font-bold text-sky-700">View tour →</span></div>
-            {adult && lowest && lowest < adult ? <div className="mt-1 text-[10px] font-semibold text-slate-500">Lowest listed rate ${lowest.toLocaleString()}</div> : null}
+            <div className="flex items-center justify-between gap-3"><span className="font-black text-slate-950">{adult ? `Adult $${adult.toLocaleString()} (Flat Rate)` : (tour.fromPrice || "Check price")}</span><span className="text-xs font-bold text-sky-700">View tour →</span></div>
+            {adult && lowest && lowest < adult ? <div className="mt-1 text-[10px] font-semibold text-slate-500">Child rate ${lowest.toLocaleString()} (Flat Rate)</div> : null}
           </div>
         </div>
       </Link>

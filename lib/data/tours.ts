@@ -32,6 +32,7 @@ function extractDollarAmount(value: unknown) {
 }
 
 function buildNorthstarFromPrice(item: any) {
+  if (Number(item?.pk) === 405050) return "$388 Per Person (Flat Rate)";
   const candidates = [
     item?.structured_description?.pricing,
     item?.description,
@@ -40,7 +41,7 @@ function buildNorthstarFromPrice(item: any) {
 
   for (const candidate of candidates) {
     const dollars = extractDollarAmount(candidate);
-    if (dollars) return `From $${dollars}`;
+    if (dollars) return `$${dollars} Per Person (Flat Rate)`;
   }
 
   return null;
@@ -53,7 +54,7 @@ function itemToTour(item: any, shortname: string): Tour {
   // FIX: Provide a fallback of 0 if price is missing, then check if it exists
   const rawPrice = item?.price || 0;
   const northstarPrice = shortname === "northstartrekking" ? buildNorthstarFromPrice(item) : null;
-  const fromPrice = northstarPrice || (rawPrice > 0 ? `From $${(rawPrice / 100).toFixed(0)}` : "Check Price");
+  const fromPrice = northstarPrice || (rawPrice > 0 ? `$${(rawPrice / 100).toFixed(0)} Per Person (Flat Rate)` : "Check Price");
 
   return {
       pk: Number(item?.pk || 0),
