@@ -58,8 +58,10 @@ function parseTourDescriptionDetails(
 ) {
   const desc = String(description || "");
   const lower = (title + " " + desc).toLowerCase();
+  const compLower = String(company || "").toLowerCase();
+  const isTemsco = compLower.startsWith("temsco");
   const isNorthStar405050 =
-    (company === "northstartrekking" && (String(pk) === "405050" || lower.includes("northstar"))) ||
+    (compLower === "northstartrekking" && (String(pk) === "405050" || lower.includes("northstar"))) ||
     String(pk) === "405050";
 
   // 1. Duration
@@ -137,11 +139,13 @@ function parseTourDescriptionDetails(
   let weightPolicy = "";
   if (isNorthStar405050) {
     weightPolicy = "250+ lbs: $150 NorthStar surcharge";
+  } else if (isTemsco) {
+    weightPolicy = "250+ lbs (w/ gear): +$150 TEMSCO surcharge";
   } else if (lower.includes("helicopter") || lower.includes("flight")) {
     weightPolicy = "Standard passenger weight check";
   }
 
-  return { duration, activityLevel, ageConstraint, seasonality, weightPolicy, isNorthStar405050 };
+  return { duration, activityLevel, ageConstraint, seasonality, weightPolicy, isNorthStar405050, isTemsco };
 }
 
 function parseDurationMinutes(durationStr: string): number {
@@ -178,7 +182,10 @@ function getTimingBufferNote(isHeliOrAir: boolean, isBoat: boolean) {
   return "Local excursions operate rain or shine across Southeast Alaska. We recommend scheduling departures with sufficient buffer before your ship's scheduled all-aboard time.";
 }
 
-function getCheckInMappingText(isHeliOrAir: boolean, isBoat: boolean, portName: string) {
+function getCheckInMappingText(isHeliOrAir: boolean, isBoat: boolean, portName: string, company?: string) {
+  if (company?.toLowerCase().startsWith("temsco") && portName.toLowerCase() === "skagway") {
+    return "Check in directly at TEMSCO's Skagway heliport base (1000 Congress Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transfer back to downtown Skagway and cruise berths is provided following the tour.";
+  }
   if (isHeliOrAir) {
     return `Departures include round-trip shuttle service from downtown ${portName} cruise terminal staging points directly to the heliport. Complete pickup coordinates, vehicle signage, and departure times are emailed directly upon checkout confirmation.`;
   }
@@ -192,8 +199,11 @@ function getCancellationPolicyText(company: string, pk?: number | string, livePo
   return getOperatorCancellationPolicy(company, pk, livePolicy).overviewCardText;
 }
 
-function getWhoItIsBestFor(title: string, category: string) {
+function getWhoItIsBestFor(title: string, category: string, company?: string, pk?: string | number) {
   const text = (title + " " + category).toLowerCase();
+  if (company?.toLowerCase().startsWith("temsco") && String(pk) === "213561") {
+    return "Best for travelers seeking an alpine helicopter flight, authentic sled dog mushing demonstration, and husky puppy interaction (note: guests observe the demonstration rather than riding the sled).";
+  }
   if (text.includes("helicopter") || text.includes("flight") || text.includes("air")) {
     return "Best for travelers seeking once-in-a-lifetime glacier views and flightseeing.";
   }
@@ -296,7 +306,7 @@ export default async function TourDetailPage({
   const operatorName = getOperatorDisplayName(safeTour.company);
   const portName = safeTour.port ? safeTour.port.charAt(0).toUpperCase() + safeTour.port.slice(1) : "Juneau";
   const categoryName = safeTour.category || "Shore Excursion";
-  const { duration, activityLevel, ageConstraint, seasonality, weightPolicy, isNorthStar405050 } = parseTourDescriptionDetails(
+  const { duration, activityLevel, ageConstraint, seasonality, weightPolicy, isNorthStar405050, isTemsco } = parseTourDescriptionDetails(
     safeTour.title,
     safeTour.description,
     safeTour.company,
@@ -304,13 +314,17 @@ export default async function TourDetailPage({
   );
   if (isNorthStar405050) {
     safeTour.fromPrice = "$419 Per Person (Flat Rate)";
+  } else if (safeTour.company === "temscoair-skagway" && String(safeTour.pk || item) === "213556") {
+    safeTour.fromPrice = "$439 Per Person (Flat Rate)";
+  } else if (safeTour.company === "temscoair-skagway" && String(safeTour.pk || item) === "213561") {
+    safeTour.fromPrice = "$599 Per Person (Flat Rate)";
   }
   const cancellationPolicyInfo = getOperatorCancellationPolicy(
     safeTour.company,
     safeTour.pk || item,
     safeTour.cancellationPolicy,
   );
-  const bestForText = getWhoItIsBestFor(safeTour.title, categoryName);
+  const bestForText = getWhoItIsBestFor(safeTour.title, categoryName, safeTour.company, safeTour.pk || item);
   const skipText = getWhoShouldSkip(safeTour.title, activityLevel, ageConstraint);
 
   const hasRealOperatorImage = Boolean(safeTour.image && String(safeTour.image).trim());
@@ -452,7 +466,15 @@ export default async function TourDetailPage({
   const breadcrumbSchema = buildTourBreadcrumbSchema(safeTour);
 
   const priceMatch = (safeTour.fromPrice || "").match(/\d+/);
-  const numericPrice = isNorthStar405050 ? "419" : (priceMatch ? priceMatch[0] : null);
+  const numericPrice = isNorthStar405050
+    ? "419"
+    : safeTour.company === "temscoair-skagway" && String(safeTour.pk || item) === "213556"
+    ? "439"
+    : safeTour.company === "temscoair-skagway" && String(safeTour.pk || item) === "213561"
+    ? "599"
+    : priceMatch
+    ? priceMatch[0]
+    : null;
   const productSchema = numericPrice ? {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -480,6 +502,8 @@ export default async function TourDetailPage({
           ? "Departures stage near the Mt. Roberts Tramway parking lot (490 S Franklin St), an easy 5-minute flat walk from downtown docks (Franklin, CT, and IVF berths). If your ship docks at the south AJ Dock, take the $5 port shuttle directly to the tram lot for your tour check-in."
           : safeTour.port === "ketchikan"
           ? "Tours meet along the downtown Ketchikan waterfront right near Berths 1, 2, and 3. If your ship berths at Ward Cove (Berth 4, 7 miles north), allow 15 to 20 minutes to ride the port shuttle to the downtown meeting point before tour check-in."
+          : isTemsco && safeTour.port === "skagway"
+          ? "Guests check in directly at the TEMSCO Skagway heliport base (1000 Congress Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transportation back to downtown Skagway and cruise docks is provided after your tour."
           : "Departures stage in downtown Skagway along 2nd Avenue or at the Small Boat Harbor, a level 5 to 10-minute walk from the Railroad Dock, Broadway Dock, and Ore Dock.",
     },
     {
@@ -497,7 +521,7 @@ export default async function TourDetailPage({
       question: isHeliOrAir ? "What age, weight, or passenger restrictions apply?" : "What age, physical, or equipment requirements apply?",
       answer:
         isHeliOrAir
-          ? `Aircraft weight and balance calculations are required for all flights. ${isNorthStar405050 ? "NorthStar charges an additional $150 operator weight surcharge for passengers weighing 250 lbs (113 kg) or more to reserve adequate aircraft space. Minimum age: Ages 7+." : "Guests weighing 250 lbs or more may require an adjacent seat or weight surcharge in accordance with operator guidelines. " + (ageConstraint ? `Age policy: ${ageConstraint}.` : "Children of all ages are welcome.")}`
+          ? `Aircraft weight and balance calculations are required for all flights. ${isNorthStar405050 ? "NorthStar charges an additional $150 operator weight surcharge for passengers weighing 250 lbs (113 kg) or more to reserve adequate aircraft space. Minimum age: Ages 7+." : isTemsco ? "TEMSCO charges an additional $150 operator weight surcharge for passengers weighing 250 lbs or more (calculated including all clothing and footwear). Children of all ages are welcome." : "Guests weighing 250 lbs or more may require an adjacent seat or weight surcharge in accordance with operator guidelines. " + (ageConstraint ? `Age policy: ${ageConstraint}.` : "Children of all ages are welcome.")}`
           : `${ageConstraint ? `Age policy: ${ageConstraint}.` : "All ages are welcome."} Dress in warm layers with a waterproof outer jacket and flat, comfortable walking shoes. Specialized gear (neoprene overboots, spray skirts, or flotation suits) is furnished by ${operatorName}.`,
     },
     {
@@ -508,7 +532,7 @@ export default async function TourDetailPage({
       question: "Is the listed price per person or for the entire group, and what is included?",
       answer: isPrivate
         ? "This is a private charter flat rate. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service."
-        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes are transparently itemized with zero surprise booking fees at checkout.${isNorthStar405050 ? " Note: NorthStar applies a $150 weight surcharge for passengers 250+ lbs." : ""}`,
+        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes are transparently itemized with zero surprise booking fees at checkout.${isNorthStar405050 ? " Note: NorthStar applies a $150 weight surcharge for passengers 250+ lbs." : isTemsco ? " Note: TEMSCO applies a $150 weight surcharge for passengers 250+ lbs (calculated including clothing and footwear)." : ""}`,
     },
   ];
 
@@ -584,6 +608,12 @@ export default async function TourDetailPage({
                 <div>
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Tour Price (Flat Rate)</span>
                   <span className="text-xl font-black text-slate-900">{safeTour.fromPrice || "Check Price"}</span>
+                  {isTemsco && (
+                    <span className="text-[10px] text-slate-500 block">250+ lbs: +$150 weight surcharge</span>
+                  )}
+                  {isNorthStar405050 && (
+                    <span className="text-[10px] text-slate-500 block">250+ lbs: +$150 surcharge</span>
+                  )}
                 </div>
                 <Link
                   href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
@@ -643,6 +673,11 @@ export default async function TourDetailPage({
               {isNorthStar405050 && (
                 <p className="mt-1 text-[11px] text-slate-500">
                   Ages 7+ • Passengers 250+ lbs: +$150 NorthStar surcharge
+                </p>
+              )}
+              {isTemsco && (
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Passengers 250+ lbs (fully clothed with footwear): +$150 TEMSCO weight surcharge
                 </p>
               )}
             </div>
@@ -742,7 +777,11 @@ export default async function TourDetailPage({
               </div>
               <div className="flex gap-2">
                 <span>📍</span>
-                <p className="leading-normal"><strong>Port Pickup:</strong> Staged for {portName} cruise berths (including shuttle transit guidance for outer docks).</p>
+                <p className="leading-normal">
+                  <strong>Port Pickup:</strong> {isTemsco && safeTour.port === "skagway"
+                    ? "Self check-in at TEMSCO Skagway heliport base (walkable from Ore/Broadway docks); return transfer back to cruise berths included."
+                    : `Staged for ${portName} cruise berths (including shuttle transit guidance for outer docks).`}
+                </p>
               </div>
               <div className="flex gap-2">
                 <span>🛡️</span>
@@ -849,7 +888,7 @@ export default async function TourDetailPage({
             <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-2">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Check-in Mappings</h3>
               <p className="text-xs leading-relaxed text-slate-600">
-                {getCheckInMappingText(isHeliOrAir, isBoat, portName)}
+                {getCheckInMappingText(isHeliOrAir, isBoat, portName, safeTour.company)}
               </p>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-2">

@@ -213,6 +213,10 @@ function normalizeTour(
     description = description
       .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
       .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
+  } else if (company === "temscoair-skagway" && pk === 213556) {
+    description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+  } else if (company === "temscoair-skagway" && pk === 213561) {
+    description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Riding)";
   }
 
   const slugSource = String(tour.slug || title || "").trim();
@@ -226,10 +230,14 @@ function normalizeTour(
       ? "Contact for pricing"
       : company === "northstartrekking" && pk === 405050
         ? "$419 Per Person (Flat Rate)"
-        : snapshotTour.fromPrice ||
-          fareHarborTour.fromPrice ||
-          getNorthstarDisplayPrice({ company, description, pk }) ||
-          undefined;
+        : company === "temscoair-skagway" && pk === 213556
+          ? "$439 Per Person (Flat Rate)"
+          : company === "temscoair-skagway" && pk === 213561
+            ? "$599 Per Person (Flat Rate)"
+            : snapshotTour.fromPrice ||
+              fareHarborTour.fromPrice ||
+              getNorthstarDisplayPrice({ company, description, pk }) ||
+              undefined;
 
   if (resolvedFromPrice && resolvedFromPrice.startsWith("From ")) {
     const d = extractDollarAmount(resolvedFromPrice);

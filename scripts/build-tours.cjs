@@ -472,6 +472,14 @@ async function buildTours() {
               fromPrice = "$419 Per Person (Flat Rate)";
               itemDescription = "$419 Per Person (Flat Rate) | 2 Hours 15 Minutes | Activity level: Easy | Ages 7+ | September Only";
               rateSummary = "419";
+            } else if (shortname === "temscoair-skagway" && pk === 213556) {
+              fromPrice = "$439 Per Person (Flat Rate)";
+              itemDescription = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+              rateSummary = "439";
+            } else if (shortname === "temscoair-skagway" && pk === 213561) {
+              fromPrice = "$599 Per Person (Flat Rate)";
+              itemDescription = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Riding)";
+              rateSummary = "599";
             }
 
             return {
