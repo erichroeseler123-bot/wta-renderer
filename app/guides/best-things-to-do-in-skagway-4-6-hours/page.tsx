@@ -100,7 +100,7 @@ export default function GuidePage() {
         <section className="mt-8 rounded-[2rem] border border-sky-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Quick Decision Summary</div>
           <p className="mt-3 text-lg font-bold leading-8 text-slate-900">
-            {"For a 4 to 6-hour stay, prioritize excursions under 3 hours: a 2-hour helicopter glacier landing over Sawtooth Ridge ($350–$410), a 2.5-hour Liarsville Gold Rush camp and salmon bake ($75–$95), an electric scooter tour to Dyea ($120–$150), or strolling the 7-block Klondike National Historic District. Always verify that tour end time + 45 minutes is before your ship’s all-aboard."}
+            {"For a 4 to 6-hour stay, prioritize excursions under 3 hours: a 2-hour helicopter glacier landing over Sawtooth Ridge ($439), a 2.5-hour Liarsville Gold Rush camp and salmon bake ($75–$95), an electric scooter tour to Dyea ($120–$150), or strolling the 7-block Klondike National Historic District. Always verify that tour end time + 45 minutes is before your ship’s all-aboard."}
           </p>
           <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs font-semibold text-amber-900">
             <strong>Cruise Safety Buffer:</strong> We enforce the verified formula:{" "}
