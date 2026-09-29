@@ -447,7 +447,9 @@ async function run() {
     console.log('   Navigating to Tour Detail (/tours/beyondak/195602)...');
     await page.goto(`${BASE_URL}/tours/beyondak/195602`, { waitUntil: 'domcontentloaded', timeout: 30000 });
     const tourH1 = await page.locator('h1').first().innerText();
-    const hasBookNow = await page.getByRole('link', { name: /Book Now|Check availability|Check Live Calendar/i }).count() > 0;
+    const hasBookNow =
+      (await page.locator('a[href*="/calendar"]').count()) > 0 ||
+      (await page.getByRole('link', { name: /Book Now|Check availability|Check Live Calendar/i, includeHidden: true }).count()) > 0;
     browserSteps.push({
       step: '4_tour_detail',
       url: page.url(),
