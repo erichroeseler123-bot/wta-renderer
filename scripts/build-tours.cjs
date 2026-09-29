@@ -279,7 +279,7 @@ function getNorthstarDisplayPrice(item, detail) {
 
   const pk = Number(item?.pk || detail?.pk || 0);
   if (pk === 405050) {
-    return 388;
+    return 419;
   }
 
   const candidates = [
@@ -304,7 +304,7 @@ function computeTourPriceLabel(shortname, pk, item, detail, rates, fromCents) {
   }
 
   if (shortname === "northstartrekking" && pk === 405050) {
-    return "$388 Per Person (Flat Rate)";
+    return "$419 Per Person (Flat Rate)";
   }
 
   const title = String(detail?.name || item?.name || "").trim();
@@ -469,9 +469,9 @@ async function buildTours() {
 
             let itemDescription = cleanDescription(item.headline || item.description || "");
             if (shortname === "northstartrekking" && pk === 405050) {
-              fromPrice = "$388 Per Person (Flat Rate)";
-              itemDescription = itemDescription.replace(/\$405\s*(?:Per\s*Person)?/gi, "$388 Per Person (Flat Rate)");
-              rateSummary = "388";
+              fromPrice = "$419 Per Person (Flat Rate)";
+              itemDescription = "$419 Per Person (Flat Rate) | 2 Hours 15 Minutes | Activity level: Easy | Ages 7+ | September Only";
+              rateSummary = "419";
             }
 
             return {

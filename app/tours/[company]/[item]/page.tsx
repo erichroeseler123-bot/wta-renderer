@@ -49,26 +49,62 @@ function getOperatorDisplayName(company: string): string {
   return mapping[company.toLowerCase().trim()] || company.replace(/-/g, " ");
 }
 
-function parseTourDescriptionDetails(title: string, description?: string | null) {
+function parseTourDescriptionDetails(
+  title: string,
+  description?: string | null,
+  company?: string,
+  pk?: string | number,
+) {
   const desc = String(description || "");
-  
+  const lower = (title + " " + desc).toLowerCase();
+  const isNorthStar405050 =
+    (company === "northstartrekking" && (String(pk) === "405050" || lower.includes("northstar"))) ||
+    String(pk) === "405050";
+
   // 1. Duration
   let duration = "";
-  const durationMatch = desc.match(/\b(\d+(?:\.\d+)?)\s*Hours?\b/i);
-  if (durationMatch) {
-    duration = `${durationMatch[1]} Hours`;
+  const compoundMatch = desc.match(/\b(\d+)\s*Hours?\s*(?:&|and)\s*(\d+)\s*Minutes?\b/i);
+  if (compoundMatch) {
+    duration = `${compoundMatch[1]} Hours ${compoundMatch[2]} Minutes`;
+  } else {
+    const fractionMatch = desc.match(/\b(\d+)\s*([¼½¾]|1\/4|1\/2|3\/4)\s*Hours?\b/i);
+    if (fractionMatch) {
+      const frac = fractionMatch[2];
+      const mins = (frac === "¼" || frac === "1/4") ? "15 Minutes" : (frac === "½" || frac === "1/2") ? "30 Minutes" : "45 Minutes";
+      duration = `${fractionMatch[1]} Hours ${mins}`;
+    } else {
+      const durationMatch = desc.match(/\b(\d+(?:\.\d+)?)\s*Hours?\b/i);
+      if (durationMatch) {
+        const val = parseFloat(durationMatch[1]);
+        if (val === 2.25) {
+          duration = "2 Hours 15 Minutes";
+        } else if (val === 2.5) {
+          duration = "2 Hours 30 Minutes";
+        } else if (val === 3.5) {
+          duration = "3 Hours 30 Minutes";
+        } else {
+          duration = `${durationMatch[1]} Hours`;
+        }
+      }
+    }
   }
-  
+
+  if (!duration && isNorthStar405050) {
+    duration = "2 Hours 15 Minutes";
+  }
+
   // 2. Activity Level / Difficulty
   let activityLevel = "";
-  const difficultyMatch = desc.match(/Difficulty:\s*([^|]+)/i) || desc.match(/Difficulty\s*([^|]+)/i);
+  const difficultyMatch =
+    desc.match(/Difficulty:\s*([^|]+)/i) ||
+    desc.match(/Difficulty\s*([^|]+)/i) ||
+    desc.match(/Activity Level:\s*([^|]+)/i);
   if (difficultyMatch) {
     activityLevel = difficultyMatch[1].trim();
   } else {
-    const lower = (title + " " + desc).toLowerCase();
     if (lower.includes("strenuous") || lower.includes("trek") || lower.includes("active") || lower.includes("hike")) {
       activityLevel = "Moderate to Strenuous";
-    } else if (lower.includes("easy") || lower.includes("all ages") || lower.includes("flightseeing")) {
+    } else if (lower.includes("easy") || lower.includes("light") || lower.includes("flightseeing")) {
       activityLevel = "Easy";
     } else {
       activityLevel = "Easy to Moderate";
@@ -77,12 +113,86 @@ function parseTourDescriptionDetails(title: string, description?: string | null)
 
   // 3. Age Constraints
   let ageConstraint = "";
-  const ageMatch = desc.match(/\b(\d+)\+/);
+  const ageMatch =
+    desc.match(/passenger ages?\s*(\d+)\+/i) ||
+    desc.match(/ages?\s*(\d+)\+/i) ||
+    desc.match(/minimum age\s*(?:of|is)?\s*(\d+)/i) ||
+    desc.match(/\b(\d+)\+/);
   if (ageMatch) {
     ageConstraint = `Ages ${ageMatch[1]}+`;
+  } else if (isNorthStar405050) {
+    ageConstraint = "Ages 7+";
   }
 
-  return { duration, activityLevel, ageConstraint };
+  // 4. Seasonality
+  let seasonality = "May – September";
+  if (isNorthStar405050 || lower.includes("month of september") || lower.includes("september only")) {
+    seasonality = "September Only";
+  }
+
+  // 5. Weight Policy
+  let weightPolicy = "";
+  if (isNorthStar405050) {
+    weightPolicy = "250+ lbs: $150 FAA surcharge";
+  } else if (lower.includes("helicopter") || lower.includes("flight")) {
+    weightPolicy = "Standard FAA weight check";
+  }
+
+  return { duration, activityLevel, ageConstraint, seasonality, weightPolicy, isNorthStar405050 };
+}
+
+function parseDurationMinutes(durationStr: string): number {
+  if (!durationStr) return 0;
+  const hoursMatch = durationStr.match(/(\d+(?:\.\d+)?)\s*Hours?/i);
+  const minsMatch = durationStr.match(/(\d+)\s*Minutes?/i);
+  let total = 0;
+  if (hoursMatch) {
+    total += parseFloat(hoursMatch[1]) * 60;
+  }
+  if (minsMatch) {
+    total += parseInt(minsMatch[1], 10);
+  }
+  return Math.round(total);
+}
+
+function getCruiseFitSubtitle(isHeliOrAir: boolean, isBoat: boolean, portName: string) {
+  if (isHeliOrAir) {
+    return `Helicopter flights and glacial excursions in ${portName} require tight alignment with flight clearances and your port timeline. Evaluate the metrics below before final booking.`;
+  }
+  if (isBoat) {
+    return `Catamaran, whale watching, and marine excursions in ${portName} depart from local harbors on fixed schedules. Evaluate the metrics below to ensure a smooth return before your ship's all-aboard.`;
+  }
+  return `Shore excursions in ${portName} require alignment with your cruise ship's arrival and all-aboard schedule. Evaluate the metrics below before final booking.`;
+}
+
+function getTimingBufferNote(isHeliOrAir: boolean, isBoat: boolean) {
+  if (isHeliOrAir) {
+    return "Mountain weather cancellations or delays can happen due to high-altitude cloud cover or visibility checks. Always schedule flights earlier in your port day to ensure proper safety room.";
+  }
+  if (isBoat) {
+    return "Marine wildlife excursions navigate sheltered coastal passages and operate rain or shine. Booking earlier in your port stay provides the most relaxed cushion before your ship's all-aboard.";
+  }
+  return "Local excursions operate rain or shine across Southeast Alaska. We recommend scheduling departures with sufficient buffer before your ship's scheduled all-aboard time.";
+}
+
+function getCheckInMappingText(isHeliOrAir: boolean, isBoat: boolean, portName: string) {
+  if (isHeliOrAir) {
+    return `Departures include round-trip shuttle service from downtown ${portName} cruise terminal staging points directly to the heliport. Complete pickup coordinates, vehicle signage, and departure times are emailed directly upon checkout confirmation.`;
+  }
+  if (isBoat) {
+    return `Tours stage from designated cruise berth loading zones or harbor docks in ${portName}. Round-trip pier transfers or walking directions from your specific ship dock are emailed directly upon checkout confirmation.`;
+  }
+  return `Departures meet near downtown ${portName} cruise docks or designated port pickup points. Detailed meeting instructions, staging maps, and local dispatch contacts are emailed directly upon checkout confirmation.`;
+}
+
+function getCancellationPolicyText(isHeliOrAir: boolean, isBoat: boolean, operatorName: string) {
+  if (isHeliOrAir) {
+    return `Strict aviation safety rules apply. In the event of mountain weather cancellations by ${operatorName} or if your cruise ship misses port, guests receive a 100% full refund with zero penalty.`;
+  }
+  if (isBoat) {
+    return `Guaranteed cruise connection protection applies. If severe marine weather forces cancellation or if your cruise ship bypasses port due to itinerary changes, guests receive a 100% full refund with zero penalty.`;
+  }
+  return `Guaranteed cruise connection protection applies. In the event of operator cancellation due to weather or if your cruise ship misses port, guests receive a 100% full refund with zero penalty.`;
 }
 
 function getWhoItIsBestFor(title: string, category: string) {
@@ -189,8 +299,12 @@ export default async function TourDetailPage({
   const operatorName = getOperatorDisplayName(safeTour.company);
   const portName = safeTour.port ? safeTour.port.charAt(0).toUpperCase() + safeTour.port.slice(1) : "Juneau";
   const categoryName = safeTour.category || "Shore Excursion";
-
-  const { duration, activityLevel, ageConstraint } = parseTourDescriptionDetails(safeTour.title, safeTour.description);
+  const { duration, activityLevel, ageConstraint, seasonality, weightPolicy, isNorthStar405050 } = parseTourDescriptionDetails(
+    safeTour.title,
+    safeTour.description,
+    safeTour.company,
+    safeTour.pk || item,
+  );
   const bestForText = getWhoItIsBestFor(safeTour.title, categoryName);
   const skipText = getWhoShouldSkip(safeTour.title, activityLevel, ageConstraint);
 
@@ -223,14 +337,17 @@ export default async function TourDetailPage({
     }
   }
 
+  const isHeliOrAir = /helicopter|flight|air|seaplane|floatplane/i.test(safeTour.title);
+  const isBoat = /whale|boat|catamaran|marine|fishing|charter|cruise|water/i.test(safeTour.title);
+  const isKartOrScooter = /kart|scooter|utv|atv|jeep/i.test(safeTour.title);
+  const isPrivate = /private|charter/i.test(safeTour.title) || (safeTour.fromPrice && safeTour.fromPrice.toLowerCase().includes("private"));
+
   let timingStatus: "safe" | "tight" | "unsafe" | "unknown" = "unknown";
   let timingGuidanceText = "";
-  let bufferMinutes = 45; // default
+  let bufferMinutes = isHeliOrAir ? 60 : 45;
 
   if (shipArrival && shipDeparture && duration) {
-    const durationMinutesMatch = duration.match(/(\d+(?:\.\d+)?)/);
-    const durationHours = durationMinutesMatch ? parseFloat(durationMinutesMatch[1]) : 0;
-    const durationMinutes = Math.round(durationHours * 60);
+    const durationMinutes = parseDurationMinutes(duration);
 
     if (durationMinutes > 0) {
       const arrMin = parseTimeToMinutes(shipArrival);
@@ -238,11 +355,11 @@ export default async function TourDetailPage({
       if (arrMin !== null && depMin !== null) {
         const allAboardMin = depMin - 30;
         const earliestSafeStart = arrMin + 45;
-        const latestSafeStart = allAboardMin - durationMinutes - 45;
+        const latestSafeStart = allAboardMin - durationMinutes - bufferMinutes;
 
         if (latestSafeStart >= earliestSafeStart) {
           timingStatus = "safe";
-          timingGuidanceText = `This excursion fits your port window. For the ${cruiseShip} (${shipWindow}), departures for this ${duration} tour starting between ${formatMinutesToTime(earliestSafeStart)} and ${formatMinutesToTime(latestSafeStart)} leave the recommended safety buffer.`;
+          timingGuidanceText = `This excursion fits your port window. For the ${cruiseShip} (${shipWindow}), departures for this ${duration} tour starting between ${formatMinutesToTime(earliestSafeStart)} and ${formatMinutesToTime(latestSafeStart)} leave the recommended ${bufferMinutes}-minute safety buffer.`;
         } else if (allAboardMin - arrMin >= durationMinutes) {
           timingStatus = "tight";
           timingGuidanceText = `Timing may be tight. A ${duration} tour will consume most of your ship's port day window (${shipWindow}). Confirm your ship's exact all-aboard time before booking.`;
@@ -256,9 +373,9 @@ export default async function TourDetailPage({
 
   if (timingStatus === "unknown") {
     if (cruiseShip) {
-      timingGuidanceText = `Enter or confirm your ship timing for the ${cruiseShip} to check compatibility. Ensure your excursion fits with a 45-minute return buffer before all-aboard time.`;
+      timingGuidanceText = `Enter or confirm your ship timing for the ${cruiseShip} to check compatibility. Ensure your excursion fits with a ${bufferMinutes}-minute return buffer before all-aboard time.`;
     } else {
-      timingGuidanceText = `Enter your cruise ship details to check timing compatibility. We recommend leaving a return buffer of at least 45 minutes before your ship's all-aboard time.`;
+      timingGuidanceText = `Enter your cruise ship details to check timing compatibility. We recommend leaving a return buffer of at least ${bufferMinutes} minutes before your ship's all-aboard time.`;
     }
   }
 
@@ -329,9 +446,8 @@ export default async function TourDetailPage({
   
   const breadcrumbSchema = buildTourBreadcrumbSchema(safeTour);
 
-  const isNorthStar405050 = safeTour.company === "northstartrekking" && (Number(safeTour.pk) === 405050 || item === "405050");
   const priceMatch = (safeTour.fromPrice || "").match(/\d+/);
-  const numericPrice = isNorthStar405050 ? "388" : (priceMatch ? priceMatch[0] : null);
+  const numericPrice = isNorthStar405050 ? "419" : (priceMatch ? priceMatch[0] : null);
   const productSchema = numericPrice ? {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -346,11 +462,6 @@ export default async function TourDetailPage({
       "url": buildTourUrl(safeTour),
     }
   } : null;
-
-  const isHeliOrAir = /helicopter|flight|air|seaplane|floatplane/i.test(safeTour.title);
-  const isBoat = /whale|boat|catamaran|marine|fishing|charter|cruise|water/i.test(safeTour.title);
-  const isKartOrScooter = /kart|scooter|utv|atv|jeep/i.test(safeTour.title);
-  const isPrivate = /private|charter/i.test(safeTour.title) || (safeTour.fromPrice && safeTour.fromPrice.toLowerCase().includes("private"));
 
   const renderedFaqs = [
     {
@@ -378,21 +489,21 @@ export default async function TourDetailPage({
           : "Standard walking at an easy to moderate pace. Any necessary equipment, safety gear, or walking sticks are provided by the operator.",
     },
     {
-      question: "What age, weight, or equipment requirements apply?",
+      question: isHeliOrAir ? "What age, weight, or passenger restrictions apply?" : "What age, physical, or equipment requirements apply?",
       answer:
         isHeliOrAir
-          ? `FAA flight safety regulations require passenger weight verification for aircraft balance. Guests weighing 250 lbs or more may require an adjacent seat or weight surcharge in accordance with FAA and operator guidelines. ${ageConstraint ? `Age policy: ${ageConstraint}.` : "Children of all ages are welcome."}`
+          ? `FAA flight safety regulations require passenger weight verification for aircraft balance. ${isNorthStar405050 ? "NorthStar requires an additional $150 surcharge for passengers weighing 250 lbs (113 kg) or more to reserve adequate aircraft space. Minimum age: Ages 7+." : "Guests weighing 250 lbs or more may require an adjacent seat or weight surcharge in accordance with FAA and operator guidelines. " + (ageConstraint ? `Age policy: ${ageConstraint}.` : "Children of all ages are welcome.")}`
           : `${ageConstraint ? `Age policy: ${ageConstraint}.` : "All ages are welcome."} Dress in warm layers with a waterproof outer jacket and flat, comfortable walking shoes. Specialized gear (neoprene overboots, spray skirts, or flotation suits) is furnished by ${operatorName}.`,
     },
     {
-      question: `What happens if mountain weather cancels the tour or my ship misses port?`,
-      answer: `Safety is paramount in Southeast Alaska. If severe weather, heavy fog, or high winds prevent safe operations, ${operatorName} issues a 100% full refund with zero cancellation penalty. If your cruise ship cancels the port call or bypasses ${portName} due to mechanical delays or weather, your booking is fully refunded upon verification.`,
+      question: `What happens if weather cancels the tour or my ship misses port?`,
+      answer: `Safety is paramount in Southeast Alaska. If severe weather or marine conditions prevent safe operations, ${operatorName} issues a 100% full refund with zero cancellation penalty. If your cruise ship cancels the port call or bypasses ${portName} due to mechanical delays or weather, your booking is fully refunded upon verification.`,
     },
     {
-      question: "Is the listed price per person or for the entire group?",
+      question: "Is the listed price per person or for the entire group, and what is included?",
       answer: isPrivate
         ? "This is a private charter flat rate. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service."
-        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes and processing are transparently itemized with zero surprise fees at checkout.`,
+        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes are transparently itemized with zero surprise booking fees at checkout.${isNorthStar405050 ? " Note: NorthStar applies a $150 FAA weight surcharge for passengers 250+ lbs." : ""}`,
     },
   ];
 
@@ -469,10 +580,10 @@ export default async function TourDetailPage({
                 <span className="text-xl font-black text-slate-900">{safeTour.fromPrice || "Check Price"}</span>
               </div>
               <Link
-                href={bookingPageHref}
+                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar?month=2026-09` : bookingPageHref}
                 className="flex-1 max-w-[200px] rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
               >
-                Book Now
+                {isNorthStar405050 ? "Check Departures" : "Book Now"}
               </Link>
             </div>
 
@@ -518,14 +629,49 @@ export default async function TourDetailPage({
               <div className="mt-1 text-2xl font-black text-slate-900 leading-tight">
                 {safeTour.fromPrice || "Check Price"}
               </div>
+              {isNorthStar405050 && (
+                <p className="mt-1 text-[11px] text-slate-500">
+                  Ages 7+ • Passengers 250+ lbs: +$150 FAA surcharge
+                </p>
+              )}
             </div>
 
             <div className="rounded-2xl bg-slate-50 p-4 border border-slate-100">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Live Status</span>
               <span className="mt-1 font-bold text-slate-900 block text-xs">
-                {hasNextAvailability ? `Next available: ${safeTour.nextAvailableDate}` : "Check calendar for departures"}
+                {hasNextAvailability
+                  ? `Next available: ${safeTour.nextAvailableDate}`
+                  : isNorthStar405050
+                  ? "September Only (2026 dates pending release)"
+                  : "Check calendar for departures"}
               </span>
             </div>
+
+            {isNorthStar405050 && (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-xs text-amber-950 space-y-2">
+                <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] text-amber-800">
+                  <span>🗓️</span>
+                  <span>Seasonal Schedule Notice</span>
+                </div>
+                <p className="leading-relaxed text-slate-700">
+                  NorthStar operates this tour <strong>exclusively in September</strong>. 2026 departure dates have not yet been released into FareHarbor by the operator.
+                </p>
+                <div className="pt-1 flex flex-col gap-1.5 text-[11px]">
+                  <Link
+                    href={`/tours/${company}/${item}/calendar?month=2026-09`}
+                    className="font-semibold text-sky-800 underline hover:text-sky-950"
+                  >
+                    View September 2026 Calendar &rarr;
+                  </Link>
+                  <Link
+                    href="/juneau/helicopter-tours"
+                    className="font-semibold text-sky-800 underline hover:text-sky-950"
+                  >
+                    Browse May–August Helicopter Tours &rarr;
+                  </Link>
+                </div>
+              </div>
+            )}
 
             {/* Timing Safeguard Warning */}
             <div className={`rounded-2xl border p-4 ${timingConfig.border}`}>
@@ -538,11 +684,24 @@ export default async function TourDetailPage({
             {/* CTA Buttons */}
             <div className="grid gap-3 pt-2">
               <Link
-                href={bookingPageHref}
+                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar?month=2026-09` : bookingPageHref}
                 className="w-full rounded-2xl bg-slate-900 py-3.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
               >
-                {hasNextAvailability ? "Check availability" : "Check Live Calendar"}
+                {hasNextAvailability
+                  ? "Check availability"
+                  : isNorthStar405050
+                  ? "Check September 2026 Departures"
+                  : "Check Live Calendar"}
               </Link>
+
+              {isNorthStar405050 && (
+                <Link
+                  href="/juneau/helicopter-tours"
+                  className="w-full rounded-2xl border border-sky-600 bg-sky-50 py-3 text-center text-xs font-bold text-sky-900 hover:bg-sky-100 transition uppercase tracking-wider"
+                >
+                  View May–August Helicopter Tours
+                </Link>
+              )}
               
               <div className="flex gap-2">
                 <Link
@@ -597,28 +756,34 @@ export default async function TourDetailPage({
               <span className="mt-1 font-bold text-slate-900 block text-sm">{duration || "Check details"}</span>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Port Destination</span>
-              <span className="mt-1 font-bold text-slate-900 block text-sm">{portName}</span>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Operator Code</span>
-              <span className="mt-1 font-bold text-slate-950 block text-sm">{operatorName}</span>
-            </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Activity Rating</span>
-              <span className="mt-1 font-bold text-slate-900 block text-sm">{activityLevel || "Easy to Moderate"}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Operating Season</span>
+              <span className="mt-1 font-bold text-slate-900 block text-sm">{seasonality}</span>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Minimum Age</span>
               <span className="mt-1 font-bold text-slate-900 block text-sm">{ageConstraint || "All ages welcome"}</span>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Activity Level</span>
+              <span className="mt-1 font-bold text-slate-900 block text-sm">{activityLevel || "Easy to Moderate"}</span>
+            </div>
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Price (Flat Rate)</span>
               <span className="mt-1 font-bold text-slate-900 block text-sm">{safeTour.fromPrice || "Check Price"}</span>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Passenger Policy</span>
+              <span className="mt-1 font-bold text-slate-900 block text-xs">{weightPolicy || "Standard port check-in"}</span>
+            </div>
+            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Availability</span>
-              <span className="mt-1 font-bold text-slate-900 block text-sm">{hasNextAvailability ? "Live dates active" : "Check departures"}</span>
+              <span className="mt-1 font-bold text-slate-900 block text-sm">
+                {hasNextAvailability
+                  ? "Live dates active"
+                  : isNorthStar405050
+                  ? "September only (unreleased)"
+                  : "Check departures"}
+              </span>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4">
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Safety Buffer</span>
@@ -634,8 +799,7 @@ export default async function TourDetailPage({
               Cruise Ship Compatibility Evaluation
             </h2>
             <p className="mt-2 text-xs leading-relaxed text-slate-500 max-w-3xl">
-              Helicopter flights and glacial excursions require tight alignment with your port timeline.
-              Evaluate the metrics below before final booking.
+              {getCruiseFitSubtitle(isHeliOrAir, isBoat, portName)}
             </p>
           </div>
           
@@ -654,7 +818,7 @@ export default async function TourDetailPage({
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 space-y-4">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">Timing & Buffer Note</h3>
               <p className="text-xs leading-relaxed text-slate-600">
-                Weather cancellations or delays can happen due to high-altitude visibility checks. Always schedule flights earlier in your port day to ensure proper safety room.
+                {getTimingBufferNote(isHeliOrAir, isBoat)}
               </p>
               <div className="rounded-xl border border-amber-100 bg-amber-50 p-3 text-[10px] text-amber-900">
                 <strong>🚨 Return Buffer Rule:</strong> Keep a minimum {bufferMinutes}-minute buffer between the tour return time and your ship's scheduled all-aboard time. Confirm your ship's exact all-aboard time before booking.
@@ -674,13 +838,13 @@ export default async function TourDetailPage({
             <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-2">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Check-in Mappings</h3>
               <p className="text-xs leading-relaxed text-slate-600">
-                Departures leave from designated airport heliports or cruise terminal sync-points. Complete instructions, transportation maps, and pickup details will be emailed directly to you upon check-out confirmation.
+                {getCheckInMappingText(isHeliOrAir, isBoat, portName)}
               </p>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-2">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Cancellation Policy</h3>
               <p className="text-xs leading-relaxed text-slate-600">
-                Strict safety flight rules apply. In the event of weather cancellations or delays by the operator, guests receive a full refund. Excursion timing modifications can be requested subject to availability.
+                {getCancellationPolicyText(isHeliOrAir, isBoat, operatorName)}
               </p>
             </div>
           </div>

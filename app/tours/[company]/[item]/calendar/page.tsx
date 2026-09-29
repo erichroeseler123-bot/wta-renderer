@@ -89,6 +89,7 @@ export default async function Page({
   const sp = await searchParams;
   const getParam = (value: string | undefined) => String(value || "");
   const canonicalProductKey = `${company}/${item}`;
+  const isNorthStar405050 = company === "northstartrekking" && (item === "405050" || String(item) === "405050");
 
   const requestedDate = sp.date && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : "";
   let month = sp.month ?? "";
@@ -101,6 +102,8 @@ export default async function Page({
   if (!month) {
     if (requestedDate) {
       month = requestedDate.slice(0, 7);
+    } else if (isNorthStar405050) {
+      month = "2026-09";
     } else {
       month = nextAvailabilityMonth || new Date().toISOString().slice(0, 7);
     }
@@ -177,7 +180,37 @@ export default async function Page({
           <p className="mt-2 text-sm text-slate-600">
             Select a day with availability to see departure times and add the tour to the cart.
           </p>
-          {!hasAnyAvailabilityThisMonth ? (
+          {isNorthStar405050 ? (
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950 space-y-3">
+              <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-xs text-amber-800">
+                <span>🗓️</span>
+                <span>Operating Season: September Only</span>
+              </div>
+              <p className="text-xs leading-relaxed text-slate-700">
+                NorthStar Trekking operates this Helicopter Flightseeing & Glacier Landing excursion <strong>exclusively during September</strong>. Daily departure slots for the upcoming September season have not yet been opened for booking in FareHarbor by the operator.
+              </p>
+              <div className="flex flex-wrap gap-2 pt-1">
+                <Link
+                  href="/juneau/helicopter-tours"
+                  className="inline-flex rounded-xl bg-slate-900 px-4 py-2 text-xs font-bold text-white hover:bg-slate-800 transition"
+                >
+                  Browse May–August Juneau Helicopter Tours &rarr;
+                </Link>
+                <Link
+                  href="/tours/temscoair-juneau/214803"
+                  className="inline-flex rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition"
+                >
+                  TEMSCO Mendenhall Glacier ($409)
+                </Link>
+                <Link
+                  href="/tours/coastalhelicopters/413056"
+                  className="inline-flex rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 hover:bg-slate-50 transition"
+                >
+                  Coastal Icefield Excursion ($429)
+                </Link>
+              </div>
+            </div>
+          ) : !hasAnyAvailabilityThisMonth ? (
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
               {nextAvailabilityStartAt
                 ? isShowingNextAvailableMonth
@@ -244,6 +277,35 @@ export default async function Page({
             })}
           </div>
         </div>
+
+        {isNorthStar405050 && (
+          <div className="mt-8 rounded-2xl border border-sky-200 bg-sky-50/80 p-6 shadow-sm space-y-4">
+            <h2 className="text-base font-black text-slate-900">
+              Need a Juneau Helicopter Tour for May through August?
+            </h2>
+            <p className="text-xs leading-relaxed text-slate-600">
+              While NorthStar's flightseeing tour operates exclusively in September, Juneau's two primary full-season helicopter operators have daily departures available now for booking throughout the entire Alaska cruise season:
+            </p>
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Link
+                href="/tours/temscoair-juneau/214803"
+                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-sky-300 hover:shadow-md transition"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 block">TEMSCO Helicopters</span>
+                <span className="font-bold text-slate-900 block text-sm mt-0.5">Mendenhall Glacier & Guided Walk</span>
+                <span className="text-xs text-slate-500 block mt-1">$409 Per Person (Flat Rate) • May–Sept Departures</span>
+              </Link>
+              <Link
+                href="/tours/coastalhelicopters/413056"
+                className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:border-sky-300 hover:shadow-md transition"
+              >
+                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-700 block">Coastal Helicopters</span>
+                <span className="font-bold text-slate-900 block text-sm mt-0.5">Icefield Excursion & Glacier Landing</span>
+                <span className="text-xs text-slate-500 block mt-1">$429 Per Person (Flat Rate) • May–Sept Departures</span>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </main>
     </>

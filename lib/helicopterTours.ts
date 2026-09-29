@@ -117,7 +117,7 @@ function extractDollarAmount(text: string | null | undefined) {
 
 function getNorthstarDisplayPrice(tour: Pick<HelicopterTour, "company" | "description"> & { pk?: number }) {
   if (tour.company !== "northstartrekking") return undefined;
-  if (tour.pk === 405050) return "$388 Per Person (Flat Rate)";
+  if (tour.pk === 405050) return "$419 Per Person (Flat Rate)";
   const dollars = extractDollarAmount(tour.description);
   return dollars ? `$${dollars} Per Person (Flat Rate)` : undefined;
 }
@@ -203,7 +203,9 @@ function normalizeTour(
   ).trim();
 
   if (company === "northstartrekking" && pk === 405050) {
-    description = description.replace(/\$405\s*(?:Per\s*Person)?/gi, "$388 Per Person (Flat Rate)");
+    description = description
+      .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
+      .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
   }
 
   const slugSource = String(tour.slug || title || "").trim();
@@ -216,7 +218,7 @@ function normalizeTour(
     company === "temscoair-juneau" && pk === 285755
       ? "Contact for pricing"
       : company === "northstartrekking" && pk === 405050
-        ? "$388 Per Person (Flat Rate)"
+        ? "$419 Per Person (Flat Rate)"
         : snapshotTour.fromPrice ||
           fareHarborTour.fromPrice ||
           getNorthstarDisplayPrice({ company, description, pk }) ||

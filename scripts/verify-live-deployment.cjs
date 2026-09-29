@@ -11,45 +11,46 @@ function get(url) {
 }
 
 async function verify() {
-  const base = 'https://wta-renderer.vercel.app';
+  const base = process.env.VERIFY_BASE || 'https://wta-renderer.vercel.app';
   console.log(`Checking live deployment at: ${base}`);
 
   console.log('\n1. /juneau/helicopter-tours');
   const heli = await get(`${base}/juneau/helicopter-tours`);
   console.log('Status:', heli.status);
-  console.log('CSP allows googletagmanager.com:', heli.headers['content-security-policy']?.includes('googletagmanager.com'));
-  console.log('CSP allows google-analytics.com:', heli.headers['content-security-policy']?.includes('google-analytics.com'));
-  console.log('Contains $388 Per Person (Flat Rate):', heli.body.includes('$388 Per Person (Flat Rate)'));
+  console.log('Contains $409 to $429 category range:', heli.body.includes('$409 to $429') || heli.body.includes('$409–$429'));
+  console.log('Contains NorthStar $419 Per Person (Flat Rate):', heli.body.includes('$419 Per Person (Flat Rate)'));
   console.log('Contains conflicting $405 (should be FALSE):', heli.body.includes('$405') || heli.body.includes('405.00'));
   console.log('Contains TEMSCO summer camp cart (should be FALSE):', heli.body.includes('temsco-summercamp') || heli.body.includes('213994'));
   console.log('Contains TEMSCO flightseeing $100 (should be FALSE):', heli.body.includes('TEMSCO') && heli.body.includes('$100'));
 
-  console.log('\n2. /tours/northstartrekking/405050');
+  console.log('\n2. /tours/northstartrekking/405050 (NorthStar Detail Page)');
   const ns = await get(`${base}/tours/northstartrekking/405050`);
   console.log('Status:', ns.status);
-  console.log('Contains $388 Per Person (Flat Rate):', ns.body.includes('$388 Per Person (Flat Rate)'));
-  console.log('Contains 388.00 Offer Schema:', ns.body.includes('"price":"388.00"') || ns.body.includes('388.00'));
-  console.log('Contains conflicting $405 (should be FALSE):', ns.body.includes('$405') || ns.body.includes('405.00'));
-  console.log('Contains Starting Price (should be FALSE):', ns.body.includes('Starting Price'));
+  console.log('Contains $419 Per Person (Flat Rate):', ns.body.includes('$419 Per Person (Flat Rate)'));
+  console.log('Contains 419.00 Offer Schema:', ns.body.includes('"price":"419.00"') || ns.body.includes('419.00'));
+  console.log('Contains 2 Hours 15 Minutes duration:', ns.body.includes('2 Hours 15 Minutes'));
+  console.log('Contains Ages 7+ policy:', ns.body.includes('Ages 7+'));
+  console.log('Contains September Only season:', ns.body.includes('September Only'));
+  console.log('Contains $150 weight surcharge policy:', ns.body.includes('150') && ns.body.includes('250+ lbs'));
+  console.log('Contains seasonal schedule notice:', ns.body.includes('Seasonal Schedule Notice'));
+  console.log('Contains May-August alternative link:', ns.body.includes('Browse May–August Helicopter Tours'));
 
-  console.log('\n3. /juneau/whale-watching');
-  const whale = await get(`${base}/juneau/whale-watching`);
-  console.log('Status:', whale.status);
-  console.log('Contains return safety buffer text:', whale.body.includes('safety buffer') || whale.body.includes('buffer'));
-  console.log('Attributed 100% guarantee to marine operators:', whale.body.includes('marine operators'));
-  console.log('Does not claim blanket ship guarantee:', !whale.body.includes('guaranteed return to your ship'));
+  console.log('\n3. /tours/alaska-galore-juneau-whale-watching/585907 (Boat Tour Boilerplate Isolation)');
+  const boat = await get(`${base}/tours/alaska-galore-juneau-whale-watching/585907`);
+  console.log('Status:', boat.status);
+  console.log('Mentions helicopter flights (should be FALSE):', boat.body.includes('Helicopter flights') || boat.body.includes('helicopter flights'));
+  console.log('Mentions airport heliports (should be FALSE):', boat.body.includes('airport heliports') || boat.body.includes('heliports'));
+  console.log('Mentions high-altitude visibility (should be FALSE):', boat.body.includes('high-altitude visibility'));
+  console.log('Mentions strict safety flight rules (should be FALSE):', boat.body.includes('Strict safety flight rules') || boat.body.includes('flight rules'));
+  console.log('Contains catamaran / marine copy:', boat.body.includes('Catamaran') || boat.body.includes('marine') || boat.body.includes('harbor'));
 
-  console.log('\n4. /guides/juneau-whale-watching-vs-mendenhall');
-  const g1 = await get(`${base}/guides/juneau-whale-watching-vs-mendenhall`);
-  console.log('Status:', g1.status);
-  console.log('Contains operator refund notice guidance:', g1.body.includes('100% full refund upon verification'));
-  console.log('Contains operator whale guarantee attribution:', g1.body.includes('operator sighting guarantees (May'));
-
-  console.log('\n5. /guides/how-to-get-to-mendenhall-glacier-from-cruise-port');
-  const g2 = await get(`${base}/guides/how-to-get-to-mendenhall-glacier-from-cruise-port`);
-  console.log('Status:', g2.status);
-  console.log('Contains Mt. Roberts Tramway lot pickup note:', g2.body.includes('Mt. Roberts Tramway'));
-  console.log('Contains AJ Dock shuttle note:', g2.body.includes('AJ Dock'));
+  console.log('\n4. /tours/northstartrekking/405050/calendar (Seasonal Calendar Page)');
+  const cal = await get(`${base}/tours/northstartrekking/405050/calendar`);
+  console.log('Status:', cal.status);
+  console.log('Contains Operating Season: September Only banner:', cal.body.includes('Operating Season: September Only'));
+  console.log('Contains May-August alternative helicopter tours:', cal.body.includes('Need a Juneau Helicopter Tour for May through August?'));
+  console.log('Contains TEMSCO Mendenhall link:', cal.body.includes('/tours/temscoair-juneau/214803'));
+  console.log('Contains Coastal Icefield link:', cal.body.includes('/tours/coastalhelicopters/413056'));
 
   console.log('\nVerification complete!');
 }

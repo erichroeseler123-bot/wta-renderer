@@ -92,7 +92,7 @@ const PAGES: PageConfig[] = [
     topic: "helicopter-tours",
     title: "Juneau Helicopter Tours & Glacier Treks | 2026 Prices & Landings",
     h1: "Juneau helicopter tours, glacier treks and prices",
-    description: "Compare Juneau helicopter tour prices ($388 per person flat rate): glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
+    description: "Compare Juneau helicopter tour prices ($409 to $429 per person flat rate): glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
     intro: "Experience the vast 1,500-square-mile Juneau Icefield from the air. Compare scenic glacier landings (Herbert, Norris, Taku Glaciers), guided ice walks, extended technical glacier treks (NorthStar style), and high-elevation glacier dog sledding camps (TEMSCO & Coastal style) with certified FAA Part 135 air operators and cruise port transfers.",
     chooserTopic: "flightseeing",
     keywords: ["helicopter", "flightseeing", "icefield", "glacier walk", "glacier trek", "dog sledding on the mendenhall", "pilot's choice", "northstar", "coastal"],
@@ -101,12 +101,12 @@ const PAGES: PageConfig[] = [
     decisionTitle: "Choose your Juneau helicopter experience tier",
     decisionIntro: "Price and duration vary based on what you do once the helicopter lands on the Juneau Icefield.",
     decisionPoints: [
-      { title: "Scenic flight + glacier landing ($388–$420)", text: "2.25 to 2.5 hours total (30–35 min flight + 20–25 min walking on glacier ice). Overboots provided. Excellent for all ages and fitness levels. $388 per person (flat rate)." },
+      { title: "Scenic flight + glacier landing ($409–$429)", text: "2.25 to 2.5 hours total (30–35 min flight + 20–25 min walking on glacier ice). Overboots provided. $409 per person flat rate (TEMSCO) to $419 (NorthStar, September only) and $429 (Coastal)." },
       { title: "Guided glacier ice walk & trek ($479–$749)", text: "3 to 5.25 hours total. Includes 1 to 3 hours of guided walking or technical ice trekking with crampons, harnesses, and ice axes on deep icefield terrain." },
       { title: "Helicopter glacier dog sledding ($699–$839)", text: "2.75 to 3.5 hours total. Fly to a high-elevation glacier snow camp on Herbert or Norris Glacier, meet Alaskan huskies, and ride a real snow dog sled. $699 per person (flat rate)." },
     ],
     faqs: [
-      { question: "How much do Juneau helicopter tours cost?", answer: "Scenic glacier landings are $388 per person flat rate (NorthStar Flightseeing and Glacier Landing) to $409 per person flat rate (TEMSCO Mendenhall). Guided ice walks and technical treks range from $479 to $749, and high-altitude helicopter dog sledding on snow starts at $699 to $839 flat rate. (Note: inquiry-only listings without online fares are excluded from category minimums, and land-based wheeled cart summer camps do not include flights)." },
+      { question: "How much do Juneau helicopter tours cost?", answer: "Scenic glacier landings start at $409 per person flat rate (TEMSCO Mendenhall Glacier Landing) to $419 (NorthStar, September only) and $429 (Coastal Icefield Excursion). Guided ice walks and technical treks range from $479 to $749, and high-altitude helicopter dog sledding on snow starts at $699 to $839 flat rate. (Note: inquiry-only listings without online fares are excluded from category minimums, and land-based wheeled cart summer camps do not include flights)." },
       { question: "What happens if mountain weather cancels my helicopter flight?", answer: "If fog, wind, or low cloud ceilings prevent safe flying, passengers receive an immediate 100% full refund with zero cancellation penalties, or the option to rebook if your port time permits." },
       { question: "How do cruise passengers get to the helicopter base?", answer: "All helicopter tours include round-trip van and shuttle transportation from the downtown Juneau cruise docks (Mt. Roberts Tram plaza) directly to the heliport at Juneau International Airport (JNU)." },
       { question: "Do I need special boots or gear for walking on the glacier?", answer: "No specialty gear needed. The flight base equips all guests with neoprene traction overboots that slip directly over your sneakers or walking shoes. Treks provide crampons and gear." },

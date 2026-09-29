@@ -40,7 +40,7 @@ export function buildTourPriceLabel(
   tour: Pick<HelicopterTour, "company" | "description" | "fromPrice"> & { pk?: number }
 ) {
   if (tour.company === "northstartrekking" && (tour as any)?.pk === 405050) {
-    return "$388 Per Person (Flat Rate)";
+    return "$419 Per Person (Flat Rate)";
   }
   const description = cleanTourDescription(tour.description);
   const headlinePrice = extractDollarAmount(description);

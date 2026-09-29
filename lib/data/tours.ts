@@ -32,7 +32,7 @@ function extractDollarAmount(value: unknown) {
 }
 
 function buildNorthstarFromPrice(item: any) {
-  if (Number(item?.pk) === 405050) return "$388 Per Person (Flat Rate)";
+  if (Number(item?.pk) === 405050) return "$419 Per Person (Flat Rate)";
   const candidates = [
     item?.structured_description?.pricing,
     item?.description,
