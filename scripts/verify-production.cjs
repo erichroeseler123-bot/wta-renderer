@@ -26,6 +26,8 @@ async function verifyHost(host) {
   console.log(`  NorthStar surcharge identified: ${/NorthStar\s+surcharge/i.test(nsHtml)}`);
   console.log(`  Calendar unpinned from 2026-09: ${!/calendar\?month=2026-09/.test(nsHtml)}`);
   console.log(`  Pre-Payment Cancellation Deadlines present: ${nsHtml.includes('Pre-Payment Cancellation Deadlines')}`);
+  console.log(`  Duration in specifications is '2 Hours 15 Minutes': ${nsHtml.includes('2 Hours 15 Minutes')}`);
+  console.log(`  Duration specifications does NOT say '2 Hours' alone: ${!/>Duration<\/span><span[^>]*>2 Hours<\/span>/.test(nsHtml)}`);
 
   // 2. Alaska Galore Catamaran 585907
   const agUrl = `${host}/tours/alaska-galore-juneau-whale-watching/585907`;
@@ -36,6 +38,8 @@ async function verifyHost(host) {
   console.log(`  Mentions $50 fee: ${agHtml.includes('$50')}`);
   console.log(`  Uses verified 'within 14 days' boundary: ${agHtml.includes('within 14 days')}`);
   console.log(`  Does NOT use '<14 days': ${!agHtml.includes('<14 days')}`);
+  console.log(`  Does NOT claim 'out of guest control': ${!agHtml.includes('out of guest control')}`);
+  console.log(`  Does NOT claim refund for illness: ${!agHtml.includes('illness')}`);
 
   // 3. Dolphin Tours 2436
   const dUrl = `${host}/tours/dolphintours/2436`;

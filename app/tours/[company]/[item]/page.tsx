@@ -64,7 +64,7 @@ function parseTourDescriptionDetails(
 
   // 1. Duration
   let duration = "";
-  const compoundMatch = desc.match(/\b(\d+)\s*Hours?\s*(?:&|and)\s*(\d+)\s*Minutes?\b/i);
+  const compoundMatch = desc.match(/\b(\d+)\s*Hours?(?:\s*(?:&|and|,)\s*|\s+)(\d+)\s*Minutes?\b/i);
   if (compoundMatch) {
     duration = `${compoundMatch[1]} Hours ${compoundMatch[2]} Minutes`;
   } else {
@@ -81,6 +81,8 @@ function parseTourDescriptionDetails(
           duration = "2 Hours 15 Minutes";
         } else if (val === 2.5) {
           duration = "2 Hours 30 Minutes";
+        } else if (val === 2.75) {
+          duration = "2 Hours 45 Minutes";
         } else if (val === 3.5) {
           duration = "3 Hours 30 Minutes";
         } else {
@@ -90,7 +92,7 @@ function parseTourDescriptionDetails(
     }
   }
 
-  if (!duration && isNorthStar405050) {
+  if (isNorthStar405050) {
     duration = "2 Hours 15 Minutes";
   }
 

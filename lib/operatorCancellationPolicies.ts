@@ -39,9 +39,9 @@ const OPERATOR_POLICIES: Record<
   },
   "alaska-galore-juneau-whale-watching": {
     operatorName: "Alaska Galore Tours",
-    weatherPolicy: "100% full refund for anything out of guest control, including severe weather, illness, or late/missed cruise ships.",
+    weatherPolicy: "100% full refund if the operator cancels due to unsafe sea or weather conditions.",
     guestCutoffNotice: "30+ days prior (100% refund less $50 fee), 15–29 days prior (50%), non-refundable within 14 days of departure.",
-    shortSummary: "100% refund for weather, illness, or missed ships. Guest cancellations: 30+ days prior (full less $50 fee), 15–29 days (50%), within 14 days (non-refundable).",
+    shortSummary: "100% refund for operator weather cancellations. Guest cancellations: 30+ days prior (full less $50 fee), 15–29 days (50%), within 14 days (non-refundable).",
     detailedBullets: [
       "30+ days prior to departure: 100% refund minus a $50 cancellation fee.",
       "15 to 29 days prior to departure: 50% refund.",
