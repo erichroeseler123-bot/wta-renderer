@@ -283,7 +283,7 @@ export const getHelicopterToursSnapshot = unstable_cache(
       return portCompare || a.title.localeCompare(b.title);
     });
   },
-  ["alaska-tours-snapshot-v3"],
+  ["alaska-tours-snapshot-v5"],
   { revalidate: 1800 },
 );
 
@@ -316,7 +316,7 @@ export const getHelicopterTours = unstable_cache(
       return portCompare || a.title.localeCompare(b.title);
     });
   },
-  ["alaska-tours-v3"],
+  ["alaska-tours-v5"],
   { revalidate: 1800 },
 );
 
@@ -330,6 +330,13 @@ export async function getHelicopterTour(company: string, item: string): Promise<
       (String(tour.pk) === normalizedItem || tour.slug === normalizedItem),
   ) || null;
   if (!found) return null;
+
+  if (found.company === "northstartrekking" && (Number(found.pk) === 405050 || String(found.pk) === "405050")) {
+    found.fromPrice = "$419 Per Person (Flat Rate)";
+    found.description = (found.description || "")
+      .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
+      .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
+  }
 
   const details = await getLiveItemDetails(found.company, found.pk);
   const imageGallery = details.imageGallery.length

@@ -133,9 +133,9 @@ function parseTourDescriptionDetails(
   // 5. Weight Policy
   let weightPolicy = "";
   if (isNorthStar405050) {
-    weightPolicy = "250+ lbs: $150 FAA surcharge";
+    weightPolicy = "250+ lbs: $150 NorthStar surcharge";
   } else if (lower.includes("helicopter") || lower.includes("flight")) {
-    weightPolicy = "Standard FAA weight check";
+    weightPolicy = "Standard passenger weight check";
   }
 
   return { duration, activityLevel, ageConstraint, seasonality, weightPolicy, isNorthStar405050 };
@@ -190,9 +190,9 @@ function getCancellationPolicyText(isHeliOrAir: boolean, isBoat: boolean, operat
     return `Strict aviation safety rules apply. In the event of mountain weather cancellations by ${operatorName} or if your cruise ship misses port, guests receive a 100% full refund with zero penalty.`;
   }
   if (isBoat) {
-    return `Guaranteed cruise connection protection applies. If severe marine weather forces cancellation or if your cruise ship bypasses port due to itinerary changes, guests receive a 100% full refund with zero penalty.`;
+    return `In the event that severe marine weather or safety conditions force cancellation by ${operatorName}, guests receive a 100% full refund with zero penalty. Guest-initiated cancellations follow operator cut-off policies (please review the specific cancellation deadlines on your booking confirmation voucher).`;
   }
-  return `Guaranteed cruise connection protection applies. In the event of operator cancellation due to weather or if your cruise ship misses port, guests receive a 100% full refund with zero penalty.`;
+  return `In the event of operator cancellation due to weather or safety, guests receive a 100% full refund. Guest-initiated cancellations follow operator cut-off policies.`;
 }
 
 function getWhoItIsBestFor(title: string, category: string) {
@@ -305,6 +305,9 @@ export default async function TourDetailPage({
     safeTour.company,
     safeTour.pk || item,
   );
+  if (isNorthStar405050) {
+    safeTour.fromPrice = "$419 Per Person (Flat Rate)";
+  }
   const bestForText = getWhoItIsBestFor(safeTour.title, categoryName);
   const skipText = getWhoShouldSkip(safeTour.title, activityLevel, ageConstraint);
 
@@ -492,18 +495,20 @@ export default async function TourDetailPage({
       question: isHeliOrAir ? "What age, weight, or passenger restrictions apply?" : "What age, physical, or equipment requirements apply?",
       answer:
         isHeliOrAir
-          ? `FAA flight safety regulations require passenger weight verification for aircraft balance. ${isNorthStar405050 ? "NorthStar requires an additional $150 surcharge for passengers weighing 250 lbs (113 kg) or more to reserve adequate aircraft space. Minimum age: Ages 7+." : "Guests weighing 250 lbs or more may require an adjacent seat or weight surcharge in accordance with FAA and operator guidelines. " + (ageConstraint ? `Age policy: ${ageConstraint}.` : "Children of all ages are welcome.")}`
+          ? `Aircraft weight and balance calculations are required for all flights. ${isNorthStar405050 ? "NorthStar charges an additional $150 operator weight surcharge for passengers weighing 250 lbs (113 kg) or more to reserve adequate aircraft space. Minimum age: Ages 7+." : "Guests weighing 250 lbs or more may require an adjacent seat or weight surcharge in accordance with operator guidelines. " + (ageConstraint ? `Age policy: ${ageConstraint}.` : "Children of all ages are welcome.")}`
           : `${ageConstraint ? `Age policy: ${ageConstraint}.` : "All ages are welcome."} Dress in warm layers with a waterproof outer jacket and flat, comfortable walking shoes. Specialized gear (neoprene overboots, spray skirts, or flotation suits) is furnished by ${operatorName}.`,
     },
     {
       question: `What happens if weather cancels the tour or my ship misses port?`,
-      answer: `Safety is paramount in Southeast Alaska. If severe weather or marine conditions prevent safe operations, ${operatorName} issues a 100% full refund with zero cancellation penalty. If your cruise ship cancels the port call or bypasses ${portName} due to mechanical delays or weather, your booking is fully refunded upon verification.`,
+      answer: isHeliOrAir
+        ? `Flight safety is paramount in Southeast Alaska. If mountain weather prevents safe flying, ${operatorName} cancels the flight and issues a 100% full refund with zero cancellation penalty. If your cruise ship cancels the port call or bypasses ${portName} due to weather or itinerary changes, your booking is fully refunded upon verification.`
+        : `Safety is paramount in Southeast Alaska. If severe marine weather or safety conditions prevent operations and ${operatorName} cancels the tour, you receive a 100% full refund with zero penalty. Guest-initiated cancellations follow operator cut-off policies as detailed on your confirmation voucher.`,
     },
     {
       question: "Is the listed price per person or for the entire group, and what is included?",
       answer: isPrivate
         ? "This is a private charter flat rate. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service."
-        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes are transparently itemized with zero surprise booking fees at checkout.${isNorthStar405050 ? " Note: NorthStar applies a $150 FAA weight surcharge for passengers 250+ lbs." : ""}`,
+        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes are transparently itemized with zero surprise booking fees at checkout.${isNorthStar405050 ? " Note: NorthStar applies a $150 weight surcharge for passengers 250+ lbs." : ""}`,
     },
   ];
 
@@ -580,7 +585,7 @@ export default async function TourDetailPage({
                 <span className="text-xl font-black text-slate-900">{safeTour.fromPrice || "Check Price"}</span>
               </div>
               <Link
-                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar?month=2026-09` : bookingPageHref}
+                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
                 className="flex-1 max-w-[200px] rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
               >
                 {isNorthStar405050 ? "Check Departures" : "Book Now"}
@@ -631,7 +636,7 @@ export default async function TourDetailPage({
               </div>
               {isNorthStar405050 && (
                 <p className="mt-1 text-[11px] text-slate-500">
-                  Ages 7+ • Passengers 250+ lbs: +$150 FAA surcharge
+                  Ages 7+ • Passengers 250+ lbs: +$150 NorthStar surcharge
                 </p>
               )}
             </div>
@@ -642,7 +647,7 @@ export default async function TourDetailPage({
                 {hasNextAvailability
                   ? `Next available: ${safeTour.nextAvailableDate}`
                   : isNorthStar405050
-                  ? "September Only (2026 dates pending release)"
+                  ? "September Only (Check calendar for dates)"
                   : "Check calendar for departures"}
               </span>
             </div>
@@ -654,14 +659,14 @@ export default async function TourDetailPage({
                   <span>Seasonal Schedule Notice</span>
                 </div>
                 <p className="leading-relaxed text-slate-700">
-                  NorthStar operates this tour <strong>exclusively in September</strong>. 2026 departure dates have not yet been released into FareHarbor by the operator.
+                  NorthStar operates this tour <strong>exclusively during the month of September</strong>. No departures are currently available for online booking for these dates.
                 </p>
                 <div className="pt-1 flex flex-col gap-1.5 text-[11px]">
                   <Link
-                    href={`/tours/${company}/${item}/calendar?month=2026-09`}
+                    href={`/tours/${company}/${item}/calendar`}
                     className="font-semibold text-sky-800 underline hover:text-sky-950"
                   >
-                    View September 2026 Calendar &rarr;
+                    Check Tour Calendar &rarr;
                   </Link>
                   <Link
                     href="/juneau/helicopter-tours"
@@ -684,13 +689,13 @@ export default async function TourDetailPage({
             {/* CTA Buttons */}
             <div className="grid gap-3 pt-2">
               <Link
-                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar?month=2026-09` : bookingPageHref}
+                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
                 className="w-full rounded-2xl bg-slate-900 py-3.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
               >
                 {hasNextAvailability
                   ? "Check availability"
                   : isNorthStar405050
-                  ? "Check September 2026 Departures"
+                  ? "Check Departures"
                   : "Check Live Calendar"}
               </Link>
 
@@ -735,7 +740,7 @@ export default async function TourDetailPage({
               </div>
               <div className="flex gap-2">
                 <span>🛡️</span>
-                <p className="leading-normal"><strong>Cancellation Protection:</strong> 100% refund if weather cancels the activity or if your ship misses port.</p>
+                <p className="leading-normal"><strong>Cancellation Protection:</strong> {isHeliOrAir ? "100% refund if weather cancels the flight or if your ship misses port." : "100% refund if the activity is canceled by the operator due to weather or safety."}</p>
               </div>
               <div className="flex gap-2">
                 <span>⏱️</span>
@@ -781,7 +786,7 @@ export default async function TourDetailPage({
                 {hasNextAvailability
                   ? "Live dates active"
                   : isNorthStar405050
-                  ? "September only (unreleased)"
+                  ? "September only (Check departures)"
                   : "Check departures"}
               </span>
             </div>

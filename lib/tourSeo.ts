@@ -58,14 +58,26 @@ export function buildTourUrl(tour: Pick<HelicopterTour, "company" | "pk">) {
   return `https://www.welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`;
 }
 
-export function sanitizeTour<T extends Pick<HelicopterTour, "description">>(tour: T): T {
+export function sanitizeTour<T extends Pick<HelicopterTour, "description"> & { company?: string; pk?: number | string; fromPrice?: string }>(tour: T): T {
+  const isNorthStar405050 = tour.company === "northstartrekking" && (Number(tour.pk) === 405050 || String(tour.pk) === "405050");
+  let fromPrice = tour.fromPrice;
+  let description = cleanTourDescription(tour.description);
+
+  if (isNorthStar405050) {
+    fromPrice = "$419 Per Person (Flat Rate)";
+    description = description
+      .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
+      .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
+  }
+
   return {
     ...tour,
-    description: cleanTourDescription(tour.description),
+    description,
+    fromPrice,
   };
 }
 
-export function sanitizeTours<T extends Pick<HelicopterTour, "description">>(tours: T[]): T[] {
+export function sanitizeTours<T extends Pick<HelicopterTour, "description"> & { company?: string; pk?: number | string; fromPrice?: string }>(tours: T[]): T[] {
   return tours.map((tour) => sanitizeTour(tour));
 }
 

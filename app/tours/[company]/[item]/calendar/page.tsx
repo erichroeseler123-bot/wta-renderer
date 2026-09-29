@@ -102,8 +102,6 @@ export default async function Page({
   if (!month) {
     if (requestedDate) {
       month = requestedDate.slice(0, 7);
-    } else if (isNorthStar405050) {
-      month = "2026-09";
     } else {
       month = nextAvailabilityMonth || new Date().toISOString().slice(0, 7);
     }
@@ -187,7 +185,7 @@ export default async function Page({
                 <span>Operating Season: September Only</span>
               </div>
               <p className="text-xs leading-relaxed text-slate-700">
-                NorthStar Trekking operates this Helicopter Flightseeing & Glacier Landing excursion <strong>exclusively during September</strong>. Daily departure slots for the upcoming September season have not yet been opened for booking in FareHarbor by the operator.
+                NorthStar Trekking operates this Helicopter Flightseeing & Glacier Landing excursion <strong>exclusively during the month of September</strong>. No departures are currently available for online booking for {monthLabel}.
               </p>
               <div className="flex flex-wrap gap-2 pt-1">
                 <Link
