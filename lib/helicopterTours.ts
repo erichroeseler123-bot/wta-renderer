@@ -19,6 +19,7 @@ export type HelicopterTour = {
   category?: string;
   nextAvailableDate?: string;
   hasInventory?: boolean | null;
+  cancellationPolicy?: string;
 };
 
 export type HelicopterTourDeparture = {
@@ -134,7 +135,7 @@ function getLowestRateCents(rates: unknown) {
   return values.length ? Math.min(...values) : undefined;
 }
 
-async function loadLiveItemDetails(company: string, item: number): Promise<{ imageGallery: string[] }> {
+async function loadLiveItemDetails(company: string, item: number): Promise<{ imageGallery: string[]; cancellationPolicy?: string }> {
   if (process.env.NEXT_PHASE === "phase-production-build") return { imageGallery: [] };
 
   const appKey = String(process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "").trim();
@@ -162,7 +163,13 @@ async function loadLiveItemDetails(company: string, item: number): Promise<{ ima
           .map((image: { image_cdn_url?: string }) => String(image?.image_cdn_url || "").trim())
           .filter(Boolean)
       : [];
-    return { imageGallery: Array.from(new Set(imageGallery)) };
+    const cancellationPolicy = itemData?.cancellation_policy
+      ? String(itemData.cancellation_policy).trim()
+      : undefined;
+    return {
+      imageGallery: Array.from(new Set(imageGallery)),
+      cancellationPolicy,
+    };
   } catch {
     return { imageGallery: [] };
   }
@@ -345,7 +352,12 @@ export async function getHelicopterTour(company: string, item: string): Promise<
       ? [found.image]
       : [];
 
-  return { ...found, imageGallery, image: imageGallery[0] || found.image };
+  return {
+    ...found,
+    imageGallery,
+    image: imageGallery[0] || found.image,
+    cancellationPolicy: details.cancellationPolicy,
+  };
 }
 
 export async function getHelicopterTourDeparturesForDate(

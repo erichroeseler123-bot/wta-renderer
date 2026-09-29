@@ -277,6 +277,16 @@ export default function CheckoutClient() {
               Payments are encrypted and processed by Stripe. Tour availability and pricing are verified at confirmation time.
             </div>
 
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5 text-xs text-slate-700 space-y-1.5">
+              <span className="font-bold text-slate-900 block">Pre-Payment Cancellation & Refund Terms</span>
+              <p className="leading-relaxed">
+                • <strong>Operator Weather & Safety:</strong> 100% full refund if severe weather, sea conditions, or safety prevent operations.
+              </p>
+              <p className="leading-relaxed">
+                • <strong>Guest Cancellation Cutoffs:</strong> Subject to operator departure deadlines (30+ days for full refund less fee, 15–29 days for 50%, non-refundable within 14 days for marine excursions; 24+ hours for flight tours).
+              </p>
+            </div>
+
             {err ? <div className="rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{err}</div> : null}
 
             <button

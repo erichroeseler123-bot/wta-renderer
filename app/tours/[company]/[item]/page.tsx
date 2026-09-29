@@ -185,14 +185,22 @@ function getCheckInMappingText(isHeliOrAir: boolean, isBoat: boolean, portName: 
   return `Departures meet near downtown ${portName} cruise docks or designated port pickup points. Detailed meeting instructions, staging maps, and local dispatch contacts are emailed directly upon checkout confirmation.`;
 }
 
-function getCancellationPolicyText(isHeliOrAir: boolean, isBoat: boolean, operatorName: string) {
+function getCancellationPolicyText(isHeliOrAir: boolean, isBoat: boolean, operatorName: string, company?: string, livePolicy?: string) {
+  if (livePolicy && livePolicy.trim()) {
+    return livePolicy.trim().replace(/\*\*/g, "").replace(/\*No additional administrative fees for partial refunds\./g, "").trim();
+  }
   if (isHeliOrAir) {
-    return `Strict aviation safety rules apply. In the event of mountain weather cancellations by ${operatorName} or if your cruise ship misses port, guests receive a 100% full refund with zero penalty.`;
+    return `Strict aviation safety rules apply. In the event of mountain weather cancellations by ${operatorName} or if your cruise ship misses port, guests receive a 100% full refund with zero penalty. For guest-initiated cancellations, cancellations more than 24 hours in advance incur a 10% operator cancellation fee; bookings are non-refundable within 24 hours of tour start time.`;
   }
-  if (isBoat) {
-    return `In the event that severe marine weather or safety conditions force cancellation by ${operatorName}, guests receive a 100% full refund with zero penalty. Guest-initiated cancellations follow operator cut-off policies (please review the specific cancellation deadlines on your booking confirmation voucher).`;
+  if (isBoat || company?.includes("whale") || company?.includes("galore")) {
+    return `In the event that severe marine weather or safety conditions force cancellation by ${operatorName}, guests receive a 100% full refund with zero penalty.
+
+Guest-Initiated Cancellation Deadlines (Pre-Payment Disclosure):
+• 30+ days prior to departure: 100% refund minus a $50 cancellation fee.
+• 15 to 29 days prior to departure: 50% refund.
+• Within 14 days of departure: Non-refundable.`;
   }
-  return `In the event of operator cancellation due to weather or safety, guests receive a 100% full refund. Guest-initiated cancellations follow operator cut-off policies.`;
+  return `In the event of operator cancellation due to weather or safety, guests receive a 100% full refund. For guest-initiated cancellations, advance notice is required: full refund (less fee) 30+ days prior, 50% refund 15–29 days prior, and non-refundable within 14 days of departure.`;
 }
 
 function getWhoItIsBestFor(title: string, category: string) {
@@ -501,8 +509,8 @@ export default async function TourDetailPage({
     {
       question: `What happens if weather cancels the tour or my ship misses port?`,
       answer: isHeliOrAir
-        ? `Flight safety is paramount in Southeast Alaska. If mountain weather prevents safe flying, ${operatorName} cancels the flight and issues a 100% full refund with zero cancellation penalty. If your cruise ship cancels the port call or bypasses ${portName} due to weather or itinerary changes, your booking is fully refunded upon verification.`
-        : `Safety is paramount in Southeast Alaska. If severe marine weather or safety conditions prevent operations and ${operatorName} cancels the tour, you receive a 100% full refund with zero penalty. Guest-initiated cancellations follow operator cut-off policies as detailed on your confirmation voucher.`,
+        ? `Flight safety is paramount in Southeast Alaska. If mountain weather prevents safe flying, ${operatorName} cancels the flight and issues a 100% full refund with zero cancellation penalty. If your cruise ship cancels the port call or bypasses ${portName} due to weather or itinerary changes, your booking is fully refunded upon verification. If you cancel: full refund minus 10% operator fee if canceled >24 hours prior; non-refundable inside 24 hours.`
+        : `Safety is paramount in Southeast Alaska. If severe marine weather or safety conditions prevent operations and ${operatorName} cancels the tour, you receive a 100% full refund with zero penalty. Pre-payment guest cancellation deadlines: 100% refund (less $50 cancellation fee) 30+ days prior; 50% refund 15–29 days prior; non-refundable within 14 days of departure.`,
     },
     {
       question: "Is the listed price per person or for the entire group, and what is included?",
@@ -740,7 +748,7 @@ export default async function TourDetailPage({
               </div>
               <div className="flex gap-2">
                 <span>🛡️</span>
-                <p className="leading-normal"><strong>Cancellation Protection:</strong> {isHeliOrAir ? "100% refund if weather cancels the flight or if your ship misses port." : "100% refund if the activity is canceled by the operator due to weather or safety."}</p>
+                <p className="leading-normal"><strong>Cancellation Policy:</strong> {isHeliOrAir ? "100% refund if weather cancels the flight or if your ship misses port. Guest cancellations: 90% refund >24h prior, non-refundable <24h." : "100% refund for operator weather cancellations. Guest cancellations: 30+ days prior (full less $50 fee), 15–29 days (50%), <14 days (non-refundable)."}</p>
               </div>
               <div className="flex gap-2">
                 <span>⏱️</span>
@@ -847,9 +855,9 @@ export default async function TourDetailPage({
               </p>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-2">
-              <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Cancellation Policy</h3>
-              <p className="text-xs leading-relaxed text-slate-600">
-                {getCancellationPolicyText(isHeliOrAir, isBoat, operatorName)}
+              <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Pre-Payment Cancellation Deadlines</h3>
+              <p className="text-xs leading-relaxed text-slate-600 whitespace-pre-line">
+                {getCancellationPolicyText(isHeliOrAir, isBoat, operatorName, safeTour.company, safeTour.cancellationPolicy)}
               </p>
             </div>
           </div>
