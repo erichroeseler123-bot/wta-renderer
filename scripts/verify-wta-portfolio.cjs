@@ -494,10 +494,14 @@ async function run() {
   fs.writeFileSync(wtaReportPath, JSON.stringify(results, null, 2), 'utf8');
   console.log(`\nSaved verification report to:\n   ${wtaReportPath}`);
 
-  // Mirror report to gosno-production/reports (Portfolio Register)
-  const gosnoReportPath = 'C:/Users/erich/gosno-production/reports/wta-browser-verification-results.json';
-  fs.writeFileSync(gosnoReportPath, JSON.stringify(results, null, 2), 'utf8');
-  console.log(`Mirrored verification report to Portfolio Register:\n   ${gosnoReportPath}`);
+  // Mirror report to gosno-production/reports if available
+  const gosnoReportPath = 'C:/Users/erich/Documents/Projects/gosno-production/reports/wta-browser-verification-results.json';
+  if (fs.existsSync(path.dirname(gosnoReportPath))) {
+    try {
+      fs.writeFileSync(gosnoReportPath, JSON.stringify(results, null, 2), 'utf8');
+      console.log(`Mirrored verification report to Portfolio Register:\n   ${gosnoReportPath}`);
+    } catch {}
+  }
 
   console.log('\n=====================================================');
   console.log(`FINAL RESULT: ${results.status === 'PASSED' ? 'ALL CHECKS PASSED ✅' : 'SOME CHECKS FAILED ❌'}`);

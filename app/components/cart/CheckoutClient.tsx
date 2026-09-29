@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "./CartContext";
 import TurnstileWidget from "@/app/components/security/TurnstileWidget";
+import { trackCheckoutStart } from "@/lib/analytics/ga";
 
 function sendPlanEvent(payload: Record<string, unknown>) {
   const body = JSON.stringify(payload);
@@ -131,6 +132,10 @@ export default function CheckoutClient() {
     checkoutTelemetrySentRef.current = true;
 
     const first = payloadItems[0];
+    trackCheckoutStart({
+      value: estimatedTotal > 0 ? estimatedTotal / 100 : undefined,
+      itemCount: payloadItems.length,
+    });
     sendPlanEvent({
       event: "checkout_start",
       path: "/checkout",
@@ -142,7 +147,7 @@ export default function CheckoutClient() {
       topic: first.topicSlug || first.authorityTopic,
       sourcePage: first.sourcePage || first.referrerPath,
     });
-  }, [payloadItems]);
+  }, [payloadItems, estimatedTotal]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();

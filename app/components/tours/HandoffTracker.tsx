@@ -5,6 +5,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { canonicalizePortSlug } from "@/lib/dccSatellite";
 import { resolveWidgetInitContext } from "@/lib/widgetContext";
 import { emitWidgetLifecycleEvent, widgetViewStorageKey } from "@/components/widget/widgetLifecycle";
+import { trackOperatorHandoff } from "@/lib/analytics/ga";
 
 export default function HandoffTracker({
   port,
@@ -22,6 +23,15 @@ export default function HandoffTracker({
 
     const storageKey = widgetViewStorageKey(widgetContext.handoffId, pathname, widgetContext.widgetId);
     if (typeof window !== "undefined" && sessionStorage.getItem(storageKey)) return;
+
+    trackOperatorHandoff({
+      handoffId: widgetContext.handoffId,
+      company: search.get("company") || undefined,
+      itemPk: search.get("item") || search.get("itemPk") || undefined,
+      destination: "dcc_partner",
+      port: widgetContext.portSlug || canonicalizePortSlug(port),
+      lane: search.get("lane") || search.get("resolvedLane") || undefined,
+    });
 
     void emitWidgetLifecycleEvent({
       ...widgetContext,

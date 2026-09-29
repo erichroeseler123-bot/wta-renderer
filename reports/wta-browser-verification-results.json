@@ -1,5 +1,5 @@
 {
-  "test_run_timestamp": "2026-09-13T14:43:49.300Z",
+  "test_run_timestamp": "2026-09-29T12:34:34.587Z",
   "property_name": "Welcome to Alaska Tours",
   "repository": "https://github.com/erichroeseler123-bot/wta-renderer.git",
   "local_repository_path": "C:/Users/erich/Documents/Projects/wta-renderer",
@@ -48,8 +48,8 @@
         {
           "path": "/ports/juneau",
           "status": 200,
-          "title": "Juneau Cruise Port Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
-          "description": "Compare Juneau whale watching, glacier, dog sledding, flightseeing, and active shore excursions for your cruise day.",
+          "title": "Juneau Shore Excursions: Whale Watching, Mendenhall &amp; Helicopter Tours (2026) | Welcome to Alaska Tours",
+          "description": "Compare Juneau whale watching, Mendenhall Glacier combos, helicopter glacier treks, dog sledding, and fishing charters. 100% weather refund and cruise dock pickup.",
           "canonical": "https://www.welcometoalaskatours.com/ports/juneau",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -58,8 +58,8 @@
         {
           "path": "/ports/ketchikan",
           "status": 200,
-          "title": "Ketchikan Cruise Port Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
-          "description": "Compare Ketchikan rainforest, wildlife, kayak, flightseeing, fishing, and wilderness shore excursions.",
+          "title": "Ketchikan Shore Excursions: Adventure Karts, Kayaking, Bears &amp; Misty Fjords (2026) | Welcome to Alaska Tours",
+          "description": "Compare Ketchikan shore excursions: Adventure Kart Expeditions, Ketchikan Kayak Co sea kayaking, Herring Cove bear viewing, Misty Fjords floatplanes, and Duck tours.",
           "canonical": "https://www.welcometoalaskatours.com/ports/ketchikan",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -68,8 +68,8 @@
         {
           "path": "/ports/skagway",
           "status": 200,
-          "title": "Skagway Cruise Port Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
-          "description": "Compare Skagway helicopter, dog sledding, scooter, and active shore excursions for your cruise day.",
+          "title": "Skagway Shore Excursions: Scooters, Gold Rush, Glacier Flights &amp; Dog Sleds (2026) | Welcome to Alaska Tours",
+          "description": "Compare Skagway shore excursions: Skagway Scooters Gold Rush adventures, electric rentals to Dyea, TEMSCO helicopter glacier landings, Liarsville, and dog sledding.",
           "canonical": "https://www.welcometoalaskatours.com/ports/skagway",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -78,8 +78,8 @@
         {
           "path": "/juneau/whale-watching",
           "status": 200,
-          "title": "Juneau Whale Watching Tours for Cruise Passengers | Welcome to Alaska Tours",
-          "description": "Compare connected Juneau whale watching excursions, then open the live calendar to check current departures, pricing and capacity.",
+          "title": "Juneau Whale Watching Tours: Mendenhall Combos &amp; Small Boats (2026) | Welcome to Alaska Tours",
+          "description": "Compare Juneau whale watching excursions and Mendenhall Glacier combos. Guaranteed sightings, heated catamarans, Auke Bay departures, and cruise ship buffers.",
           "canonical": "https://www.welcometoalaskatours.com/juneau/whale-watching",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -88,8 +88,8 @@
         {
           "path": "/juneau/mendenhall-glacier-tours",
           "status": 200,
-          "title": "Mendenhall Glacier Tours from Juneau Cruise Port | Welcome to Alaska Tours",
-          "description": "Compare Mendenhall Glacier excursions connected to the Juneau catalog, including sightseeing, paddling, hiking and combination tours.",
+          "title": "Mendenhall Glacier Tours from Juneau Cruise Port (2026 Guide) | Welcome to Alaska Tours",
+          "description": "Compare Mendenhall Glacier excursions from the Juneau cruise port: authorized shuttles, guided lake canoe/kayak paddles, Nugget Falls walks, and combo tours.",
           "canonical": "https://www.welcometoalaskatours.com/juneau/mendenhall-glacier-tours",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -98,8 +98,8 @@
         {
           "path": "/juneau/helicopter-tours",
           "status": 200,
-          "title": "Juneau Helicopter Tours: Prices &amp; Glacier Trips (2026) | Welcome to Alaska Tours",
-          "description": "Compare Juneau helicopter tour prices, glacier landings, guided walks, treks and dog sledding flights. Check current operator calendars for your cruise day.",
+          "title": "Juneau Helicopter Glacier Tours: Prices, Treks &amp; Dog Sledding (2026) | Welcome to Alaska Tours",
+          "description": "Compare Juneau helicopter tour prices, glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
           "canonical": "https://www.welcometoalaskatours.com/juneau/helicopter-tours",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -148,8 +148,8 @@
         {
           "path": "/ketchikan/bear-tours",
           "status": 200,
-          "title": "Ketchikan Bear Tours and Wildlife Excursions | Welcome to Alaska Tours",
-          "description": "Compare Ketchikan bear viewing and wildlife excursions, including rainforest and flightseeing options when present in connected inventory.",
+          "title": "Ketchikan Bear Tours: Herring Cove, Traitors Cove &amp; Anan Creek (2026) | Welcome to Alaska Tours",
+          "description": "Compare Ketchikan bear viewing excursions: guided rainforest tours at Herring Cove, remote fly-in viewing at Traitors Cove and Anan Creek, and wildlife safaris.",
           "canonical": "https://www.welcometoalaskatours.com/ketchikan/bear-tours",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -189,7 +189,7 @@
           "path": "/skagway/helicopter-tours",
           "status": 200,
           "title": "Skagway Helicopter Tours and Glacier Flightseeing | Welcome to Alaska Tours",
-          "description": "Compare connected Skagway helicopter excursions and glacier flightseeing, then check live calendars for current departures.",
+          "description": "Compare connected Skagway helicopter excursions and glacier flightseeing with TEMSCO Air Skagway. Glacier landings, dock pickup, and weather refund protections.",
           "canonical": "https://www.welcometoalaskatours.com/skagway/helicopter-tours",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -228,8 +228,8 @@
         {
           "path": "/guides/how-to-get-to-mendenhall-glacier-from-cruise-port",
           "status": 200,
-          "title": "How to Get to Mendenhall Glacier from Juneau Cruise Port",
-          "description": "Complete guide on how to get from Juneau cruise docks to Mendenhall Glacier: commercial shuttles, tour buses, taxi shortages, city bus walking distance, and permit limits.",
+          "title": "How to Get to Mendenhall Glacier from Juneau Cruise Port: Shuttles, Taxis &amp; Tours (2026)",
+          "description": "Compare Mendenhall Glacier transportation from Juneau cruise docks: 13-mile shuttles, whale combos, rideshare risks, city bus limits, USFS permits, and verified 2026 excursions.",
           "canonical": "https://www.welcometoalaskatours.com/guides/how-to-get-to-mendenhall-glacier-from-cruise-port",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -278,8 +278,8 @@
         {
           "path": "/guides/easy-alaska-shore-excursions",
           "status": 200,
-          "title": "Best Easy Alaska Shore Excursions for Seniors &amp; Limited Mobility",
-          "description": "Discover the best low-walking, scenic, and wheelchair-accessible Alaska cruise excursions in Juneau, Skagway, and Ketchikan for seniors and multigenerational families.",
+          "title": "Best Alaska Shore Excursions for Seniors: 2026 Port-by-Port Guide",
+          "description": "Compare senior-friendly, low-walking, and wheelchair-accessible Alaska cruise excursions in Juneau, Skagway, and Ketchikan. Mobility tiers, pier walking distances, and restroom access.",
           "canonical": "https://www.welcometoalaskatours.com/guides/easy-alaska-shore-excursions",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -298,11 +298,11 @@
         {
           "path": "/guides/juneau-whale-watching-vs-mendenhall",
           "status": 200,
-          "title": "Juneau Whale Watching vs Mendenhall Glacier: Which Should You Choose?",
-          "description": "Compare Juneau whale watching and Mendenhall Glacier for a cruise port day. Choose by wildlife priority, walking, weather tolerance, port-call length, and whether a combo tour fits your ship window.",
+          "title": "Juneau Whale Watching vs Mendenhall Glacier (or Both? 2026 Cruise Guide)",
+          "description": "Whale watching vs Mendenhall Glacier in Juneau: compare standalone trips vs 5-hour combo excursions. Cruise port logistics, timing buffers, USFS permits, and 2026 prices.",
           "canonical": "https://www.welcometoalaskatours.com/guides/juneau-whale-watching-vs-mendenhall",
-          "hasGeoCard": false,
-          "hasDirectAnswer": false,
+          "hasGeoCard": true,
+          "hasDirectAnswer": true,
           "pass": true
         },
         {
@@ -320,7 +320,7 @@
           "status": 200,
           "title": "Celebrity Edge Alaska Shore Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
           "description": "Plan independent Alaska shore excursions for Celebrity Edge. Compare Juneau, Skagway, and Ketchikan tours and check live operator calendars against your current ship schedule.",
-          "canonical": "https://welcometoalaskatours.com/ships/celebrity-edge",
+          "canonical": "https://www.welcometoalaskatours.com/ships/celebrity-edge",
           "hasGeoCard": false,
           "hasDirectAnswer": false,
           "pass": true
@@ -328,9 +328,9 @@
         {
           "path": "/categories/juneau-helicopter-tours",
           "status": 200,
-          "title": "Juneau Helicopter Shore Excursions | Welcome To Alaska Tours | Welcome to Alaska Tours",
-          "description": "Compare Juneau helicopter tours, glacier landings, dog sledding flights, and live booking calendars for your cruise port day.",
-          "canonical": "https://welcometoalaskatours.com/categories/juneau-helicopter-tours",
+          "title": "Juneau Helicopter Tours: Glacier Landings, Treks &amp; Prices (2026) | Welcome to Alaska Tours",
+          "description": "Compare Juneau helicopter tour prices, glacier landings on Herbert and Norris Glaciers, guided ice walks, and glacier dog sledding with 100% weather refunds.",
+          "canonical": "https://www.welcometoalaskatours.com/categories/juneau-helicopter-tours",
           "hasGeoCard": false,
           "hasDirectAnswer": false,
           "pass": true
@@ -360,7 +360,7 @@
           "status": 200,
           "title": "Privacy Policy | Welcome To Alaska Tours | Welcome to Alaska Tours",
           "description": "Privacy information for Welcome To Alaska Tours, including booking, contact, analytics, and payment data handling.",
-          "canonical": "https://welcometoalaskatours.com/privacy",
+          "canonical": "https://www.welcometoalaskatours.com/privacy",
           "hasGeoCard": false,
           "hasDirectAnswer": false,
           "pass": true
@@ -370,7 +370,7 @@
           "status": 200,
           "title": "Terms of Use | Welcome To Alaska Tours | Welcome to Alaska Tours",
           "description": "Terms for using Welcome To Alaska Tours and booking independently operated Alaska excursions.",
-          "canonical": "https://welcometoalaskatours.com/terms",
+          "canonical": "https://www.welcometoalaskatours.com/terms",
           "hasGeoCard": false,
           "hasDirectAnswer": false,
           "pass": true
@@ -471,7 +471,7 @@
       },
       "sitemap": {
         "status": 200,
-        "total_urls": 150,
+        "total_urls": 154,
         "sample_urls": [
           "https://www.welcometoalaskatours.com",
           "https://www.welcometoalaskatours.com/tours",

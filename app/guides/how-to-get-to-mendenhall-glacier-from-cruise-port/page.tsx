@@ -69,7 +69,7 @@ const transportOptions = [
     travelTime: "20–25 min each way",
     permitIncluded: "Yes (USFS Pass Included)",
     returnReliability: "Plan a 45–60 min buffer",
-    pros: "Direct dockside pickup, fixed departure and return schedules, guaranteed USFS recreation permit.",
+    pros: "Direct dockside pickup (Mt. Roberts Tram lot), scheduled departure and return slots, USFS recreation permit included.",
     cons: "Requires advance reservation; walk-up tickets often sell out on multi-ship days.",
     bestFor: "Passengers wanting self-paced time for Nugget Falls and the Visitor Center.",
     badge: "Most Popular",

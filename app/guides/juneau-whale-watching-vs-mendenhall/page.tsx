@@ -24,7 +24,7 @@ const rows = [
   ["Typical price", "$165–$195 per adult", "$45–$95 shuttle/tour (USFS pass included)", "$245–$295 combo package"],
   ["Cruise port fit", "Fits tight 4–5 hour port calls easily", "Fits tight 4–5 hour port calls easily", "Requires comfortable 6.5+ hour port call"],
   ["Transportation", "Round-trip bus/van from Mt. Roberts Tram plaza to Auke Bay", "Shuttle from Mt. Roberts Tram parking to Visitor Center", "Pre-coordinated shuttle connecting dock, marina, and glacier"],
-  ["Key highlights", "Guaranteed humpbacks, sea lions, eagles, hydrophone listening", "Nugget Falls 2-mile walk, Visitor Center exhibits, photo points", "100% whale guarantee + Mendenhall access without separate bookings"],
+  ["Key highlights", "Humpbacks with operator sighting guarantees (May–Sept), sea lions, eagles", "Nugget Falls 2-mile walk, Visitor Center exhibits, photo points", "Whale sighting guarantee + Mendenhall USFS access in one booking"],
 ] as const;
 
 const faqs = [
@@ -46,12 +46,12 @@ const faqs = [
   {
     question: "What happens if our cruise ship arrives late or misses Juneau?",
     answer:
-      "Independent operators monitor ship docking schedules in real time. If your vessel arrives late, tour departure times are adjusted. If weather or mechanical issues force your cruise ship to cancel the Juneau port call entirely, Welcome to Alaska Tours automatically issues a 100% full refund.",
+      "Independent operators monitor ship docking schedules in real time. If your vessel arrives late, tour operators work to adjust departure times when fleet space allows. If weather or mechanical disruptions force your cruise ship to cancel the Juneau port call entirely, Welcome to Alaska Tours and local operators issue a 100% full refund upon verification.",
   },
   {
     question: "What is included on Whale Watching + Mendenhall combination tours?",
     answer:
-      "Combo tours include round-trip transfers from the cruise docks, 2 to 2.5 hours on a covered heated catamaran with outdoor viewing decks and a naturalist guide, light snacks and hot beverages, and official US Forest Service admission permits for the Mendenhall Glacier Recreation Area and Visitor Center.",
+      "Combo tours include round-trip transfers from the cruise docks, 2 to 2.5 hours on a covered heated catamaran with outdoor viewing decks and a naturalist guide, light snacks and hot beverages, and official US Forest Service admission permits for the Mendenhall Glacier Recreation Area and Visitor Center (standalone whale-only excursions do not require or include USFS permits).",
   },
 ];
 

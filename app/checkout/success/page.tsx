@@ -5,6 +5,7 @@ import Link from "next/link";
 import DccHandoffStatusCard from "@/app/components/handoff/DccHandoffStatusCard";
 import PartnerForwardCard from "@/app/components/handoff/PartnerForwardCard";
 import NewsletterSignup from "@/app/components/newsletter/NewsletterSignup";
+import { trackPurchase } from "@/lib/analytics/ga";
 
 type ReceiptResult = {
   ok?: boolean;
@@ -26,6 +27,8 @@ type ReceiptPayload = {
   status?: string;
   results?: ReceiptResult[];
   order_id?: string;
+  totalCents?: number;
+  currency?: string;
   attribution?: {
     handoffSource?: string;
     handoffId?: string;
@@ -97,6 +100,24 @@ export default function SuccessPage() {
 
   const status = data?.status || "pending";
   const isDone = status === "booked" || status === "completed";
+
+  useEffect(() => {
+    if (!isDone || !data) return;
+    const orderId = data.order_id || pi;
+    if (!orderId) return;
+
+    trackPurchase({
+      orderId,
+      value: typeof data.totalCents === "number" ? data.totalCents / 100 : undefined,
+      currency: data.currency || "USD",
+      items: data.results?.map((res) => ({
+        item_id: String(res.booking?.pk || res.booking?.uuid || ""),
+        item_name: res.line?.title || "Alaska Excursion",
+        item_brand: res.line?.company || "Welcome to Alaska Tours",
+        quantity: res.line?.qty || 1,
+      })),
+    });
+  }, [isDone, data, pi]);
 
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">

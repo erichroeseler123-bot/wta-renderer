@@ -8,6 +8,7 @@ import CartProvider from "@/app/components/cart/CartContext";
 import BackForwardRefresh from "@/app/BackForwardRefresh";
 import IntentTracker from "@/app/components/analytics/IntentTracker";
 import PublicStorefrontShell from "@/app/components/site/PublicStorefrontShell";
+import GoogleAnalytics from "@/app/components/analytics/GoogleAnalytics";
 import JsonLd from "@/components/seo/JsonLd";
 import { buildOrganizationSchema, buildWebsiteSchema } from "@/lib/tourSeo";
 
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="antialiased bg-stone-50 text-slate-900">
+        <GoogleAnalytics />
         <JsonLd data={organizationSchema} />
         <JsonLd data={websiteSchema} />
         <CartProvider>

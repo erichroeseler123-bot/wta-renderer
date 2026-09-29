@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef } from "react";
 import { useCart } from "./CartContext";
+import { trackCheckoutStart } from "@/lib/analytics/ga";
 
 export default function CartDrawer() {
   const { items, isOpen, close, removeItem, setQty, clear, count } = useCart();
@@ -163,7 +164,13 @@ export default function CartDrawer() {
           <div className="flex gap-2">
             <Link
               href="/checkout"
-              onClick={close}
+              onClick={() => {
+                trackCheckoutStart({
+                  value: estimatedTotal > 0 ? estimatedTotal / 100 : undefined,
+                  itemCount: count,
+                });
+                close();
+              }}
               className="flex-1 min-h-11 rounded-xl bg-slate-900 py-2 text-center text-sm font-semibold text-white hover:bg-slate-700"
             >
               Checkout →

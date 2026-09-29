@@ -246,7 +246,9 @@ async function computeFromPriceSafe(shortname, itemPk, APP_KEY, USER_KEY) {
   }
 }
 
-function categorize(name) {
+function categorize(name, company) {
+  const comp = String(company || "").toLowerCase();
+  if (comp.includes("summercamp")) return "Dog Sledding";
   const title = String(name || "").toLowerCase();
   if (title.includes("helicopter") || title.includes("flight")) return "Air Tours";
   if (title.includes("whale")) return "Whale Watching";
@@ -276,11 +278,11 @@ function getNorthstarDisplayPrice(item, detail) {
   }
 
   const candidates = [
+    detail?.headline,
+    item?.headline,
     detail?.structured_description?.pricing,
     detail?.description,
-    detail?.headline,
     item?.description,
-    item?.headline,
   ];
 
   for (const candidate of candidates) {
@@ -402,6 +404,11 @@ async function buildTours() {
               rateSummary = String(northstarDisplayDollars);
             }
 
+            if (shortname === "temscoair-juneau" && pk === 285755) {
+              fromPrice = "Contact for pricing";
+              rateSummary = "";
+            }
+
             return {
               pk,
               title: item.name,
@@ -414,7 +421,7 @@ async function buildTours() {
               company: shortname,
               fromPrice,      // grid-safe
               rateSummary,    // optional extra detail
-              category: categorize(item.name),
+              category: categorize(item.name, shortname),
             };
           })
         );

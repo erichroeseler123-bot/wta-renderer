@@ -91,6 +91,7 @@ function slugify(value: string) {
 function inferCategory(title: string, description: string, explicit?: string) {
   if (explicit) return explicit;
   const text = `${title} ${description}`.toLowerCase();
+  if (text.includes("summer camp") || text.includes("wheeled cart")) return "Dog Sledding";
   if (text.includes("whale")) return "Whale Watching";
   if (text.includes("dog") || text.includes("sled") || text.includes("husky")) return "Dog Sledding";
   if (text.includes("helicopter") || text.includes("flightseeing") || text.includes("seaplane") || text.includes("flight")) return "Air Tours";
@@ -205,6 +206,14 @@ function normalizeTour(
 
   if (!isPublicExcursion(pk, title, company, port)) return null;
 
+  const resolvedFromPrice =
+    company === "temscoair-juneau" && pk === 285755
+      ? "Contact for pricing"
+      : getNorthstarDisplayPrice({ company, description }) ||
+        snapshotTour.fromPrice ||
+        fareHarborTour.fromPrice ||
+        undefined;
+
   return {
     pk,
     slug,
@@ -214,7 +223,7 @@ function normalizeTour(
     imageGallery: tour.image ? [tour.image] : [],
     company,
     port,
-    fromPrice: snapshotTour.fromPrice || fareHarborTour.fromPrice || undefined,
+    fromPrice: resolvedFromPrice,
     category: inferCategory(title, description, snapshotTour.category),
     hasInventory: null,
   };

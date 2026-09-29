@@ -2,6 +2,7 @@ import FAQSection from "@/app/components/faq/FAQSection";
 import Breadcrumbs from "@/app/components/seo/Breadcrumbs";
 import JsonLd from "@/components/seo/JsonLd";
 import HandoffTracker from "@/app/components/tours/HandoffTracker";
+import TourViewTracker from "@/app/components/analytics/TourViewTracker";
 import { getHelicopterTour } from "@/lib/helicopterTours";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { parseTimeToMinutes, formatMinutesToTime } from "@/lib/timing";
@@ -387,6 +388,16 @@ export default async function TourDetailPage({
     <>
       <StageTelemetry payload={telemetryPayload} enabled={Boolean(getParam(sp.from) === "plan" || getParam(sp.requestedLane))} />
       <HandoffTracker port={safeTour.port} slug={safeTour.slug} />
+      <TourViewTracker
+        tour={{
+          company: safeTour.company,
+          itemPk: safeTour.pk || item,
+          title: safeTour.title,
+          category: categoryName,
+          fromPrice: safeTour.fromPrice,
+          port: safeTour.port,
+        }}
+      />
       <JsonLd data={seoData} />
       <JsonLd data={breadcrumbSchema} />
       {productSchema && <JsonLd data={productSchema} />}

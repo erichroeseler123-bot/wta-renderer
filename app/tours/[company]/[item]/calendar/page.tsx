@@ -5,6 +5,7 @@ import {
   getFareHarborNextAvailability,
 } from "@/lib/fareharborAvailability";
 import StageTelemetry from "@/app/components/plan/StageTelemetry";
+import CalendarOpenTracker from "@/app/components/analytics/CalendarOpenTracker";
 
 export const metadata: Metadata = {
   robots: {
@@ -157,6 +158,7 @@ export default async function Page({
 
   return (
     <>
+      <CalendarOpenTracker tour={{ company, itemPk: item, month }} />
       <StageTelemetry payload={telemetryPayload} enabled={Boolean(getParam((sp as any).from) === "plan" || getParam(sp.requestedLane))} />
     <main className="min-h-screen bg-[linear-gradient(180deg,#f5f7fb_0%,#eef6f6_45%,#f8fafc_100%)]">
       <div className="mx-auto max-w-5xl px-4 py-10">

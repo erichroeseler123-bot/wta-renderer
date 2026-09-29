@@ -26,19 +26,19 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     topic: "whale-watching",
     directQuestion: "How much does whale watching in Juneau cost and how does it work with cruise schedules?",
     directAnswer:
-      "Juneau whale watching excursions typically cost $165 to $195 per person for small-to-midsize passenger boats, or $245 to $295 for Whale Watching + Mendenhall Glacier combo tours (5 to 5.5 hours total). Tours last approximately 3 to 3.5 hours total (including 2 to 2.5 hours on the water in Auke Bay). Local independent operators provide round-trip transfers from the downtown Juneau cruise ship terminal (Mt. Roberts Tram plaza) and guarantee on-time return to your ship well ahead of all-aboard.",
+      "Juneau whale watching excursions typically cost $165 to $195 per adult for small-to-midsize passenger boats, or $245 to $295 per person for Whale Watching + Mendenhall Glacier combo tours (5 to 5.5 hours total). Tours last approximately 3 to 3.5 hours total (including 2 to 2.5 hours on the water in Auke Bay). Local independent operators provide round-trip transfers from the downtown Juneau cruise terminal area (Mt. Roberts Tram plaza) and schedule departures to leave a recommended 45-to-60-minute planning buffer before ship all-aboard.",
     pricingLabel: "Starting Rate",
-    pricingValue: "$165–$195 / person standalone • $245–$295 with Mendenhall combo",
+    pricingValue: "$165–$195 / adult standalone • $245–$295 with Mendenhall combo",
     durationLabel: "Duration & Water Time",
     durationValue: "~3.5 hours standalone (2–2.5h on water) • 5–5.5h combo",
     meetingPointLabel: "Cruise Dock Meeting Point",
-    meetingPointValue: "Mt. Roberts Tram Plaza / Berth curbside (Auke Bay shuttle included)",
+    meetingPointValue: "Mt. Roberts Tram Plaza (Auke Bay shuttle included; AJ Dock requires transfer)",
     safetyBufferLabel: "Ship Return Buffer",
-    safetyBufferValue: "Guaranteed on-time return • 60+ min pre-departure cushion",
+    safetyBufferValue: "Plan a 45–60 min buffer before all-aboard • Operator departures scheduled for port-day fit",
     faqSchema: [
       {
         question: "Is Juneau whale watching guaranteed?",
-        answer: "Yes, reputable Juneau boat operators offer a 100% whale sighting guarantee from May through September, as humpback whales consistently feed in the nutrient-rich waters around Auke Bay and Favorite Channel."
+        answer: "Yes, participating Juneau marine operators offer a 100% whale sighting guarantee from May through September, as humpback whales consistently feed in the nutrient-rich waters around Auke Bay and Favorite Channel."
       },
       {
         question: "Can I do whale watching and Mendenhall Glacier on the same port day?",
@@ -68,11 +68,11 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     faqSchema: [
       {
         question: "Is it better to book whale watching and Mendenhall Glacier together or separately?",
-        answer: "Booking a combined tour with one operator is significantly smoother because transportation between the cruise dock, Auke Bay marina, and Mendenhall Glacier is pre-coordinated, saving 45 minutes of transfer friction and guaranteeing USFS recreation area access."
+        answer: "Booking a combined tour with one operator is significantly smoother because transportation between the cruise dock, Auke Bay marina, and Mendenhall Glacier is pre-coordinated, saving transfer friction and including USFS recreation area permits."
       },
       {
         question: "What happens if our ship arrives late in Juneau?",
-        answer: "Local operators monitor ship docking in real time. If your vessel arrives late, tour departure times are adjusted automatically, or you will be placed on the next available departure with full on-time return protection."
+        answer: "Local operators monitor ship docking in real time. If your vessel arrives late, tour operators work to adjust departure times where schedule permits, or provide refund options if the port call is canceled. Travelers should maintain a 45–60 minute buffer before all-aboard."
       }
     ]
   },
@@ -108,15 +108,15 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     topic: "helicopter-tours",
     directQuestion: "How much is a helicopter glacier tour in Juneau and what is included?",
     directAnswer:
-      "Juneau helicopter glacier tours start at $360 to $420 per person for a scenic icefield flight with a 20-to-25 minute walking landing on Herbert, Norris, or Taku Glacier. Premium glacier treks and dog-sledding camps range from $550 to $799+. All tours include shuttle pickup from the cruise docks, glacier overboots, safety briefings, and a 100% full refund if flights are canceled due to mountain weather.",
+      "Juneau helicopter glacier tours start at $405 to $420 per person for a scenic icefield flight with a 20-to-25 minute walking landing on Herbert, Norris, or Taku Glacier. Premium glacier treks and dog-sledding camps range from $549 to $799+. All tours include shuttle pickup from the cruise docks, glacier overboots, safety briefings, and a 100% full refund if flights are canceled due to mountain weather.",
     pricingLabel: "Glacier Landing Price",
-    pricingValue: "$360–$420 per passenger (Scenic flight + walk)",
+    pricingValue: "$405–$420 per person (Scenic flight + walk)",
     durationLabel: "Total Tour Window",
     durationValue: "2.25–2.5 hours total (30–35 min flight + ice walk)",
     meetingPointLabel: "Cruise Ship Pickup",
     meetingPointValue: "Juneau Cruise Ship Terminal / Mt. Roberts Tram Plaza shuttle",
-    safetyBufferLabel: "Weather & Cruise Guarantee",
-    safetyBufferValue: "100% weather refund if grounded • Coordinated with ship port hours",
+    safetyBufferLabel: "Weather & Cruise Cushion",
+    safetyBufferValue: "100% weather refund if grounded • Plan 45–60 min buffer before all-aboard",
     faqSchema: [
       {
         question: "What happens if my Juneau helicopter tour gets canceled by weather?",

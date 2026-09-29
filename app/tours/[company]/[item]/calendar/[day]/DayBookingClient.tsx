@@ -9,6 +9,7 @@ import { canonicalizePortSlug } from "@/lib/dccSatellite";
 import { parseWidgetInitContext } from "@/lib/widgetContext";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { evaluatePortDayFit } from "@/lib/timing";
+import { trackDepartureSelect } from "@/lib/analytics/ga";
 
 export type SlotRate = {
   pk: number;
@@ -139,6 +140,16 @@ export default function DayBookingClient({
       },
       safeQty,
     );
+
+    trackDepartureSelect({
+      company,
+      itemPk: Number(item),
+      day,
+      startAt: String(selected.start_at || selected.startAt || ""),
+      price: unitCents,
+      quantity: safeQty,
+      rateLabel: chosenRate?.name ? String(chosenRate.name) : undefined,
+    });
 
     open();
   }
