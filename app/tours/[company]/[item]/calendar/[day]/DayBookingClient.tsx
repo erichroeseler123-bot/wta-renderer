@@ -10,6 +10,7 @@ import { parseWidgetInitContext } from "@/lib/widgetContext";
 import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { evaluatePortDayFit } from "@/lib/timing";
 import { trackDepartureSelect } from "@/lib/analytics/ga";
+import { getOperatorCancellationPolicy } from "@/lib/operatorCancellationPolicies";
 
 export type SlotRate = {
   pk: number;
@@ -63,6 +64,7 @@ export default function DayBookingClient({
   const [ratePk, setRatePk] = useState<number | null>(null);
   const [qty, setQty] = useState<number>(1);
   const widgetContext = useMemo(() => parseWidgetInitContext(sp), [sp]);
+  const policy = useMemo(() => getOperatorCancellationPolicy(company, item), [company, item]);
 
   const rates = useMemo<PickerRate[]>(() => {
     if (!selected?.customer_type_rates) return [];
@@ -325,6 +327,26 @@ export default function DayBookingClient({
               >
                 Go to checkout
               </Link>
+            </div>
+
+            {/* Operator Trust & Booking Disclosure */}
+            <div className="mt-6 rounded-2xl border border-sky-100 bg-sky-50/70 p-4 text-xs text-slate-700 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-slate-900">
+                <span>🛡️</span>
+                <span className="uppercase tracking-wider text-[10px]">Verified Booking & Operator Terms</span>
+              </div>
+              <p>
+                <strong>Operator:</strong> Directly operated by <strong>{policy.operatorName}</strong>.
+              </p>
+              <p>
+                <strong>Payment & Invoicing:</strong> Billed securely by Welcome to Alaska Tours via Stripe. Instant booking voucher issued upon checkout.
+              </p>
+              <p>
+                <strong>Pre-Payment Cancellation Policy:</strong> {policy.guestCutoffNotice}
+              </p>
+              <p className="text-[11px] text-slate-500">
+                100% full refund if severe weather or safety conditions prevent operations.
+              </p>
             </div>
           </div>
         )}

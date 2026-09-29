@@ -47,7 +47,7 @@ const PAGES: PageConfig[] = [
       { question: "How do cruise passengers get to the whale watching boats?", answer: "Excursions include round-trip motorcoach or van shuttle transportation from the downtown Juneau cruise terminal area (Mt. Roberts Tramway plaza) to Auke Bay Harbor (approx. 20–25 minutes each way). Ships docking at the south AJ Dock take the $5 port shuttle to reach downtown departure points." },
       { question: "How long does a Juneau whale watching tour take?", answer: "Standalone whale watching tours take approximately 3 to 3.5 hours total (2 to 2.5 hours on the water). Combined Whale Watching + Mendenhall Glacier tours take 5 to 5.5 hours total." },
       { question: "Can we see bald eagles and seabirds on Juneau whale watching tours?", answer: "Yes. In addition to humpback whales, Auke Bay boat tours frequently pass bald eagle nests along the forested shoreline, as well as Marbled Murrelets, Pigeon Guillemots, and Pelagic Cormorants foraging in the marine passages." },
-      { question: "What happens if our cruise ship arrives late or misses port?", answer: "Local operators monitor ship docking in real time. If your vessel arrives behind schedule, operators will adjust departure times when fleet space allows. If weather or mechanical disruptions force your cruise ship to cancel the Juneau port call entirely, you receive a 100% full refund upon notification." },
+      { question: "What happens if our cruise ship arrives late or misses port?", answer: "Local operators monitor ship docking in real time. If your vessel arrives behind schedule, operators will adjust departure times when fleet space allows. For missed ports or ship cancellations, refund terms depend on the operator's specific booking policy (many operators like Dolphin Tours and Alaska Tales offer refunds or adjustments for ship delays; review your chosen excursion's terms prior to booking)." },
     ],
     related: [
       { href: "/juneau/mendenhall-glacier-tours", label: "Mendenhall Glacier tours" },
@@ -479,9 +479,9 @@ const PAGES: PageConfig[] = [
   {
     port: "skagway",
     topic: "helicopter-tours",
-    title: "Skagway Helicopter Tours and Glacier Flightseeing",
+    title: "Skagway Helicopter Tours & Glacier Landings | 2026 Prices",
     h1: "Skagway helicopter tours & glacier landings",
-    description: "Compare connected Skagway helicopter excursions and glacier flightseeing with TEMSCO Air Skagway. Glacier landings, dock pickup, and weather refund protections.",
+    description: "Compare Skagway helicopter tours ($439 to $599 per person flat rate): Chilkat Glacier landings and glacier dogsledding with TEMSCO Air. Cruise dock pickup and 100% weather refund guarantee.",
     intro: "Skagway's helicopter flightseeing inventory features dramatic aerial ascents over Sawtooth Ridge, the Taiya Inlet, and landings on Chilkat Glacier. Compare connected glacier flights with live departure checks before booking.",
     chooserTopic: "flightseeing",
     keywords: ["helicopter", "glacier discovery", "flightseeing", "temscoair-skagway", "temsco"],
@@ -489,13 +489,14 @@ const PAGES: PageConfig[] = [
     decisionTitle: "Fly over Skagway's rugged mountain passes",
     decisionIntro: "Helicopter tours in Skagway offer dramatic alpine topography right outside port.",
     decisionPoints: [
-      { title: "Sawtooth Ridge & glacier landing ($350–$410)", text: "2 to 2.5 hours total. Scenic flight over rugged peaks and a walking landing on the ancient ice of Chilkat Glacier." },
-      { title: "Denver Glacier helicopter dog sledding ($650–$750)", text: "Fly to an alpine snow camp on Denver Glacier for dog sledding on real snow with Alaskan racing teams." },
+      { title: "Glacier Discovery & Chilkat landing ($439)", text: "2 hours total. Scenic flight over Sawtooth Ridge and a walking landing on the ancient ice of Chilkat Glacier with overboots provided. $439 per person flat rate." },
+      { title: "Glacier dog sledding demonstration ($599)", text: "2 hours total. Fly to an alpine snow camp on Denver Glacier for dog sledding on real snow with Alaskan huskies. $599 per person flat rate." },
       { title: "Weather cancellation policy", text: "100% full refund if mountain weather or low cloud ceilings prevent flight operations." },
     ],
     faqs: [
+      { question: "How much do Skagway helicopter tours cost?", answer: "Skagway glacier helicopter tours start at $439 per person flat rate for the Glacier Discovery landing on Chilkat Glacier, and $599 per person flat rate for the Glacier Dog Sledding Demonstration (TEMSCO Air). Rates include all gear and dock shuttles; a surcharge applies for passengers 250+ lbs." },
       { question: "Where do Skagway helicopter tours depart from?", answer: "Shuttles pick up cruise passengers directly near the Skagway cruise docks and transfer them to the Skagway heliport in under 10 minutes." },
-      { question: "Is Skagway helicopter flightseeing suitable for cruise passengers?", answer: "Yes. Tours run 2 to 2.5 hours, leaving plenty of time to explore historic Broadway and return to your ship well before all-aboard." },
+      { question: "Is Skagway helicopter flightseeing suitable for cruise passengers?", answer: "Yes. Tours run 2 hours total, leaving plenty of time to explore historic Broadway and return to your ship well before all-aboard." },
     ],
     related: [
       { href: "/skagway/dog-sledding", label: "Skagway dog sledding" },
@@ -536,14 +537,14 @@ const PAGES: PageConfig[] = [
     title: "Skagway Dog Sledding and Glacier Dog Tours",
     h1: "Skagway dog sledding tours & Denver Glacier",
     description: "Compare connected Skagway dog sledding and glacier dog experiences: Denver Glacier helicopter flights and Dyea cart mushing.",
-    intro: "Skagway offers two dog-sledding formats: high-altitude helicopter glacier dog sledding on Denver Glacier ($650–$750) and summer dirt-cart sledding through the scenic Dyea valley ($140–$180). Use this page to compare connected choices with live departure checks.",
+    intro: "Skagway offers two dog-sledding formats: high-altitude helicopter glacier dog sledding on Denver Glacier ($599 flat rate) and summer dirt-cart sledding through the scenic Dyea valley ($140–$180). Use this page to compare connected choices with live departure checks.",
     chooserTopic: "dog-sledding",
     keywords: ["dog", "sled", "dogsled", "husky", "denver glacier", "dyea"],
     eyebrow: "Glacier Helicopter Sledding & Dyea Cart Mushing",
     decisionTitle: "Choose your Skagway dog sledding experience",
     decisionIntro: "Select between alpine glacier snow sledding and accessible rainforest cart mushing.",
     decisionPoints: [
-      { title: "Denver Glacier helicopter dog sledding", text: "Fly by helicopter to an alpine snow camp on Denver Glacier for real snow sledding with veteran mushers." },
+      { title: "Denver Glacier helicopter dog sledding ($599)", text: "Fly by helicopter to an alpine snow camp on Denver Glacier for real snow sledding with veteran mushers. $599 per person flat rate." },
       { title: "Dyea valley summer cart mushing", text: "Ride wheeled training carts pulled by powerful Alaskan huskies along rainforest trails in scenic Dyea." },
       { title: "Puppy socialization & musher talks", text: "Both formats include hands-on time petting sled dogs and holding newborn husky puppies." },
     ],
@@ -570,7 +571,7 @@ const PAGES: PageConfig[] = [
     decisionIntro: "Small-group adventure excursions offer an energetic alternative to crowded tour buses.",
     decisionPoints: [
       { title: "Skagway Scooters & rentals ($110–$150)", text: "Ride easy-to-handle electric scooters along historic Broadway, coastal viewpoints, and Gold Rush trails out to Dyea Tidal Flats." },
-      { title: "Sawtooth Ridge helicopter glacier flight ($350–$410)", text: "2.5 hours total. Fly high over jagged peaks and land on Chilkat Glacier for a guided ice walk." },
+      { title: "Sawtooth Ridge helicopter glacier flight ($439)", text: "2 hours total. Fly high over jagged peaks and land on Chilkat Glacier for a guided ice walk. $439 per person flat rate." },
       { title: "Taiya River scenic raft float ($145–$185)", text: "Hike a portion of the historic Chilkoot Trail and enjoy a gentle float down the Taiya River with eagle viewing." },
     ],
     faqs: [
@@ -641,7 +642,29 @@ const PAGES: PageConfig[] = [
 
 function textFor(tour: HelicopterTour) { return `${tour.title} ${tour.category || ""} ${tour.description || ""}`.toLowerCase(); }
 function priceNumber(value?: string) { const match = String(value || "").match(/\$\s*([0-9][0-9,]*)/); return match ? Number(match[1].replace(/,/g, "")) : null; }
-function durationLabel(value?: string) { const match = String(value || "").match(/(\d+(?:\.\d+)?)\s*hours?/i); return match ? `${match[1]} hours` : "Check tour details"; }
+function durationLabel(value?: string) {
+  const str = String(value || "");
+  const compoundMatch = str.match(/\b(\d+)\s*Hours?(?:\s*(?:&|and|,)\s*|\s+)(\d+)\s*Minutes?\b/i);
+  if (compoundMatch) {
+    return `${compoundMatch[1]} hrs ${compoundMatch[2]} mins`;
+  }
+  const fracMatch = str.match(/\b(\d+)\s*([¼½¾]|1\/4|1\/2|3\/4)\s*Hours?\b/i);
+  if (fracMatch) {
+    const f = fracMatch[2];
+    const mins = (f === "¼" || f === "1/4") ? "15 mins" : (f === "½" || f === "1/2") ? "30 mins" : "45 mins";
+    return `${fracMatch[1]} hrs ${mins}`;
+  }
+  const match = str.match(/(\d+(?:\.\d+)?)\s*hours?/i);
+  if (match) {
+    const val = parseFloat(match[1]);
+    if (val === 2.25) return "2 hrs 15 mins";
+    if (val === 2.5) return "2.5 hours";
+    if (val === 2.75) return "2 hrs 45 mins";
+    if (val === 3.5) return "3.5 hours";
+    return `${match[1]} hours`;
+  }
+  return "Check tour details";
+}
 function parsePriceBasis(tour: HelicopterTour) {
   const rawPrice = tour.fromPrice || "";
   const desc = tour.description || "";

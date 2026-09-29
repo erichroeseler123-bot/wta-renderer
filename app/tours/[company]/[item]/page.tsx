@@ -579,17 +579,23 @@ export default async function TourDetailPage({
             </p>
 
             {/* Mobile-only CTA and Price right below the operator */}
-            <div className="flex items-center justify-between gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100 lg:hidden">
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Tour Price (Flat Rate)</span>
-                <span className="text-xl font-black text-slate-900">{safeTour.fromPrice || "Check Price"}</span>
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 lg:hidden space-y-3">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Tour Price (Flat Rate)</span>
+                  <span className="text-xl font-black text-slate-900">{safeTour.fromPrice || "Check Price"}</span>
+                </div>
+                <Link
+                  href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
+                  className="flex-1 max-w-[200px] rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
+                >
+                  {isNorthStar405050 ? "Check Departures" : "Book Now"}
+                </Link>
               </div>
-              <Link
-                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
-                className="flex-1 max-w-[200px] rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
-              >
-                {isNorthStar405050 ? "Check Departures" : "Book Now"}
-              </Link>
+              <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px] text-slate-500">
+                <span>🛡️ {cancellationPolicyInfo.shortTerms.split(".")[0]}.</span>
+                <span>⚡ Instant voucher</span>
+              </div>
             </div>
 
             {/* Main Hero Image */}

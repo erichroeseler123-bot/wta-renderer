@@ -59,6 +59,23 @@ async function verifyHost(host) {
   console.log(`  Mentions 24 hours: ${atHtml.includes('24 hours')}`);
   console.log(`  Does NOT falsely default to Alaska Galore 14 days: ${!atHtml.includes('within 14 days')}`);
   console.log(`  Does NOT falsely mention $50 fee: ${!atHtml.includes('$50')}`);
+
+  // 5. Skagway Helicopter Tours Category
+  const skgHeliUrl = `${host}/skagway/helicopter-tours`;
+  const skgHeliRes = await fetchUrl(skgHeliUrl);
+  const skgHeliHtml = skgHeliRes.data;
+  console.log(`[Skagway Helicopter Category] HTTP Status: ${skgHeliRes.status}`);
+  console.log(`  Displays verified $439 rate: ${skgHeliHtml.includes('$439')}`);
+  console.log(`  Displays verified $599 rate: ${skgHeliHtml.includes('$599')}`);
+  console.log(`  Does NOT display obsolete $350-$410 range: ${!skgHeliHtml.includes('$350') && !skgHeliHtml.includes('$410')}`);
+  console.log(`  Does NOT display obsolete $650-$750 range: ${!skgHeliHtml.includes('$650') && !skgHeliHtml.includes('$750')}`);
+
+  // 6. Juneau Whale Watching Topic Page
+  const jnuWhaleUrl = `${host}/juneau/whale-watching`;
+  const jnuWhaleRes = await fetchUrl(jnuWhaleUrl);
+  const jnuWhaleHtml = jnuWhaleRes.data;
+  console.log(`[Juneau Whale Watching Topic] HTTP Status: ${jnuWhaleRes.status}`);
+  console.log(`  Accurate operator-dependent ship cancellation FAQ: ${jnuWhaleHtml.includes("refund terms depend on the operator's specific booking policy")}`);
 }
 
 async function main() {
