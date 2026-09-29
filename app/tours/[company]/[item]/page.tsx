@@ -184,7 +184,7 @@ function getTimingBufferNote(isHeliOrAir: boolean, isBoat: boolean) {
 
 function getCheckInMappingText(isHeliOrAir: boolean, isBoat: boolean, portName: string, company?: string) {
   if (company?.toLowerCase().startsWith("temsco") && portName.toLowerCase() === "skagway") {
-    return "Check in directly at TEMSCO's Skagway heliport base (1000 Congress Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transfer back to downtown Skagway and cruise berths is provided following the tour.";
+    return "Check in directly at TEMSCO's Skagway heliport base (101 Terminal Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transfer back to downtown Skagway and cruise berths is provided following the tour.";
   }
   if (isHeliOrAir) {
     return `Departures include round-trip shuttle service from downtown ${portName} cruise terminal staging points directly to the heliport. Complete pickup coordinates, vehicle signage, and departure times are emailed directly upon checkout confirmation.`;
@@ -268,9 +268,16 @@ export async function generateMetadata({
   const title = `${safeTour.title} | ${operatorName} Excursion`;
   
   let description = cleanTourDescription(safeTour.description, "Alaska excursion.");
-  if (isGenericDescription(description)) {
+  const isTemsco556Meta = safeTour.company === "temscoair-skagway" && (String(safeTour.pk || item) === "213556" || Number(safeTour.pk || item) === 213556);
+  const isTemsco561Meta = safeTour.company === "temscoair-skagway" && (String(safeTour.pk || item) === "213561" || Number(safeTour.pk || item) === 213561);
+  if (isTemsco556Meta) {
+    description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+  } else if (isTemsco561Meta) {
+    description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
+  } else if (isGenericDescription(description)) {
     description = `Book the ${safeTour.title} operated by ${operatorName}. Verify cruise schedule fit and check real-time availability.`;
   }
+  description = description.replace(/^Starting at\s+/i, "");
 
   return {
     title,
@@ -312,11 +319,13 @@ export default async function TourDetailPage({
     safeTour.company,
     safeTour.pk || item,
   );
+  const isTemsco556 = safeTour.company === "temscoair-skagway" && (String(safeTour.pk || item) === "213556" || Number(safeTour.pk || item) === 213556);
+  const isTemsco561 = safeTour.company === "temscoair-skagway" && (String(safeTour.pk || item) === "213561" || Number(safeTour.pk || item) === 213561);
   if (isNorthStar405050) {
     safeTour.fromPrice = "$419 Per Person (Flat Rate)";
-  } else if (safeTour.company === "temscoair-skagway" && String(safeTour.pk || item) === "213556") {
+  } else if (isTemsco556) {
     safeTour.fromPrice = "$439 Per Person (Flat Rate)";
-  } else if (safeTour.company === "temscoair-skagway" && String(safeTour.pk || item) === "213561") {
+  } else if (isTemsco561) {
     safeTour.fromPrice = "$599 Per Person (Flat Rate)";
   }
   const cancellationPolicyInfo = getOperatorCancellationPolicy(
@@ -331,9 +340,14 @@ export default async function TourDetailPage({
   const fallbackHero = safeTour.port === "ketchikan" ? "/hero/ketchikan.png" : safeTour.port === "skagway" ? "/hero/skagway.jpg" : "/hero/juneau.jpg";
   const heroSrc = hasRealOperatorImage ? safeTour.image! : fallbackHero;
   let description = cleanTourDescription(safeTour.description, "Alaska excursion.");
-  if (isGenericDescription(description)) {
+  if (isTemsco556) {
+    description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+  } else if (isTemsco561) {
+    description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
+  } else if (isGenericDescription(description)) {
     description = "Experience a premier excursion during your port day in Alaska. Review live departures and availability below to secure your booking.";
   }
+  description = description.replace(/^Starting at\s+/i, "");
 
   const hasNextAvailability = Boolean(safeTour.nextAvailableDate);
   const categoryLink = getCategoryLink(categoryName, safeTour.title);
@@ -503,9 +517,13 @@ export default async function TourDetailPage({
           : safeTour.port === "ketchikan"
           ? "Tours meet along the downtown Ketchikan waterfront right near Berths 1, 2, and 3. If your ship berths at Ward Cove (Berth 4, 7 miles north), allow 15 to 20 minutes to ride the port shuttle to the downtown meeting point before tour check-in."
           : isTemsco && safeTour.port === "skagway"
-          ? "Guests check in directly at the TEMSCO Skagway heliport base (1000 Congress Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transportation back to downtown Skagway and cruise docks is provided after your tour."
+          ? "Guests check in directly at the TEMSCO Skagway heliport base (101 Terminal Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transportation back to downtown Skagway and cruise docks is provided after your tour."
           : "Departures stage in downtown Skagway along 2nd Avenue or at the Small Boat Harbor, a level 5 to 10-minute walk from the Railroad Dock, Broadway Dock, and Ore Dock.",
     },
+    ...(isTemsco561 ? [{
+      question: "Do guests get to ride on the dog sled during this Skagway helicopter tour?",
+      answer: "No. TEMSCO Air explicitly confirms that guests cannot ride the sled on this excursion. The tour is an aerial flightseeing experience, alpine snow landing, kennel visit, and active dog sledding demonstration where you observe the dog team running and interact directly with the dogs and puppies.",
+    }] : []),
     {
       question: "How much walking, climbing, or boarding assistance is involved?",
       answer:
@@ -622,6 +640,11 @@ export default async function TourDetailPage({
                   {isNorthStar405050 ? "Check Departures" : "Book Now"}
                 </Link>
               </div>
+              {isTemsco561 && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-[11px] font-medium text-amber-950">
+                  ⚠️ <strong>No Sled Riding:</strong> Guests observe an active dog sledding demonstration on snow and cuddle puppies. <strong>Guests cannot ride the sled on this excursion.</strong>
+                </div>
+              )}
               <div className="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[10px] text-slate-500">
                 <span>🛡️ {cancellationPolicyInfo.shortTerms.split(".")[0]}.</span>
                 <span>⚡ Instant voucher</span>
@@ -729,6 +752,17 @@ export default async function TourDetailPage({
 
             {/* CTA Buttons */}
             <div className="grid gap-3 pt-2">
+              {isTemsco561 && (
+                <div className="rounded-2xl border border-amber-300 bg-amber-50 p-3.5 text-xs text-amber-950 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-1.5 font-bold uppercase tracking-wider text-[10px] text-amber-900">
+                    <span>⚠️</span>
+                    <span>Demonstration Excursion (No Sled Riding)</span>
+                  </div>
+                  <p className="leading-relaxed text-slate-800">
+                    Guests fly to Denver Glacier to observe an active dog sledding demonstration on snow, meet veteran mushers, and cuddle husky puppies. <strong>TEMSCO explicitly notes that guests cannot ride the sled on this tour; sled riding is not available on this flight.</strong>
+                  </p>
+                </div>
+              )}
               <Link
                 href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
                 className="w-full rounded-2xl bg-slate-900 py-3.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
@@ -771,6 +805,12 @@ export default async function TourDetailPage({
                 <span>🏔️</span>
                 <p className="leading-normal"><strong>Operator:</strong> Operated directly by <strong>{operatorName}</strong> in {portName}.</p>
               </div>
+              {isTemsco561 && (
+                <div className="flex gap-2">
+                  <span>🐕</span>
+                  <p className="leading-normal"><strong>Format:</strong> Musher demonstration on snow, kennel tour, and puppy interaction. Sled riding is not available.</p>
+                </div>
+              )}
               <div className="flex gap-2">
                 <span>💳</span>
                 <p className="leading-normal"><strong>Payment & Voucher:</strong> Billed securely by Welcome to Alaska Tours via Stripe. Instant confirmation voucher issued.</p>
@@ -779,7 +819,7 @@ export default async function TourDetailPage({
                 <span>📍</span>
                 <p className="leading-normal">
                   <strong>Port Pickup:</strong> {isTemsco && safeTour.port === "skagway"
-                    ? "Self check-in at TEMSCO Skagway heliport base (walkable from Ore/Broadway docks); return transfer back to cruise berths included."
+                    ? "Self check-in at TEMSCO Skagway heliport base (101 Terminal Way, walkable from Ore/Broadway docks); return transfer back to cruise berths included."
                     : `Staged for ${portName} cruise berths (including shuttle transit guidance for outer docks).`}
                 </p>
               </div>
@@ -839,6 +879,12 @@ export default async function TourDetailPage({
               <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Safety Buffer</span>
               <span className="mt-1 font-bold text-slate-900 block text-sm">{bufferMinutes} mins minimum</span>
             </div>
+            {isTemsco561 && (
+              <div className="rounded-2xl border border-amber-200 bg-amber-50/70 p-4 col-span-2 sm:col-span-4">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800 block">Sled Riding Policy</span>
+                <span className="mt-1 font-bold text-slate-900 block text-xs">Demonstration &amp; interaction only (Guests cannot ride the sled on this flight)</span>
+              </div>
+            )}
           </div>
         </section>
 
@@ -880,6 +926,16 @@ export default async function TourDetailPage({
         {/* Full Product Info */}
         <section className="prose max-w-none space-y-4">
           <h2 className="text-xl font-black tracking-tight text-slate-900">Tour Overview & Operator Notes</h2>
+          {isTemsco561 && (
+            <div className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-950 space-y-1.5 not-prose">
+              <span className="font-bold uppercase tracking-wider text-[11px] text-amber-900 block">
+                ⚠️ Operator Notice (TEMSCO Helicopters): Demonstration Only — No Sled Riding
+              </span>
+              <p className="leading-relaxed text-slate-800">
+                TEMSCO explicitly notes that guests cannot ride the dog sled on this excursion. This tour is an aerial glacier flight, kennel tour, and musher presentation where guests observe the dog team running the snow trail and interact with sled dogs and puppies. <strong>Sled riding is not available on this flight.</strong>
+              </p>
+            </div>
+          )}
           <p className="text-sm leading-relaxed text-slate-655 max-w-4xl">
             {description}
           </p>

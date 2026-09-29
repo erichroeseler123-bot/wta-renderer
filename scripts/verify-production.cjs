@@ -23,7 +23,8 @@ async function verifyHost(host) {
   console.log(`  Visible $599 rate: ${skgDogHtml.includes('$599')}`);
   console.log(`  Obsolete $650-$750 rate removed: ${!skgDogHtml.includes('$650') && !skgDogHtml.includes('$750')}`);
   console.log(`  Clarified demonstration (no riding on glacier): ${skgDogHtml.includes('demonstration') && !skgDogHtml.includes('glacier snow sledding')}`);
-  console.log(`  Base check-in / return transfer reflected: ${skgDogHtml.includes('TEMSCO Skagway heliport') || skgDogHtml.includes('Congress Way')}`);
+  console.log(`  Official 101 Terminal Way address present: ${skgDogHtml.includes('101 Terminal Way')}`);
+  console.log(`  Conflicting Congress Way removed: ${!skgDogHtml.includes('Congress Way')}`);
 
   // 2. Skagway Helicopter Tours Category
   const skgHeliUrl = `${host}/skagway/helicopter-tours`;
@@ -34,7 +35,8 @@ async function verifyHost(host) {
   console.log(`  Displays verified $599 rate: ${skgHeliHtml.includes('$599')}`);
   console.log(`  Discloses explicit $150 weight surcharge: ${skgHeliHtml.includes('$150') && skgHeliHtml.includes('250')}`);
   console.log(`  Footwear / clothing inclusion mentioned: ${skgHeliHtml.includes('clothing and footwear') || skgHeliHtml.includes('clothing & footwear')}`);
-  console.log(`  Check-in base logistics described: ${skgHeliHtml.includes('Congress Way') || skgHeliHtml.includes('heliport base')}`);
+  console.log(`  Official 101 Terminal Way address present: ${skgHeliHtml.includes('101 Terminal Way')}`);
+  console.log(`  Conflicting Congress Way removed: ${!skgHeliHtml.includes('Congress Way')}`);
   console.log(`  No 'Starting at' for TEMSCO cards: ${!/Starting at \$439/i.test(skgHeliHtml) && !/Starting at \$599/i.test(skgHeliHtml)}`);
 
   // 3. Juneau Helicopter Tours Category
@@ -51,7 +53,9 @@ async function verifyHost(host) {
   console.log(`[TEMSCO Glacier Discovery 213556] HTTP Status: ${temsco556Res.status}`);
   console.log(`  Price $439 flat rate: ${temsco556Html.includes('$439')}`);
   console.log(`  TEMSCO $150 weight surcharge visible: ${temsco556Html.includes('+$150 TEMSCO') || temsco556Html.includes('$150 operator weight surcharge')}`);
-  console.log(`  Base check-in / return transfer visible: ${temsco556Html.includes('Congress Way') || temsco556Html.includes('TEMSCO Skagway heliport base')}`);
+  console.log(`  Official 101 Terminal Way address visible: ${temsco556Html.includes('101 Terminal Way')}`);
+  console.log(`  Conflicting Congress Way removed: ${!temsco556Html.includes('Congress Way')}`);
+  console.log(`  No 'Starting at' in product copy or meta: ${!temsco556Html.includes('Starting at')}`);
 
   // 5. TEMSCO 213561 Detail Page
   const temsco561Url = `${host}/tours/temscoair-skagway/213561`;
@@ -60,7 +64,11 @@ async function verifyHost(host) {
   console.log(`[TEMSCO Dog Sledding Demonstration 213561] HTTP Status: ${temsco561Res.status}`);
   console.log(`  Price $599 flat rate: ${temsco561Html.includes('$599')}`);
   console.log(`  Described as demonstration / puppy interaction: ${temsco561Html.includes('demonstration')}`);
+  console.log(`  Explicit 'no sled ride' disclosure on product page: ${temsco561Html.includes('cannot ride the sled') || temsco561Html.includes('sled riding is not available') || temsco561Html.includes('No Sled Riding')}`);
   console.log(`  TEMSCO $150 weight surcharge visible: ${temsco561Html.includes('+$150 TEMSCO') || temsco561Html.includes('$150 operator weight surcharge')}`);
+  console.log(`  Official 101 Terminal Way address visible: ${temsco561Html.includes('101 Terminal Way')}`);
+  console.log(`  Conflicting Congress Way removed: ${!temsco561Html.includes('Congress Way')}`);
+  console.log(`  No 'Starting at' in product copy or meta: ${!temsco561Html.includes('Starting at')}`);
 
   // 6. NorthStar 405050
   const nsUrl = `${host}/tours/northstartrekking/405050`;

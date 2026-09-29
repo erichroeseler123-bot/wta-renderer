@@ -495,7 +495,7 @@ const PAGES: PageConfig[] = [
     ],
     faqs: [
       { question: "How much do Skagway helicopter tours cost?", answer: "Skagway glacier helicopter tours start at $439 per person flat rate for the Glacier Discovery landing on Chilkat Glacier, and $599 per person flat rate for the Glacier Dog Sledding Demonstration (TEMSCO Air). Rates include all gear and return dock shuttles. Note: Passengers weighing 250 lbs or more (including clothing and footwear) are subject to a mandatory $150 operator weight surcharge." },
-      { question: "Where do Skagway helicopter tours depart from?", answer: "Guests check in directly at the TEMSCO Skagway heliport base (conveniently located on Congress Way near the waterfront/ferry dock, walkable from Ore and Broadway Docks). Following your flight, complimentary return transportation is provided back to downtown Skagway or the cruise docks." },
+      { question: "Where do Skagway helicopter tours depart from?", answer: "Guests check in directly at the TEMSCO Skagway heliport base at 101 Terminal Way (located along the Skagway waterfront near the ferry terminal, walkable from Ore and Broadway Docks). Following your flight, complimentary return transportation is provided back to downtown Skagway or the cruise docks." },
       { question: "Is Skagway helicopter flightseeing suitable for cruise passengers?", answer: "Yes. Tours run 2 hours total, leaving plenty of time to explore historic Broadway and return to your ship well before all-aboard." },
     ],
     related: [
@@ -550,7 +550,7 @@ const PAGES: PageConfig[] = [
     ],
     faqs: [
       { question: "Can guests ride the dog sled on the Skagway helicopter tour?", answer: "No. TEMSCO Air Skagway's glacier dog sledding excursion is an active demonstration and interaction tour where guests observe dogs running the snow trail, meet mushers, and cuddle husky puppies. Sled riding is not available on this Skagway flight." },
-      { question: "Where do Skagway dog sledding tours meet?", answer: "Helicopter flights check in directly at the TEMSCO Skagway heliport on Congress Way (walkable from docks; return drop-off provided). Dyea cart mushing tours provide shuttle pickups near the Skagway cruise docks." },
+      { question: "Where do Skagway dog sledding tours meet?", answer: "Helicopter flights check in directly at the TEMSCO Skagway heliport at 101 Terminal Way (walkable from docks; return drop-off provided). Dyea cart mushing tours provide shuttle pickups near the Skagway cruise docks." },
     ],
     related: [
       { href: "/skagway/helicopter-tours", label: "Skagway helicopter tours" },

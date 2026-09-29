@@ -351,6 +351,12 @@ export async function getHelicopterTour(company: string, item: string): Promise<
     found.description = (found.description || "")
       .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
       .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
+  } else if (found.company === "temscoair-skagway" && (Number(found.pk) === 213556 || String(found.pk) === "213556")) {
+    found.fromPrice = "$439 Per Person (Flat Rate)";
+    found.description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+  } else if (found.company === "temscoair-skagway" && (Number(found.pk) === 213561 || String(found.pk) === "213561")) {
+    found.fromPrice = "$599 Per Person (Flat Rate)";
+    found.description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
   }
 
   const details = await getLiveItemDetails(found.company, found.pk);

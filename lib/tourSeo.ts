@@ -22,10 +22,11 @@ export function getProductOneLiner(tour: { title?: string | null; category?: str
 }
 
 export function cleanTourDescription(description?: string | null, fallback?: string) {
-  const source = String(description || fallback || "")
+  let source = String(description || fallback || "")
     .replace(/\$\$/g, "$")
     .replace(/\s+/g, " ")
     .trim();
+  source = source.replace(/^Starting at\s+/i, "");
   return source || "Review the tour details, then continue to the booking page to choose a date.";
 }
 
@@ -59,7 +60,12 @@ export function buildTourUrl(tour: Pick<HelicopterTour, "company" | "pk">) {
 }
 
 export function sanitizeTour<T extends Pick<HelicopterTour, "description"> & { company?: string; pk?: number | string; fromPrice?: string }>(tour: T): T {
-  const isNorthStar405050 = tour.company === "northstartrekking" && (Number(tour.pk) === 405050 || String(tour.pk) === "405050");
+  const comp = String(tour.company || "").toLowerCase();
+  const pkStr = String(tour.pk || "");
+  const isNorthStar405050 = comp === "northstartrekking" && pkStr === "405050";
+  const isTemsco556 = comp === "temscoair-skagway" && pkStr === "213556";
+  const isTemsco561 = comp === "temscoair-skagway" && pkStr === "213561";
+
   let fromPrice = tour.fromPrice;
   let description = cleanTourDescription(tour.description);
 
@@ -68,7 +74,15 @@ export function sanitizeTour<T extends Pick<HelicopterTour, "description"> & { c
     description = description
       .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
       .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
+  } else if (isTemsco556) {
+    fromPrice = "$439 Per Person (Flat Rate)";
+    description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+  } else if (isTemsco561) {
+    fromPrice = "$599 Per Person (Flat Rate)";
+    description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
   }
+
+  description = description.replace(/^Starting at\s+/i, "");
 
   return {
     ...tour,

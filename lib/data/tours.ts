@@ -54,14 +54,23 @@ function itemToTour(item: any, shortname: string): Tour {
   // FIX: Provide a fallback of 0 if price is missing, then check if it exists
   const rawPrice = item?.price || 0;
   const northstarPrice = shortname === "northstartrekking" ? buildNorthstarFromPrice(item) : null;
-  const fromPrice = northstarPrice || (rawPrice > 0 ? `$${(rawPrice / 100).toFixed(0)} Per Person (Flat Rate)` : "Check Price");
+  let fromPrice = northstarPrice || (rawPrice > 0 ? `$${(rawPrice / 100).toFixed(0)} Per Person (Flat Rate)` : "Check Price");
+
+  let desc = cleanDescription(item?.headline || item?.description) || "View details and availability.";
+  if (shortname === "temscoair-skagway" && (Number(item?.pk) === 213556 || String(item?.pk) === "213556")) {
+    fromPrice = "$439 Per Person (Flat Rate)";
+    desc = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+  } else if (shortname === "temscoair-skagway" && (Number(item?.pk) === 213561 || String(item?.pk) === "213561")) {
+    fromPrice = "$599 Per Person (Flat Rate)";
+    desc = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
+  }
+  desc = desc.replace(/^Starting at\s+/i, "");
 
   return {
-      pk: Number(item?.pk || 0),
-      slug,
+    pk: Number(item?.pk || 0),
+    slug,
     title: name,
-    description:
-      cleanDescription(item?.headline || item?.description) || "View details and availability.",
+    description: desc,
     duration: item?.duration_minutes ? `${Math.round(item.duration_minutes / 60 * 10) / 10} Hours` : undefined,
     fromPrice,
     image: item?.hero_image_url || item?.image_cdn_url || undefined,
