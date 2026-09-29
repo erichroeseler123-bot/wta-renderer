@@ -194,7 +194,9 @@ export default async function TourDetailPage({
   const bestForText = getWhoItIsBestFor(safeTour.title, categoryName);
   const skipText = getWhoShouldSkip(safeTour.title, activityLevel, ageConstraint);
 
-  const heroSrc = safeTour.image && String(safeTour.image).trim() ? safeTour.image : "/hero/juneau.jpg";
+  const hasRealOperatorImage = Boolean(safeTour.image && String(safeTour.image).trim());
+  const fallbackHero = safeTour.port === "ketchikan" ? "/hero/ketchikan.png" : safeTour.port === "skagway" ? "/hero/skagway.jpg" : "/hero/juneau.jpg";
+  const heroSrc = hasRealOperatorImage ? safeTour.image! : fallbackHero;
   let description = cleanTourDescription(safeTour.description, "Alaska excursion.");
   if (isGenericDescription(description)) {
     description = "Experience a premier excursion during your port day in Alaska. Review live departures and availability below to secure your booking.";
@@ -344,31 +346,53 @@ export default async function TourDetailPage({
     }
   } : null;
 
+  const isHeliOrAir = /helicopter|flight|air|seaplane|floatplane/i.test(safeTour.title);
+  const isBoat = /whale|boat|catamaran|marine|fishing|charter|cruise|water/i.test(safeTour.title);
+  const isKartOrScooter = /kart|scooter|utv|atv|jeep/i.test(safeTour.title);
+  const isPrivate = /private|charter/i.test(safeTour.title) || (safeTour.fromPrice && safeTour.fromPrice.toLowerCase().includes("private"));
+
   const renderedFaqs = [
     {
-      question: "Will this fit my cruise ship schedule?",
-      answer: "Excursion timing compatibility depends directly on your cruise ship's port arrival and departure window. Ensure the tour start time leaves a return safety buffer before your scheduled all-aboard time."
+      question: `Does this departure fit my cruise ship's port window in ${portName}?`,
+      answer: `Excursion timing compatibility depends directly on your ship's arrival and all-aboard times. We recommend a minimum ${isHeliOrAir ? "60-minute" : "45-minute"} return safety buffer between the tour return and your ship's scheduled all-aboard time. Always confirm your ship's exact port hours before booking.`,
     },
     {
-      question: "How much return buffer should I leave?",
-      answer: "We recommend a minimum 45-minute return safety buffer for standard excursions and 60 minutes for high-altitude glacier landings or flightseeing to allow for weather checks and transit logistics."
+      question: `Where do we meet in ${portName}, and what if my ship docks at an outer berth?`,
+      answer:
+        safeTour.port === "juneau"
+          ? "Departures stage near the Mt. Roberts Tramway parking lot (490 S Franklin St), an easy 5-minute flat walk from downtown docks (Franklin, CT, and IVF berths). If your ship docks at the south AJ Dock, take the $5 port shuttle directly to the tram lot for your tour check-in."
+          : safeTour.port === "ketchikan"
+          ? "Tours meet along the downtown Ketchikan waterfront right near Berths 1, 2, and 3. If your ship berths at Ward Cove (Berth 4, 7 miles north), allow 15 to 20 minutes to ride the port shuttle to the downtown meeting point before tour check-in."
+          : "Departures stage in downtown Skagway along 2nd Avenue or at the Small Boat Harbor, a level 5 to 10-minute walk from the Railroad Dock, Broadway Dock, and Ore Dock.",
     },
     {
-      question: "What should I confirm before booking?",
-      answer: "Always confirm your ship's exact all-aboard time (typically 30 minutes before departure) and check the tour duration against your port day calendar before final checkout."
+      question: "How much walking, climbing, or boarding assistance is involved?",
+      answer:
+        isHeliOrAir
+          ? "Moderate mobility is required. Guests must climb 2–3 steep steps into the aircraft with staff assistance. Glacier landings involve walking 200–400 yards over natural ice; sturdy overboots or crampons are fitted on site."
+          : isBoat
+          ? "Low physical exertion. Boarding is via dock gangway ramps. Enclosed heated cabins feature comfortable seating and wide outdoor viewing decks. Folding wheelchairs can be stowed on board."
+          : isKartOrScooter
+          ? "Active physical participation. Operators must hold a valid driver's license. Riding involves vibration and sitting upright over off-road or gravel surfaces. Full protective helmets are supplied."
+          : "Standard walking at an easy to moderate pace. Any necessary equipment, safety gear, or walking sticks are provided by the operator.",
     },
     {
-      question: "Is this good for families?",
-      answer: "Yes, many tours accommodate all ages. However, glacier hiking and trekking excursions may have minimum age restrictions (such as 8+ or 12+) due to gear outfitting constraints."
+      question: "What age, weight, or equipment requirements apply?",
+      answer:
+        isHeliOrAir
+          ? `FAA flight safety regulations require passenger weight verification for aircraft balance. Guests weighing 250 lbs or more may require an adjacent seat or weight surcharge in accordance with FAA and operator guidelines. ${ageConstraint ? `Age policy: ${ageConstraint}.` : "Children of all ages are welcome."}`
+          : `${ageConstraint ? `Age policy: ${ageConstraint}.` : "All ages are welcome."} Dress in warm layers with a waterproof outer jacket and flat, comfortable walking shoes. Specialized gear (neoprene overboots, spray skirts, or flotation suits) is furnished by ${operatorName}.`,
     },
     {
-      question: "What happens if weather affects flightseeing?",
-      answer: "Safety is the operator's top priority. If your flightseeing tour is cancelled due to weather, you will receive a full refund. We recommend booking flights earlier in the day when weather is typically most stable."
+      question: `What happens if mountain weather cancels the tour or my ship misses port?`,
+      answer: `Safety is paramount in Southeast Alaska. If severe weather, heavy fog, or high winds prevent safe operations, ${operatorName} issues a 100% full refund with zero cancellation penalty. If your cruise ship cancels the port call or bypasses ${portName} due to mechanical delays or weather, your booking is fully refunded upon verification.`,
     },
     {
-      question: "Where do I confirm exact departure details?",
-      answer: "Your booking confirmation email will contain the operator's local office contact number, exact check-in address at the port, and departure instructions."
-    }
+      question: "Is the listed price per person or for the entire group?",
+      answer: isPrivate
+        ? "This is a private charter listing. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service."
+        : `The price (${safeTour.fromPrice || "listed starting rate"}) is per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes and processing are transparently itemized with zero surprise fees at checkout.`,
+    },
   ];
 
   const faqSchema = {
@@ -455,13 +479,18 @@ export default async function TourDetailPage({
             <div className="relative aspect-[16/10] w-full overflow-hidden rounded-3xl border border-stone-200 shadow-md">
               <Image
                 src={heroSrc}
-                alt={safeTour.title}
+                alt={`${safeTour.title} - ${operatorName} (${portName}, Alaska)`}
                 fill
                 priority
                 unoptimized
                 className="object-cover"
                 sizes="(max-w-7xl) 100vw, 1200px"
               />
+              {!hasRealOperatorImage && (
+                <div className="absolute bottom-3 left-3 rounded-lg bg-black/75 px-3 py-1.5 text-[11px] font-medium text-white backdrop-blur-sm">
+                  📍 Regional preview shown · Verified operator itinerary below
+                </div>
+              )}
             </div>
 
             {/* Thumbnails Gallery */}
@@ -530,23 +559,27 @@ export default async function TourDetailPage({
               </div>
             </div>
 
-            <div className="rounded-2xl border border-sky-100 bg-sky-50/50 p-4 text-[11px] text-slate-700 space-y-2.5">
-              <span className="font-black text-slate-900 uppercase tracking-wider text-[9px] block">WTA Booking Guarantees</span>
-              <div className="flex gap-2">
-                <span>⚡</span>
-                <p className="leading-normal"><strong>Live Inventory:</strong> Calendars connect directly to operator departure schedules.</p>
-              </div>
+            <div className="rounded-2xl border border-sky-100 bg-sky-50/50 p-4 text-[11px] text-slate-700 space-y-3">
+              <span className="font-black text-slate-900 uppercase tracking-wider text-[9px] block">Verified Booking Terms</span>
               <div className="flex gap-2">
                 <span>🏔️</span>
-                <p className="leading-normal"><strong>Direct Booking:</strong> Placed directly with verified Alaskan operators.</p>
-              </div>
-              <div className="flex gap-2">
-                <span>🛡️</span>
-                <p className="leading-normal"><strong>Safety Buffer:</strong> Enforces 45+ minute return margins before ship departs.</p>
+                <p className="leading-normal"><strong>Operator:</strong> Operated directly by <strong>{operatorName}</strong> in {portName}.</p>
               </div>
               <div className="flex gap-2">
                 <span>💳</span>
-                <p className="leading-normal"><strong>Secure Stripe:</strong> Protected checkouts with instant confirmations.</p>
+                <p className="leading-normal"><strong>Payment & Voucher:</strong> Billed securely by Welcome to Alaska Tours via Stripe. Instant confirmation voucher issued.</p>
+              </div>
+              <div className="flex gap-2">
+                <span>📍</span>
+                <p className="leading-normal"><strong>Port Pickup:</strong> Staged for {portName} cruise berths (including shuttle transit guidance for outer docks).</p>
+              </div>
+              <div className="flex gap-2">
+                <span>🛡️</span>
+                <p className="leading-normal"><strong>Cancellation Protection:</strong> 100% refund if weather cancels the activity or if your ship misses port.</p>
+              </div>
+              <div className="flex gap-2">
+                <span>⏱️</span>
+                <p className="leading-normal"><strong>Safety Margin:</strong> {bufferMinutes}-minute return cushion enforced before ship all-aboard.</p>
               </div>
             </div>
           </div>

@@ -2,7 +2,7 @@ const AGENT = {
   spec: "dcc-site-contract",
   version: "1.0",
   dcc_id: "dcc:site:welcome-to-alaska-tours",
-  schema_version: "2026-08-24",
+  schema_version: "2026-09-29",
   site: {
     id: "welcome-to-alaska-tours",
     name: "Welcome to Alaska Tours",
@@ -12,7 +12,7 @@ const AGENT = {
   },
   status: {
     state: "active",
-    last_verified: "2026-08-24",
+    last_verified: "2026-09-29",
   },
   authority: [
     "excursion_catalog",

@@ -15,18 +15,18 @@ const APPROVED_PORTS = ["juneau", "skagway", "ketchikan"];
 const PORT_INFO: Record<string, { title: string; description: string; problem: string }> = {
   juneau: {
     title: "Juneau Shore Excursions: Whale Watching, Mendenhall & Helicopter Tours (2026)",
-    description: "Compare Juneau whale watching, Mendenhall Glacier combos, helicopter glacier treks, dog sledding, and fishing charters. 100% weather refund and cruise dock pickup.",
-    problem: "Juneau has Alaska's largest excursion menu. The key is coordinating signature highlights like whale watching and Mendenhall Glacier with your ship's specific port window and guaranteed return timing.",
+    description: "Compare Juneau whale watching, Mendenhall Glacier combos, helicopter glacier treks, dog sledding, and fishing charters. Operator weather refunds and cruise dock shuttles.",
+    problem: "Juneau has Alaska's largest excursion menu. The key is coordinating signature highlights like whale watching and Mendenhall Glacier with your ship's specific port window and a 45–60 minute return safety buffer.",
   },
   skagway: {
     title: "Skagway Shore Excursions: Scooters, Gold Rush, Glacier Flights & Dog Sleds (2026)",
-    description: "Compare Skagway shore excursions: Skagway Scooters Gold Rush adventures, electric rentals to Dyea, TEMSCO helicopter glacier landings, Liarsville, and dog sledding.",
-    problem: "Skagway offers a mix of structured mountain adventures and self-directed explorations. The best choice balances your group's desired activity level with safe all-aboard return buffers.",
+    description: "Compare Skagway shore excursions: Skagway Scooters Gold Rush adventures, electric rentals to Dyea, TEMSCO helicopter glacier landings, Liarsville, and dog sledding. Verified ship timing buffers.",
+    problem: "Skagway offers a mix of structured mountain adventures and self-directed explorations. The best choice balances your group's desired activity level with safe 45+ minute all-aboard return buffers.",
   },
   ketchikan: {
     title: "Ketchikan Shore Excursions: Adventure Karts, Kayaking, Bears & Misty Fjords (2026)",
-    description: "Compare Ketchikan shore excursions: Adventure Kart Expeditions, Ketchikan Kayak Co sea kayaking, Herring Cove bear viewing, Misty Fjords floatplanes, and Duck tours.",
-    problem: "Ketchikan offers everything from rugged rainforest kart tracks and sea kayaking to tranquil Misty Fjords seaplanes. Match the right excursion to your ship's berth location (Berths 1–4 vs. Ward Cove).",
+    description: "Compare Ketchikan shore excursions: Adventure Kart Expeditions, Ketchikan Kayak Co sea kayaking, Herring Cove bear viewing, Misty Fjords floatplanes, and Duck tours. Ward Cove and downtown berth logistics.",
+    problem: "Ketchikan offers everything from rugged rainforest kart tracks and sea kayaking to tranquil Misty Fjords seaplanes. Match the right excursion to your ship's berth location (Berths 1–4 vs. Ward Cove shuttle transfer).",
   },
 };
 

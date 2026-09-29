@@ -5,7 +5,7 @@ DCC ID: dcc:site:welcome-to-alaska-tours
 DCC truth record: https://www.destinationcommandcenter.com/api/public/truth-feed?id=welcome-to-alaska-tours
 Portfolio graph: https://www.destinationcommandcenter.com/api/public/portfolio-feed
 Agent contract: https://www.welcometoalaskatours.com/agent.json
-Last verified: 2026-08-24
+Last verified: 2026-09-29
 
 Welcome to Alaska Tours is an Alaska excursion shopping property with published excursion inventory, tour calendars and site checkout.
 

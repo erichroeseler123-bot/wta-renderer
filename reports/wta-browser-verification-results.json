@@ -1,5 +1,5 @@
 {
-  "test_run_timestamp": "2026-09-29T12:34:34.587Z",
+  "test_run_timestamp": "2026-09-29T12:42:05.198Z",
   "property_name": "Welcome to Alaska Tours",
   "repository": "https://github.com/erichroeseler123-bot/wta-renderer.git",
   "local_repository_path": "C:/Users/erich/Documents/Projects/wta-renderer",
@@ -78,8 +78,8 @@
         {
           "path": "/juneau/whale-watching",
           "status": 200,
-          "title": "Juneau Whale Watching Tours: Mendenhall Combos &amp; Small Boats (2026) | Welcome to Alaska Tours",
-          "description": "Compare Juneau whale watching excursions and Mendenhall Glacier combos. Guaranteed sightings, heated catamarans, Auke Bay departures, and cruise ship buffers.",
+          "title": "Juneau Whale Watching &amp; Mendenhall Tours | 2026 Cruise Excursions | Welcome to Alaska Tours",
+          "description": "Compare Juneau whale watching excursions (3–3.5 hrs) and Mendenhall Glacier combos (5–5.5 hrs). Operator sighting guarantees, Auke Bay departures &amp; cruise timing buffers.",
           "canonical": "https://www.welcometoalaskatours.com/juneau/whale-watching",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -98,8 +98,8 @@
         {
           "path": "/juneau/helicopter-tours",
           "status": 200,
-          "title": "Juneau Helicopter Glacier Tours: Prices, Treks &amp; Dog Sledding (2026) | Welcome to Alaska Tours",
-          "description": "Compare Juneau helicopter tour prices, glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
+          "title": "Juneau Helicopter Tours &amp; Glacier Treks | 2026 Prices &amp; Landings | Welcome to Alaska Tours",
+          "description": "Compare Juneau helicopter tour prices from $405 per person: glacier landings, guided walks, treks and dog sledding flights. 100% weather refund guarantee and cruise dock pickup.",
           "canonical": "https://www.welcometoalaskatours.com/juneau/helicopter-tours",
           "hasGeoCard": true,
           "hasDirectAnswer": true,
@@ -471,7 +471,7 @@
       },
       "sitemap": {
         "status": 200,
-        "total_urls": 154,
+        "total_urls": 153,
         "sample_urls": [
           "https://www.welcometoalaskatours.com",
           "https://www.welcometoalaskatours.com/tours",

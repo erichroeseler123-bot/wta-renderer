@@ -46,7 +46,11 @@ const CATEGORY_CONFIGS: Record<string, CategoryConfig> = {
     metaDescription: "Compare Juneau helicopter tour prices, glacier landings on Herbert and Norris Glaciers, guided ice walks, and glacier dog sledding with 100% weather refunds.",
     intro: "Experience the Juneau Icefield from the air. Compare scenic glacier landing flights, guided crampon ice walks (NorthStar / TEMSCO style), and helicopter dog sledding camps departing with cruise dock transfers.",
     matchFilter: (tour) =>
-      tour.port === "juneau" && (tour.category === "Air Tours" || has(tour, "helicopter")),
+      tour.port === "juneau" &&
+      (tour.category === "Air Tours" || has(tour, "helicopter")) &&
+      !has(tour, "summer camp") &&
+      !has(tour, "wheeled cart") &&
+      tour.company !== "temsco-summercamp-juneau",
   },
   "glacier-tours": {
     title: "Glacier Tours",
