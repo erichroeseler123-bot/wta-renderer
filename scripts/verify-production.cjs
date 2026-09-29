@@ -11,53 +11,50 @@ function fetchUrl(url) {
 }
 
 async function verifyHost(host) {
-  console.log('\n==================================================');
-  console.log('=== Checking host:', host, '===');
-  console.log('==================================================');
-  const tourUrl = host + '/tours/northstartrekking/405050';
-  const res = await fetchUrl(tourUrl);
-  console.log('NorthStar tour page HTTP status:', res.status);
-  const html = res.data;
-  
-  const has388 = html.includes('388');
-  const has405 = html.includes('$405');
-  const has419 = html.includes('$419');
-  const hasFAA = /FAA\s+surcharge/i.test(html);
-  const hasUnreleased = /have\s+not\s+yet\s+been\s+released/i.test(html);
-  const hasPinnedSep = /calendar\?month=2026-09/.test(html);
-  const offersMatch = html.match(/"price":"([^"]+)"/);
-  
-  console.log('Mentions 388:', has388);
-  console.log('Mentions $405:', has405);
-  console.log('Mentions $419:', has419);
-  console.log('Offers price in schema:', offersMatch ? offersMatch[1] : 'NOT FOUND');
-  console.log('Has FAA surcharge attribution:', hasFAA);
-  console.log('Has unreleased 2026 text:', hasUnreleased);
-  console.log('Has pinned calendar?month=2026-09:', hasPinnedSep);
+  console.log(`\n==================================================`);
+  console.log(`=== Checking host: ${host} ===`);
+  console.log(`==================================================`);
 
-  // Check visible price card
-  const priceMatches = html.match(/Tour Price \(Flat Rate\)<\/span>\s*<div[^>]*>([^<]+)<\/div>/i);
-  console.log('Visible hero price:', priceMatches ? priceMatches[1].trim() : 'NOT MATCHED');
+  // 1. NorthStar 405050
+  const nsUrl = `${host}/tours/northstartrekking/405050`;
+  const nsRes = await fetchUrl(nsUrl);
+  const nsHtml = nsRes.data;
+  console.log(`[NorthStar 405050] HTTP Status: ${nsRes.status}`);
+  console.log(`  Visible $419: ${nsHtml.includes('$419')}`);
+  console.log(`  Contains obsolete $388 or $405: ${nsHtml.includes('388') || nsHtml.includes('$405')}`);
+  console.log(`  FAA surcharge attribution removed: ${!/FAA\s+surcharge/i.test(nsHtml)}`);
+  console.log(`  NorthStar surcharge identified: ${/NorthStar\s+surcharge/i.test(nsHtml)}`);
+  console.log(`  Calendar unpinned from 2026-09: ${!/calendar\?month=2026-09/.test(nsHtml)}`);
+  console.log(`  Pre-Payment Cancellation Deadlines present: ${nsHtml.includes('Pre-Payment Cancellation Deadlines')}`);
 
-  // Check weight surcharge text in HTML
-  const weightMatches = html.match(/Passengers 250\+ lbs:[^<]+/i);
-  console.log('Weight surcharge text:', weightMatches ? weightMatches[0].trim() : 'NOT MATCHED');
+  // 2. Alaska Galore Catamaran 585907
+  const agUrl = `${host}/tours/alaska-galore-juneau-whale-watching/585907`;
+  const agRes = await fetchUrl(agUrl);
+  const agHtml = agRes.data;
+  console.log(`[Alaska Galore Catamaran 585907] HTTP Status: ${agRes.status}`);
+  console.log(`  Mentions 30+ days: ${agHtml.includes('30+ days')}`);
+  console.log(`  Mentions $50 fee: ${agHtml.includes('$50')}`);
+  console.log(`  Uses verified 'within 14 days' boundary: ${agHtml.includes('within 14 days')}`);
+  console.log(`  Does NOT use '<14 days': ${!agHtml.includes('<14 days')}`);
 
-  // Check calendar page
-  const calUrl = host + '/tours/northstartrekking/405050/calendar';
-  const calRes = await fetchUrl(calUrl);
-  console.log('Calendar page status:', calRes.status);
-  const calHasUnreleased = /have\s+not\s+yet\s+been\s+opened/i.test(calRes.data);
-  const calHasDeparturesNotice = /No departures are currently available for online booking/i.test(calRes.data);
-  console.log('Calendar has unreleased text:', calHasUnreleased);
-  console.log('Calendar has updated departures notice:', calHasDeparturesNotice);
+  // 3. Dolphin Tours 2436
+  const dUrl = `${host}/tours/dolphintours/2436`;
+  const dRes = await fetchUrl(dUrl);
+  const dHtml = dRes.data;
+  console.log(`[Dolphin Tours 2436] HTTP Status: ${dRes.status}`);
+  console.log(`  Mentions 24 hours: ${dHtml.includes('24 hours')}`);
+  console.log(`  Mentions 7 days for private tours/groups of 8+: ${dHtml.includes('7 days')}`);
+  console.log(`  Does NOT falsely default to Alaska Galore 14 days: ${!dHtml.includes('within 14 days')}`);
+  console.log(`  Does NOT falsely mention $50 fee: ${!dHtml.includes('$50')}`);
 
-  // Check boat tour cancellation policy
-  const boatUrl = host + '/tours/alaska-galore-juneau-whale-watching/276418';
-  const boatRes = await fetchUrl(boatUrl);
-  console.log('Boat tour status:', boatRes.status);
-  const hasBoatConnectionGuarantee = /Guaranteed cruise connection protection/i.test(boatRes.data);
-  console.log('Boat tour has "Guaranteed cruise connection protection":', hasBoatConnectionGuarantee);
+  // 4. Alaska Tales 47295
+  const atUrl = `${host}/tours/alaskatales/47295`;
+  const atRes = await fetchUrl(atUrl);
+  const atHtml = atRes.data;
+  console.log(`[Alaska Tales 47295] HTTP Status: ${atRes.status}`);
+  console.log(`  Mentions 24 hours: ${atHtml.includes('24 hours')}`);
+  console.log(`  Does NOT falsely default to Alaska Galore 14 days: ${!atHtml.includes('within 14 days')}`);
+  console.log(`  Does NOT falsely mention $50 fee: ${!atHtml.includes('$50')}`);
 }
 
 async function main() {
@@ -68,48 +65,7 @@ async function main() {
   ];
 
   for (const host of hosts) {
-    console.log(`\n================== HOST: ${host} ==================`);
-    const tourUrl = `${host}/tours/northstartrekking/405050`;
-    const res = await fetchUrl(tourUrl);
-    const html = res.data;
-
-    const has388 = html.includes('388');
-    const has405 = html.includes('$405');
-    const has419 = html.includes('$419');
-    const priceMatches = html.match(/Tour Price \(Flat Rate\)<\/span>\s*<div[^>]*>([^<]+)<\/div>/i);
-    const visiblePrice = priceMatches ? priceMatches[1].trim() : 'NOT MATCHED';
-    const offersMatch = html.match(/"price":"([^"]+)"/);
-    const schemaPrice = offersMatch ? offersMatch[1] : 'NOT MATCHED';
-
-    const hasFAA = /FAA\s+surcharge/i.test(html);
-    const hasNorthStarSurcharge = /NorthStar\s+surcharge/i.test(html);
-    const hasUnreleased = /have\s+not\s+yet\s+been\s+released/i.test(html);
-    const hasPinnedCalendar = /calendar\?month=2026-09/.test(html);
-
-    console.log(`Tour Page HTTP Status: ${res.status}`);
-    console.log(`Visible Price: ${visiblePrice}`);
-    console.log(`Schema Price: ${schemaPrice}`);
-    console.log(`Contains 388: ${has388}`);
-    console.log(`Contains $405: ${has405}`);
-    console.log(`Contains $419: ${has419}`);
-    console.log(`Has "FAA surcharge": ${hasFAA}`);
-    console.log(`Has "NorthStar surcharge": ${hasNorthStarSurcharge}`);
-    console.log(`Has "have not yet been released": ${hasUnreleased}`);
-    console.log(`Has calendar link pinned to 2026-09: ${hasPinnedCalendar}`);
-
-    const calUrl = `${host}/tours/northstartrekking/405050/calendar`;
-    const calRes = await fetchUrl(calUrl);
-    const calHtml = calRes.data;
-    const calHasDeparturesNotice = /No departures are currently available for online booking/i.test(calHtml);
-    console.log(`Calendar Page HTTP Status: ${calRes.status}`);
-    console.log(`Calendar updated departures notice: ${calHasDeparturesNotice}`);
-
-    const boatUrl = `${host}/tours/alaska-galore-juneau-whale-watching/276418`;
-    const boatRes = await fetchUrl(boatUrl);
-    const boatHtml = boatRes.data;
-    const hasBoatConnectionGuarantee = /Guaranteed cruise connection protection/i.test(boatHtml);
-    console.log(`Boat Tour Page HTTP Status: ${boatRes.status}`);
-    console.log(`Boat has "Guaranteed cruise connection protection": ${hasBoatConnectionGuarantee}`);
+    await verifyHost(host);
   }
 }
 

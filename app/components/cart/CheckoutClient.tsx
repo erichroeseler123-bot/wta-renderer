@@ -5,6 +5,7 @@ import { CardElement, useElements, useStripe } from "@stripe/react-stripe-js";
 import { useCart } from "./CartContext";
 import TurnstileWidget from "@/app/components/security/TurnstileWidget";
 import { trackCheckoutStart } from "@/lib/analytics/ga";
+import { getOperatorCancellationPolicy } from "@/lib/operatorCancellationPolicies";
 
 function sendPlanEvent(payload: Record<string, unknown>) {
   const body = JSON.stringify(payload);
@@ -112,6 +113,9 @@ export default function CheckoutClient() {
       portSlug: it.portSlug ? String(it.portSlug) : undefined,
     }));
   }, [items]);
+  const distinctCompanies = useMemo(() => {
+    return Array.from(new Set(payloadItems.map((it) => it.company).filter(Boolean)));
+  }, [payloadItems]);
   const estimatedTotal = useMemo(() => {
     const source = (items || []) as Array<Record<string, unknown>>;
     return source.reduce((sum, it) => {
@@ -277,14 +281,28 @@ export default function CheckoutClient() {
               Payments are encrypted and processed by Stripe. Tour availability and pricing are verified at confirmation time.
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5 text-xs text-slate-700 space-y-1.5">
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3.5 text-xs text-slate-700 space-y-2">
               <span className="font-bold text-slate-900 block">Pre-Payment Cancellation & Refund Terms</span>
-              <p className="leading-relaxed">
-                • <strong>Operator Weather & Safety:</strong> 100% full refund if severe weather, sea conditions, or safety prevent operations.
-              </p>
-              <p className="leading-relaxed">
-                • <strong>Guest Cancellation Cutoffs:</strong> Subject to operator departure deadlines (30+ days for full refund less fee, 15–29 days for 50%, non-refundable within 14 days for marine excursions; 24+ hours for flight tours).
-              </p>
+              {distinctCompanies.length > 0 ? (
+                distinctCompanies.map((comp) => {
+                  const policy = getOperatorCancellationPolicy(comp);
+                  return (
+                    <div key={comp} className="border-t border-slate-200/60 pt-2 first:border-0 first:pt-0 space-y-0.5">
+                      <span className="font-bold text-slate-800 block text-[11px] uppercase tracking-wide">{policy.operatorName}</span>
+                      <p className="leading-relaxed text-slate-600">
+                        • <strong>Weather & Safety:</strong> 100% full refund if canceled by operator.
+                      </p>
+                      <p className="leading-relaxed text-slate-600">
+                        • <strong>Guest Cancellation:</strong> {policy.guestCutoffNotice}
+                      </p>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="leading-relaxed">
+                  100% refund if your excursion is canceled due to weather or safety. Specific operator cancellation cutoffs apply as disclosed on your chosen tour.
+                </p>
+              )}
             </div>
 
             {err ? <div className="rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{err}</div> : null}
@@ -306,13 +324,19 @@ export default function CheckoutClient() {
             <div className="text-2xl font-black text-slate-900">{estimatedTotalLabel}</div>
           </div>
           <ul className="mt-4 space-y-2 text-sm">
-            {payloadItems.map((it, idx) => (
-              <li key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
-                <div className="font-semibold text-slate-900">{it.title || "Tour"}</div>
-                <div className="text-slate-600">{it.company} • Qty {it.qty}</div>
-                {it.startAt ? <div className="text-xs text-slate-500">{String(it.startAt).slice(0, 16).replace("T", " ")}</div> : null}
-              </li>
-            ))}
+            {payloadItems.map((it, idx) => {
+              const itemPolicy = getOperatorCancellationPolicy(it.company);
+              return (
+                <li key={idx} className="rounded-xl border border-slate-200 bg-slate-50 p-3 space-y-1">
+                  <div className="font-semibold text-slate-900">{it.title || "Tour"}</div>
+                  <div className="text-slate-600">{itemPolicy.operatorName || it.company} • Qty {it.qty}</div>
+                  {it.startAt ? <div className="text-xs text-slate-500">{String(it.startAt).slice(0, 16).replace("T", " ")}</div> : null}
+                  <div className="mt-1 text-[11px] text-slate-500 border-t border-slate-200/60 pt-1">
+                    Cancellation: {itemPolicy.guestCutoffNotice}
+                  </div>
+                </li>
+              );
+            })}
           </ul>
           <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
             After payment, we finalize booking and show per-tour status in confirmation.
