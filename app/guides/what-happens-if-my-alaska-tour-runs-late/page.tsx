@@ -69,7 +69,7 @@ export default function GuidePage() {
             sizes="100vw"
             className="object-cover object-center opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/80" />
         </div>
         <div className="relative z-10 mx-auto max-w-5xl">
           <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
@@ -93,7 +93,7 @@ export default function GuidePage() {
             </Link>
             <Link
               href="/tours"
-              className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/20 transition"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl border-2 border-white/40 bg-slate-950 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-slate-900 hover:border-white/70 shadow-md transition"
             >
               Browse Live Excursions
             </Link>
@@ -129,8 +129,8 @@ export default function GuidePage() {
             <div key={"The Golden Timing Rule: Tour End Time + 45 Minutes <= All-Aboard"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
               <div className="relative h-48 w-full bg-slate-100">
                 <Image
-                  src="/hero/hero8521.jpg"
-                  alt="Alaska coastal waterway and timed excursion transit"
+                  src="/images/home-hero.jpg"
+                  alt="Cruise ship and excursion vessel navigating Alaska Inside Passage waters on strict schedule"
                   fill
                   sizes="(max-width: 640px) 100vw, 33vw"
                   className="object-cover"

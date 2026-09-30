@@ -31,7 +31,7 @@ const charterTours = [
     calendarHref: "/tours/alaska-galore-juneau-whale-watching/585456/calendar",
     tag: "Lowest Private Charter Base Rate",
     badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
-    image: "https://cdn.filestackcontent.com/iupIP17ASRluV2O9ZjgE",
+    image: "https://cdn.filestackcontent.com/BiZrxNkTHaMstzWv7dEA",
   },
   {
     title: "Private Charter Whale Watching Tour",
@@ -44,7 +44,7 @@ const charterTours = [
     calendarHref: "/tours/alaskatales/273539/calendar",
     tag: "Most Popular Jetboat Charter",
     badgeColor: "bg-sky-100 text-sky-800 border-sky-200",
-    image: "/images/ketchikan/ketchikan-whale-watching.jpg",
+    image: "https://cdn.filestackcontent.com/6E3uZHfRUYG5uzREcPQ1",
   },
   {
     title: "Private Charter Whale Watching & Mendenhall Glacier Tour",
@@ -70,7 +70,7 @@ const charterTours = [
     calendarHref: "/tours/moorecharters/446031/calendar",
     tag: "Fishing + Whales Combo",
     badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
-    image: "/hero/hero8521.jpg",
+    image: "https://www.filepicker.io/api/file/lUatUI0gQbaj9namOTzI",
   },
 ];
 
@@ -154,7 +154,7 @@ export default function JuneauPrivateWhaleWatchingPage() {
             sizes="100vw"
             className="object-cover object-center opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/80" />
         </div>
         <div className="relative z-10 mx-auto max-w-5xl">
           <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
@@ -178,7 +178,7 @@ export default function JuneauPrivateWhaleWatchingPage() {
             </Link>
             <Link
               href="#verified-charters"
-              className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/20 transition"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl border-2 border-white/40 bg-slate-950 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-slate-900 hover:border-white/70 shadow-md transition"
             >
               Compare Boats &amp; Rates ↓
             </Link>

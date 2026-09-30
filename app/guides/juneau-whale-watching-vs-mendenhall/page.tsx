@@ -156,8 +156,8 @@ export default function JuneauWhalesVsMendenhallGuide() {
             <div>
               <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
                 <img
-                  src="/images/ketchikan/ketchikan-whale-watching.jpg"
-                  alt="Whale watching catamaran encountering wild humpback whales"
+                  src="https://cdn.filestackcontent.com/yhEJiyfzTFygwKNl107S"
+                  alt="Humpback whale breaching out of the water near a Juneau tour boat"
                   className="h-full w-full object-cover"
                   loading="lazy"
                 />

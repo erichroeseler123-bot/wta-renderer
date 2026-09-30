@@ -76,7 +76,7 @@ const featuredSeniorTours = [
     highlights: "Enclosed heated cabin, 360° picture windows, marine restroom onboard, 100% whale sighting guarantee, and direct dock transfers.",
     href: "/tours/alaskatales/47295",
     calendarHref: "/tours/alaskatales/47295/calendar",
-    image: "https://cdn.filestackcontent.com/iupIP17ASRluV2O9ZjgE",
+    image: "https://cdn.filestackcontent.com/6E3uZHfRUYG5uzREcPQ1",
   },
   {
     port: "Juneau",
@@ -87,7 +87,7 @@ const featuredSeniorTours = [
     highlights: "All-you-can-eat wild salmon grilled over alder wood, covered heated rainforest pavilion, live music, marshmallow fire, and low-step motorcoach transit.",
     href: "/tours/aktraveladventures/311581",
     calendarHref: "/tours/aktraveladventures/311581/calendar",
-    image: "/hero/hero8521.jpg",
+    image: "https://cdn.filestackcontent.com/Es7oapOPSU3omkr9G02l",
   },
   {
     port: "Skagway",
@@ -98,7 +98,7 @@ const featuredSeniorTours = [
     highlights: "Hilarious live melodrama, seated gold panning at waist-height warm water troughs, all-you-can-eat wild salmon, and covered pavilions.",
     href: "/tours/aktraveladventures/340207",
     calendarHref: "/tours/aktraveladventures/340207/calendar",
-    image: "https://cdn.filestackcontent.com/XJrduLPHS1Oy22FpK3vn",
+    image: "https://cdn.filestackcontent.com/A27F1sqXQXeHA42ZJacQ",
   },
   {
     port: "Ketchikan",
@@ -109,7 +109,7 @@ const featuredSeniorTours = [
     highlights: "Sturdy handrails and low steps to board; drives through historic downtown Ketchikan and Creek Street before splashing into the harbor for a calm harbor cruise.",
     href: "/tours/akduck/4161",
     calendarHref: "/tours/akduck/4161/calendar",
-    image: "/hero/ketchikan.png",
+    image: "https://www.filepicker.io/api/file/UnNmoUQdQeSGBjKksDk6",
   },
   {
     port: "Ketchikan",
@@ -120,7 +120,7 @@ const featuredSeniorTours = [
     highlights: "Gentle step onto floatplane pontoon with crew assistance; smooth aerial flight over sheer 3,000-ft granite fiords and alpine lake landing.",
     href: "/tours/taquanair/392949",
     calendarHref: "/tours/taquanair/392949/calendar",
-    image: "/images/ketchikan/ketchikan-misty-fjords.jpg",
+    image: "https://cdn.filestackcontent.com/F68TIQZRJSNvKvyDfnyl",
   },
   {
     port: "Ketchikan",
@@ -202,7 +202,7 @@ export default function EasyAlaskaShoreExcursionsPage() {
             sizes="100vw"
             className="object-cover object-center opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/80" />
         </div>
         <div className="relative z-10 mx-auto max-w-5xl">
           <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
@@ -226,7 +226,7 @@ export default function EasyAlaskaShoreExcursionsPage() {
             </Link>
             <Link
               href="#featured-tours"
-              className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/20 transition"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl border-2 border-white/40 bg-slate-950 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-slate-900 hover:border-white/70 shadow-md transition"
             >
               Browse Verified Excursions
             </Link>

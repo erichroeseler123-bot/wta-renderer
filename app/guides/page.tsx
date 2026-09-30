@@ -95,8 +95,8 @@ const GUIDE_IMAGES: Record<string, { src: string; alt: string; badge: string }> 
     badge: "Mendenhall Transit",
   },
   "juneau-whale-watching-vs-mendenhall": {
-    src: "/images/ketchikan/ketchikan-whale-watching.jpg",
-    alt: "Whale watching catamaran encountering humpback whale",
+    src: "https://cdn.filestackcontent.com/yhEJiyfzTFygwKNl107S",
+    alt: "Humpback whale breaching out of the water near a Juneau tour boat",
     badge: "Juneau Decision",
   },
   "best-things-to-do-in-skagway-4-6-hours": {
@@ -105,8 +105,8 @@ const GUIDE_IMAGES: Record<string, { src: string; alt: string; badge: string }> 
     badge: "Skagway Highlights",
   },
   "first-time-in-ketchikan-shore-excursions": {
-    src: "/images/ketchikan/ketchikan-cruise-port.jpg",
-    alt: "Ketchikan cruise ship dock and waterfront boardwalks",
+    src: "https://cdn.filestackcontent.com/F68TIQZRJSNvKvyDfnyl",
+    alt: "Taquan Air floatplane soaring over the granite cliffs of Misty Fjords",
     badge: "First-Timer Guide",
   },
   "how-much-do-alaska-shore-excursions-cost": {
@@ -130,8 +130,8 @@ const GUIDE_IMAGES: Record<string, { src: string; alt: string; badge: string }> 
     badge: "Private Charters",
   },
   "juneau-private-whale-watching-charters": {
-    src: "https://cdn.filestackcontent.com/ogUfIAD9S9SMFeVJoNgP",
-    alt: "Private charter boat watching humpback whales in Auke Bay",
+    src: "https://cdn.filestackcontent.com/BiZrxNkTHaMstzWv7dEA",
+    alt: "Private whale-watching charter boat in Juneau watching a humpback whale dive",
     badge: "Private Whale Charters",
   },
   "cruise-ship-vs-independent-alaska-excursions": {

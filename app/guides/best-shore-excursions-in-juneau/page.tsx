@@ -69,7 +69,7 @@ export default function GuidePage() {
             sizes="100vw"
             className="object-cover object-center opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/90 to-slate-950/80" />
         </div>
         <div className="relative z-10 mx-auto max-w-5xl">
           <Link href="/ports/juneau" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
@@ -93,7 +93,7 @@ export default function GuidePage() {
             </Link>
             <Link
               href="/tours"
-              className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-white/20 transition"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl border-2 border-white/40 bg-slate-950 px-6 py-3 text-sm font-black uppercase tracking-wider text-white hover:bg-slate-900 hover:border-white/70 shadow-md transition"
             >
               Browse Live Excursions
             </Link>
@@ -129,8 +129,8 @@ export default function GuidePage() {
             <div key={"1. Small-Boat Humpback Whale Watching (Top Wildlife Choice)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
               <div className="relative h-52 w-full bg-slate-100">
                 <Image
-                  src="https://cdn.filestackcontent.com/iupIP17ASRluV2O9ZjgE"
-                  alt="Juneau whale watching boat observing humpback whales in Auke Bay"
+                  src="https://cdn.filestackcontent.com/6E3uZHfRUYG5uzREcPQ1"
+                  alt="Humpback whale fluking its tail near a Juneau tour boat in Auke Bay"
                   fill
                   sizes="(max-width: 640px) 100vw, 50vw"
                   className="object-cover"
@@ -207,8 +207,8 @@ export default function GuidePage() {
             <div key={"4. Salmon & Halibut Fishing Charters (Top Active Choice)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
               <div className="relative h-52 w-full bg-slate-100">
                 <Image
-                  src="/hero/hero8521.jpg"
-                  alt="Scenic waters and forested mountains of Southeast Alaska"
+                  src="https://cdn.filestackcontent.com/iD6MqfCHSkewF6AWw3QX"
+                  alt="Angler holding a fresh Pacific halibut on a Juneau fishing charter boat"
                   fill
                   sizes="(max-width: 640px) 100vw, 50vw"
                   className="object-cover"
