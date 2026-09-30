@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "About Welcome To Alaska Tours",
@@ -11,7 +12,27 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-      <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-6 sm:p-10">
+      <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] p-6 sm:p-10">
+        <div className="relative mb-8 h-48 w-full overflow-hidden rounded-2xl sm:h-64">
+          <Image
+            src="/images/home-hero.jpg"
+            alt="Alaska coastal waterway and mountain landscape"
+            fill
+            priority
+            sizes="(max-width: 896px) 100vw, 896px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">
+              Welcome To Alaska Tours
+            </p>
+            <p className="text-lg font-bold text-white sm:text-2xl drop-shadow">
+              Connecting Southeast Alaska Shore Excursions
+            </p>
+          </div>
+        </div>
+
         <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">
           About Welcome To Alaska Tours
         </p>
@@ -36,6 +57,30 @@ export default function AboutPage() {
               <p className="mt-2 text-sm leading-6 text-slate-400">{body}</p>
             </div>
           ))}
+        </div>
+
+        <div className="mt-8">
+          <h2 className="text-sm font-black uppercase tracking-wider text-slate-300 mb-4">Ports We Serve</h2>
+          <div className="grid gap-4 sm:grid-cols-3">
+            {[
+              { name: "Juneau", image: "/hero/juneau.jpg", desc: "Whale watching, Mendenhall Glacier, helicopter landings", slug: "juneau" },
+              { name: "Skagway", image: "/hero/skagway.jpg", desc: "White Pass Summit, Yukon frontier, Klondike gold rush", slug: "skagway" },
+              { name: "Ketchikan", image: "/images/ketchikan/ketchikan-cruise-port.jpg", desc: "Misty Fjords flightseeing, wildlife charters, totem parks", slug: "ketchikan" },
+            ].map((port) => (
+              <Link key={port.slug} href={`/ports/${port.slug}`} className="group overflow-hidden rounded-2xl border border-white/10 bg-black/20 hover:border-cyan-400/40 transition">
+                <div className="relative h-28 w-full overflow-hidden">
+                  <Image src={port.image} alt={port.name} fill sizes="(max-width: 640px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
+                  <div className="absolute bottom-2 left-3 right-3 text-white">
+                    <span className="font-bold text-sm drop-shadow">{port.name}</span>
+                  </div>
+                </div>
+                <div className="p-3">
+                  <p className="text-xs text-slate-400">{port.desc}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
 
         <div className="mt-8 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-5">

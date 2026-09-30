@@ -83,6 +83,89 @@ const GUIDES = [
   },
 ];
 
+const GUIDE_IMAGES: Record<string, { src: string; alt: string; badge: string }> = {
+  "best-shore-excursions-in-juneau": {
+    src: "/hero/juneau.jpg",
+    alt: "Juneau Alaska harbor and mountain backdrop",
+    badge: "Juneau Excursions",
+  },
+  "how-to-get-to-mendenhall-glacier-from-cruise-port": {
+    src: "https://cdn.filestackcontent.com/CT2dtoRkRU2deQYYVMz8",
+    alt: "Mendenhall Glacier guided hike and trail",
+    badge: "Mendenhall Transit",
+  },
+  "juneau-whale-watching-vs-mendenhall": {
+    src: "/images/ketchikan/ketchikan-whale-watching.jpg",
+    alt: "Whale watching catamaran encountering humpback whale",
+    badge: "Juneau Decision",
+  },
+  "best-things-to-do-in-skagway-4-6-hours": {
+    src: "/hero/skagway.jpg",
+    alt: "Skagway historic Gold Rush port and railway town",
+    badge: "Skagway Highlights",
+  },
+  "first-time-in-ketchikan-shore-excursions": {
+    src: "/images/ketchikan/ketchikan-cruise-port.jpg",
+    alt: "Ketchikan cruise ship dock and waterfront boardwalks",
+    badge: "First-Timer Guide",
+  },
+  "how-much-do-alaska-shore-excursions-cost": {
+    src: "/images/home-hero.jpg",
+    alt: "Scenic Alaska cruise fjord and mountain landscape",
+    badge: "Cost Transparency",
+  },
+  "what-happens-if-my-alaska-tour-runs-late": {
+    src: "/images/ketchikan/ketchikan-cruise-port.jpg",
+    alt: "Cruise ship berthed in Alaska port",
+    badge: "Cruise Ship Buffer",
+  },
+  "easy-alaska-shore-excursions": {
+    src: "/hero/skagway.jpg",
+    alt: "Scenic railroad and low-walking Alaska excursions",
+    badge: "Low-Walking & Seniors",
+  },
+  "private-premium-alaska-shore-excursions": {
+    src: "/images/juneau/juneau-helicopter-glacier.jpg",
+    alt: "Helicopter landed atop pristine blue glacier ice",
+    badge: "Private Charters",
+  },
+  "juneau-private-whale-watching-charters": {
+    src: "https://cdn.filestackcontent.com/ogUfIAD9S9SMFeVJoNgP",
+    alt: "Private charter boat watching humpback whales in Auke Bay",
+    badge: "Private Whale Charters",
+  },
+  "cruise-ship-vs-independent-alaska-excursions": {
+    src: "/images/ketchikan/ketchikan-cruise-port.jpg",
+    alt: "Cruise ship port and independent tour comparison",
+    badge: "Independent vs Ship",
+  },
+  "how-long-does-it-take-to-get-off-the-ship-in-juneau": {
+    src: "/hero/juneau.jpg",
+    alt: "Juneau cruise dock and Mt. Roberts Tramway staging area",
+    badge: "Juneau Timing",
+  },
+  "how-long-does-it-take-to-get-off-the-ship-in-skagway": {
+    src: "/hero/skagway.jpg",
+    alt: "Skagway Broadway, Ore, and Railroad piers",
+    badge: "Skagway Timing",
+  },
+  "how-long-does-it-take-to-get-off-the-ship-in-ketchikan": {
+    src: "/images/ketchikan/ketchikan-cruise-port.jpg",
+    alt: "Ketchikan downtown berths and Ward Cove shuttle terminal",
+    badge: "Ketchikan Timing",
+  },
+  "best-alaska-cruise-ports-for-bird-watching": {
+    src: "/hero/hero8521.jpg",
+    alt: "Southeast Alaska bald eagle and temperate coastal habitat",
+    badge: "Birding & Coastal Nature",
+  },
+  "alaska-nature-by-cruise-port": {
+    src: "/images/ketchikan/ketchikan-misty-fjords.jpg",
+    alt: "Misty Fjords National Monument granite cliffs and wilderness",
+    badge: "Alaska Nature & Fjord",
+  },
+};
+
 export const metadata = {
   title: "Alaska Cruise Planning Guides | Welcome To Alaska Tours",
   description: "Compare Alaska cruise-port decisions, excursion choices, dock logistics, disembarkation timing, and safety buffers for Juneau, Skagway, and Ketchikan.",
@@ -94,41 +177,73 @@ export const metadata = {
 export default function GuidesIndexPage() {
   return (
     <main className="min-h-screen bg-[linear-gradient(180deg,#eef7ff_0%,#f8fafc_42%,#ffffff_100%)] text-slate-900 pb-20">
-      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 space-y-8">
-        <section className="text-center space-y-4">
-          <div className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-sky-800">
+      <section className="relative isolate overflow-hidden bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
+        <img
+          src="/images/home-hero.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+        <div className="relative z-10 mx-auto max-w-5xl text-center space-y-4">
+          <div className="inline-flex rounded-full border border-cyan-400/30 bg-white/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-200 backdrop-blur-sm">
             Resource Directory
           </div>
-          <h1 className="text-4xl font-black tracking-tight text-slate-900 sm:text-5xl max-w-3xl mx-auto leading-tight">
+          <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl max-w-3xl mx-auto leading-tight">
             Alaska Cruise Planning Guides
           </h1>
-          <p className="text-base text-slate-655 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base text-slate-200 max-w-2xl mx-auto leading-relaxed">
             Make the big port-day decisions first, then check dock logistics, excursion timing, and return buffers before you book.
           </p>
-        </section>
+        </div>
+      </section>
 
+      <div className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16 space-y-8">
         <section className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {GUIDES.map((guide) => (
-            <Link
-              key={guide.slug}
-              href={`/guides/${guide.slug}`}
-              className="rounded-[2.5rem] border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-1 block space-y-3"
-            >
-              <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
-                Planning Guide
-              </span>
-              <h2 className="text-xl font-black text-slate-950 block leading-tight">
-                {guide.title}
-              </h2>
-              <p className="text-xs leading-5 text-slate-600 block">
-                {guide.description}
-              </p>
-              <span className="text-xs font-bold text-sky-805 block hover:text-sky-900 pt-4 border-t border-slate-100 flex justify-between items-center">
-                <span>Read Guide</span>
-                <span>→</span>
-              </span>
-            </Link>
-          ))}
+          {GUIDES.map((guide) => {
+            const imgData = GUIDE_IMAGES[guide.slug];
+            return (
+              <Link
+                key={guide.slug}
+                href={`/guides/${guide.slug}`}
+                className="group overflow-hidden rounded-[2.5rem] border border-slate-200 bg-white shadow-sm hover:shadow-md transition hover:-translate-y-1 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
+                    <img
+                      src={imgData?.src || "/images/home-hero.jpg"}
+                      alt={imgData?.alt || guide.title}
+                      className="h-full w-full object-cover transition duration-500 group-hover:scale-105 opacity-90 group-hover:opacity-100"
+                      loading="lazy"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                    {imgData?.badge && (
+                      <span className="absolute top-3 left-3 rounded-full bg-slate-950/80 backdrop-blur-sm px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-cyan-200 border border-cyan-400/30">
+                        {imgData.badge}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-6 space-y-3">
+                    <span className="text-[10px] font-black uppercase tracking-wider text-slate-500 block">
+                      Planning Guide
+                    </span>
+                    <h2 className="text-xl font-black text-slate-950 block leading-tight">
+                      {guide.title}
+                    </h2>
+                    <p className="text-xs leading-5 text-slate-600 block">
+                      {guide.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="p-6 pt-0">
+                  <span className="text-xs font-bold text-sky-800 block group-hover:text-sky-950 pt-4 border-t border-slate-100 flex justify-between items-center">
+                    <span>Read Guide</span>
+                    <span>→</span>
+                  </span>
+                </div>
+              </Link>
+            );
+          })}
         </section>
 
         <section className="pt-8 border-t border-slate-205 grid gap-4 sm:grid-cols-3">

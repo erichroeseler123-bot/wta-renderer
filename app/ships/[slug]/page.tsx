@@ -1,7 +1,14 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import JsonLd from "@/components/seo/JsonLd";
 import Breadcrumbs from "@/app/components/seo/Breadcrumbs";
+
+const PORT_IMAGES: Record<string, string> = {
+  juneau: "/hero/juneau.jpg",
+  skagway: "/hero/skagway.jpg",
+  ketchikan: "/images/ketchikan/ketchikan-cruise-port.jpg",
+};
 
 const APPROVED_SLUGS = [
   "celebrity-edge",
@@ -224,8 +231,16 @@ export default async function ShipSlugPage({
       <JsonLd data={breadcrumbSchema} />
       <JsonLd data={webPageSchema} />
 
-      <section className="relative bg-slate-900 text-white py-12 px-6 sm:px-8">
-        <div className="mx-auto max-w-5xl">
+      <section className="relative overflow-hidden bg-slate-900 text-white py-12 px-6 sm:px-8">
+        <Image
+          src="/images/home-hero.jpg"
+          alt={config.name}
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover opacity-20 pointer-events-none"
+        />
+        <div className="relative z-10 mx-auto max-w-5xl">
           <div className="mb-5 text-white/80">
             <Breadcrumbs items={[{ href: "/", label: "Home" }, { href: "/ships", label: "Ships" }, { label: config.name }]} />
           </div>
@@ -273,12 +288,27 @@ export default async function ShipSlugPage({
           <div className="border-b border-slate-200 pb-2"><h2 className="text-lg font-black tracking-tight text-slate-950">Shop Excursions by Alaska Port</h2><p className="mt-1 text-xs text-slate-500">Use your ship page as the starting point, then compare the live inventory available in each port.</p></div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {config.ports.map((port) => (
-              <div key={port.slug} className="rounded-2xl border border-slate-200 bg-white p-5 space-y-3 shadow-sm hover:shadow transition">
-                <div className="flex justify-between items-center"><h3 className="font-bold text-slate-900">{port.name}</h3><span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[9px] font-bold text-emerald-800">Connected tours</span></div>
-                <p className="text-xs text-slate-600">{port.note}</p>
-                <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
-                  <Link href={`/ports/${port.slug}?cruiseShip=${encodeURIComponent(config.name)}`} className="text-[11px] font-black uppercase text-sky-800 hover:text-sky-900">Shop {port.name} excursions →</Link>
-                  {port.hasGuide && <Link href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${port.slug}`} className="text-[11px] font-black uppercase text-slate-500 hover:text-slate-700">Read timing guide →</Link>}
+              <div key={port.slug} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm hover:shadow transition flex flex-col">
+                <div className="relative h-32 w-full overflow-hidden bg-slate-100">
+                  <Image
+                    src={PORT_IMAGES[port.slug] || "/hero/juneau.jpg"}
+                    alt={`${port.name} Alaska`}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent" />
+                  <div className="absolute bottom-2.5 left-3 right-3 flex items-center justify-between text-white">
+                    <h3 className="font-bold text-sm drop-shadow">{port.name}</h3>
+                    <span className="rounded bg-emerald-600/90 px-1.5 py-0.5 text-[9px] font-bold text-white shadow-xs backdrop-blur-xs">Connected tours</span>
+                  </div>
+                </div>
+                <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
+                  <p className="text-xs text-slate-600">{port.note}</p>
+                  <div className="flex flex-col gap-1.5 pt-2 border-t border-slate-100">
+                    <Link href={`/ports/${port.slug}?cruiseShip=${encodeURIComponent(config.name)}`} className="text-[11px] font-black uppercase text-sky-800 hover:text-sky-900">Shop {port.name} excursions →</Link>
+                    {port.hasGuide && <Link href={`/guides/how-long-does-it-take-to-get-off-the-ship-in-${port.slug}`} className="text-[11px] font-black uppercase text-slate-500 hover:text-slate-700">Read timing guide →</Link>}
+                  </div>
                 </div>
               </div>
             ))}

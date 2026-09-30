@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Contact Welcome To Alaska Tours",
@@ -11,7 +12,23 @@ export const metadata: Metadata = {
 export default function ContactUsPage() {
   return (
     <main className="mx-auto max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-      <div className="rounded-3xl border border-white/10 bg-white/[0.05] p-6 sm:p-10">
+      <div className="overflow-hidden rounded-3xl border border-white/10 bg-white/[0.05] p-6 sm:p-10">
+        <div className="relative mb-8 h-44 w-full overflow-hidden rounded-2xl sm:h-56">
+          <Image
+            src="/hero/juneau.jpg"
+            alt="Southeast Alaska cruise port waterway"
+            fill
+            priority
+            sizes="(max-width: 896px) 100vw, 896px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
+          <div className="absolute bottom-4 left-4 right-4 sm:bottom-6 sm:left-6">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">Port Support</p>
+            <p className="text-lg font-bold text-white sm:text-2xl drop-shadow">We're Here to Help Your Alaska Port Day</p>
+          </div>
+        </div>
+
         <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">Contact</p>
         <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-5xl">
           Need help with your Alaska port day?

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "Compare private whale watching charters in Juneau, AK for cruise passengers. Verified vessel sizes (6 to 14+), pricing ($1,150–$3,500), Auke Bay marina logistics, and back-to-ship timing.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/hero/juneau.jpg", width: 1200, height: 630, alt: "Juneau Alaska harbor and whale watching waters" }],
   },
 };
 
@@ -29,6 +31,7 @@ const charterTours = [
     calendarHref: "/tours/alaska-galore-juneau-whale-watching/585456/calendar",
     tag: "Lowest Private Charter Base Rate",
     badgeColor: "bg-emerald-100 text-emerald-800 border-emerald-200",
+    image: "https://cdn.filestackcontent.com/iupIP17ASRluV2O9ZjgE",
   },
   {
     title: "Private Charter Whale Watching Tour",
@@ -41,6 +44,7 @@ const charterTours = [
     calendarHref: "/tours/alaskatales/273539/calendar",
     tag: "Most Popular Jetboat Charter",
     badgeColor: "bg-sky-100 text-sky-800 border-sky-200",
+    image: "/images/ketchikan/ketchikan-whale-watching.jpg",
   },
   {
     title: "Private Charter Whale Watching & Mendenhall Glacier Tour",
@@ -53,6 +57,7 @@ const charterTours = [
     calendarHref: "/tours/alaskatales/273545/calendar",
     tag: "Whale + Glacier Combo",
     badgeColor: "bg-indigo-100 text-indigo-800 border-indigo-200",
+    image: "https://cdn.filestackcontent.com/8tB0m1rESzylyunnWCBP",
   },
   {
     title: "Private Charter • Salmon / Halibut / Whale Watching Combo",
@@ -65,6 +70,7 @@ const charterTours = [
     calendarHref: "/tours/moorecharters/446031/calendar",
     tag: "Fishing + Whales Combo",
     badgeColor: "bg-amber-100 text-amber-800 border-amber-200",
+    image: "/hero/hero8521.jpg",
   },
 ];
 
@@ -138,12 +144,23 @@ export default function JuneauPrivateWhaleWatchingPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       {/* Hero Header */}
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/juneau.jpg"
+            alt="Scenic Gastineau Channel and Auke Bay in Juneau Alaska"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Alaska Guides Directory"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Private Charters &amp; Custom Excursions · Juneau, AK
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -240,41 +257,53 @@ export default function JuneauPrivateWhaleWatchingPage() {
             {charterTours.map((tour, idx) => (
               <div
                 key={idx}
-                className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-0.5"
+                className="overflow-hidden flex flex-col justify-between rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition hover:-translate-y-0.5"
               >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className={`inline-flex rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${tour.badgeColor}`}>
-                      {tour.tag}
-                    </span>
-                    <span className="text-lg font-black text-slate-950">{tour.price}</span>
-                  </div>
-                  <h3 className="text-xl font-black text-slate-900 leading-tight">
-                    {tour.title}
-                  </h3>
-                  <div className="space-y-1 text-xs text-slate-500">
-                    <p><strong>Operator:</strong> {tour.operator}</p>
-                    <p><strong>Capacity:</strong> {tour.capacity}</p>
-                    <p><strong>Duration:</strong> {tour.duration}</p>
-                  </div>
-                  <p className="text-sm leading-6 text-slate-600">
-                    {tour.description}
-                  </p>
+                <div className="relative h-48 w-full bg-slate-100">
+                  <Image
+                    src={tour.image}
+                    alt={tour.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                  <span className={`absolute top-3 left-3 rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider backdrop-blur bg-white/90 ${tour.badgeColor}`}>
+                    {tour.tag}
+                  </span>
+                  <span className="absolute bottom-3 right-3 rounded-xl bg-white/95 px-3 py-1 text-xs font-black text-slate-900 shadow">
+                    {tour.price}
+                  </span>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
-                  <Link
-                    href={tour.href}
-                    className="flex-1 min-h-11 inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-wider text-white hover:bg-slate-800 transition"
-                  >
-                    View Tour Details →
-                  </Link>
-                  <Link
-                    href={tour.calendarHref}
-                    className="min-h-11 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-100 transition"
-                  >
-                    Live Calendar
-                  </Link>
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <h3 className="text-xl font-black text-slate-900 leading-tight">
+                      {tour.title}
+                    </h3>
+                    <div className="mt-2 space-y-1 text-xs text-slate-500">
+                      <p><strong>Operator:</strong> {tour.operator}</p>
+                      <p><strong>Capacity:</strong> {tour.capacity}</p>
+                      <p><strong>Duration:</strong> {tour.duration}</p>
+                    </div>
+                    <p className="mt-3 text-sm leading-6 text-slate-600">
+                      {tour.description}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-2">
+                    <Link
+                      href={tour.href}
+                      className="flex-1 min-h-11 inline-flex items-center justify-center rounded-xl bg-slate-900 px-4 py-2 text-xs font-black uppercase tracking-wider text-white hover:bg-slate-800 transition"
+                    >
+                      View Tour Details →
+                    </Link>
+                    <Link
+                      href={tour.calendarHref}
+                      className="min-h-11 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-100 transition"
+                    >
+                      Live Calendar
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

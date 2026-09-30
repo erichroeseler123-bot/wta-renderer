@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "Comprehensive 2026 Alaska shore excursion pricing guide: real cost ranges for whale watching, helicopters, dog sledding, fishing, floatplanes, and how to save 20–40%.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/hero/hero8521.jpg", width: 1200, height: 630, alt: "Alaska shore excursion landscape and coastal waters" }],
   },
 };
 
@@ -57,12 +59,23 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/hero8521.jpg"
+            alt="Scenic view of Southeast Alaska coastal mountains and waterways"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Alaska Guides Directory"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -111,45 +124,109 @@ export default function GuidePage() {
         {/* Detailed Sections */}
         <section className="mt-12 space-y-10">
           <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">Key Decisions & Experience Breakdown</h2>
-          <div className="grid gap-6">
+          <div className="grid gap-8 sm:grid-cols-2">
             
-            <div key={"Historic, Cultural & Town Tours ($65 – $110)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Historic, Cultural & Town Tours ($65 – $110)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Accessible walking tours, salmon bakes, trolley excursions, and gold panning demonstrations in Juneau, Skagway, and Ketchikan fall in this entry price tier. Perfect for families, multi-generational groups, and budget-conscious days."}</p>
-              <div className="mt-4">
-                <Link href="/guides/easy-alaska-shore-excursions" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Accessible & Easy Shore Excursions →"}
-                </Link>
+            <div key={"Historic, Cultural & Town Tours ($65 – $110)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/1LvXaHH5RQmIzTnR2s7e"
+                  alt="Historic town excursion and walking tour in Alaska port"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  $65 – $110 / person
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Historic, Cultural & Town Tours"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Accessible walking tours, salmon bakes, trolley excursions, and gold panning demonstrations in Juneau, Skagway, and Ketchikan fall in this entry price tier. Perfect for families, multi-generational groups, and budget-conscious days."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/guides/easy-alaska-shore-excursions" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Accessible & Easy Shore Excursions →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Wildlife & Marine Excursions ($145 – $220)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Wildlife & Marine Excursions ($145 – $220)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Juneau humpback whale watching ($165–$195), Ketchikan coastal kayaking ($145–$185), and Ketchikan wildlife boat safaris ($165–$215) offer high-value wilderness immersion on stable, enclosed, or guided vessels."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/whale-watching" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Compare Juneau Whale Watching Tours →"}
-                </Link>
+            <div key={"Wildlife & Marine Excursions ($145 – $220)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/iupIP17ASRluV2O9ZjgE"
+                  alt="Marine catamaran exploring Alaska waters on a whale watching tour"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  $145 – $220 / person
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Wildlife & Marine Excursions"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Juneau humpback whale watching ($165–$195), Ketchikan coastal kayaking ($145–$185), and Ketchikan wildlife boat safaris ($165–$215) offer high-value wilderness immersion on stable, enclosed, or guided vessels."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/whale-watching" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Compare Juneau Whale Watching Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Aviation & Glacier Landings ($330 – $420)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Aviation & Glacier Landings ($330 – $420)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Misty Fjords floatplanes ($330–$395) and helicopter glacier flights over Juneau and Skagway icefields ($350–$420) include 30–45 minutes of air time and remote landings on water or blue ice."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/helicopter-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Check Glacier Helicopter Tours →"}
-                </Link>
+            <div key={"Aviation & Glacier Landings ($330 – $420)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/images/juneau/juneau-helicopter-glacier.jpg"
+                  alt="Helicopter landing on icefield glacier in Alaska"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  $330 – $420 / person
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Aviation & Glacier Landings"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Misty Fjords floatplanes ($330–$395) and helicopter glacier flights over Juneau and Skagway icefields ($350–$420) include 30–45 minutes of air time and remote landings on water or blue ice."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/helicopter-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Check Glacier Helicopter Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Glacier Dog Sledding & Fly-In Wilderness ($495 – $799)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Glacier Dog Sledding & Fly-In Wilderness ($495 – $799)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"The peak of Alaska adventure: landing on snowfields for dog sledding with real Iditarod teams ($650–$799) or flying by floatplane to remote bear sanctuaries like Anan Creek ($495–$650). Highly limited capacity requires early booking."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/dog-sledding" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Glacier Dog Sledding Tours →"}
-                </Link>
+            <div key={"Glacier Dog Sledding & Fly-In Wilderness ($495 – $799)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/XJrduLPHS1Oy22FpK3vn"
+                  alt="Alaska husky sled dog team on glacier snowfield"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  $495 – $799 / person
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Glacier Dog Sledding & Fly-In Wilderness"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"The peak of Alaska adventure: landing on snowfields for dog sledding with real Iditarod teams ($650–$799) or flying by floatplane to remote bear sanctuaries like Anan Creek ($495–$650). Highly limited capacity requires early booking."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/dog-sledding" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Glacier Dog Sledding Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

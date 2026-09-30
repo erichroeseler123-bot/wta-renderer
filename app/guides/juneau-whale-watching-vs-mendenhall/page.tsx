@@ -84,8 +84,15 @@ export default function JuneauWhalesVsMendenhallGuide() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
+      <section className="relative isolate overflow-hidden bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
+        <img
+          src="/hero/juneau.jpg"
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 -z-20 h-full w-full object-cover opacity-25"
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
+        <div className="relative z-10 mx-auto max-w-5xl">
           <Link href="/ports/juneau" className="text-sm font-bold text-cyan-200 hover:text-white">← Juneau excursions</Link>
           <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">Juneau Cruise Planning Guide · 2026</div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">Whale watching vs Mendenhall Glacier: which should you choose?</h1>
@@ -145,40 +152,93 @@ export default function JuneauWhalesVsMendenhallGuide() {
         </section>
 
         <section className="mt-10 grid gap-6 md:grid-cols-2">
-          <article className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Choose whales when...</div>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">Wildlife is the reason you came to Alaska.</h2>
-            <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
-              <li>• Your group wants a boat-based wildlife experience more than another scenic land stop.</li>
-              <li>• Seeing whales from a dedicated viewing boat matters more than seeing them opportunistically from the cruise ship.</li>
-              <li>• Your group is comfortable with a marine excursion and variable weather.</li>
-              <li>• You found a departure that fits the ship window without a rushed return.</li>
-            </ul>
-            <Link href="/juneau/whale-watching" className="mt-6 inline-flex rounded-xl bg-sky-700 px-5 py-3 text-sm font-black text-white hover:bg-sky-800">See connected whale tours →</Link>
+          <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
+                <img
+                  src="/images/ketchikan/ketchikan-whale-watching.jpg"
+                  alt="Whale watching catamaran encountering wild humpback whales"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+                <span className="absolute top-3 left-3 rounded-full bg-slate-950/80 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-cyan-200 border border-cyan-400/30">
+                  Auke Bay Wildlife
+                </span>
+              </div>
+              <div className="p-7">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Choose whales when...</div>
+                <h2 className="mt-2 text-2xl font-black tracking-tight">Wildlife is the reason you came to Alaska.</h2>
+                <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
+                  <li>• Your group wants a boat-based wildlife experience more than another scenic land stop.</li>
+                  <li>• Seeing whales from a dedicated viewing boat matters more than seeing them opportunistically from the cruise ship.</li>
+                  <li>• Your group is comfortable with a marine excursion and variable weather.</li>
+                  <li>• You found a departure that fits the ship window without a rushed return.</li>
+                </ul>
+              </div>
+            </div>
+            <div className="p-7 pt-0">
+              <Link href="/juneau/whale-watching" className="inline-flex rounded-xl bg-sky-700 px-5 py-3 text-sm font-black text-white hover:bg-sky-800">See connected whale tours →</Link>
+            </div>
           </article>
 
-          <article className="rounded-[2rem] border border-slate-200 bg-white p-7 shadow-sm">
-            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Choose Mendenhall when...</div>
-            <h2 className="mt-2 text-2xl font-black tracking-tight">You want glacier scenery on your own two feet.</h2>
-            <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
-              <li>• A glacier viewpoint is a must-do for your first Alaska visit.</li>
-              <li>• Your group prefers a land-based outing to several hours on a sightseeing boat.</li>
-              <li>• You want the option to pair scenery with walking rather than make wildlife the whole excursion.</li>
-              <li>• Your port call is tight enough that one focused activity feels smarter than stacking two.</li>
-            </ul>
-            <Link href="/juneau/mendenhall-glacier-tours" className="mt-6 inline-flex rounded-xl bg-sky-700 px-5 py-3 text-sm font-black text-white hover:bg-sky-800">See connected Mendenhall tours →</Link>
+          <article className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm flex flex-col justify-between">
+            <div>
+              <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-900">
+                <img
+                  src="https://cdn.filestackcontent.com/CT2dtoRkRU2deQYYVMz8"
+                  alt="Mendenhall Glacier Recreation Area and guided glacier trail"
+                  className="h-full w-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent" />
+                <span className="absolute top-3 left-3 rounded-full bg-slate-950/80 px-2.5 py-1 text-[9px] font-black uppercase tracking-wider text-cyan-200 border border-cyan-400/30">
+                  Mendenhall Recreation Area
+                </span>
+              </div>
+              <div className="p-7">
+                <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Choose Mendenhall when...</div>
+                <h2 className="mt-2 text-2xl font-black tracking-tight">You want glacier scenery on your own two feet.</h2>
+                <ul className="mt-5 space-y-3 text-sm leading-6 text-slate-600">
+                  <li>• A glacier viewpoint is a must-do for your first Alaska visit.</li>
+                  <li>• Your group prefers a land-based outing to several hours on a sightseeing boat.</li>
+                  <li>• You want the option to pair scenery with walking rather than make wildlife the whole excursion.</li>
+                  <li>• Your port call is tight enough that one focused activity feels smarter than stacking two.</li>
+                </ul>
+              </div>
+            </div>
+            <div className="p-7 pt-0">
+              <Link href="/juneau/mendenhall-glacier-tours" className="inline-flex rounded-xl bg-sky-700 px-5 py-3 text-sm font-black text-white hover:bg-sky-800">See connected Mendenhall tours →</Link>
+            </div>
           </article>
         </section>
 
-        <section className="mt-10 rounded-[2rem] border border-amber-200 bg-amber-50 p-7 sm:p-8">
-          <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-800">When a combo makes sense</div>
-          <h2 className="mt-2 text-2xl font-black tracking-tight">Two icons, but only if the timing is comfortable.</h2>
-          <p className="mt-4 text-sm leading-7 text-slate-700">
-            Whale-watching and Mendenhall combinations are popular because one operator can coordinate the transfers and sequence. The tradeoff is that each stop gets a defined amount of time. If your priority is a longer hike, a long wildlife outing, or a relaxed downtown visit, one major excursion may fit better than trying to collect both highlights.
-          </p>
-          <p className="mt-3 text-sm font-bold leading-7 text-slate-800">
-            Use the cruise line's current all-aboard time and the operator's actual meeting and return details as the controlling schedule. Never rely on a generic port-day estimate for a specific sailing.
-          </p>
+        <section className="mt-10 overflow-hidden rounded-[2rem] border border-amber-200 bg-amber-50 shadow-sm">
+          <div className="relative aspect-[21/9] w-full overflow-hidden bg-slate-900 sm:aspect-[24/8]">
+            <img
+              src="https://cdn.filestackcontent.com/8tB0m1rESzylyunnWCBP"
+              alt="Juneau Whale Watching and Mendenhall Glacier Combo Excursion"
+              className="h-full w-full object-cover"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
+            <div className="absolute bottom-4 left-6 sm:bottom-6 sm:left-8">
+              <span className="rounded-full bg-cyan-400/20 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-cyan-200 border border-cyan-400/40 backdrop-blur-sm">
+                5 to 5.5-Hour Signature Combo
+              </span>
+              <h3 className="mt-2 text-xl font-black text-white sm:text-2xl">Whales + Glacier in a Single Booking</h3>
+            </div>
+          </div>
+          <div className="p-7 sm:p-8">
+            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-800">When a combo makes sense</div>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Two icons, but only if the timing is comfortable.</h2>
+            <p className="mt-4 text-sm leading-7 text-slate-700">
+              Whale-watching and Mendenhall combinations are popular because one operator can coordinate the transfers and sequence. The tradeoff is that each stop gets a defined amount of time. If your priority is a longer hike, a long wildlife outing, or a relaxed downtown visit, one major excursion may fit better than trying to collect both highlights.
+            </p>
+            <p className="mt-3 text-sm font-bold leading-7 text-slate-800">
+              Use the cruise line's current all-aboard time and the operator's actual meeting and return details as the controlling schedule. Never rely on a generic port-day estimate for a specific sailing.
+            </p>
+          </div>
         </section>
 
         <section className="mt-10 rounded-[2rem] border border-slate-200 bg-white p-7 sm:p-8">

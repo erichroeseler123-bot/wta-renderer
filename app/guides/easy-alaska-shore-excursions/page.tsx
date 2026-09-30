@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "Compare senior-friendly, low-walking, and wheelchair-accessible Alaska cruise excursions in Juneau, Skagway, and Ketchikan. Mobility tiers, pier walking distances, and restroom access.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/images/home-hero.jpg", width: 1200, height: 630, alt: "Alaska scenic mountains and cruise harbor" }],
   },
 };
 
@@ -74,6 +76,7 @@ const featuredSeniorTours = [
     highlights: "Enclosed heated cabin, 360° picture windows, marine restroom onboard, 100% whale sighting guarantee, and direct dock transfers.",
     href: "/tours/alaskatales/47295",
     calendarHref: "/tours/alaskatales/47295/calendar",
+    image: "https://cdn.filestackcontent.com/iupIP17ASRluV2O9ZjgE",
   },
   {
     port: "Juneau",
@@ -84,6 +87,7 @@ const featuredSeniorTours = [
     highlights: "All-you-can-eat wild salmon grilled over alder wood, covered heated rainforest pavilion, live music, marshmallow fire, and low-step motorcoach transit.",
     href: "/tours/aktraveladventures/311581",
     calendarHref: "/tours/aktraveladventures/311581/calendar",
+    image: "/hero/hero8521.jpg",
   },
   {
     port: "Skagway",
@@ -94,6 +98,7 @@ const featuredSeniorTours = [
     highlights: "Hilarious live melodrama, seated gold panning at waist-height warm water troughs, all-you-can-eat wild salmon, and covered pavilions.",
     href: "/tours/aktraveladventures/340207",
     calendarHref: "/tours/aktraveladventures/340207/calendar",
+    image: "https://cdn.filestackcontent.com/XJrduLPHS1Oy22FpK3vn",
   },
   {
     port: "Ketchikan",
@@ -104,6 +109,7 @@ const featuredSeniorTours = [
     highlights: "Sturdy handrails and low steps to board; drives through historic downtown Ketchikan and Creek Street before splashing into the harbor for a calm harbor cruise.",
     href: "/tours/akduck/4161",
     calendarHref: "/tours/akduck/4161/calendar",
+    image: "/hero/ketchikan.png",
   },
   {
     port: "Ketchikan",
@@ -114,6 +120,7 @@ const featuredSeniorTours = [
     highlights: "Gentle step onto floatplane pontoon with crew assistance; smooth aerial flight over sheer 3,000-ft granite fiords and alpine lake landing.",
     href: "/tours/taquanair/392949",
     calendarHref: "/tours/taquanair/392949/calendar",
+    image: "/images/ketchikan/ketchikan-misty-fjords.jpg",
   },
   {
     port: "Ketchikan",
@@ -124,6 +131,7 @@ const featuredSeniorTours = [
     highlights: "Accessible elevated wooden walkways through old-growth forest, master totem carvers, raptor rehabilitation center, and frequent seated rest areas.",
     href: "/tours/alaskarainforest/64273",
     calendarHref: "/tours/alaskarainforest/64273/calendar",
+    image: "https://cdn.filestackcontent.com/EBP7uUwhTp26SZPUlciL",
   },
 ];
 
@@ -184,12 +192,23 @@ export default function EasyAlaskaShoreExcursionsPage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       {/* Hero Header */}
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/home-hero.jpg"
+            alt="Scenic cruise through the calm protected waters of the Inside Passage in Alaska"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Alaska Guides Directory"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026 Edition
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -337,38 +356,52 @@ export default function EasyAlaskaShoreExcursionsPage() {
             {featuredSeniorTours.map((tour, idx) => (
               <div
                 key={idx}
-                className="flex flex-col justify-between rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition hover:-translate-y-0.5"
+                className="overflow-hidden flex flex-col justify-between rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition hover:-translate-y-0.5"
               >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-sky-700">{tour.port}</span>
-                    <span className="font-black text-slate-900">{tour.price}</span>
-                  </div>
-                  <h3 className="text-lg font-black text-slate-900 leading-tight">
-                    {tour.title}
-                  </h3>
-                  <div className="space-y-1 text-xs text-slate-500">
-                    <p><strong>Operator:</strong> {tour.operator}</p>
-                    <p><strong>Mobility:</strong> {tour.mobility}</p>
-                  </div>
-                  <p className="text-xs leading-5 text-slate-600">
-                    {tour.highlights}
-                  </p>
+                <div className="relative h-44 w-full bg-slate-100">
+                  <Image
+                    src={tour.image}
+                    alt={tour.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                  <span className="absolute top-3 left-3 rounded-full bg-slate-950/80 px-2.5 py-1 text-[10px] font-black uppercase tracking-wider text-white backdrop-blur">
+                    {tour.port}
+                  </span>
+                  <span className="absolute bottom-3 right-3 rounded-xl bg-white/95 px-2.5 py-1 text-xs font-black text-slate-900 shadow">
+                    {tour.price}
+                  </span>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-100 flex flex-wrap gap-2">
-                  <Link
-                    href={tour.href}
-                    className="flex-1 min-h-10 inline-flex items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-xs font-black uppercase tracking-wider text-white hover:bg-slate-800 transition"
-                  >
-                    View Tour →
-                  </Link>
-                  <Link
-                    href={tour.calendarHref}
-                    className="min-h-10 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-100 transition"
-                  >
-                    Calendar
-                  </Link>
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-3">
+                  <div>
+                    <h3 className="text-lg font-black text-slate-900 leading-tight">
+                      {tour.title}
+                    </h3>
+                    <div className="mt-2 space-y-1 text-xs text-slate-500">
+                      <p><strong>Operator:</strong> {tour.operator}</p>
+                      <p><strong>Mobility:</strong> {tour.mobility}</p>
+                    </div>
+                    <p className="mt-3 text-xs leading-5 text-slate-600">
+                      {tour.highlights}
+                    </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-slate-100 flex flex-wrap gap-2">
+                    <Link
+                      href={tour.href}
+                      className="flex-1 min-h-10 inline-flex items-center justify-center rounded-xl bg-slate-900 px-3 py-2 text-xs font-black uppercase tracking-wider text-white hover:bg-slate-800 transition"
+                    >
+                      View Tour →
+                    </Link>
+                    <Link
+                      href={tour.calendarHref}
+                      className="min-h-10 inline-flex items-center justify-center rounded-xl border border-slate-200 bg-slate-50 px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-700 hover:bg-slate-100 transition"
+                    >
+                      Calendar
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

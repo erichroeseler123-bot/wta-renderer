@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
       "A practical bird-watching guide for Alaska cruise passengers: top coastal spots near cruise docks, species breakdown, seasonal timing, independent walking routes, and excursion tips.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/hero/hero5678.jpg", width: 1200, height: 630, alt: "Coastal birds and shoreline in Southeast Alaska" }],
   },
 };
 
@@ -76,12 +78,23 @@ export default function BirdWatchingGuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/hero5678.jpg"
+            alt="Coastal temperate rainforest and marine habitat in Southeast Alaska"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Alaska Guides Directory"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Wildlife & Nature Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">

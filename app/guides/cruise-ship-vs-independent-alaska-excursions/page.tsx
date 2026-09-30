@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
 import { ALASKA_GEO_FACTS } from "@/lib/alaskaGeoFacts";
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
       "A complete guide to pricing, boat crowd sizes, guaranteed ship returns, and port logistics for Alaska cruise passengers.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/images/home-hero.jpg", width: 1200, height: 630, alt: "Cruise ship and small excursion boat in Alaska waters" }],
   },
 };
 
@@ -123,9 +125,20 @@ export default function CruiseShipVsIndependentGuide() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       {/* HERO SECTION */}
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-cyan-200 hover:text-white inline-flex items-center gap-1.5 mb-4">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/home-hero.jpg"
+            alt="Cruise ship and small excursion vessel in Alaska Inside Passage"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5 mb-4">
             ← All Alaska cruise guides
           </Link>
           <div className="text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
@@ -243,34 +256,82 @@ export default function CruiseShipVsIndependentGuide() {
               Port-Specific Dock Logistics: Juneau, Ketchikan & Skagway
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-5">
-                <h3 className="font-black text-slate-900 text-lg mb-2">Juneau Berths</h3>
-                <p className="text-xs text-slate-600 leading-relaxed mb-3">
-                  Most ships dock right downtown (Franklin, CT, IVF) along the seawalk. If your ship berths at the AJ Dock (1 mile south), a dedicated $5 shuttle drops you right at the Mt. Roberts Tram plaza, which is the primary independent excursion pickup hub.
-                </p>
-                <Link href="/ports/juneau" className="text-xs font-bold text-sky-700 hover:underline">
-                  Juneau Cruise Port Guide →
-                </Link>
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 flex flex-col justify-between shadow-sm">
+                <div className="relative h-36 w-full bg-slate-200">
+                  <Image
+                    src="/hero/juneau.jpg"
+                    alt="Juneau cruise docks along Gastineau Channel"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
+                  />
+                  <span className="absolute bottom-2 left-2 rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+                    Port of Juneau
+                  </span>
+                </div>
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-black text-slate-900 text-lg mb-2">Juneau Berths</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                      Most ships dock right downtown (Franklin, CT, IVF) along the seawalk. If your ship berths at the AJ Dock (1 mile south), a dedicated $5 shuttle drops you right at the Mt. Roberts Tram plaza, which is the primary independent excursion pickup hub.
+                    </p>
+                  </div>
+                  <Link href="/ports/juneau" className="text-xs font-bold text-sky-700 hover:underline">
+                    Juneau Cruise Port Guide →
+                  </Link>
+                </div>
               </div>
 
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-5">
-                <h3 className="font-black text-slate-900 text-lg mb-2">Ketchikan & Ward Cove</h3>
-                <p className="text-xs text-slate-600 leading-relaxed mb-3">
-                  Downtown berths 1–4 are right in front of historic Creek Street. Ships berthing at Ward Cove (NCL/Oceania, 9 miles north) take a free 20-minute shuttle into town. Independent tours coordinate pick-ups at both locations.
-                </p>
-                <Link href="/ports/ketchikan" className="text-xs font-bold text-sky-700 hover:underline">
-                  Ketchikan Cruise Port Guide →
-                </Link>
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 flex flex-col justify-between shadow-sm">
+                <div className="relative h-36 w-full bg-slate-200">
+                  <Image
+                    src="/images/ketchikan/ketchikan-cruise-port.jpg"
+                    alt="Ketchikan cruise berths and downtown waterfront"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
+                  />
+                  <span className="absolute bottom-2 left-2 rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+                    Port of Ketchikan
+                  </span>
+                </div>
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-black text-slate-900 text-lg mb-2">Ketchikan & Ward Cove</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                      Downtown berths 1–4 are right in front of historic Creek Street. Ships berthing at Ward Cove (NCL/Oceania, 9 miles north) take a free 20-minute shuttle into town. Independent tours coordinate pick-ups at both locations.
+                    </p>
+                  </div>
+                  <Link href="/ports/ketchikan" className="text-xs font-bold text-sky-700 hover:underline">
+                    Ketchikan Cruise Port Guide →
+                  </Link>
+                </div>
               </div>
 
-              <div className="rounded-xl border border-slate-100 bg-slate-50 p-5">
-                <h3 className="font-black text-slate-900 text-lg mb-2">Skagway Docks</h3>
-                <p className="text-xs text-slate-600 leading-relaxed mb-3">
-                  Ore and Broadway Docks are a 5-minute walk to town. For ships at the Railroad Dock, a free municipal shuttle or scenic transfer train transports passengers past hillside mitigation zones directly to Broadway.
-                </p>
-                <Link href="/ports/skagway" className="text-xs font-bold text-sky-700 hover:underline">
-                  Skagway Cruise Port Guide →
-                </Link>
+              <div className="overflow-hidden rounded-2xl border border-slate-200 bg-slate-50 flex flex-col justify-between shadow-sm">
+                <div className="relative h-36 w-full bg-slate-200">
+                  <Image
+                    src="/hero/skagway.jpg"
+                    alt="Skagway cruise dock and historic mountain valley"
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
+                  />
+                  <span className="absolute bottom-2 left-2 rounded-full bg-slate-950/80 px-2.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+                    Port of Skagway
+                  </span>
+                </div>
+                <div className="p-5 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="font-black text-slate-900 text-lg mb-2">Skagway Docks</h3>
+                    <p className="text-xs text-slate-600 leading-relaxed mb-3">
+                      Ore and Broadway Docks are a 5-minute walk to town. For ships at the Railroad Dock, a free municipal shuttle or scenic transfer train transports passengers past hillside mitigation zones directly to Broadway.
+                    </p>
+                  </div>
+                  <Link href="/ports/skagway" className="text-xs font-bold text-sky-700 hover:underline">
+                    Skagway Cruise Port Guide →
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

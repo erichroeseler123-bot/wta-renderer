@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
       "Complete guide on getting to Mendenhall Glacier from Juneau cruise docks: commercial shuttles, whale combos, taxi shortages, city bus walking distance, permit limits, and back-to-ship timing.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/hero/juneau.jpg", width: 1200, height: 630, alt: "Juneau Alaska cruise port and Mendenhall Valley" }],
   },
 };
 
@@ -135,6 +137,7 @@ const featuredTours = [
     href: "/tours/alaskatales/47296",
     calendarHref: "/tours/alaskatales/47296/calendar",
     tag: "Whale + Glacier Combo",
+    image: "https://cdn.filestackcontent.com/8tB0m1rESzylyunnWCBP",
   },
   {
     title: "Mendenhall Lake Canoe Adventure",
@@ -145,6 +148,7 @@ const featuredTours = [
     href: "/tours/aktraveladventures/311607",
     calendarHref: "/tours/aktraveladventures/311607/calendar",
     tag: "Lake Paddle",
+    image: "https://cdn.filestackcontent.com/CT2dtoRkRU2deQYYVMz8",
   },
   {
     title: "Mendenhall Glacier Float Trip",
@@ -155,6 +159,7 @@ const featuredTours = [
     href: "/tours/aktraveladventures/311600",
     calendarHref: "/tours/aktraveladventures/311600/calendar",
     tag: "Scenic Float",
+    image: "/images/juneau/juneau-helicopter-glacier.jpg",
   },
   {
     title: "Mendenhall Glacier Guided Hike",
@@ -165,6 +170,7 @@ const featuredTours = [
     href: "/tours/beyondak/195602",
     calendarHref: "/tours/beyondak/195602/calendar",
     tag: "Guided Hike",
+    image: "/hero/hero8521.jpg",
   },
 ];
 
@@ -198,12 +204,23 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
       {/* Hero Section */}
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/ports/juneau" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/juneau.jpg"
+            alt="Scenic Gastineau Channel and Mendenhall Glacier Valley in Juneau"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/ports/juneau" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Juneau excursions"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -369,38 +386,49 @@ export default function GuidePage() {
             </Link>
           </div>
 
-          <div className="mt-6 grid gap-5 md:grid-cols-2">
+          <div className="mt-6 grid gap-6 md:grid-cols-2">
             {featuredTours.map((t) => (
               <div
                 key={t.title}
-                className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition"
+                className="overflow-hidden flex flex-col justify-between rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition"
               >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <span className="rounded-full bg-sky-50 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-sky-800">
-                      {t.tag}
-                    </span>
-                    <span className="text-sm font-black text-slate-900">{t.price}</span>
-                  </div>
-                  <h3 className="mt-3 text-lg font-black text-slate-950">{t.title}</h3>
-                  <div className="mt-1 text-xs font-semibold text-slate-500">
-                    Operator: {t.operator} • Duration: {t.duration}
-                  </div>
-                  <p className="mt-3 text-xs leading-5 text-slate-600">{t.highlights}</p>
+                <div className="relative h-48 w-full bg-slate-100">
+                  <Image
+                    src={t.image}
+                    alt={t.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                    className="object-cover"
+                  />
+                  <span className="absolute top-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[10px] font-black uppercase tracking-wider text-white backdrop-blur">
+                    {t.tag}
+                  </span>
+                  <span className="absolute bottom-3 right-3 rounded-xl bg-white/95 px-3 py-1 text-xs font-black text-slate-900 shadow">
+                    {t.price}
+                  </span>
                 </div>
-                <div className="mt-6 grid grid-cols-2 gap-2">
-                  <Link
-                    href={t.href}
-                    className="rounded-xl border border-slate-200 px-3 py-2 text-center text-xs font-black hover:bg-slate-50 transition"
-                  >
-                    View Details
-                  </Link>
-                  <Link
-                    href={t.calendarHref}
-                    className="rounded-xl bg-sky-700 px-3 py-2 text-center text-xs font-black text-white hover:bg-sky-800 transition"
-                  >
-                    Live Calendar →
-                  </Link>
+                <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div>
+                    <h3 className="text-lg font-black text-slate-950">{t.title}</h3>
+                    <div className="mt-1 text-xs font-semibold text-slate-500">
+                      Operator: {t.operator} • Duration: {t.duration}
+                    </div>
+                    <p className="mt-3 text-xs leading-5 text-slate-600">{t.highlights}</p>
+                  </div>
+                  <div className="mt-6 grid grid-cols-2 gap-2">
+                    <Link
+                      href={t.href}
+                      className="rounded-xl border border-slate-200 px-3 py-2 text-center text-xs font-black hover:bg-slate-50 transition"
+                    >
+                      View Details
+                    </Link>
+                    <Link
+                      href={t.calendarHref}
+                      className="rounded-xl bg-sky-700 px-3 py-2 text-center text-xs font-black text-white hover:bg-sky-800 transition"
+                    >
+                      Live Calendar →
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}

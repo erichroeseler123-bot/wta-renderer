@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "Cruise passenger safety guide: how independent Alaska tour operators guarantee on-time ship return, strict safety buffers, and comprehensive contingency protections.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/images/ketchikan/ketchikan-cruise-port.jpg", width: 1200, height: 630, alt: "Alaska cruise ship docked in port" }],
   },
 };
 
@@ -57,12 +59,23 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/ketchikan/ketchikan-cruise-port.jpg"
+            alt="Cruise ship tied to Alaska port dock against forested mountains"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Alaska Guides Directory"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -111,35 +124,83 @@ export default function GuidePage() {
         {/* Detailed Sections */}
         <section className="mt-12 space-y-10">
           <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">Key Decisions & Experience Breakdown</h2>
-          <div className="grid gap-6">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             
-            <div key={"The Golden Timing Rule: Tour End Time + 45 Minutes <= All-Aboard"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"The Golden Timing Rule: Tour End Time + 45 Minutes <= All-Aboard"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"All-aboard is typically 30 to 60 minutes before scheduled ship departure. Reputable independent tours finish a minimum of 45 to 90 minutes prior to all-aboard. If your all-aboard is 4:30 PM, your tour must return to the dock by 3:45 PM or earlier. If an excursion cannot satisfy this rule, our booking platform will not allow you to confirm it."}</p>
-              <div className="mt-4">
-                <Link href="/guides/cruise-ship-vs-independent-alaska-excursions" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Compare Ship vs Independent Excursions →"}
-                </Link>
+            <div key={"The Golden Timing Rule: Tour End Time + 45 Minutes <= All-Aboard"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-48 w-full bg-slate-100">
+                <Image
+                  src="/hero/hero8521.jpg"
+                  alt="Alaska coastal waterway and timed excursion transit"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Timing Rule
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{"Tour End Time + 45 Minutes &le; All-Aboard"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"All-aboard is typically 30 to 60 minutes before scheduled ship departure. Reputable independent tours finish a minimum of 45 to 90 minutes prior to all-aboard. If your all-aboard is 4:30 PM, your tour must return to the dock by 3:45 PM or earlier."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/guides/cruise-ship-vs-independent-alaska-excursions" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Compare Ship vs Independent →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Why Alaska Ports Are Logistically Low-Risk"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Why Alaska Ports Are Logistically Low-Risk"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Unlike sprawling metropolitan ports like Rome, Barcelona, or Miami where cruise ships dock 60 miles away from city centers through heavy freeway traffic, Alaska ports are tiny towns. In Juneau, the airport is 15 minutes away; in Skagway, the entire town is 7 blocks long; in Ketchikan, floatplanes land directly in the harbor next to the cruise ships."}</p>
-              <div className="mt-4">
-                <Link href="/guides/how-long-does-it-take-to-get-off-the-ship-in-juneau" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Learn About Port Disembarkation Logistics →"}
-                </Link>
+            <div key={"Why Alaska Ports Are Logistically Low-Risk"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-48 w-full bg-slate-100">
+                <Image
+                  src="/hero/juneau.jpg"
+                  alt="Juneau port harbor directly adjacent to excursion departure piers"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Low-Risk Logistics
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{"Why Alaska Ports Are Low-Risk"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Unlike sprawling metropolitan ports like Rome, Barcelona, or Miami where cruise ships dock 60 miles away from city centers through heavy freeway traffic, Alaska ports are tiny towns. In Juneau, the airport is 15 minutes away; in Skagway, the town is 7 blocks long."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/guides/how-long-does-it-take-to-get-off-the-ship-in-juneau" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Disembarkation Timing Guide →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Our 100% Back-to-Ship Guarantee"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Our 100% Back-to-Ship Guarantee"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"In the virtually non-existent event that an operator delay causes you to miss your ship, reputable operators provide full contingency coverage: arranging and paying for air transportation, meals, and lodging to deliver you to your cruise ship’s very next port of call."}</p>
-              <div className="mt-4">
-                <Link href="/ports" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Verified Alaska Shore Excursions →"}
-                </Link>
+            <div key={"Our 100% Back-to-Ship Guarantee"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-48 w-full bg-slate-100">
+                <Image
+                  src="/images/ketchikan/ketchikan-cruise-port.jpg"
+                  alt="Cruise ship in Alaska harbor under verified operator guarantee"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Back-To-Ship Guarantee
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{"100% Back-to-Ship Guarantee"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"In the virtually non-existent event that an operator delay causes you to miss your ship, reputable operators provide full contingency coverage: arranging and paying for air transportation, meals, and lodging to deliver you to the next port."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/ports" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Verified Excursions →"}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

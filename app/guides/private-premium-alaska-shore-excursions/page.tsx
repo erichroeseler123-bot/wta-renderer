@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "Exclusive private Alaska shore excursions: private 6-pack whale watching yachts, chartered glacier helicopters, luxury van tours, and private Misty Fjords floatplanes.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/images/juneau/juneau-helicopter-glacier.jpg", width: 1200, height: 630, alt: "Private helicopter on Alaska glacier" }],
   },
 };
 
@@ -57,12 +59,23 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/juneau/juneau-helicopter-glacier.jpg"
+            alt="VIP helicopter excursion on blue glacier ice in Alaska"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Alaska Guides Directory"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -111,45 +124,109 @@ export default function GuidePage() {
         {/* Detailed Sections */}
         <section className="mt-12 space-y-10">
           <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">Key Decisions & Experience Breakdown</h2>
-          <div className="grid gap-6">
+          <div className="grid gap-8 sm:grid-cols-2">
             
-            <div key={"Private 6-Pack Whale Watching Charters (Juneau)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Private 6-Pack Whale Watching Charters (Juneau)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Charter an entire 32 to 38-foot catamaran for just your family (up to 6 passengers). You get 360-degree unobstructed rail space, direct access to the licensed captain and naturalist, custom hydrophone listening, and flexible cruise dock departure timing."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/private-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Juneau Private Shore Excursions →"}
-                </Link>
+            <div key={"Private 6-Pack Whale Watching Charters (Juneau)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/images/ketchikan/ketchikan-whale-watching.jpg"
+                  alt="Private whale watching boat in Southeast Alaska waters"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Private 6-Pack Yacht
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Private 6-Pack Whale Watching Charters (Juneau)"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Charter an entire 32 to 38-foot catamaran for just your family (up to 6 passengers). You get 360-degree unobstructed rail space, direct access to the licensed captain and naturalist, custom hydrophone listening, and flexible cruise dock departure timing."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/private-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Juneau Private Shore Excursions →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Exclusive Helicopter Glacier & Icefield Charters"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Exclusive Helicopter Glacier & Icefield Charters"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Charter a private helicopter for up to 6 guests to land on secluded high-altitude icefields, drink pure glacial meltwater, and explore untouched crevasses away from standard commercial tour groups."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/helicopter-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Juneau Helicopter Tours →"}
-                </Link>
+            <div key={"Exclusive Helicopter Glacier & Icefield Charters"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/images/juneau/juneau-helicopter-glacier.jpg"
+                  alt="Exclusive helicopter landing on remote glacier icefield"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Exclusive Flight Charter
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Exclusive Helicopter Glacier & Icefield Charters"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Charter a private helicopter for up to 6 guests to land on secluded high-altitude icefields, drink pure glacial meltwater, and explore untouched crevasses away from standard commercial tour groups."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/helicopter-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Juneau Helicopter Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Private Misty Fjords Floatplane Charters (Ketchikan)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Private Misty Fjords Floatplane Charters (Ketchikan)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"A private floatplane charter accommodates your party for an unforgettable aerial flight through Misty Fjords, landing in a secluded alpine lake for champagne or wilderness photography before flying back along the coastline."}</p>
-              <div className="mt-4">
-                <Link href="/ketchikan/private-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Ketchikan Private Shore Excursions →"}
-                </Link>
+            <div key={"Private Misty Fjords Floatplane Charters (Ketchikan)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/images/ketchikan/ketchikan-misty-fjords.jpg"
+                  alt="Private floatplane charter over Misty Fjords National Monument"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Private Floatplane
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Private Misty Fjords Floatplane Charters (Ketchikan)"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"A private floatplane charter accommodates your party for an unforgettable aerial flight through Misty Fjords, landing in a secluded alpine lake for champagne or wilderness photography before flying back along the coastline."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/ketchikan/private-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Ketchikan Private Shore Excursions →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"Private Luxury Van & Yukon Explorations (Skagway)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"Private Luxury Van & Yukon Explorations (Skagway)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Travel the scenic Klondike Highway in a private luxury Mercedes Sprinter or executive van, crossing the Canadian border to Emerald Lake and Carcross with custom photo stops, wildlife viewing, and no large bus crowds."}</p>
-              <div className="mt-4">
-                <Link href="/skagway/private-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Skagway Private Shore Excursions →"}
-                </Link>
+            <div key={"Private Luxury Van & Yukon Explorations (Skagway)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/hero/skagway.jpg"
+                  alt="Klondike Highway and mountain scenery from Skagway to the Yukon"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Private Luxury Van
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"Private Luxury Van & Yukon Explorations (Skagway)"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Travel the scenic Klondike Highway in a private luxury Mercedes Sprinter or executive van, crossing the Canadian border to Emerald Lake and Carcross with custom photo stops, wildlife viewing, and no large bus crowds."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/skagway/private-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Skagway Private Shore Excursions →"}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

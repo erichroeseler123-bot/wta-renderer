@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "Maximize a short 4 to 6-hour Skagway port call: helicopter glacier landings, historic Broadway, Liarsville Gold Rush camp, and scenic White Pass summit trips.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/hero/skagway.jpg", width: 1200, height: 630, alt: "Skagway Alaska port and mountain valley" }],
   },
 };
 
@@ -57,12 +59,23 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/ports/skagway" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/skagway.jpg"
+            alt="Scenic view of Skagway valley and historic port"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/ports/skagway" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Skagway excursions"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -111,35 +124,83 @@ export default function GuidePage() {
         {/* Detailed Sections */}
         <section className="mt-12 space-y-10">
           <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">Key Decisions & Experience Breakdown</h2>
-          <div className="grid gap-6">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             
-            <div key={"1. Helicopter Glacier Landing over Sawtooth Ridge (2–2.5 Hours)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"1. Helicopter Glacier Landing over Sawtooth Ridge (2–2.5 Hours)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Because the Skagway heliport is located directly adjacent to the harbor, transfer time is under 5 minutes. Flights lift off over Taiya Inlet and land directly on high alpine glacier icefields, offering 30 minutes of guided ice walking before returning you to the docks."}</p>
-              <div className="mt-4">
-                <Link href="/skagway/helicopter-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Check Skagway Helicopter Tours →"}
-                </Link>
+            <div key={"1. Helicopter Glacier Landing over Sawtooth Ridge (2–2.5 Hours)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-48 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/UfdwGOWFSR6bOeRrQjNA"
+                  alt="TEMSCO helicopter landing on glacier icefield in Skagway"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Bucket-List
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{"1. Helicopter Glacier Landing (2–2.5 Hours)"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Because the Skagway heliport is located directly adjacent to the harbor, transfer time is under 5 minutes. Flights lift off over Taiya Inlet and land directly on high alpine glacier icefields, offering 30 minutes of guided ice walking before returning you to the docks."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/skagway/helicopter-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Check Skagway Helicopter Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"2. Liarsville Gold Rush Trail Camp & Salmon Bake (2.5 Hours)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"2. Liarsville Gold Rush Trail Camp & Salmon Bake (2.5 Hours)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Located just 3 miles from the cruise piers at the foot of White Pass, Liarsville recreates an 1898 stampeders tent city. Features include seated gold panning with guaranteed gold flakes, historic melodrama performances, and fresh Alaskan wild salmon grilled over alder wood."}</p>
-              <div className="mt-4">
-                <Link href="/skagway/gold-rush-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Skagway Gold Rush Tours →"}
-                </Link>
+            <div key={"2. Liarsville Gold Rush Trail Camp & Salmon Bake (2.5 Hours)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-48 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/XJrduLPHS1Oy22FpK3vn"
+                  alt="Gold rush dog sled camp and outdoor experience in Skagway"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Cultural Camp
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{"2. Liarsville Gold Rush Camp (2.5 Hours)"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Located just 3 miles from the cruise piers at the foot of White Pass, Liarsville recreates an 1898 stampeders tent city. Features include seated gold panning with guaranteed gold flakes, historic melodrama performances, and fresh Alaskan wild salmon grilled over alder wood."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/skagway/gold-rush-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Skagway Gold Rush Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"3. Historic Broadway Walking & Klondike Museum (1–2 Hours)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"3. Historic Broadway Walking & Klondike Museum (1–2 Hours)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Skagway’s historic downtown features false-front saloons, wooden boardwalks, and restored gold rush buildings managed by the National Park Service. Free museum exhibits, the Mascot Saloon, and local artisan shops sit within a flat 10-minute walk from Broadway and Ore docks."}</p>
-              <div className="mt-4">
-                <Link href="/ports/skagway" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Browse All Skagway Excursions →"}
-                </Link>
+            <div key={"3. Historic Broadway Walking & Klondike Museum (1–2 Hours)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-48 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/1LvXaHH5RQmIzTnR2s7e"
+                  alt="Historic Skagway Broadway wooden sidewalks and historic gold rush buildings"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 33vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Walkable Choice
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{"3. Historic Broadway & Museum (1–2 Hours)"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Skagway’s historic downtown features false-front saloons, wooden boardwalks, and restored gold rush buildings managed by the National Park Service. Free museum exhibits, the Mascot Saloon, and local artisan shops sit within a flat 10-minute walk from Broadway and Ore docks."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/ports/skagway" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Browse All Skagway Excursions →"}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

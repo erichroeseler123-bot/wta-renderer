@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "Discover the top shore excursions in Juneau for cruise passengers: whale watching, Mendenhall Glacier, helicopter icefield landings, and dog sledding with verified pricing and cruise timing.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/hero/juneau.jpg", width: 1200, height: 630, alt: "Juneau Alaska harbor and mountains" }],
   },
 };
 
@@ -57,12 +59,23 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/ports/juneau" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/juneau.jpg"
+            alt="Scenic view of Juneau port, mountains, and Gastineau Channel"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/ports/juneau" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Juneau excursions"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -111,45 +124,109 @@ export default function GuidePage() {
         {/* Detailed Sections */}
         <section className="mt-12 space-y-10">
           <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">Key Decisions & Experience Breakdown</h2>
-          <div className="grid gap-6">
+          <div className="grid gap-8 sm:grid-cols-2">
             
-            <div key={"1. Small-Boat Humpback Whale Watching (Top Wildlife Choice)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"1. Small-Boat Humpback Whale Watching (Top Wildlife Choice)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Auke Bay, located 20 minutes north of downtown Juneau, is one of North America’s premier feeding grounds for humpback whales during summer. Independent operators utilize custom twin-engine jet catamarans carrying 20–40 passengers, compared to 150+ on cruise ship contract vessels. Every passenger has 360-degree rail viewing, heated enclosed cabins, and hydrophone audio to listen to underwater whale songs."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/whale-watching" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Juneau Whale Watching Tours →"}
-                </Link>
+            <div key={"1. Small-Boat Humpback Whale Watching (Top Wildlife Choice)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/iupIP17ASRluV2O9ZjgE"
+                  alt="Juneau whale watching boat observing humpback whales in Auke Bay"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Wildlife Choice
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"1. Small-Boat Humpback Whale Watching"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Auke Bay, located 20 minutes north of downtown Juneau, is one of North America’s premier feeding grounds for humpback whales during summer. Independent operators utilize custom twin-engine jet catamarans carrying 20–40 passengers, compared to 150+ on cruise ship contract vessels. Every passenger has 360-degree rail viewing, heated enclosed cabins, and hydrophone audio."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/whale-watching" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Juneau Whale Watching Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"2. Mendenhall Glacier Tours & Shuttles (Top Scenic Choice)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"2. Mendenhall Glacier Tours & Shuttles (Top Scenic Choice)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Mendenhall Glacier descends 13 miles from the Juneau Icefield into Mendenhall Lake. Because the US Forest Service caps commercial visitor permits, booking an authorized tour shuttle or guided combo in advance is required. Key highlights include the paved photo boardwalk to Nugget Falls (2 miles round-trip) and the elevated Visitor Center overlook."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/mendenhall-glacier-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Mendenhall Glacier Tours →"}
-                </Link>
+            <div key={"2. Mendenhall Glacier Tours & Shuttles (Top Scenic Choice)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/CT2dtoRkRU2deQYYVMz8"
+                  alt="Mendenhall Glacier cascading into Mendenhall Lake near Juneau"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Scenic Choice
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"2. Mendenhall Glacier Tours & Shuttles"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Mendenhall Glacier descends 13 miles from the Juneau Icefield into Mendenhall Lake. Because the US Forest Service caps commercial visitor permits, booking an authorized tour shuttle or guided combo in advance is required. Key highlights include the paved photo boardwalk to Nugget Falls (2 miles round-trip) and the elevated Visitor Center overlook."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/mendenhall-glacier-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Mendenhall Glacier Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"3. Helicopter Glacier Landings & Dog Sledding (Top Bucket-List Choice)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"3. Helicopter Glacier Landings & Dog Sledding (Top Bucket-List Choice)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Taking off from Juneau airport, helicopters soar over the jagged granite towers and crevasses of the Herbert, Taku, or Norris glaciers. The standard 2.25-hour tour includes 30 minutes of flight time and a 20–25 minute guided walk on pristine blue ice. The premier upgrade is flying up to high-alpine snow camps for an authentic sled dog run powered by Iditarod sled teams."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/helicopter-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Juneau Helicopter & Dog Sledding Tours →"}
-                </Link>
+            <div key={"3. Helicopter Glacier Landings & Dog Sledding (Top Bucket-List Choice)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/images/juneau/juneau-helicopter-glacier.jpg"
+                  alt="Helicopter parked on blue glacier ice field in Juneau Alaska"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Bucket-List Choice
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"3. Helicopter Glacier Landings & Dog Sledding"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Taking off from Juneau airport, helicopters soar over the jagged granite towers and crevasses of the Herbert, Taku, or Norris glaciers. The standard 2.25-hour tour includes 30 minutes of flight time and a 20–25 minute guided walk on pristine blue ice. The premier upgrade is flying up to high-alpine snow camps for an authentic sled dog run powered by Iditarod sled teams."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/helicopter-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Juneau Helicopter & Dog Sledding Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"4. Salmon & Halibut Fishing Charters (Top Active Choice)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"4. Salmon & Halibut Fishing Charters (Top Active Choice)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Southeast Alaska waters teem with King, Coho, and Pink salmon from June through August, alongside giant Pacific halibut. Half-day charters (4 to 5 hours) provide top-tier rods, bait, heated boats, and professional processing to flash-freeze and ship your catch directly to your home."}</p>
-              <div className="mt-4">
-                <Link href="/juneau/fishing" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Juneau Fishing Charters →"}
-                </Link>
+            <div key={"4. Salmon & Halibut Fishing Charters (Top Active Choice)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/hero/hero8521.jpg"
+                  alt="Scenic waters and forested mountains of Southeast Alaska"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Active Choice
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"4. Salmon & Halibut Fishing Charters"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Southeast Alaska waters teem with King, Coho, and Pink salmon from June through August, alongside giant Pacific halibut. Half-day charters (4 to 5 hours) provide top-tier rods, bait, heated boats, and professional processing to flash-freeze and ship your catch directly to your home."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/juneau/fishing" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Juneau Fishing Charters →"}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>

@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getHelicopterTours } from "@/lib/helicopterTours";
@@ -34,6 +35,7 @@ type GuideConfig = {
   gangwayTime: string;
   transitToTours: string;
   timingRule: string;
+  heroImage: string;
   faqs: { question: string; answer: string }[];
 };
 
@@ -51,6 +53,7 @@ const GUIDE_CONFIGS: Record<string, GuideConfig> = {
     gangwayTime: "The ship must be cleared before passengers can disembark, and the first wave of passengers can create a queue. Actual timing varies by ship, berth, arrival conditions, and cruise-line procedures.",
     transitToTours: "Independent operators use different meeting points. Some are near the downtown docks; others require a walk or transfer. Use the meeting location shown for the specific excursion rather than assuming every operator uses the same pickup point.",
     timingRule: "Build extra time between your scheduled arrival and an independent excursion departure, and confirm the operator's recommended check-in time. Also leave enough time at the end of the tour to meet your cruise line's published all-aboard deadline.",
+    heroImage: "/hero/juneau.jpg",
     faqs: [
       {
         question: "How much time should I allow to get off in Juneau?",
@@ -75,6 +78,7 @@ const GUIDE_CONFIGS: Record<string, GuideConfig> = {
     gangwayTime: "Morning excursion periods can be busy. Do not assume you can step off the ship at the scheduled arrival minute; ship clearance and passenger queues can affect when you actually reach the dock.",
     transitToTours: "Meeting arrangements vary. Some experiences may meet close to the pier while others use town or operator-specific pickup points. Follow the instructions for the exact tour you book.",
     timingRule: "Leave a practical cushion after scheduled arrival before an independent departure and verify the operator's check-in requirement. For the return, use the cruise line's current all-aboard time as the controlling deadline.",
+    heroImage: "/hero/skagway.jpg",
     faqs: [
       {
         question: "Can I walk from the Skagway cruise docks?",
@@ -99,6 +103,7 @@ const GUIDE_CONFIGS: Record<string, GuideConfig> = {
     gangwayTime: "Even at a convenient berth, ship clearance and passenger queues can affect the first part of the port day. At Ward Cove, include the transfer process in your planning rather than counting only driving time.",
     transitToTours: "Some excursions meet downtown, some use operator transportation, and some may accommodate Ward Cove differently. The specific booking's meeting instructions are more reliable than a generic port-wide assumption.",
     timingRule: "If your ship uses Ward Cove, allow substantially more transfer time than you would at a downtown berth. In every case, confirm the operator's meeting instructions and your cruise line's current all-aboard time.",
+    heroImage: "/images/ketchikan/ketchikan-cruise-port.jpg",
     faqs: [
       {
         question: "How far is Ward Cove from downtown Ketchikan?",
@@ -125,6 +130,11 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     title: config.metaTitle,
     description: config.metaDescription,
     alternates: { canonical: `https://www.welcometoalaskatours.com/guides/${slug}` },
+    openGraph: {
+      title: config.metaTitle,
+      description: config.metaDescription,
+      images: [{ url: `https://www.welcometoalaskatours.com${config.heroImage}`, width: 1200, height: 630, alt: config.title }],
+    },
   };
 }
 
@@ -157,13 +167,27 @@ export default async function GuideSlugPage({ params }: { params: Promise<{ slug
     <main className="min-h-screen bg-slate-50 text-slate-900 pb-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="relative bg-slate-900 text-white py-12 px-6 sm:px-8">
-        <div className="mx-auto max-w-5xl">
+      <section className="relative overflow-hidden bg-slate-900 text-white py-16 px-6 sm:px-8 sm:py-20">
+        <div className="absolute inset-0">
+          <Image
+            src={config.heroImage}
+            alt={config.headline}
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5 mb-4">
+            ← All Alaska cruise guides
+          </Link>
           <div className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200">
             Cruise-day planning guide
           </div>
-          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">{config.headline}</h1>
-          <p className="mt-2 text-sm text-white/80 max-w-2xl">
+          <h1 className="mt-3 text-3xl font-black tracking-tight sm:text-5xl">{config.headline}</h1>
+          <p className="mt-4 text-base text-slate-200 max-w-2xl leading-relaxed">
             Practical planning guidance for independent excursions. Port operations can change, so confirm your berth, operator meeting instructions, and cruise-line all-aboard time for the actual sailing.
           </p>
         </div>
@@ -204,8 +228,14 @@ export default async function GuideSlugPage({ params }: { params: Promise<{ slug
             <div className="grid gap-6 md:grid-cols-2">
               {portTours.map((tour) => (
                 <div key={tour.pk} className="rounded-[2rem] border border-slate-200 bg-white overflow-hidden shadow-[0_18px_60px_rgba(15,23,42,0.08)] flex flex-col justify-between">
-                  <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-slate-100">
-                    <img src={tour.image || `/hero/${config.portSlug}.${config.portSlug === "ketchikan" ? "png" : "jpg"}`} alt={tour.title} className="h-full w-full object-cover" />
+                  <div className="relative aspect-[16/9] w-full overflow-hidden border-b border-slate-100 bg-slate-100">
+                    <Image
+                      src={tour.image || `/hero/${config.portSlug}.${config.portSlug === "ketchikan" ? "png" : "jpg"}`}
+                      alt={tour.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                    />
                   </div>
                   <div className="p-6 space-y-4 flex-grow flex flex-col justify-between">
                     <div className="space-y-2">

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -16,6 +17,7 @@ export const metadata: Metadata = {
       "A realistic nature guide for Alaska cruise passengers: bird watching, northern lights visibility, and whale viewing across Juneau, Ketchikan, Skagway, Sitka, and Icy Strait Point.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/hero/hero5678.jpg", width: 1200, height: 630, alt: "Alaska nature wildlife and coastal waters" }],
   },
 };
 
@@ -81,9 +83,20 @@ export default function AlaskaNatureGuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#064e3b_0%,#0f172a_55%,#0c4a6e_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/guides" className="text-sm font-bold text-emerald-300 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/hero/hero5678.jpg"
+            alt="Lush green wilderness and coastal waters in Southeast Alaska"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/guides" className="text-sm font-bold text-emerald-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Alaska Guides Directory"}
           </Link>
           <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-emerald-300">

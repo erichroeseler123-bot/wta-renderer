@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { getAlaskaGeoFact } from "@/lib/alaskaGeoFacts";
 import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
     description: "First-time cruise visitor guide to Ketchikan: Misty Fjords floatplanes, Herring Cove bear viewing, Creek Street boardwalk, coastal kayaking, and dock logistics.",
     url: canonical,
     type: "article",
+    images: [{ url: "https://www.welcometoalaskatours.com/images/ketchikan/ketchikan-cruise-port.jpg", width: 1200, height: 630, alt: "Ketchikan Alaska cruise harbor and waterfront" }],
   },
 };
 
@@ -57,12 +59,23 @@ export default function GuidePage() {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
 
-      <section className="bg-[linear-gradient(135deg,#082f49_0%,#0f172a_58%,#164e63_100%)] px-6 py-14 text-white sm:py-20">
-        <div className="mx-auto max-w-5xl">
-          <Link href="/ports/ketchikan" className="text-sm font-bold text-cyan-200 hover:text-white">
+      <section className="relative overflow-hidden bg-slate-900 px-6 py-16 text-white sm:py-24">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/ketchikan/ketchikan-cruise-port.jpg"
+            alt="Scenic Ketchikan cruise ship port, harbor, and green rainforest mountains"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover object-center opacity-30"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-950/80 to-transparent" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <Link href="/ports/ketchikan" className="text-sm font-bold text-cyan-300 hover:text-white inline-flex items-center gap-1.5">
             {"← Ketchikan excursions"}
           </Link>
-          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+          <div className="mt-5 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
             Alaska Cruise Planning Guide · 2026
           </div>
           <h1 className="mt-3 max-w-4xl text-3xl font-black tracking-tight sm:text-5xl lg:text-6xl">
@@ -111,45 +124,109 @@ export default function GuidePage() {
         {/* Detailed Sections */}
         <section className="mt-12 space-y-10">
           <h2 className="text-2xl font-black text-slate-950 sm:text-3xl">Key Decisions & Experience Breakdown</h2>
-          <div className="grid gap-6">
+          <div className="grid gap-8 sm:grid-cols-2">
             
-            <div key={"1. Misty Fjords National Monument Floatplane (Signature Splurge)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"1. Misty Fjords National Monument Floatplane (Signature Splurge)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Misty Fjords sits 22 miles east of Ketchikan and has no road access. Seaplanes take off directly from the harbor next to the cruise berths, cruising over 3,000-foot granite sea walls, sheer waterfalls, and jade-green fjords. Authentic tours include an active water landing on a remote mountain lake."}</p>
-              <div className="mt-4">
-                <Link href="/ketchikan/misty-fjords" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Check Misty Fjords Floatplane Tours →"}
-                </Link>
+            <div key={"1. Misty Fjords National Monument Floatplane (Signature Splurge)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/images/ketchikan/ketchikan-misty-fjords.jpg"
+                  alt="Misty Fjords National Monument sheer granite cliffs and deep blue water"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Signature Splurge
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"1. Misty Fjords National Monument Floatplane"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Misty Fjords sits 22 miles east of Ketchikan and has no road access. Seaplanes take off directly from the harbor next to the cruise berths, cruising over 3,000-foot granite sea walls, sheer waterfalls, and jade-green fjords. Authentic tours include an active water landing on a remote mountain lake."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/ketchikan/misty-fjords" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Check Misty Fjords Floatplane Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"2. Rainforest Wildlife & Bear Viewing at Herring Cove (Top Wildlife)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"2. Rainforest Wildlife & Bear Viewing at Herring Cove (Top Wildlife)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"During salmon spawning season (mid-July through September), black bears gather along the tidal flats and streams of Herring Cove to feast on pink and chum salmon. Guided excursions provide safe elevated boardwalk viewing alongside bald eagles and harbor seals."}</p>
-              <div className="mt-4">
-                <Link href="/ketchikan/bear-tours" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Ketchikan Bear & Wildlife Tours →"}
-                </Link>
+            <div key={"2. Rainforest Wildlife & Bear Viewing at Herring Cove (Top Wildlife)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="https://cdn.filestackcontent.com/EBP7uUwhTp26SZPUlciL"
+                  alt="Black bear fishing for salmon in Southeast Alaska rainforest stream"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Wildlife Pick
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"2. Rainforest Wildlife & Bear Viewing at Herring Cove"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"During salmon spawning season (mid-July through September), black bears gather along the tidal flats and streams of Herring Cove to feast on pink and chum salmon. Guided excursions provide safe elevated boardwalk viewing alongside bald eagles and harbor seals."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/ketchikan/bear-tours" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Ketchikan Bear & Wildlife Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"3. Coastal Sea Kayaking (Top Active Adventure)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"3. Coastal Sea Kayaking (Top Active Adventure)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Paddling tandem kayaks through protected coastal channels lets you glide silently past starfish, sea urchins, harbor seals, and diving bald eagles. Stable boats, warm spray skirts, and professional marine guides make this accessible even for first-time paddlers."}</p>
-              <div className="mt-4">
-                <Link href="/ketchikan/kayaking" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Explore Ketchikan Sea Kayaking Tours →"}
-                </Link>
+            <div key={"3. Coastal Sea Kayaking (Top Active Adventure)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/hero/hero5678.jpg"
+                  alt="Kayakers paddling along lush Alaska shoreline"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  Top Active Adventure
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"3. Coastal Sea Kayaking"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Paddling tandem kayaks through protected coastal channels lets you glide silently past starfish, sea urchins, harbor seals, and diving bald eagles. Stable boats, warm spray skirts, and professional marine guides make this accessible even for first-time paddlers."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/ketchikan/kayaking" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Explore Ketchikan Sea Kayaking Tours →"}
+                  </Link>
+                </div>
               </div>
             </div>
 
-            <div key={"4. Creek Street & Totem Heritage (On Foot in Port)"} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm hover:shadow-md transition">
-              <h3 className="text-xl font-black text-slate-900">{"4. Creek Street & Totem Heritage (On Foot in Port)"}</h3>
-              <p className="mt-3 text-sm leading-6 text-slate-600">{"Built on wooden pilings over Ketchikan Creek, Creek Street was the town’s historic red-light district during gold rush and fishing booms. Today it is a charming boardwalk filled with galleries, salmon ladders, and access to the Totem Heritage Center."}</p>
-              <div className="mt-4">
-                <Link href="/ports/ketchikan" className="text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
-                  {"Browse All Ketchikan Shore Excursions →"}
-                </Link>
+            <div key={"4. Creek Street & Totem Heritage (On Foot in Port)"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+              <div className="relative h-52 w-full bg-slate-100">
+                <Image
+                  src="/hero/ketchikan.png"
+                  alt="Historic Ketchikan Creek Street boardwalk on wooden pilings"
+                  fill
+                  sizes="(max-width: 640px) 100vw, 50vw"
+                  className="object-cover"
+                />
+                <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
+                  On Foot in Port
+                </span>
+              </div>
+              <div className="p-6 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="text-xl font-black text-slate-900">{"4. Creek Street & Totem Heritage"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Built on wooden pilings over Ketchikan Creek, Creek Street was the town’s historic red-light district during gold rush and fishing booms. Today it is a charming boardwalk filled with galleries, salmon ladders, and access to the Totem Heritage Center."}</p>
+                </div>
+                <div className="mt-5 pt-4 border-t border-slate-100">
+                  <Link href="/ports/ketchikan" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
+                    {"Browse All Ketchikan Shore Excursions →"}
+                  </Link>
+                </div>
               </div>
             </div>
           </div>
