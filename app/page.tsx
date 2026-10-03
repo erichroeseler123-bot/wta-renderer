@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import HomepageForm from "@/app/components/home/HomepageForm";
 import JsonLd from "@/components/seo/JsonLd";
 
@@ -14,32 +15,32 @@ const APPROVED_PORTS = [
   {
     slug: "juneau",
     title: "Juneau",
-    image: "/hero/juneau.jpg",
+    image: "/images/home/port-juneau.webp",
     description: "Whales, Mendenhall, glacier flights, dog sledding, fishing and adventure.",
   },
   {
     slug: "skagway",
     title: "Skagway",
-    image: "/hero/skagway.jpg",
+    image: "/images/home/port-skagway.webp",
     description: "Glacier flights, Gold Rush experiences, scooters and cruise-day adventures.",
   },
   {
     slug: "ketchikan",
     title: "Ketchikan",
-    image: "/hero/ketchikan.png",
+    image: "/images/home/port-ketchikan.webp",
     description: "Misty Fjords, bears, rainforest, kayaking, UTVs, snorkeling and more.",
   },
 ];
 
 const TRIP_STYLES = [
-  { icon: "🐋", title: "Wildlife & whales", text: "Whales, bears, rainforest and wildlife-focused experiences.", href: "/juneau/whale-watching" },
-  { icon: "🧊", title: "Glaciers", text: "Glacier views, icefields, Mendenhall, hikes and paddles.", href: "/juneau/mendenhall-glacier-tours" },
-  { icon: "🚁", title: "Flightseeing", text: "Helicopters, seaplanes and Alaska scenery from the air.", href: "/juneau/helicopter-tours" },
-  { icon: "🐕", title: "Dog sledding", text: "Huskies, glacier camps and sled-dog experiences.", href: "/juneau/dog-sledding" },
-  { icon: "🎣", title: "Fishing", text: "Salmon, halibut and private fishing charters.", href: "/juneau/fishing" },
-  { icon: "🛶", title: "Adventure", text: "Kayaks, canoes, Jeeps, UTVs, ziplines, hiking and snorkeling.", href: "/ketchikan/adventure-tours" },
-  { icon: "☕", title: "Easy day", text: "Lower-friction sightseeing and simpler-paced choices.", href: "/guides/easy-alaska-shore-excursions" },
-  { icon: "✨", title: "Private / premium", text: "Private charters and bigger once-in-a-lifetime splurges.", href: "/guides/private-premium-alaska-shore-excursions" },
+  { icon: "🐋", title: "Wildlife & whales", text: "Whales, bears, rainforest and wildlife-focused experiences.", href: "/juneau/whale-watching", image: "/images/home/exp-wildlife.webp" },
+  { icon: "🧊", title: "Glaciers", text: "Glacier views, icefields, Mendenhall, hikes and paddles.", href: "/juneau/mendenhall-glacier-tours", image: "/images/home/exp-glaciers.webp" },
+  { icon: "🚁", title: "Flightseeing", text: "Helicopters, seaplanes and Alaska scenery from the air.", href: "/juneau/helicopter-tours", image: "/images/home/exp-flightseeing.webp" },
+  { icon: "🐕", title: "Dog sledding", text: "Huskies, glacier camps and sled-dog experiences.", href: "/juneau/dog-sledding", image: "/images/home/exp-dogsledding.webp" },
+  { icon: "🎣", title: "Fishing", text: "Salmon, halibut and private fishing charters.", href: "/juneau/fishing", image: "/images/home/exp-fishing.webp" },
+  { icon: "🛶", title: "Adventure", text: "Kayaks, canoes, Jeeps, UTVs, ziplines, hiking and snorkeling.", href: "/ketchikan/adventure-tours", image: "/images/home/exp-adventure.webp" },
+  { icon: "☕", title: "Easy day", text: "Lower-friction sightseeing and simpler-paced choices.", href: "/guides/easy-alaska-shore-excursions", image: "/images/home/exp-easyday.webp" },
+  { icon: "✨", title: "Private / premium", text: "Private charters and bigger once-in-a-lifetime splurges.", href: "/guides/private-premium-alaska-shore-excursions", image: "/images/home/exp-premium.webp" },
 ];
 
 const POPULAR_SEARCHES = [
@@ -126,9 +127,13 @@ export default function HomePage() {
 
       <section className="relative isolate min-h-[860px] overflow-hidden bg-[#082522] text-white lg:min-h-[780px]">
         <div className="absolute inset-0 -z-20">
-          <img
-            src="/images/home-hero.jpg"
+          <Image
+            src="/images/home/hero-1920.webp"
             alt="Alaska cruise port scenery"
+            fill
+            priority
+            sizes="100vw"
+            quality={80}
             className="h-full w-full scale-[1.03] object-cover"
           />
         </div>
@@ -233,6 +238,14 @@ export default function HomePage() {
 
           <div className="mt-10 grid gap-4 lg:grid-cols-3">
             <Link href="/ports" className="group relative min-h-[300px] overflow-hidden rounded-[2.25rem] bg-[#0a312e] p-7 text-white shadow-[0_20px_70px_rgba(8,37,34,.14)]">
+              <Image
+                src="/images/home/card-ports.webp"
+                alt="First Alaska cruise"
+                fill
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                loading="lazy"
+                className="object-cover -z-10 brightness-[0.7] transition duration-500 group-hover:scale-105"
+              />
               <div className="absolute -bottom-20 -right-16 h-64 w-64 rounded-full border border-[#d7ff76]/20 transition duration-500 group-hover:scale-110" />
               <div className="relative flex h-full flex-col justify-between">
                 <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#d7ff76]">First Alaska cruise?</div>
@@ -245,6 +258,14 @@ export default function HomePage() {
             </Link>
 
             <Link href="/ships" className="group relative min-h-[300px] overflow-hidden rounded-[2.25rem] bg-[#cfe7e2] p-7 text-[#082522] shadow-[0_20px_70px_rgba(8,37,34,.08)]">
+              <Image
+                src="/images/home/card-ships.webp"
+                alt="Know your ship"
+                fill
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                loading="lazy"
+                className="object-cover -z-10 brightness-[0.7] transition duration-500 group-hover:scale-105"
+              />
               <div className="absolute right-6 top-5 text-8xl font-black leading-none text-white/35">02</div>
               <div className="relative flex h-full flex-col justify-between">
                 <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#426962]">Know your ship?</div>
@@ -257,6 +278,14 @@ export default function HomePage() {
             </Link>
 
             <a href="#popular-searches" className="group relative min-h-[300px] overflow-hidden rounded-[2.25rem] bg-[#d7ff76] p-7 text-[#082522] shadow-[0_20px_70px_rgba(141,174,58,.15)]">
+              <Image
+                src="/images/home/card-experiences.webp"
+                alt="Know the experience"
+                fill
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                loading="lazy"
+                className="object-cover -z-10 brightness-[0.7] transition duration-500 group-hover:scale-105"
+              />
               <div className="absolute -right-6 -top-8 text-[9rem] font-black leading-none text-[#082522]/7">03</div>
               <div className="relative flex h-full flex-col justify-between">
                 <div className="text-[10px] font-black uppercase tracking-[0.22em] text-[#456019]">Know the experience?</div>
@@ -287,7 +316,17 @@ export default function HomePage() {
 
           <div className="mt-12 grid gap-px overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
             {TRIP_STYLES.map((style, index) => (
-              <Link key={style.title} href={style.href} className="group min-h-[240px] bg-[#0a302c] p-6 transition hover:bg-[#0d3a35]">
+              <Link key={style.title} href={style.href} className="group relative min-h-[240px] overflow-hidden bg-[#0a302c] p-6 transition hover:bg-[#0d3a35]">
+                {style.image && (
+                  <Image
+                    src={style.image}
+                    alt={style.title}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                    loading="lazy"
+                    className="object-cover -z-10 brightness-[0.55] transition duration-500 group-hover:scale-105"
+                  />
+                )}
                 <div className="flex items-start justify-between">
                   <span className="text-3xl">{style.icon}</span>
                   <span className="text-[10px] font-black tracking-[0.18em] text-white/25">0{index + 1}</span>
@@ -335,8 +374,15 @@ export default function HomePage() {
           <div className="mt-10 grid gap-5 lg:grid-cols-3">
             {APPROVED_PORTS.map((port, index) => (
               <Link key={port.slug} href={`/ports/${port.slug}`} className={`group relative overflow-hidden rounded-[2.4rem] bg-[#082522] shadow-[0_22px_70px_rgba(8,37,34,.12)] ${index === 1 ? "lg:translate-y-8" : ""}`}>
-                <div className="aspect-[4/5] overflow-hidden">
-                  <img src={port.image} alt={port.title} className="h-full w-full object-cover transition duration-700 group-hover:scale-105" />
+                <div className="aspect-[4/5] relative overflow-hidden">
+                  <Image
+                    src={port.image}
+                    alt={port.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                    loading="lazy"
+                    className="object-cover transition duration-700 group-hover:scale-105"
+                  />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-[#041c1a] via-[#041c1a]/25 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-7 text-white">
@@ -390,7 +436,14 @@ export default function HomePage() {
       <section className="px-5 pb-10 pt-10 sm:px-7 lg:px-10 lg:pb-14">
         <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[3rem] bg-[#082522] px-7 py-14 text-white shadow-[0_28px_90px_rgba(8,37,34,.2)] sm:px-10 lg:px-14 lg:py-20">
           <div className="absolute inset-0 opacity-30">
-            <img src="/hero/juneau.jpg" alt="Juneau Alaska scenery" className="h-full w-full object-cover" />
+            <Image
+              src="/images/home/cta-scenery.webp"
+              alt="Juneau Alaska scenery"
+              fill
+              sizes="100vw"
+              loading="lazy"
+              className="object-cover"
+            />
           </div>
           <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(4,29,27,.96),rgba(4,29,27,.72),rgba(4,29,27,.34))]" />
           <div className="relative grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">

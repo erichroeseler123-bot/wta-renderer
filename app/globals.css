@@ -169,30 +169,7 @@ body {
   color: #d7ff76;
 }
 
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(1) {
-  background-image: url("https://upload.wikimedia.org/wikipedia/commons/1/1c/Humpback_whale_breaching_in_southeast_alaska.jpg");
-}
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(2) {
-  background-image: url("https://upload.wikimedia.org/wikipedia/commons/0/04/Mendenhall_Glacier.jpg");
-}
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(3) {
-  background-image: url("/media/juneau-aerial.png");
-}
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(4) {
-  background-image: url("https://upload.wikimedia.org/wikipedia/commons/c/c6/Sled_dogs.jpg");
-}
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(5) {
-  background-image: url("https://upload.wikimedia.org/wikipedia/commons/a/a4/Novice_fisherman_with_a_chum_salmon_taken_at_Alexander_Creek%2C_Matanuska-Susitna_Borough%2C_Alaska.jpg");
-}
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(6) {
-  background-image: url("/hero/ketchikan.png");
-}
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(7) {
-  background-image: url("/hero/skagway.jpg");
-}
-#experiences div[class*="lg:grid-cols-4"] > a.group:nth-child(8) {
-  background-image: url("/hero/juneau.jpg");
-}
+
 
 @media (max-width: 639px) {
   #experiences div[class*="lg:grid-cols-4"] > a.group {
@@ -262,24 +239,19 @@ main[class*="bg-[#f4f0e7]"] [class*="text-[#6b817d]"],
 main[class*="bg-[#f4f0e7]"] [class*="text-[#6c817d]"] {
   color: var(--ak-muted) !important;
 }
-main[class*="bg-[#f4f0e7]"] [class*="text-[#81a29a]"] { color: #b77c54 !important; }
-main[class*="bg-[#f4f0e7]"] [class*="text-[#82938f]"] { color: #9a8170 !important; }
-main[class*="bg-[#f4f0e7]"] [class*="text-[#b9d7cd]"] { color: #dfb79c !important; }
+main[class*="bg-[#f4f0e7]"] [class*="text-[#81a29a]"] { color: #7e4624 !important; }
+main[class*="bg-[#f4f0e7]"] [class*="text-[#82938f]"] { color: #685244 !important; }
+main[class*="bg-[#f4f0e7]"] [class*="text-[#b9d7cd]"] { color: #935d39 !important; }
+
+#experiences a[href="#find-your-port-day"] {
+  color: #ffffff !important;
+}
 
 main[class*="bg-[#f4f0e7]"] select:focus,
 main[class*="bg-[#f4f0e7]"] input:focus {
   --tw-ring-color: rgba(255,138,61,.35) !important;
 }
 
-/* New hero image with warmer neutral overlays. */
-main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:first-child {
-  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Glacier_Bay_National_Park_and_Preserve_GLBA3434.jpg");
-  background-position: center 48%;
-  background-size: cover;
-}
-main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:first-child > img {
-  opacity: 0;
-}
 main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:nth-child(2) {
   background: linear-gradient(90deg, rgba(25,16,10,.96) 0%, rgba(25,16,10,.82) 42%, rgba(25,16,10,.47) 67%, rgba(25,16,10,.18) 100%) !important;
 }
@@ -287,22 +259,10 @@ main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:nth-child(3) {
   background: linear-gradient(0deg, rgba(20,13,9,.92) 0%, transparent 48%) !important;
 }
 
-/* Make the three decision cards photographic instead of flat blocks. */
-main[class*="bg-[#f4f0e7]"] a[href="/ports"].group {
-  background-image: linear-gradient(180deg, rgba(22,14,9,.18), rgba(22,14,9,.88)), url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Misty_Fjords-Tongass-AES-011_%2852502715136%29.jpg") !important;
-  background-position: center 48%;
-  background-size: cover;
-}
 main[class*="bg-[#f4f0e7]"] a[href="/ships"].group {
-  background-image: linear-gradient(180deg, rgba(22,14,9,.18), rgba(22,14,9,.9)), url("https://commons.wikimedia.org/wiki/Special:Redirect/file/At_the_face_of_a_glacier_%282f5124b0-1dd8-b71c-0781-3e60dc7694e5%29.jpg") !important;
-  background-position: center;
-  background-size: cover;
   color: white !important;
 }
 main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group {
-  background-image: linear-gradient(180deg, rgba(22,14,9,.16), rgba(22,14,9,.88)), url("https://commons.wikimedia.org/wiki/Special:Redirect/file/The_face_of_Johns_Hopkins_Glacier_%283d2a695c-b635-453f-9ea9-07f1dc2ae590%29.jpg") !important;
-  background-position: center;
-  background-size: cover;
   color: white !important;
 }
 main[class*="bg-[#f4f0e7]"] a[href="/ports"].group p,
@@ -314,24 +274,6 @@ main[class*="bg-[#f4f0e7]"] a[href="/ports"].group [class*="text-[10px]"],
 main[class*="bg-[#f4f0e7]"] a[href="/ships"].group [class*="text-[10px]"],
 main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group [class*="text-[10px]"] {
   color: var(--ak-orange-light) !important;
-}
-
-/* Fresh port photography. */
-#ports a.group > div:first-child {
-  background-position: center;
-  background-size: cover;
-}
-#ports a.group > div:first-child > img {
-  opacity: 0;
-}
-#ports a.group:nth-child(1) > div:first-child {
-  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Mendenhall_Glacier%2C_Juneau.jpg");
-}
-#ports a.group:nth-child(2) > div:first-child {
-  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/KLGO_downtown_Skagway_%2835572184472%29.jpg");
-}
-#ports a.group:nth-child(3) > div:first-child {
-  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Ketchikan_waterfront_and_cruise_ships_in_port.JPG");
 }
 
 /* Warm the experience section itself and change its CTA accent to orange. */
@@ -354,14 +296,4 @@ main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group [class*="text-[10p
 /* Make the large popular-search panel warm instead of neon. */
 #popular-searches > div {
   background: linear-gradient(135deg, #efb98f 0%, #f6d5be 56%, #f8e5d8 100%) !important;
-}
-
-/* Refresh the final photographic CTA as well. */
-main[class*="bg-[#f4f0e7]"] div:has(> img[alt="Juneau Alaska scenery"]) {
-  background-image: url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Misty_Fjords-Tongass-AES-011_%2852502715136%29.jpg");
-  background-position: center 44%;
-  background-size: cover;
-}
-main[class*="bg-[#f4f0e7]"] img[alt="Juneau Alaska scenery"] {
-  opacity: 0;
 }
