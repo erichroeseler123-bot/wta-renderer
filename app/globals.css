@@ -262,18 +262,22 @@ main[class*="bg-[#f4f0e7]"] > section:first-of-type > div:nth-child(3) {
 main[class*="bg-[#f4f0e7]"] a[href="/ships"].group {
   color: white !important;
 }
-main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group {
-  color: white !important;
-}
 main[class*="bg-[#f4f0e7]"] a[href="/ports"].group p,
-main[class*="bg-[#f4f0e7]"] a[href="/ships"].group p,
-main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group p {
+main[class*="bg-[#f4f0e7]"] a[href="/ships"].group p {
   color: rgba(255,255,255,.72) !important;
 }
 main[class*="bg-[#f4f0e7]"] a[href="/ports"].group [class*="text-[10px]"],
-main[class*="bg-[#f4f0e7]"] a[href="/ships"].group [class*="text-[10px]"],
-main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group [class*="text-[10px]"] {
+main[class*="bg-[#f4f0e7]"] a[href="/ships"].group [class*="text-[10px]"] {
   color: var(--ak-orange-light) !important;
+}
+main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group {
+  color: #1a120c !important;
+}
+main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group p {
+  color: #2e1e14 !important;
+}
+main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group [class*="text-[10px]"] {
+  color: #3e1e0a !important;
 }
 
 /* Warm the experience section itself and change its CTA accent to orange. */
