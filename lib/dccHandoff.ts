@@ -146,14 +146,28 @@ export function decodeHandoffPayload(payload: string): unknown {
   return JSON.parse(json);
 }
 
-export function signDccHandoffPayload(payload: string, secret: string) {
-  return crypto.createHmac("sha256", secret).update(payload).digest("hex");
+export function signDccHandoffPayload(payload: string, secret: string, encoding: "base64url" | "hex" = "base64url") {
+  return crypto.createHmac("sha256", secret).update(payload).digest(encoding);
 }
 
-export function verifyDccHandoffSignature(payload: string, sig: string, secret: string) {
-  const expected = signDccHandoffPayload(payload, secret);
-  const left = Buffer.from(expected, "utf8");
-  const right = Buffer.from(String(sig || ""), "utf8");
-  if (left.length !== right.length) return false;
-  return crypto.timingSafeEqual(left, right);
+export function verifyDccHandoffSignature(payload: string, sig: string, secret: string): boolean {
+  if (!payload || !sig || !secret) return false;
+  const trimmed = String(sig).trim();
+  const sigBuf = Buffer.from(trimmed, "utf8");
+
+  // Check base64url signature (DCC standard)
+  const expectedB64 = crypto.createHmac("sha256", secret).update(payload).digest("base64url");
+  const b64Buf = Buffer.from(expectedB64, "utf8");
+  if (sigBuf.length === b64Buf.length && crypto.timingSafeEqual(sigBuf, b64Buf)) {
+    return true;
+  }
+
+  // Check hex signature (legacy/fallback)
+  const expectedHex = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+  const hexBuf = Buffer.from(expectedHex, "utf8");
+  if (sigBuf.length === hexBuf.length && crypto.timingSafeEqual(sigBuf, hexBuf)) {
+    return true;
+  }
+
+  return false;
 }
