@@ -35,6 +35,7 @@ export async function GET(req: Request) {
     attribution: order.attribution || null,
     results: order.bookingResults || [],
     lastError: order.lastError || null,
+    cancel_token: order.cancel_token || null,
     updatedAt: order.updatedAt,
   });
 }

@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import { getKV } from "@/lib/kv";
 import {
   saveOrder,
+  makeOrderCancelToken,
   type OrderAttribution,
   type OrderLine,
   type OrderSnapshot,
@@ -263,6 +264,7 @@ export async function POST(req: NextRequest) {
       attribution,
       status: "payment_pending",
       bookingAttempts: 0,
+      cancel_token: makeOrderCancelToken(order_id, email),
     };
 
     await saveOrder(draft);

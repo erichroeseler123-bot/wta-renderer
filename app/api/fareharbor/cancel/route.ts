@@ -9,9 +9,14 @@ import {
   getOrderByPaymentIntent,
   releaseOrderLock,
   saveOrder,
+  verifyOrderCancelToken,
   type OrderSnapshot,
 } from "@/lib/orders";
 import { isAdminCookieValue } from "@/lib/admin";
+import {
+  evaluateOrderCancellationPolicy,
+  type CancellationReason,
+} from "@/lib/cancellationPolicy";
 
 export const runtime = "nodejs";
 
@@ -52,6 +57,10 @@ export async function POST(req: NextRequest) {
       handoffId,
       orderId,
       paymentIntentId,
+      cancelToken,
+      adminOverride,
+      adminRationale,
+      adminRequestedCents,
       email,
       name,
       partySize,
@@ -62,7 +71,6 @@ export async function POST(req: NextRequest) {
       sourcePath,
       sourceSlug,
       topicSlug,
-      refundAmountCents,
     } = body;
 
     const isAdmin = await checkAdminAuth(req);
@@ -76,25 +84,31 @@ export async function POST(req: NextRequest) {
       ord = await getOrderByPaymentIntent(String(paymentIntentId).trim());
     }
 
-    // Authorization check: Must be Admin OR verified customer matching order email
-    if (!isAdmin) {
-      const customerEmail = String(email || "").trim().toLowerCase();
-      const orderEmail = String(ord?.contact?.email || "").trim().toLowerCase();
-      const isOwner = Boolean(customerEmail && orderEmail && customerEmail === orderEmail);
+    if (!ord && !isAdmin) {
+      return NextResponse.json(
+        { success: false, error: "Order not found. Valid orderId or paymentIntentId is required." },
+        { status: 404 }
+      );
+    }
 
-      if (!isOwner) {
+    // Step 1: Strict Ownership and Authorization Verification
+    // Matching an email address is strictly NOT sufficient to authenticate cancellation.
+    // The requester must be an authenticated administrator OR possess the secure, order-specific cancelToken.
+    if (!isAdmin) {
+      const isTokenValid = ord ? verifyOrderCancelToken(ord, String(cancelToken || "")) : false;
+      if (!isTokenValid) {
         return NextResponse.json(
           {
             success: false,
-            error: "Unauthorized. Administrator authorization or matching customer email required.",
+            error: "Unauthorized. Administrator authorization or secure order cancellation token required.",
           },
           { status: 401 }
         );
       }
     }
 
-    // Repeated request / Idempotency guard:
-    // If order is already completely refunded, return previous refund data safely without calling Stripe or FH again
+    // Step 2: Idempotency & Repeated Request Guard
+    // If order is already completely refunded or already cancelled, return existing state safely
     if (ord && (ord.status === "refunded" || (ord.refundStatus === "succeeded" && (ord.refundAmountCents || 0) >= ord.totalCents))) {
       return NextResponse.json({
         success: true,
@@ -121,7 +135,33 @@ export async function POST(req: NextRequest) {
       lockOrderId = ord.order_id;
     }
 
-    // Step 1: Execute and Verify FareHarbor Cancellation
+    // Step 3: Server-Side Policy Evaluation & Refund Amount Calculation
+    // The server calculates the allowed refund from the booked item’s terms, departure time, and cancellation reason.
+    // Caller-supplied amounts from non-admins are strictly ignored.
+    const validReason = (typeof reason === "string" ? reason : "customer_request") as CancellationReason;
+    const policyResult = ord
+      ? evaluateOrderCancellationPolicy({
+          order: ord,
+          reason: validReason,
+          now: new Date(),
+          adminOverride: isAdmin && Boolean(adminOverride),
+          adminRequestedCents: isAdmin && Boolean(adminOverride) ? Number(adminRequestedCents) : null,
+          adminRationale: typeof adminRationale === "string" ? adminRationale : "",
+        })
+      : {
+          eligible: false,
+          refundPercentage: 0,
+          allowedRefundCents: 0,
+          feeDeductedCents: 0,
+          hoursUntilDeparture: null,
+          policyMatched: "no_order_record",
+          explanation: "No order record found to evaluate policy against.",
+          isOverrideApplied: false,
+        };
+
+    const centsToRefund = policyResult.allowedRefundCents;
+
+    // Step 4: Execute and Verify FareHarbor Cancellation
     let fhData: Record<string, unknown> | null = null;
     let fhOk = false;
     let fhStatus = 200;
@@ -154,6 +194,7 @@ export async function POST(req: NextRequest) {
             success: false,
             error: (fhData?.error as string) || `FareHarbor cancellation failed with status ${fhStatus}`,
             details: fhData,
+            policy: policyResult,
             refund: null,
           },
           { status: fhStatus || 400 }
@@ -164,26 +205,9 @@ export async function POST(req: NextRequest) {
       fhOk = true;
     }
 
-    // Step 2: Policy-respecting Stripe Refund Processing
+    // Step 5: Policy-Respecting Stripe Refund Processing
     let refundResult: { id?: string; status?: string | null; amount?: number } | null = null;
     let pi = paymentIntentId || ord?.payment_intent_id;
-
-    // Determine refund amount respecting applicable cancellation policy
-    // - If refundAmountCents is explicitly 0 (e.g. non-refundable policy or within 48h penalty window): do not refund.
-    // - If refundAmountCents is provided > 0: refund up to that capped amount.
-    // - If refundAmountCents is undefined: full remaining order balance.
-    const isExplicitNonRefundable = refundAmountCents === 0;
-    const requestedCents = Number.isFinite(Number(refundAmountCents)) ? Math.floor(Number(refundAmountCents)) : null;
-
-    let centsToRefund = 0;
-    if (!isExplicitNonRefundable) {
-      if (ord) {
-        const remaining = Math.max(0, ord.totalCents - (ord.refundAmountCents || 0));
-        centsToRefund = requestedCents !== null ? Math.min(requestedCents, remaining) : remaining;
-      } else if (requestedCents !== null && requestedCents > 0) {
-        centsToRefund = requestedCents;
-      }
-    }
 
     if (fhOk && pi && process.env.STRIPE_SECRET_KEY && centsToRefund > 0) {
       try {
@@ -216,7 +240,7 @@ export async function POST(req: NextRequest) {
               refundAmountCents: newRefundTotal,
               refundStatus: "succeeded",
               cancelledAt: new Date().toISOString(),
-              cancellationReason: typeof reason === "string" ? reason : undefined,
+              cancellationReason: typeof reason === "string" ? reason : policyResult.policyMatched,
               lastError: undefined,
             });
           } else if (refund.status === "pending") {
@@ -227,7 +251,7 @@ export async function POST(req: NextRequest) {
               refundAmountCents: newRefundTotal,
               refundStatus: "pending",
               cancelledAt: new Date().toISOString(),
-              cancellationReason: typeof reason === "string" ? reason : undefined,
+              cancellationReason: typeof reason === "string" ? reason : policyResult.policyMatched,
               lastError: undefined,
             });
           }
@@ -251,24 +275,26 @@ export async function POST(req: NextRequest) {
           {
             success: false,
             error: `Booking cancelled in FareHarbor, but Stripe refund failed: ${refundErrMsg}`,
+            policy: policyResult,
             fareharbor: fhData,
             refund: null,
           },
           { status: 502 }
         );
       }
-    } else if (fhOk && ord && (isExplicitNonRefundable || centsToRefund === 0)) {
-      // Non-refundable cancellation (or already refunded)
+    } else if (fhOk && ord && centsToRefund === 0) {
+      // Non-refundable cancellation per operator contract (or $0 allowed)
       await saveOrder({
         ...ord,
         status: "cancelled",
         refundStatus: "none",
+        refundAmountCents: 0,
         cancelledAt: new Date().toISOString(),
-        cancellationReason: typeof reason === "string" ? reason : "non_refundable_policy",
+        cancellationReason: typeof reason === "string" ? reason : policyResult.policyMatched,
       });
     }
 
-    // Step 3: Emit DCC Satellite Event
+    // Step 6: Emit DCC Satellite Event
     if (handoffId) {
       await emitDccSatelliteEvent({
         handoffId: String(handoffId),
@@ -278,10 +304,10 @@ export async function POST(req: NextRequest) {
         externalReference: typeof orderId === "string" ? orderId : String(bookingUuid || ""),
         status: fhOk ? "cancelled" : "cancel_failed",
         stage: "cancellation",
-        message: typeof reason === "string" ? reason : undefined,
+        message: typeof reason === "string" ? reason : policyResult.explanation,
         traveler: {
-          email: typeof email === "string" ? email : undefined,
-          name: typeof name === "string" ? name : undefined,
+          email: typeof email === "string" ? email : ord?.contact?.email,
+          name: typeof name === "string" ? name : ord?.contact?.name,
           partySize: Number.isFinite(Number(partySize)) ? Number(partySize) : undefined,
         },
         attribution: {
@@ -304,6 +330,7 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         status: ord ? ord.status : "cancelled",
+        policy: policyResult,
         fareharbor: fhData,
         refund: refundResult,
       },

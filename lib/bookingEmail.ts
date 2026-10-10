@@ -94,8 +94,18 @@ function makeHtml(order: OrderSnapshot) {
         : ""
     }
 
+    ${
+      order.cancel_token
+        ? `<div style="margin:16px 0;padding:12px;background:#f8fafc;border:1px dashed #cbd5e1;border-radius:8px;">
+            <p style="margin:0 0 4px 0;font-size:13px;color:#475569;"><strong>Manage or Cancel Reservation</strong></p>
+            <p style="margin:0;font-size:12px;color:#64748b;">Cancellation Token: <code style="background:#e2e8f0;padding:2px 6px;border-radius:4px;color:#0f172a;">${esc(order.cancel_token)}</code></p>
+            <p style="margin:4px 0 0 0;font-size:11px;color:#94a3b8;">Cancellations are evaluated strictly against operator contractual deadlines.</p>
+          </div>`
+        : ""
+    }
+
     <p style="margin:16px 0 4px 0;">Operator instructions and meeting details are included in your tour confirmation flow.</p>
-    <p style="margin:0;color:#475569;">Need help? Reply to this email or contact support.</p>
+    <p style="margin:0;color:#475569;">Need help? Reply to this email or contact support at hello@welcometoalaskatours.com.</p>
   </div>
 </body>
 </html>`;
@@ -129,6 +139,7 @@ function makeText(order: OrderSnapshot) {
     lines,
     "",
     confirmations ? `Confirmation Numbers: ${confirmations}` : "",
+    order.cancel_token ? `Cancellation Token: ${order.cancel_token}` : "",
     "Thank you for booking with Welcome To Alaska Tours.",
   ]
     .filter(Boolean)
