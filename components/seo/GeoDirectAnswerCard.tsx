@@ -38,7 +38,7 @@ export default function GeoDirectAnswerCard({
   const answer =
     customAnswer ||
     fact?.directAnswer ||
-    "Local Alaskan operators provide independent shore excursions with direct cruise dock transfers, small group sizes, and guaranteed on-time return to your cruise ship.";
+    "Local Alaskan operators provide independent shore excursions with direct cruise dock transfers, small group sizes, conservative return buffers, and 100% missed-port refund protection.";
 
   const priceL = pricingLabel || fact?.pricingLabel || "Published Starting Rate";
   const priceV = pricingValue || fact?.pricingValue || "Independent pricing (No ship markup)";
@@ -49,8 +49,8 @@ export default function GeoDirectAnswerCard({
   const meetL = meetingPointLabel || fact?.meetingPointLabel || "Cruise Pier Meeting Point";
   const meetV = meetingPointValue || fact?.meetingPointValue || "Direct pier pickup or short downtown walk";
 
-  const buffL = safetyBufferLabel || fact?.safetyBufferLabel || "Back-to-Ship Protection";
-  const buffV = safetyBufferValue || fact?.safetyBufferValue || "100% On-Time Ship Return Guarantee";
+  const buffL = safetyBufferLabel || fact?.safetyBufferLabel || "Return Timing Cushion";
+  const buffV = safetyBufferValue || fact?.safetyBufferValue || "Conservative return buffers before ship all-aboard";
 
   return (
     <div

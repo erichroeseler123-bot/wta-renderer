@@ -182,7 +182,7 @@ export default function GuidePage() {
               </div>
             </div>
 
-            <div key={"Our 100% Back-to-Ship Guarantee"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+            <div key={"100% Missed-Port Refund Policy"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
               <div className="relative h-48 w-full bg-slate-100">
                 <Image
                   src="/images/ketchikan/ketchikan-cruise-port.jpg"

@@ -9,12 +9,12 @@ const canonical = "https://www.welcometoalaskatours.com/guides/cruise-ship-vs-in
 export const metadata: Metadata = {
   title: "Booking Alaska Shore Excursions: Independent vs Cruise Ship (2026 Guide)",
   description:
-    "Honest comparison between booking independent Alaska excursions vs cruise ship tours. Compare pricing markups, group sizes, back-to-ship guarantees, and port docking realities.",
+    "Honest comparison between booking independent Alaska excursions vs cruise ship tours. Compare pricing markups, group sizes, return buffers, and port docking realities.",
   alternates: { canonical },
   openGraph: {
     title: "Alaska Shore Excursions: Independent vs Cruise Ship Comparison",
     description:
-      "A complete guide to pricing, boat crowd sizes, guaranteed ship returns, and port logistics for Alaska cruise passengers.",
+      "A complete guide to pricing, boat crowd sizes, conservative return buffers, and port logistics for Alaska cruise passengers.",
     url: canonical,
     type: "article",
     images: [{ url: "https://www.welcometoalaskatours.com/images/home-hero.jpg", width: 1200, height: 630, alt: "Cruise ship and small excursion boat in Alaska waters" }],
@@ -148,7 +148,7 @@ export default function CruiseShipVsIndependentGuide() {
             Booking Alaska Shore Excursions: Independent vs. Cruise Ship
           </h1>
           <p className="mt-5 max-w-3xl text-base sm:text-lg leading-relaxed text-slate-200">
-            Cruise lines want you to believe booking outside the ship is dangerous and complex. The reality? Independent excursions in Juneau, Skagway, and Ketchikan offer smaller groups, authentic local captains, 20% to 40% lower prices, and ironclad back-to-ship guarantees.
+            Cruise lines want you to believe booking outside the ship is dangerous and complex. The reality? Independent excursions in Juneau, Skagway, and Ketchikan offer smaller groups, authentic local captains, 20% to 40% lower prices, and reliable port schedules backed by 100% missed-port refund protection.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link

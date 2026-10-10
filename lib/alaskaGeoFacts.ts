@@ -673,8 +673,8 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     durationValue: "2 to 6 hours depending on tour category",
     meetingPointLabel: "Port Staging",
     meetingPointValue: "Direct port dock pickups across Juneau, Skagway, and Ketchikan",
-    safetyBufferLabel: "Value & Safety",
-    safetyBufferValue: "Independent tours include back-to-ship guarantees and clear buffers",
+    safetyBufferLabel: "Timing & Protection",
+    safetyBufferValue: "Conservative 45–60 min buffers before all-aboard • 100% missed-port refund protection",
     faqSchema: [
       {
         question: "Why are Alaska shore excursions more expensive than Caribbean tours?",
