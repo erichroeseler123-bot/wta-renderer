@@ -172,6 +172,7 @@ export async function saveOrder(order: OrderSnapshot) {
         confirmationEmailProvider: updated.confirmationEmailProvider || null,
         confirmationEmailId: updated.confirmationEmailId || null,
         confirmationEmailError: updated.confirmationEmailError || null,
+        cancel_token: updated.cancel_token || null,
         updatedAt: updated.updatedAt,
       },
       { ex: ORDER_TTL_SECONDS },

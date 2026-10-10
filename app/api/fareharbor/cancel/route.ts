@@ -11,6 +11,7 @@ import {
   saveOrder,
   verifyOrderCancelToken,
   type OrderSnapshot,
+  type OrderStatus,
 } from "@/lib/orders";
 import { isAdminCookieValue } from "@/lib/admin";
 import {
@@ -24,6 +25,9 @@ const ADMIN_SECRET = String(process.env.WTA_ADMIN_SECRET || "").trim();
 const INTERNAL_SECRET = String(process.env.WTA_INTERNAL_SECRET || "").trim();
 
 async function checkAdminAuth(req: NextRequest): Promise<boolean> {
+  const adminSecret = String(process.env.WTA_ADMIN_SECRET || "").trim();
+  const internalSecret = String(process.env.WTA_INTERNAL_SECRET || "").trim();
+
   // 1. Admin cookie
   try {
     const jar = await cookies();
@@ -35,14 +39,14 @@ async function checkAdminAuth(req: NextRequest): Promise<boolean> {
 
   // 2. Internal header
   const internalHdr = req.headers.get("x-wta-internal") || "";
-  if (INTERNAL_SECRET && internalHdr === INTERNAL_SECRET) return true;
+  if (internalSecret && internalHdr === internalSecret) return true;
 
   // 3. Admin secret header or URL parameter
   const secretHdr = req.headers.get("x-wta-admin-secret") || "";
-  if (ADMIN_SECRET && ADMIN_SECRET.length >= 20 && secretHdr === ADMIN_SECRET) return true;
+  if (adminSecret && adminSecret.length >= 20 && secretHdr === adminSecret) return true;
 
   const urlSecret = new URL(req.url).searchParams.get("secret");
-  if (ADMIN_SECRET && ADMIN_SECRET.length >= 20 && urlSecret === ADMIN_SECRET) return true;
+  if (adminSecret && adminSecret.length >= 20 && urlSecret === adminSecret) return true;
 
   return false;
 }
@@ -123,6 +127,16 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    if (ord && ord.status === "cancelled") {
+      return NextResponse.json({
+        success: true,
+        already_cancelled: true,
+        status: ord.status,
+        orderId: ord.order_id,
+        refund: null,
+      });
+    }
+
     // Acquire lock if order exists
     if (ord?.order_id) {
       const gotLock = await acquireOrderLock(ord.order_id, 60);
@@ -137,12 +151,32 @@ export async function POST(req: NextRequest) {
 
     // Step 3: Server-Side Policy Evaluation & Refund Amount Calculation
     // The server calculates the allowed refund from the booked item’s terms, departure time, and cancellation reason.
-    // Caller-supplied amounts from non-admins are strictly ignored.
-    const validReason = (typeof reason === "string" ? reason : "customer_request") as CancellationReason;
+    // Privilege check on cancellation reason:
+    // Only administrators or internal webhooks with trusted operator evidence can submit exception reasons
+    // (operator_cancelled, weather_safety, missed_ship, ship_delayed, medical_emergency).
+    // If an unprivileged customer submits an exception reason, it is automatically downgraded to "customer_request".
+    const EXCEPTION_REASONS = new Set([
+      "operator_cancelled",
+      "weather_safety",
+      "missed_ship",
+      "ship_delayed",
+      "medical_emergency",
+    ]);
+
+    let effectiveReason: CancellationReason = "customer_request";
+    if (typeof reason === "string" && EXCEPTION_REASONS.has(reason)) {
+      if (isAdmin) {
+        effectiveReason = reason as CancellationReason;
+      } else {
+        console.warn(`[cancel-route] Unprivileged customer attempted to claim exception reason "${reason}". Downgrading to "customer_request".`);
+        effectiveReason = "customer_request";
+      }
+    }
+
     const policyResult = ord
       ? evaluateOrderCancellationPolicy({
           order: ord,
-          reason: validReason,
+          reason: effectiveReason,
           now: new Date(),
           adminOverride: isAdmin && Boolean(adminOverride),
           adminRequestedCents: isAdmin && Boolean(adminOverride) ? Number(adminRequestedCents) : null,
@@ -208,6 +242,7 @@ export async function POST(req: NextRequest) {
     // Step 5: Policy-Respecting Stripe Refund Processing
     let refundResult: { id?: string; status?: string | null; amount?: number } | null = null;
     let pi = paymentIntentId || ord?.payment_intent_id;
+    let resultingStatus: OrderStatus = "cancelled";
 
     if (fhOk && pi && process.env.STRIPE_SECRET_KEY && centsToRefund > 0) {
       try {
@@ -233,9 +268,10 @@ export async function POST(req: NextRequest) {
           const isFull = newRefundTotal >= ord.totalCents;
 
           if (refund.status === "succeeded") {
+            resultingStatus = isFull ? "refunded" : "partially_refunded";
             await saveOrder({
               ...ord,
-              status: isFull ? "refunded" : "partially_refunded",
+              status: resultingStatus,
               refundId: refund.id,
               refundAmountCents: newRefundTotal,
               refundStatus: "succeeded",
@@ -244,9 +280,10 @@ export async function POST(req: NextRequest) {
               lastError: undefined,
             });
           } else if (refund.status === "pending") {
+            resultingStatus = "refund_pending";
             await saveOrder({
               ...ord,
-              status: "refund_pending",
+              status: resultingStatus,
               refundId: refund.id,
               refundAmountCents: newRefundTotal,
               refundStatus: "pending",
@@ -284,11 +321,21 @@ export async function POST(req: NextRequest) {
       }
     } else if (fhOk && ord && centsToRefund === 0) {
       // Non-refundable cancellation per operator contract (or $0 allowed)
+      resultingStatus = "cancelled";
       await saveOrder({
         ...ord,
-        status: "cancelled",
+        status: resultingStatus,
         refundStatus: "none",
         refundAmountCents: 0,
+        cancelledAt: new Date().toISOString(),
+        cancellationReason: typeof reason === "string" ? reason : policyResult.policyMatched,
+      });
+    } else if (fhOk && ord) {
+      resultingStatus = "cancelled";
+      await saveOrder({
+        ...ord,
+        status: resultingStatus,
+        refundStatus: "none",
         cancelledAt: new Date().toISOString(),
         cancellationReason: typeof reason === "string" ? reason : policyResult.policyMatched,
       });
@@ -329,7 +376,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: true,
-        status: ord ? ord.status : "cancelled",
+        status: resultingStatus,
         policy: policyResult,
         fareharbor: fhData,
         refund: refundResult,
