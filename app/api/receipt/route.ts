@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import Stripe from "stripe";
 import { getKV } from "@/lib/kv";
-import { getOrderByPaymentIntent } from "@/lib/orders";
+import {
+  getOrderByPaymentIntent,
+  hashClientSecret,
+  verifyClientSecret,
+  saveOrder,
+} from "@/lib/orders";
 import { isAdminCookieValue } from "@/lib/admin";
 
 export const runtime = "nodejs";
@@ -48,29 +54,61 @@ export async function GET(req: NextRequest) {
   const clientSecret = String(searchParams.get("client_secret") || "").trim();
   const isAdmin = await checkAdminAuth(req);
 
-  // The cancellation token is sensitive and allows initiating cancellation.
-  // It is ONLY revealed if the caller presents the matching Stripe client_secret
-  // from their active browser checkout session, or an authenticated administrator.
-  const isAuthorizedForToken = Boolean(
-    isAdmin || (clientSecret && clientSecret.startsWith(pi + "_secret_"))
-  );
-
   const receipt = await kv.get<Record<string, unknown>>(`receipt:${pi}`);
+  const order = !receipt ? await getOrderByPaymentIntent(pi) : null;
+
+  // The cancellation token is sensitive and allows initiating cancellation.
+  // It is ONLY revealed if:
+  // 1. Caller is an authenticated administrator, OR
+  // 2. Caller presents the COMPLETE authentic Stripe client_secret matching the PaymentIntent.
+  // Fabricated suffixes (e.g. pi_xxx_secret_fake) are strictly rejected.
+  let isAuthorizedForToken = Boolean(isAdmin);
+
+  if (!isAuthorizedForToken && clientSecret) {
+    const storedHash =
+      (typeof receipt?.client_secret_hash === "string" ? receipt.client_secret_hash : null) ||
+      (order?.client_secret_hash || null);
+
+    if (storedHash) {
+      isAuthorizedForToken = verifyClientSecret(clientSecret, storedHash);
+    } else if (process.env.STRIPE_SECRET_KEY) {
+      // Fallback verification: Check complete secret against live Stripe PaymentIntent
+      try {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {});
+        const livePi = await stripe.paymentIntents.retrieve(pi);
+        if (livePi.client_secret) {
+          const liveHash = hashClientSecret(livePi.client_secret);
+          isAuthorizedForToken = verifyClientSecret(clientSecret, liveHash);
+          if (isAuthorizedForToken) {
+            // Backfill client_secret_hash in order and receipt
+            const existingOrder = order || (await getOrderByPaymentIntent(pi));
+            if (existingOrder) {
+              existingOrder.client_secret_hash = liveHash;
+              await saveOrder(existingOrder);
+            }
+          }
+        }
+      } catch (err) {
+        console.warn("[receipt-route] Stripe client_secret verification error:", err);
+        isAuthorizedForToken = false;
+      }
+    }
+  }
+
   if (receipt) {
     let token = receipt.cancel_token;
     if (!token && isAuthorizedForToken) {
-      const order = await getOrderByPaymentIntent(pi);
-      token = order?.cancel_token;
+      const ord = await getOrderByPaymentIntent(pi);
+      token = ord?.cancel_token;
     }
     return NextResponse.json({
       success: true,
       ...receipt,
-      // Redact cancel_token unless authorized by client_secret or admin
+      // Redact cancel_token unless authorized by verified complete client_secret or admin
       cancel_token: isAuthorizedForToken ? (token || null) : null,
     });
   }
 
-  const order = await getOrderByPaymentIntent(pi);
   if (!order) {
     return NextResponse.json({ success: true, status: "pending" });
   }

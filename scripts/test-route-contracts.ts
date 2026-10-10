@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import { GET as receiptHandler } from "../app/api/receipt/route";
 import { POST as cancelHandler } from "../app/api/fareharbor/cancel/route";
-import { saveOrder, getOrder, makeOrderCancelToken, type OrderSnapshot } from "../lib/orders";
+import { saveOrder, getOrder, makeOrderCancelToken, hashClientSecret, type OrderSnapshot } from "../lib/orders";
 
 process.env.USE_LOCAL_KV = "true";
 process.env.WTA_INTERNAL_SECRET = "test-internal-secret-xyz-123456789";
@@ -21,6 +21,7 @@ async function runRouteTests() {
   const controlledPi = `pi_live_check_${Date.now()}`;
   const legitimateEmail = "traveler.qa@example.com";
   const legitimateCancelToken = makeOrderCancelToken(controlledOrderId, legitimateEmail);
+  const validClientSecret = `${controlledPi}_secret_live_session_owner_xyz`;
 
   const controlledOrder: OrderSnapshot = {
     order_id: controlledOrderId,
@@ -52,6 +53,7 @@ async function runRouteTests() {
     bookingAttempts: 1,
     payment_intent_id: controlledPi,
     cancel_token: legitimateCancelToken,
+    client_secret_hash: hashClientSecret(validClientSecret),
   };
 
   await saveOrder(controlledOrder);
@@ -79,16 +81,25 @@ async function runRouteTests() {
   console.log("  ✔ Receipt query without client_secret: 200 OK with cancel_token REDACTED (null)");
 
   // 1b. Session owner passing the exact Stripe client_secret
-  const validClientSecret = `${controlledPi}_secret_live_session_owner_xyz`;
   const reqAuthReceipt = new NextRequest(`https://welcometoalaskatours.com/api/receipt?pi=${controlledPi}&client_secret=${validClientSecret}`);
   const resAuthReceipt = await receiptHandler(reqAuthReceipt);
   const dataAuthReceipt = await resAuthReceipt.json();
 
   assert.equal(resAuthReceipt.status, 200);
-  assert.equal(dataAuthReceipt.cancel_token, legitimateCancelToken, "cancel_token MUST be revealed to client_secret holder");
-  console.log("  ✔ Receipt query with valid client_secret: 200 OK with cancel_token delivered safely");
+  assert.equal(dataAuthReceipt.cancel_token, legitimateCancelToken, "cancel_token MUST be revealed to genuine client_secret holder");
+  console.log("  ✔ Receipt query with genuine client_secret: 200 OK with cancel_token delivered safely");
 
-  results.push({ test: "Receipt Token Redaction & Independence", status: "PASS", details: "Redacted without client_secret, delivered with secret" });
+  // 1c. REGRESSION TEST: Attacker constructing a fabricated client_secret suffix matching the prefix (pi + '_secret_')
+  const fabricatedSuffixSecret = `${controlledPi}_secret_fabricated_random_suffix_guess`;
+  const reqFabricatedReceipt = new NextRequest(`https://welcometoalaskatours.com/api/receipt?pi=${controlledPi}&client_secret=${fabricatedSuffixSecret}`);
+  const resFabricatedReceipt = await receiptHandler(reqFabricatedReceipt);
+  const dataFabricatedReceipt = await resFabricatedReceipt.json();
+
+  assert.equal(resFabricatedReceipt.status, 200);
+  assert.equal(dataFabricatedReceipt.cancel_token, null, "cancel_token MUST be redacted when client_secret has fabricated suffix!");
+  console.log("  ✔ Regression test: fabricated client_secret suffix REJECTED with cancel_token REDACTED (null)");
+
+  results.push({ test: "Receipt Token Redaction & Independence", status: "PASS", details: "Redacted without secret and with fabricated suffix; delivered ONLY with genuine secret" });
 
   // ==================================================================
   // CHECK 2: AUTHORIZATION ON AN EXISTING ORDER (EMAIL-ONLY REJECTED)

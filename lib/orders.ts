@@ -101,6 +101,7 @@ export type OrderSnapshot = {
   cancelledAt?: string;
   cancellationReason?: string;
   cancel_token?: string;
+  client_secret_hash?: string;
 };
 
 function nowIso() {
@@ -173,6 +174,7 @@ export async function saveOrder(order: OrderSnapshot) {
         confirmationEmailId: updated.confirmationEmailId || null,
         confirmationEmailError: updated.confirmationEmailError || null,
         cancel_token: updated.cancel_token || null,
+        client_secret_hash: updated.client_secret_hash || null,
         updatedAt: updated.updatedAt,
       },
       { ex: ORDER_TTL_SECONDS },
@@ -263,6 +265,21 @@ export function verifyOrderCancelToken(order: OrderSnapshot, providedToken: stri
     }
   }
   return false;
+}
+
+export function hashClientSecret(clientSecret: string): string {
+  return crypto.createHash("sha256").update(String(clientSecret || "").trim()).digest("hex");
+}
+
+export function verifyClientSecret(providedSecret: string, storedHash?: string | null): boolean {
+  if (!providedSecret || !storedHash) return false;
+  const providedHash = hashClientSecret(providedSecret);
+  if (providedHash.length !== storedHash.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(providedHash), Buffer.from(storedHash));
+  } catch {
+    return false;
+  }
 }
 
 export { ORDER_TTL_SECONDS };

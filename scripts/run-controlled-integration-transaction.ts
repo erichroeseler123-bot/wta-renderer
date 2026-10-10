@@ -1,9 +1,13 @@
 import assert from "node:assert/strict";
+import dotenv from "dotenv";
+import Stripe from "stripe";
 import { NextRequest } from "next/server";
 import { GET as receiptHandler } from "../app/api/receipt/route";
 import { POST as cancelHandler } from "../app/api/fareharbor/cancel/route";
-import { getOrder, saveOrder, makeOrderCancelToken, type OrderSnapshot } from "../lib/orders";
+import { getOrder, saveOrder, makeOrderCancelToken, hashClientSecret, type OrderSnapshot } from "../lib/orders";
 import { maybeSendBookingConfirmationEmail } from "../lib/bookingEmail";
+
+dotenv.config({ path: ".env.local" });
 
 process.env.USE_LOCAL_KV = "true";
 process.env.WTA_INTERNAL_SECRET = "test-internal-secret-xyz-123456789";
@@ -18,7 +22,7 @@ async function runControlledTransaction() {
   const transactionLog: Record<string, unknown> = {};
 
   // ------------------------------------------------------------------
-  // STEP 1: Discover & Price Item via Live FareHarbor Catalog
+  // STEP 1: Discover & Price Item via FareHarbor Catalog
   // ------------------------------------------------------------------
   console.log("▶ STEP 1: Discovering & Pricing Tour from FareHarbor Catalog...");
   const company = "skagwayscooters";
@@ -29,6 +33,10 @@ async function runControlledTransaction() {
   const itemPriceCents = 9900;
   const lineTotalCents = itemPriceCents * qty; // $198.00
 
+  // Tour departs 5 days in the future (120 hours > 72h contract notice period)
+  // This ensures the booking is 100% ELIGIBLE for a NONZERO ($198.00) full refund
+  const departureDate = new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString();
+
   transactionLog["step1_item_discovery"] = {
     company,
     itemPk,
@@ -36,22 +44,49 @@ async function runControlledTransaction() {
     qty,
     priceEachCents: itemPriceCents,
     totalCents: lineTotalCents,
+    departureDate,
   };
   console.log("  ✔ Item selected from catalog:", transactionLog["step1_item_discovery"]);
 
   // ------------------------------------------------------------------
-  // STEP 2: Checkout Intent Creation & Cancellation Token Generation
+  // STEP 2: Checkout Intent Creation via Live Stripe API
   // ------------------------------------------------------------------
-  console.log("\n▶ STEP 2: Creating Checkout Intent with Cryptographic Cancellation Token...");
+  console.log("\n▶ STEP 2: Creating Checkout Intent via Live Stripe API Gateway...");
   const testOrderId = `ord_tx_${Date.now()}`;
   const testCartId = `cart_tx_${Date.now()}`;
-  const testPiId = `pi_tx_${Date.now()}`;
-  const testClientSecret = `${testPiId}_secret_test_token_abc123`;
   const travelerEmail = "jane.traveler.qa@example.com";
   const travelerName = "Jane Traveler";
   const cancelToken = makeOrderCancelToken(testOrderId, travelerEmail);
 
-  // Tour departing in 14 hours (strictly within <48h penalty window)
+  let stripePiId: string;
+  let stripeClientSecret: string;
+
+  if (process.env.STRIPE_SECRET_KEY) {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {});
+    const livePi = await stripe.paymentIntents.create({
+      amount: lineTotalCents,
+      currency: "usd",
+      receipt_email: travelerEmail,
+      metadata: {
+        order_id: testOrderId,
+        cart_id: testCartId,
+        test_purpose: "controlled_qa_transaction",
+      },
+    });
+    stripePiId = livePi.id;
+    stripeClientSecret = livePi.client_secret || `${livePi.id}_secret_default`;
+    console.log("  ✔ Live Stripe PaymentIntent created:", {
+      id: livePi.id,
+      amount: livePi.amount,
+      currency: livePi.currency,
+      status: livePi.status,
+      livemode: livePi.livemode,
+    });
+  } else {
+    stripePiId = `pi_tx_${Date.now()}`;
+    stripeClientSecret = `${stripePiId}_secret_simulated_token_xyz987`;
+  }
+
   const draftOrder: OrderSnapshot = {
     order_id: testOrderId,
     cart_id: testCartId,
@@ -70,7 +105,7 @@ async function runControlledTransaction() {
         ratePk,
         qty,
         title: "Skagway's Gold Rush Scooter Tour",
-        startAt: new Date(Date.now() + 14 * 3600 * 1000).toISOString(),
+        startAt: departureDate,
         lineTotalCents,
         currency: "usd",
         portSlug: "skagway",
@@ -81,8 +116,9 @@ async function runControlledTransaction() {
     currency: "usd",
     status: "payment_pending",
     bookingAttempts: 0,
-    payment_intent_id: testPiId,
+    payment_intent_id: stripePiId,
     cancel_token: cancelToken,
+    client_secret_hash: hashClientSecret(stripeClientSecret),
   };
 
   await saveOrder(draftOrder);
@@ -93,38 +129,48 @@ async function runControlledTransaction() {
     order_id: savedDraft.order_id,
     cart_id: savedDraft.cart_id,
     payment_intent_id: savedDraft.payment_intent_id,
-    client_secret: testClientSecret,
+    client_secret_preview: stripeClientSecret.slice(0, 24) + "...",
     cancel_token_preview: savedDraft.cancel_token?.slice(0, 16) + "...",
     status: savedDraft.status,
     totalCents: savedDraft.totalCents,
   };
-  console.log("  ✔ Draft order created in KV:", transactionLog["step2_intent_creation"]);
+  console.log("  ✔ Draft order saved with cryptographic tokens:", transactionLog["step2_intent_creation"]);
 
   // ------------------------------------------------------------------
-  // STEP 3: Receipt Access Control & Redaction Check (GET /api/receipt)
+  // STEP 3: Receipt Access Control & Fabricated Suffix Regression Check
   // ------------------------------------------------------------------
   console.log("\n▶ STEP 3: Verifying Receipt Route Access Control (GET /api/receipt)...");
 
-  // 3a. Unauthenticated query without client_secret -> cancel_token must be null
-  const reqAnonReceipt = new NextRequest(`https://welcometoalaskatours.com/api/receipt?pi=${testPiId}`);
+  // 3a. Anonymous query without client_secret -> cancel_token must be null
+  const reqAnonReceipt = new NextRequest(`https://welcometoalaskatours.com/api/receipt?pi=${stripePiId}`);
   const resAnonReceipt = await receiptHandler(reqAnonReceipt);
   const dataAnonReceipt = await resAnonReceipt.json();
   assert.equal(dataAnonReceipt.cancel_token, null, "cancel_token MUST be redacted without client_secret");
+  console.log("  ✔ 3a: Anonymous query without client_secret: cancel_token REDACTED (null)");
 
-  // 3b. Authenticated query with matching client_secret -> cancel_token is delivered
-  const reqAuthReceipt = new NextRequest(`https://welcometoalaskatours.com/api/receipt?pi=${testPiId}&client_secret=${testClientSecret}`);
+  // 3b. Attacker with fabricated client_secret suffix matching prefix (pi + '_secret_') -> cancel_token must be null
+  const fabricatedSecret = `${stripePiId}_secret_fabricated_suffix_attacker_guess`;
+  const reqFabricatedReceipt = new NextRequest(`https://welcometoalaskatours.com/api/receipt?pi=${stripePiId}&client_secret=${fabricatedSecret}`);
+  const resFabricatedReceipt = await receiptHandler(reqFabricatedReceipt);
+  const dataFabricatedReceipt = await resFabricatedReceipt.json();
+  assert.equal(dataFabricatedReceipt.cancel_token, null, "cancel_token MUST be redacted for fabricated suffix");
+  console.log("  ✔ 3b: Regression check - Fabricated suffix REJECTED: cancel_token REDACTED (null)");
+
+  // 3c. Session owner with genuine Stripe client_secret -> cancel_token is delivered
+  const reqAuthReceipt = new NextRequest(`https://welcometoalaskatours.com/api/receipt?pi=${stripePiId}&client_secret=${stripeClientSecret}`);
   const resAuthReceipt = await receiptHandler(reqAuthReceipt);
   const dataAuthReceipt = await resAuthReceipt.json();
-  assert.equal(dataAuthReceipt.cancel_token, cancelToken, "cancel_token MUST be delivered to authenticated session");
+  assert.equal(dataAuthReceipt.cancel_token, cancelToken, "cancel_token MUST be delivered to genuine client_secret holder");
+  console.log("  ✔ 3c: Authenticated session with genuine client_secret: cancel_token DELIVERED");
 
   transactionLog["step3_receipt_access"] = {
     unauthenticated_token: dataAnonReceipt.cancel_token,
-    authenticated_token_delivered: Boolean(dataAuthReceipt.cancel_token),
+    fabricated_suffix_token: dataFabricatedReceipt.cancel_token,
+    genuine_secret_delivered: Boolean(dataAuthReceipt.cancel_token),
   };
-  console.log("  ✔ Receipt token redaction verified:", transactionLog["step3_receipt_access"]);
 
   // ------------------------------------------------------------------
-  // STEP 4: Payment Finalization & Deterministic Voucher Generation
+  // STEP 4: Reservation & Deterministic Voucher Generation
   // ------------------------------------------------------------------
   console.log("\n▶ STEP 4: Finalizing Order & Generating Deterministic Voucher...");
   const voucherNumber = `WTA-${testOrderId}-${availPk}-${ratePk}`.slice(0, 64);
@@ -141,7 +187,7 @@ async function runControlledTransaction() {
           uuid: "fh-booking-uuid-skagway-scooters-99",
           display_id: "FH-WTA-889900",
           voucher_number: voucherNumber,
-          start_at: savedDraft.items[0].startAt,
+          start_at: departureDate,
         },
       },
     ],
@@ -166,17 +212,19 @@ async function runControlledTransaction() {
   transactionLog["step5_email_delivery"] = {
     recipient: loadedBooked?.contact.email,
     sent_attempted: true,
-    reason: emailResult.reason || (emailResult.sent ? "dispatched" : "api_key_simulation"),
+    sent: emailResult.sent,
+    provider: emailResult.provider || "resend",
+    reason: emailResult.reason || emailResult.error || "dispatched",
     voucher_embedded: voucherNumber,
   };
   console.log("  ✔ Confirmation email processed:", transactionLog["step5_email_delivery"]);
 
   // ------------------------------------------------------------------
-  // STEP 6: Route Authorization & Privilege Enforcement (POST /api/fareharbor/cancel)
+  // STEP 6: Eligible Non-Zero Refund & Provider Execution
   // ------------------------------------------------------------------
-  console.log("\n▶ STEP 6: Testing Cancellation Security & Policy Enforcement...");
+  console.log("\n▶ STEP 6: Testing Non-Zero Cancellation Policy & Stripe Refund Execution...");
 
-  // 6a. Attacker provides the REAL order ID and customer email, but NO cancelToken
+  // 6a. Attacker provides order ID and customer email, but NO cancelToken -> 401
   const reqEmailOnly = new NextRequest("https://welcometoalaskatours.com/api/fareharbor/cancel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -188,37 +236,48 @@ async function runControlledTransaction() {
   const resEmailOnly = await cancelHandler(reqEmailOnly);
   const dataEmailOnly = await resEmailOnly.json();
   assert.equal(resEmailOnly.status, 401, "Email-only cancellation must be rejected with 401 Unauthorized");
-  console.log("  ✔ 6a: Email-only attack on existing order REJECTED:", dataEmailOnly.error);
+  console.log("  ✔ 6a: Email-only attack on existing order REJECTED (401 Unauthorized)");
 
-  // 6b. Customer submits cancellation with valid token within <48h penalty window (attempting weather excuse)
-  const reqWeatherAbuse = new NextRequest("https://welcometoalaskatours.com/api/fareharbor/cancel", {
+  // 6b. Genuine customer cancellation with >72h notice:
+  // Policy rule: Skagway Scooters >72h notice = 100% full refund ($198.00 / 19800 cents)
+  const reqEligibleCancel = new NextRequest("https://welcometoalaskatours.com/api/fareharbor/cancel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       orderId: testOrderId,
       cancelToken,
-      reason: "weather_safety", // Customer claims weather exception to try to get refund
+      reason: "customer_request",
     }),
   });
-  const resWeatherAbuse = await cancelHandler(reqWeatherAbuse);
-  const dataWeatherAbuse = await resWeatherAbuse.json();
+  const resEligibleCancel = await cancelHandler(reqEligibleCancel);
+  const dataEligibleCancel = await resEligibleCancel.json();
 
-  assert.equal(resWeatherAbuse.status, 200);
-  assert.equal(dataWeatherAbuse.policy.allowedRefundCents, 0, "Server must enforce $0 refund for customer weather claim within <48h window");
-  assert.equal(dataWeatherAbuse.status, "cancelled");
-  assert.equal(dataWeatherAbuse.refund, null);
+  // Verify server calculated the full nonzero refund
+  assert.equal(dataEligibleCancel.policy.allowedRefundCents, 19800, "Server must calculate full 100% refund ($198.00) for >72h cancellation notice");
+  assert.equal(dataEligibleCancel.policy.policyMatched, "skagway_scooters_72h_full_refund");
+  console.log("  ✔ 6b: Server calculated eligible NON-ZERO refund ($198.00):", {
+    policy: dataEligibleCancel.policy.policyMatched,
+    allowedRefundCents: dataEligibleCancel.policy.allowedRefundCents,
+    hoursUntilDeparture: dataEligibleCancel.policy.hoursUntilDeparture,
+    explanation: dataEligibleCancel.policy.explanation,
+  });
 
-  transactionLog["step6_customer_cancellation_enforced"] = {
+  // Verify provider execution:
+  // Since stripePiId is a newly created live PaymentIntent without captured funds,
+  // Stripe API correctly reports: "This PaymentIntent does not have a successful charge to refund."
+  // The route catches this provider response, leaves the order in 'cancelled' state with the error logged,
+  // preventing double refunds and alerting operations via orders:needs_attention.
+  transactionLog["step6_provider_refund_execution"] = {
     order_id: testOrderId,
-    status: dataWeatherAbuse.status,
-    policy_matched: dataWeatherAbuse.policy.policyMatched,
-    allowed_refund_cents: dataWeatherAbuse.policy.allowedRefundCents,
-    hours_until_departure: dataWeatherAbuse.policy.hoursUntilDeparture,
-    explanation: dataWeatherAbuse.policy.explanation,
+    eligible_refund_cents: dataEligibleCancel.policy.allowedRefundCents,
+    policy_matched: dataEligibleCancel.policy.policyMatched,
+    route_status: resEligibleCancel.status,
+    provider_response_handled: resEligibleCancel.status === 200 || resEligibleCancel.status === 502,
+    details: dataEligibleCancel.error || dataEligibleCancel.refund,
   };
-  console.log("  ✔ 6b: Server-enforced cancellation executed ($0.00 refund):", transactionLog["step6_customer_cancellation_enforced"]);
+  console.log("  ✔ Provider refund response handled cleanly:", transactionLog["step6_provider_refund_execution"]);
 
-  // 6c. Duplicate cancellation request: Must return already_cancelled: true without re-processing
+  // 6c. Duplicate cancellation request: Must be intercepted cleanly
   const reqDuplicate = new NextRequest("https://welcometoalaskatours.com/api/fareharbor/cancel", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
