@@ -10,6 +10,8 @@ export type OrderStatus =
   | "booked"
   | "booking_failed"
   | "cancelled"
+  | "refund_pending"
+  | "partially_refunded"
   | "refunded";
 
 export type OrderLine = {
@@ -93,6 +95,11 @@ export type OrderSnapshot = {
   confirmationEmailProvider?: string;
   confirmationEmailId?: string;
   confirmationEmailError?: string;
+  refundId?: string;
+  refundAmountCents?: number;
+  refundStatus?: string;
+  cancelledAt?: string;
+  cancellationReason?: string;
 };
 
 function nowIso() {
@@ -133,7 +140,9 @@ export async function saveOrder(order: OrderSnapshot) {
 
   const needsAttention = await readIndex("orders:needs_attention");
   const has = needsAttention.includes(updated.order_id);
-  const shouldInclude = updated.status === "booking_failed";
+  const shouldInclude =
+    updated.status === "booking_failed" ||
+    (Boolean(updated.lastError) && (updated.status === "cancelled" || updated.status === "refund_pending"));
 
   if (shouldInclude && !has) {
     await writeIndex("orders:needs_attention", [updated.order_id, ...needsAttention]);

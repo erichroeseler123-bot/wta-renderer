@@ -1,11 +1,51 @@
+import { NextRequest, NextResponse } from "next/server";
+import { cookies } from "next/headers";
+import Stripe from "stripe";
 import { getFareHarborCredentials } from "@/lib/fareharbor";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
-import { getOrder, saveOrder } from "@/lib/orders";
-import Stripe from "stripe";
+import {
+  acquireOrderLock,
+  getOrder,
+  getOrderByPaymentIntent,
+  releaseOrderLock,
+  saveOrder,
+  type OrderSnapshot,
+} from "@/lib/orders";
+import { isAdminCookieValue } from "@/lib/admin";
 
-export async function POST(req: Request) {
+export const runtime = "nodejs";
+
+const ADMIN_SECRET = String(process.env.WTA_ADMIN_SECRET || "").trim();
+const INTERNAL_SECRET = String(process.env.WTA_INTERNAL_SECRET || "").trim();
+
+async function checkAdminAuth(req: NextRequest): Promise<boolean> {
+  // 1. Admin cookie
   try {
-    const { appKey, userKey } = getFareHarborCredentials();
+    const jar = await cookies();
+    const raw = jar.get("wta_admin")?.value || "";
+    if (isAdminCookieValue(raw)) return true;
+  } catch {
+    // ignore cookie lookup errors in non-browser context
+  }
+
+  // 2. Internal header
+  const internalHdr = req.headers.get("x-wta-internal") || "";
+  if (INTERNAL_SECRET && internalHdr === INTERNAL_SECRET) return true;
+
+  // 3. Admin secret header or URL parameter
+  const secretHdr = req.headers.get("x-wta-admin-secret") || "";
+  if (ADMIN_SECRET && ADMIN_SECRET.length >= 20 && secretHdr === ADMIN_SECRET) return true;
+
+  const urlSecret = new URL(req.url).searchParams.get("secret");
+  if (ADMIN_SECRET && ADMIN_SECRET.length >= 20 && urlSecret === ADMIN_SECRET) return true;
+
+  return false;
+}
+
+export async function POST(req: NextRequest) {
+  let lockOrderId: string | null = null;
+  try {
+    const body = await req.json().catch(() => ({}));
     const {
       bookingUuid,
       reason,
@@ -22,54 +62,213 @@ export async function POST(req: Request) {
       sourcePath,
       sourceSlug,
       topicSlug,
-    } = await req.json();
+      refundAmountCents,
+    } = body;
 
-    const res = await fetch(
-      `https://fareharbor.com/api/external/v1/bookings/${bookingUuid}/cancel/`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-FareHarbor-API-App": appKey,
-          "X-FareHarbor-API-User": userKey,
-        },
-        body: JSON.stringify({ reason }),
+    const isAdmin = await checkAdminAuth(req);
+
+    // Look up the order if identifiers provided
+    let ord: OrderSnapshot | null = null;
+    if (orderId) {
+      ord = await getOrder(String(orderId).trim());
+    }
+    if (!ord && paymentIntentId) {
+      ord = await getOrderByPaymentIntent(String(paymentIntentId).trim());
+    }
+
+    // Authorization check: Must be Admin OR verified customer matching order email
+    if (!isAdmin) {
+      const customerEmail = String(email || "").trim().toLowerCase();
+      const orderEmail = String(ord?.contact?.email || "").trim().toLowerCase();
+      const isOwner = Boolean(customerEmail && orderEmail && customerEmail === orderEmail);
+
+      if (!isOwner) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Unauthorized. Administrator authorization or matching customer email required.",
+          },
+          { status: 401 }
+        );
       }
-    );
+    }
 
-    const data = await res.json();
+    // Repeated request / Idempotency guard:
+    // If order is already completely refunded, return previous refund data safely without calling Stripe or FH again
+    if (ord && (ord.status === "refunded" || (ord.refundStatus === "succeeded" && (ord.refundAmountCents || 0) >= ord.totalCents))) {
+      return NextResponse.json({
+        success: true,
+        already_refunded: true,
+        status: ord.status,
+        orderId: ord.order_id,
+        refund: {
+          id: ord.refundId,
+          amountCents: ord.refundAmountCents,
+          status: ord.refundStatus || "succeeded",
+        },
+      });
+    }
 
-    let refundResult = null;
-    if (res.ok && (orderId || paymentIntentId)) {
-      try {
-        let pi = paymentIntentId;
-        let ord = null;
-        if (orderId) {
-          ord = await getOrder(orderId);
-          if (ord?.payment_intent_id) {
-            pi = ord.payment_intent_id;
-          }
+    // Acquire lock if order exists
+    if (ord?.order_id) {
+      const gotLock = await acquireOrderLock(ord.order_id, 60);
+      if (!gotLock) {
+        return NextResponse.json(
+          { success: false, error: "Order is currently being processed. Please retry." },
+          { status: 409 }
+        );
+      }
+      lockOrderId = ord.order_id;
+    }
+
+    // Step 1: Execute and Verify FareHarbor Cancellation
+    let fhData: Record<string, unknown> | null = null;
+    let fhOk = false;
+    let fhStatus = 200;
+
+    if (bookingUuid) {
+      const { appKey, userKey } = getFareHarborCredentials();
+      const fhRes = await fetch(
+        `https://fareharbor.com/api/external/v1/bookings/${encodeURIComponent(bookingUuid)}/cancel/`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-FareHarbor-API-App": appKey,
+            "X-FareHarbor-API-User": userKey,
+          },
+          body: JSON.stringify({ reason: reason || "Cancelled via Welcome to Alaska Tours" }),
         }
-        if (pi && process.env.STRIPE_SECRET_KEY) {
-          const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {});
-          const refund = await stripe.refunds.create({
+      );
+
+      fhStatus = fhRes.status;
+      fhData = await fhRes.json().catch(() => null);
+
+      // Verify that FareHarbor cancellation explicitly succeeded
+      fhOk = fhRes.ok && (!fhData || !fhData.error);
+
+      if (!fhOk) {
+        // FareHarbor cancellation FAILED. ABORT immediately before touching Stripe!
+        return NextResponse.json(
+          {
+            success: false,
+            error: (fhData?.error as string) || `FareHarbor cancellation failed with status ${fhStatus}`,
+            details: fhData,
+            refund: null,
+          },
+          { status: fhStatus || 400 }
+        );
+      }
+    } else {
+      // If no bookingUuid (e.g. manual order cancellation or pre-booking failure)
+      fhOk = true;
+    }
+
+    // Step 2: Policy-respecting Stripe Refund Processing
+    let refundResult: { id?: string; status?: string | null; amount?: number } | null = null;
+    let pi = paymentIntentId || ord?.payment_intent_id;
+
+    // Determine refund amount respecting applicable cancellation policy
+    // - If refundAmountCents is explicitly 0 (e.g. non-refundable policy or within 48h penalty window): do not refund.
+    // - If refundAmountCents is provided > 0: refund up to that capped amount.
+    // - If refundAmountCents is undefined: full remaining order balance.
+    const isExplicitNonRefundable = refundAmountCents === 0;
+    const requestedCents = Number.isFinite(Number(refundAmountCents)) ? Math.floor(Number(refundAmountCents)) : null;
+
+    let centsToRefund = 0;
+    if (!isExplicitNonRefundable) {
+      if (ord) {
+        const remaining = Math.max(0, ord.totalCents - (ord.refundAmountCents || 0));
+        centsToRefund = requestedCents !== null ? Math.min(requestedCents, remaining) : remaining;
+      } else if (requestedCents !== null && requestedCents > 0) {
+        centsToRefund = requestedCents;
+      }
+    }
+
+    if (fhOk && pi && process.env.STRIPE_SECRET_KEY && centsToRefund > 0) {
+      try {
+        const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {});
+        const isPartial = ord ? centsToRefund < ord.totalCents : false;
+
+        // Deterministic idempotency key to prevent duplicate Stripe refunds
+        const idempotencyKey = `wta-refund-${ord?.order_id || pi}-${bookingUuid || "all"}-${centsToRefund}`;
+
+        const refund = await stripe.refunds.create(
+          {
             payment_intent: pi,
+            amount: isPartial ? centsToRefund : undefined,
             reason: "requested_by_customer",
-          });
-          refundResult = { id: refund.id, status: refund.status };
-          if (ord) {
+          },
+          { idempotencyKey }
+        );
+
+        refundResult = { id: refund.id, status: refund.status, amount: refund.amount };
+
+        if (ord) {
+          const newRefundTotal = (ord.refundAmountCents || 0) + centsToRefund;
+          const isFull = newRefundTotal >= ord.totalCents;
+
+          if (refund.status === "succeeded") {
             await saveOrder({
               ...ord,
-              status: "refunded",
+              status: isFull ? "refunded" : "partially_refunded",
+              refundId: refund.id,
+              refundAmountCents: newRefundTotal,
+              refundStatus: "succeeded",
+              cancelledAt: new Date().toISOString(),
+              cancellationReason: typeof reason === "string" ? reason : undefined,
+              lastError: undefined,
+            });
+          } else if (refund.status === "pending") {
+            await saveOrder({
+              ...ord,
+              status: "refund_pending",
+              refundId: refund.id,
+              refundAmountCents: newRefundTotal,
+              refundStatus: "pending",
+              cancelledAt: new Date().toISOString(),
+              cancellationReason: typeof reason === "string" ? reason : undefined,
               lastError: undefined,
             });
           }
         }
       } catch (refundErr) {
         console.error("[cancel-route] Stripe refund error:", refundErr);
+        const refundErrMsg = refundErr instanceof Error ? refundErr.message : String(refundErr);
+
+        // Do NOT mark order as refunded if Stripe failed!
+        // Mark as cancelled (since FareHarbor cancelled) and record lastError to trigger attention
+        if (ord) {
+          await saveOrder({
+            ...ord,
+            status: "cancelled",
+            lastError: `FareHarbor cancelled successfully, but Stripe refund failed: ${refundErrMsg}`,
+            cancelledAt: new Date().toISOString(),
+            cancellationReason: typeof reason === "string" ? reason : undefined,
+          });
+        }
+        return NextResponse.json(
+          {
+            success: false,
+            error: `Booking cancelled in FareHarbor, but Stripe refund failed: ${refundErrMsg}`,
+            fareharbor: fhData,
+            refund: null,
+          },
+          { status: 502 }
+        );
       }
+    } else if (fhOk && ord && (isExplicitNonRefundable || centsToRefund === 0)) {
+      // Non-refundable cancellation (or already refunded)
+      await saveOrder({
+        ...ord,
+        status: "cancelled",
+        refundStatus: "none",
+        cancelledAt: new Date().toISOString(),
+        cancellationReason: typeof reason === "string" ? reason : "non_refundable_policy",
+      });
     }
 
+    // Step 3: Emit DCC Satellite Event
     if (handoffId) {
       await emitDccSatelliteEvent({
         handoffId: String(handoffId),
@@ -77,7 +276,7 @@ export async function POST(req: Request) {
         eventType: "booking_cancelled",
         sourcePath: typeof sourcePath === "string" ? sourcePath : "/api/fareharbor/cancel",
         externalReference: typeof orderId === "string" ? orderId : String(bookingUuid || ""),
-        status: res.ok ? "cancelled" : "cancel_failed",
+        status: fhOk ? "cancelled" : "cancel_failed",
         stage: "cancellation",
         message: typeof reason === "string" ? reason : undefined,
         traveler: {
@@ -100,12 +299,25 @@ export async function POST(req: Request) {
         },
       });
     }
-    return Response.json({ ...data, refund: refundResult }, { status: res.status });
+
+    return NextResponse.json(
+      {
+        success: true,
+        status: ord ? ord.status : "cancelled",
+        fareharbor: fhData,
+        refund: refundResult,
+      },
+      { status: fhStatus }
+    );
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : String(err);
-    return Response.json(
-      { error: message || "Cancel failed" },
+    return NextResponse.json(
+      { success: false, error: message || "Cancel failed" },
       { status: 500 }
     );
+  } finally {
+    if (lockOrderId) {
+      await releaseOrderLock(lockOrderId);
+    }
   }
 }
