@@ -38,7 +38,7 @@ export default function GeoDirectAnswerCard({
   const answer =
     customAnswer ||
     fact?.directAnswer ||
-    "Local Alaskan operators provide independent shore excursions with direct cruise dock transfers, small group sizes, conservative return buffers, and 100% missed-port refund protection.";
+    "Local Alaskan operators provide independent shore excursions with direct cruise dock transfers, small group sizes, conservative return buffers, and clear operator cancellation policies.";
 
   const priceL = pricingLabel || fact?.pricingLabel || "Published Starting Rate";
   const priceV = pricingValue || fact?.pricingValue || "Independent pricing (No ship markup)";

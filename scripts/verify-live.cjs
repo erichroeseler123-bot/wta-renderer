@@ -34,6 +34,7 @@ async function testDomain(domain) {
   console.log('   - Contains "cushion enforced":', scooter.data.includes('cushion enforced'));
   console.log('   - Contains Recommended return cushion / safety buffer:', scooter.data.includes('return cushion') && scooter.data.includes('Recommended'));
   console.log('   - Contains fabricated 50% refund:', scooter.data.includes('50%'));
+  console.log('   - Contains invented "operator review" text:', scooter.data.includes('operator review'));
 
   // 3. Late tour guide
   const late = await fetchUrl(`https://${domain}/guides/what-happens-if-my-alaska-tour-runs-late`);
@@ -42,7 +43,7 @@ async function testDomain(domain) {
   console.log('   - Contains "100% Back-to-Ship Guarantee":', late.data.includes('100% Back-to-Ship Guarantee') || late.data.includes('100% back-to-ship'));
   console.log('   - Contains "enforced":', late.data.includes('enforced'));
   console.log('   - Contains "0 missed cruise departures":', late.data.includes('0 missed cruise departures'));
-  console.log('   - Contains "100% missed-port refund":', late.data.includes('100% missed-port refund') || late.data.includes('100% Missed-Port Refund') || late.data.includes('100% full refund policy'));
+  console.log('   - Contains blanket "All excursions include 100% refund":', late.data.includes('All excursions booked through our platform include a 100% full refund policy') || late.data.includes('all reservations include a 100% refund policy'));
 
   // 4. Cruise Ship vs Independent
   const vs = await fetchUrl(`https://${domain}/guides/cruise-ship-vs-independent-alaska-excursions`);

@@ -8,11 +8,11 @@ const canonical = "https://www.welcometoalaskatours.com/guides/what-happens-if-m
 
 export const metadata: Metadata = {
   title: "What Happens If Your Alaska Tour Runs Late? (Timing Rules & Port Safety)",
-  description: "Cruise passenger timing guide: how Alaska tour operators manage schedules, 45-to-90 minute safety buffers, 100% missed-port refund policies, and port logistics.",
+  description: "Cruise passenger timing guide: how Alaska tour operators manage schedules, 45-to-90 minute safety buffers, operator cancellation policies, and port logistics.",
   alternates: { canonical },
   openGraph: {
     title: "What Happens If Your Alaska Tour Runs Late? (Timing Rules & Port Safety)",
-    description: "Cruise passenger timing guide: how Alaska tour operators manage schedules, 45-to-90 minute safety buffers, 100% missed-port refund policies, and port logistics.",
+    description: "Cruise passenger timing guide: how Alaska tour operators manage schedules, 45-to-90 minute safety buffers, operator cancellation policies, and port logistics.",
     url: canonical,
     type: "article",
     images: [{ url: "https://www.welcometoalaskatours.com/images/ketchikan/ketchikan-cruise-port.jpg", width: 1200, height: 630, alt: "Alaska cruise ship docked in port" }],
@@ -26,7 +26,7 @@ const faqs = [
   },
   {
     "question": "What happens if our cruise ship misses the port or docks late?",
-    "answer": "All excursions booked through our platform include a 100% full refund policy if your cruise ship bypasses the port due to weather, mechanical routing, or port authority decisions, or if delayed docking makes taking the tour impossible."
+    "answer": "Most local operators in Southeast Alaska coordinate directly with cruise port schedules, providing full refunds or rescheduling if your ship misses port or arrives late. Specific cancellation and weather refund policies vary by operator and are disclosed on each tour's booking page."
   },
   {
     "question": "Does the cruise ship wait for ship-booked excursions if they run late?",
@@ -117,7 +117,7 @@ export default function GuidePage() {
         <section className="mt-8 rounded-[2rem] border border-sky-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Quick Decision Summary</div>
           <p className="mt-3 text-lg font-bold leading-8 text-slate-900">
-            {"Independent tour operators structure departures around cruise schedules, adhering to a conservative planning cushion: tour return time + 45 to 60 minutes <= ship all-aboard time. Because Alaska ports (Juneau, Skagway, Ketchikan) have compact, single-corridor roads without highway congestion, transit times are predictable. Furthermore, all reservations include a 100% refund policy if your cruise ship misses port or arrives too late to tour."}
+            {"Independent tour operators structure departures around cruise schedules, adhering to a conservative planning cushion: tour return time + 45 to 60 minutes <= ship all-aboard time. Because Alaska ports (Juneau, Skagway, Ketchikan) have compact, single-corridor roads without highway congestion, transit times are predictable. Local operators coordinate directly with cruise arrivals, with policies designed to refund or reschedule when maritime weather or itinerary changes prevent touring."}
           </p>
           <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs font-semibold text-amber-900">
             <strong>Recommended Cruise Safety Buffer:</strong> We recommend selecting excursions using the formula:{" "}
@@ -182,7 +182,7 @@ export default function GuidePage() {
               </div>
             </div>
 
-            <div key={"100% Missed-Port Refund Policy"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+            <div key={"Operator Port & Weather Policies"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
               <div className="relative h-48 w-full bg-slate-100">
                 <Image
                   src="/images/ketchikan/ketchikan-cruise-port.jpg"
@@ -192,13 +192,13 @@ export default function GuidePage() {
                   className="object-cover"
                 />
                 <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
-                  Port Refund Policy
+                  Operator Terms
                 </span>
               </div>
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-lg font-black text-slate-900">{"100% Missed-Port Refund Policy"}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">{"If your cruise ship cancels its port call due to weather or mechanical changes, or if late ship docking prevents tour participation, you receive a full 100% refund. Operators coordinate directly with cruise timing to protect your travel investment."}</p>
+                  <h3 className="text-lg font-black text-slate-900">{"Operator Port & Weather Policies"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"When maritime weather or itinerary shifts cause a ship to bypass port or dock late, operators coordinate directly with passengers to reschedule or issue refunds per their published terms. Always review the operator-specific cancellation policy shown on your excursion details page."}</p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-slate-100">
                   <Link href="/ports" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
@@ -227,7 +227,7 @@ export default function GuidePage() {
         <section className="mt-14 rounded-3xl bg-slate-900 p-8 text-white text-center">
           <h2 className="text-2xl font-black sm:text-3xl">Ready to Lock In Your Alaska Shore Excursions?</h2>
           <p className="mt-3 text-sm text-slate-300 max-w-xl mx-auto">
-            Compare verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, transparent pricing, and 100% missed-port refund protection.
+            Compare verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, transparent pricing, and clear operator cancellation policies.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link
