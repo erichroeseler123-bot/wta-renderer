@@ -905,44 +905,11 @@
     "pk": 13748,
     "title": "Skagway's Gold Rush Scooter Tour",
     "slug": "skagway-s-gold-rush-scooter-tour",
-    "description": "Cause a Ruckus on a Honda Ruckus!",
+    "description": "Guided Skagway & Dyea Scooter Tour on Honda Ruckus | 2 Hours | Ages 18+ to drive (valid driver's license required); min age 14+ for passengers",
     "image": "https://www.filepicker.io/api/file/TkZI5xIsQXKzw1Ws9ZOl",
     "company": "skagwayscooters",
     "fromPrice": "$189 Per Person (Flat Rate)",
     "rateSummary": "189",
-    "category": "Adventures"
-  },
-  {
-    "pk": 589694,
-    "title": "Harley Davidson Rentals",
-    "slug": "harley-davidson-rentals",
-    "description": "Harely Street Glide Special",
-    "image": "https://cdn.filestackcontent.com/R889DWNcRbeEIEMvZgdc",
-    "company": "skagwayscooters",
-    "fromPrice": "$349 Per Person (Flat Rate)",
-    "rateSummary": "349",
-    "category": "Adventures"
-  },
-  {
-    "pk": 522188,
-    "title": "KLR650",
-    "slug": "klr650",
-    "description": "Duration: 4 Hours or 8 Hours",
-    "image": "https://cdn.filestackcontent.com/c9z3XFwKSBCMd8G7mZo7",
-    "company": "skagwayscooters",
-    "fromPrice": "$250 Per Person (Flat Rate)",
-    "rateSummary": "250 • 295",
-    "category": "Adventures"
-  },
-  {
-    "pk": 523466,
-    "title": "Honda Shadow",
-    "slug": "honda-shadow",
-    "description": "Duration: 4 Hours or 8 Hours",
-    "image": "https://cdn.filestackcontent.com/pOb6OQ5QuuueagVXZsXA",
-    "company": "skagwayscooters",
-    "fromPrice": "$250 Per Person (Flat Rate)",
-    "rateSummary": "250 • 275",
     "category": "Adventures"
   },
   {

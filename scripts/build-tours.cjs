@@ -31,6 +31,7 @@ const BLOCKED_ITEM_IDS = new Set([
   247714, 247716, 247717, 247718, 247719, 247720, 247721,
   328657, 563490, 563491, 563492, 563493,
   563494, 563495, 563496, 563497, 563498, 563499,
+  589694, 522188, 523466,
 ]);
 
 const BLOCKED_TITLE_PATTERNS = [
@@ -42,12 +43,14 @@ const BLOCKED_TITLE_PATTERNS = [
   /transfer\b/i,
   /shuttle\s*only/i,
   /water\s*taxi/i,
-  /bike\s*rental/i,
-  /scooter\s*rental/i,
-  /boat\s*rental/i,
-  /gear\s*rental/i,
-  /drysuit\s*rental/i,
-  /kayak\s*rental/i,
+  /bike\s*rentals?/i,
+  /scooter\s*rentals?/i,
+  /boat\s*rentals?/i,
+  /gear\s*rentals?/i,
+  /drysuit\s*rentals?/i,
+  /kayak\s*rentals?/i,
+  /motorcycle\s*rentals?/i,
+  /rentals?\b/i,
   /ferry/i,
 ];
 
@@ -522,6 +525,8 @@ async function buildTours() {
               itemDescription = "Neets Bay Bear Viewing by Floatplane | 3 Hours | Guided Remote Rainforest Black Bear Observation | Peak July–Sept";
             } else if (shortname === "taquanair" && pk === 560411) {
               itemDescription = "Traitors Cove Bear Viewing Wilderness Floatplane Expedition | 3 Hours 15 Minutes | Rainforest Boardwalk & Platform";
+            } else if (shortname === "skagwayscooters" && pk === 13748) {
+              itemDescription = "Guided Skagway & Dyea Scooter Tour on Honda Ruckus | 2 Hours | Ages 18+ to drive (valid driver's license required); min age 14+ for passengers";
             }
 
             return {

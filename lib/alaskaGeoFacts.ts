@@ -687,19 +687,19 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     port: "all",
     directQuestion: "What happens if an independent Alaska shore excursion runs late?",
     directAnswer:
-      "Professional independent operators enforce a strict safety rule: all tours must return at least 45 to 60 minutes before your ship's published all-aboard time. Because Juneau, Skagway, and Ketchikan have compact road networks with single main corridors, traffic jams are practically non-existent. In the rare event of a mechanical delay, operators communicate directly with harbor pilots and port agents, deploy backup transport, and carry comprehensive back-to-ship guarantees.",
-    pricingLabel: "Protection Level",
-    pricingValue: "100% Back-to-Ship Guarantee • Fully insured local operators",
-    durationLabel: "Return Rule",
-    durationValue: "Tour end time + 45 min return buffer strictly <= ship all-aboard",
-    meetingPointLabel: "Real-Time Tracking",
-    meetingPointValue: "Port dispatchers monitor ship movements and berthing in real time",
-    safetyBufferLabel: "Safety Buffer Rule",
-    safetyBufferValue: "Mandatory 45–60 min minimum buffer enforced on every booking",
+      "We recommend planning excursions with a return safety cushion of at least 45 to 60 minutes before your ship's published all-aboard time. Because Juneau, Skagway, and Ketchikan are small coastal towns with compact, single-corridor roads, traffic congestion is rare. Excursions operate under individual operator weather and cancellation terms, and carry full refunds if your cruise ship misses the port or cannot dock on schedule.",
+    pricingLabel: "Protection Policy",
+    pricingValue: "Operator cancellation policies • 100% refund if ship misses port",
+    durationLabel: "Recommended Cushion",
+    durationValue: "Target tour return + 45–60 min <= ship all-aboard time",
+    meetingPointLabel: "Port Coordination",
+    meetingPointValue: "Operators verify daily ship docking schedules and gangway clearance",
+    safetyBufferLabel: "Planning Buffer",
+    safetyBufferValue: "Recommended 45–60 min return cushion before published all-aboard",
     faqSchema: [
       {
-        question: "Has an independent tour operator ever caused a guest to miss an Alaska cruise ship?",
-        answer: "Missed departures are virtually non-existent with established operators. Welcome to Alaska Tours partners have a 100% on-time record over thousands of passenger departures."
+        question: "What should I do if my ship changes its port arrival or departure time?",
+        answer: "Notify the tour operator as soon as possible. Operators adjust meeting times when ship schedules shift or issue refunds if the altered window cannot accommodate the tour."
       }
     ]
   },
@@ -736,8 +736,8 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     durationValue: "3 to 6 hours (Completely customized to your schedule)",
     meetingPointLabel: "VIP Dock Greeting",
     meetingPointValue: "VIP greeting directly at the ship gangway",
-    safetyBufferLabel: "Dedicated Safety",
-    safetyBufferValue: "Dedicated private transportation guarantees custom on-time ship return",
+    safetyBufferLabel: "Dedicated Timing",
+    safetyBufferValue: "Dedicated private transportation provides tailored, dock-adjacent timing",
     faqSchema: [
       {
         question: "Can private Alaska tours be tailored for multi-generational families?",
@@ -752,19 +752,19 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     port: "all",
     directQuestion: "Should you book Alaska cruise excursions through the ship or independently?",
     directAnswer:
-      "Booking independent Alaska shore excursions through Welcome to Alaska Tours saves 20% to 40% compared to cruise-line retail markups while offering smaller group sizes (12 to 24 guests vs. 50 to 150 on cruise ship cattle boats). Independent operators provide guaranteed on-time return to your ship, full weather refund protections, and personalized local captains and pilots.",
+      "Booking independent Alaska shore excursions connects you directly to local operators, typically saving 20% to 40% compared to cruise-line retail markups while offering smaller group sizes (12 to 24 guests vs. 50 to 150 on cruise ship tours). Independent operators coordinate with cruise dock schedules, provide 100% missed-port refund protection, and offer personalized local guides.",
     pricingLabel: "Cost Comparison",
-    pricingValue: "Independent saves 20%–40% • Ships mark up identical local tours",
+    pricingValue: "Independent rates save 20%–40% • Cruise lines add retail markups",
     durationLabel: "Group Sizing",
     durationValue: "Small groups (12–24 guests) vs Cruise line crowds (50–150+)",
     meetingPointLabel: "Pier Convenience",
     meetingPointValue: "Direct port dock pickup with local Alaskan guides and dispatchers",
-    safetyBufferLabel: "Ship Return Guarantee",
-    safetyBufferValue: "100% Back-to-Ship Guarantee • 0 missed cruise departures in company history",
+    safetyBufferLabel: "Return Protection",
+    safetyBufferValue: "Conservative 60–90 min return cushions • 100% missed-port refund protection",
     faqSchema: [
       {
         question: "Will the cruise ship leave without me if I book an independent excursion?",
-        answer: "No. Professional independent tour operators schedule excursions with conservative 60 to 90-minute safety buffers prior to all-aboard. In the virtually non-existent event of a mechanical delay, reputable operators carry comprehensive contingency insurance and guarantee transportation to the ship's next port of call."
+        answer: "Professional independent tour operators schedule excursions with conservative 60 to 90-minute safety buffers prior to all-aboard. In reality, operators coordinate closely with port arrivals and departures, and bookings include 100% full refund protection if your ship misses port."
       },
       {
         question: "Are independent Alaska tours the same operators the cruise lines use?",
@@ -823,8 +823,8 @@ export const ALASKA_GEO_FACTS: Record<string, AlaskaGeoFact> = {
     durationValue: "1–2 hours independent walks • 3–4.5 hours marine wildlife tours",
     meetingPointLabel: "Port Meeting Points",
     meetingPointValue: "Curbside at cruise terminals / Pier walking paths (Yakutania, Ward Lake, Tram)",
-    safetyBufferLabel: "Cruise Buffer & Guarantees",
-    safetyBufferValue: "All excursions enforce 45–60+ min return buffer before all-aboard",
+    safetyBufferLabel: "Cruise Buffer Recommendation",
+    safetyBufferValue: "Plan a 45–60+ min return buffer before published all-aboard",
     faqSchema: [
       {
         question: "Can you see the northern lights on a summer Alaska cruise?",

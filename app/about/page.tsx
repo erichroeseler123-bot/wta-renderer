@@ -61,41 +61,41 @@ export default function AboutPage() {
 
         {/* Who We Are & Experience */}
         <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Our Background & Mission</div>
-          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">Built by Alaska travel and maritime specialists</h2>
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Our Role & Approach</div>
+          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">Independent shore excursion comparison for Alaska cruisers</h2>
           <div className="mt-4 space-y-4 text-sm leading-7 text-slate-300">
             <p>
-              Welcome to Alaska Tours was founded by local Alaska travel professionals to solve a persistent cruise pain point: cruise passengers were forced to choose between paying 30% to 50% cruise line markups for crowded 100-passenger tour buses, or spending hours navigating fragmented local websites with unclear dock logistics and return buffers.
+              Welcome to Alaska Tours is an independent directory and booking resource for cruise passengers visiting Juneau, Skagway, and Ketchikan. We built this platform to provide a clear alternative to cruise-line excursion desks and scattered operator websites.
             </p>
             <p>
-              Our team brings decades of combined experience in Southeast Alaska tourism, maritime operations, and travel technology. We personally evaluate harbor meeting points, pier walking distances, and transit times across Juneau, Skagway, and Ketchikan to ensure every excursion recommendation fits comfortably within real-world port schedules.
+              By aggregating tour inventory from local operators into standardized categories, we help travelers compare tour formats, durations, base pricing, and live departure times in one place. Our planning tools focus on the practical details cruise passengers need: published meeting hubs, walking distances from berths, and return buffers before scheduled ship departure.
             </p>
           </div>
         </div>
 
         {/* How Operators Are Selected */}
         <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
-          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Vetting & Safety Standards</div>
-          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">How we select and verify tour operators</h2>
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Catalog Criteria</div>
+          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">How tours and operators are featured</h2>
           <p className="mt-3 text-sm leading-7 text-slate-300">
-            We do not list unverified street vendors or unpermitted operators. Every partner connected to our catalog must satisfy strict commercial and regulatory criteria:
+            Our catalog connects travelers to established commercial excursion operators operating in Southeast Alaska:
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-2">
             <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <div className="font-bold text-white text-sm">FAA Part 135 Aviation Certification</div>
-              <p className="mt-1 text-xs leading-5 text-slate-400">All helicopter (TEMSCO, Coastal, NorthStar) and floatplane (Taquan Air, Wings Airways) partners maintain FAA Part 135 air carrier certifications with experienced Alaska bush pilots and strict weather safety minimums.</p>
+              <div className="font-bold text-white text-sm">Direct Reservation Connectivity</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">We integrate with live reservation software (such as FareHarbor) so travelers view real-time departures, live seat availability, and operator-direct booking terms.</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <div className="font-bold text-white text-sm">USCG Licensed Captains & Inspected Vessels</div>
-              <p className="mt-1 text-xs leading-5 text-slate-400">All marine whale watching and fishing charter boats undergo annual United States Coast Guard safety inspections and are helmed by licensed USCG Master Captains with onboard VHF marine radios.</p>
+              <div className="font-bold text-white text-sm">Established Local Operators</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">Featured companies are established commercial businesses licensed to operate in Juneau, Skagway, or Ketchikan, ranging from marine wildlife operators to flightseeing bases.</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <div className="font-bold text-white text-sm">USFS Permits & Tongass Authorizations</div>
-              <p className="mt-1 text-xs leading-5 text-slate-400">Guiding companies operating in the Tongass National Forest and Mendenhall Glacier Recreation Area hold verified commercial special-use permits issued by the U.S. Forest Service.</p>
+              <div className="font-bold text-white text-sm">Cruise Port Alignment</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">We feature tours whose departures, staging locations, and durations are designed to fit within standard cruise-day port call schedules.</p>
             </div>
             <div className="rounded-xl border border-white/10 bg-black/20 p-4">
-              <div className="font-bold text-white text-sm">Cruise Pier Logistics & Buffer Policies</div>
-              <p className="mt-1 text-xs leading-5 text-slate-400">Operators maintain convenient departure hubs walking distance from cruise berths and structure tour timetables with conservative safety buffers before ship all-aboard times.</p>
+              <div className="font-bold text-white text-sm">Transparent Policy Disclosures</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">We display each operator&apos;s specific cancellation deadlines, weather policies, and meeting instructions before booking so travelers know exact terms up front.</p>
             </div>
           </div>
         </div>

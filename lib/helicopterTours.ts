@@ -249,6 +249,8 @@ function normalizeTour(
     description = "Floatplane Flightseeing • 2 Hours • All Ages • Remote fjord water landing";
   } else if (company === "taquanair" && pk === 392950) {
     description = "Floatplane Bear Viewing • 3 Hours 15 Minutes • All Ages • Traitors Cove / Neets Bay";
+  } else if (company === "skagwayscooters" && pk === 13748) {
+    description = "2 Hours • Ages 18+ to drive (valid driver's license required) • Guided Skagway & Dyea scooter tour on Honda Ruckus";
   }
 
   const slugSource = String(tour.slug || title || "").trim();

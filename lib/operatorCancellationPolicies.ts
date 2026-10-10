@@ -202,12 +202,12 @@ const OPERATOR_POLICIES: Record<
   },
   "skagwayscooters": {
     operatorName: "Skagway Scooters",
-    weatherPolicy: "100% full refund in case of operator weather cancellation, safety issues, or if your cruise ship misses port.",
-    guestCutoffNotice: "72+ hours notice (100% refund); 48–72 hours prior (50% refund or reschedule); non-refundable within 48 hours of departure.",
-    shortSummary: "100% refund for operator/ship cancellation. Guest cancellations: 72+ hrs (100% refund), 48–72 hrs (50% refund/reschedule), under 48 hrs (non-refundable).",
+    weatherPolicy: "100% full refund if the excursion is canceled by the operator due to severe weather, safety conditions, or if the cruise ship skips port.",
+    guestCutoffNotice: "Full refund with at least 72 hours notice; non-refundable within 48 hours of departure. Cancellations between 48 and 72 hours are subject to operator review and rebooking availability.",
+    shortSummary: "100% refund for operator/port cancellation. Guest cancellations: 72+ hours (100% refund); non-refundable within 48 hours; 48–72 hr window subject to operator review.",
     detailedBullets: [
       "72+ hours notice of cancellation: 100% full refund.",
-      "Between 48 and 72 hours prior: 50% refund or reschedule credit.",
+      "Between 48 and 72 hours prior: Subject to operator review and departure availability.",
       "Within 48 hours of departure: Non-refundable.",
     ],
   },

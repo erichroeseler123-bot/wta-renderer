@@ -82,7 +82,7 @@ function itemToTour(item: any, shortname: string): Tour {
     slug,
     title: name,
     description: desc,
-    duration: item?.duration_minutes ? `${Math.round(item.duration_minutes / 60 * 10) / 10} Hours` : (shortname === "akduck" ? "1.5 Hours" : undefined),
+    duration: item?.duration_minutes ? `${Math.round(item.duration_minutes / 60 * 10) / 10} Hours` : (shortname === "akduck" ? "1.5 Hours" : shortname === "skagwayscooters" ? "2 Hours" : undefined),
     fromPrice,
     image: item?.hero_image_url || item?.image_cdn_url || undefined,
     port: shortname,

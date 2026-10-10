@@ -106,6 +106,10 @@ function parseTourDescriptionDetails(
 
   if (compLower === "akduck" && String(pk) === "4161") {
     duration = "90 Minutes (1.5 Hours)";
+  } else if (compLower === "skagwayscooters") {
+    if (String(pk) === "13748" || lower.includes("scooter")) {
+      duration = "2 Hours";
+    }
   }
 
   // 2. Activity Level / Difficulty
@@ -114,6 +118,8 @@ function parseTourDescriptionDetails(
     activityLevel = "Easy (Amphibious Sightseeing)";
   } else if (compLower === "alaskarainforest" && String(pk) === "563489") {
     activityLevel = "Easy to Moderate (Boardwalk Nature Walk)";
+  } else if (compLower === "skagwayscooters") {
+    activityLevel = "Moderate (Motorized Scooter Riding)";
   } else {
     const difficultyMatch =
       desc.match(/Difficulty:\s*([^|]+)/i) ||
@@ -134,15 +140,19 @@ function parseTourDescriptionDetails(
 
   // 3. Age Constraints
   let ageConstraint = "";
-  const ageMatch =
-    desc.match(/passenger ages?\s*(\d+)\+/i) ||
-    desc.match(/ages?\s*(\d+)\+/i) ||
-    desc.match(/minimum age\s*(?:of|is)?\s*(\d+)/i) ||
-    desc.match(/\b(\d+)\+/);
-  if (ageMatch) {
-    ageConstraint = `Ages ${ageMatch[1]}+`;
-  } else if (isNorthStar405050) {
-    ageConstraint = "Ages 7+";
+  if (compLower === "skagwayscooters") {
+    ageConstraint = "Ages 18+ to drive (valid driver's license required); min age 14+ for passengers";
+  } else {
+    const ageMatch =
+      desc.match(/passenger ages?\s*(\d+)\+/i) ||
+      desc.match(/ages?\s*(\d+)\+/i) ||
+      desc.match(/minimum age\s*(?:of|is)?\s*(\d+)/i) ||
+      desc.match(/\b(\d+)\+/);
+    if (ageMatch) {
+      ageConstraint = `Ages ${ageMatch[1]}+`;
+    } else if (isNorthStar405050) {
+      ageConstraint = "Ages 7+";
+    }
   }
 
   // 4. Seasonality
@@ -912,7 +922,7 @@ export default async function TourDetailPage({
               </div>
               <div className="flex gap-2">
                 <span>⏱️</span>
-                <p className="leading-normal"><strong>Safety Margin:</strong> {bufferMinutes}-minute return cushion enforced before ship all-aboard.</p>
+                <p className="leading-normal"><strong>Safety Margin:</strong> Recommended {bufferMinutes}-minute return cushion before ship all-aboard.</p>
               </div>
             </div>
           </div>
