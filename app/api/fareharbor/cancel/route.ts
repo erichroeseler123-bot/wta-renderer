@@ -1,5 +1,7 @@
 import { getFareHarborCredentials } from "@/lib/fareharbor";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
+import { getOrder, saveOrder } from "@/lib/orders";
+import Stripe from "stripe";
 
 export async function POST(req: Request) {
   try {
@@ -9,6 +11,7 @@ export async function POST(req: Request) {
       reason,
       handoffId,
       orderId,
+      paymentIntentId,
       email,
       name,
       partySize,
@@ -22,7 +25,7 @@ export async function POST(req: Request) {
     } = await req.json();
 
     const res = await fetch(
-      `https://demo.fareharbor.com/api/external/v1/bookings/${bookingUuid}/cancel/`,
+      `https://fareharbor.com/api/external/v1/bookings/${bookingUuid}/cancel/`,
       {
         method: "POST",
         headers: {
@@ -35,6 +38,38 @@ export async function POST(req: Request) {
     );
 
     const data = await res.json();
+
+    let refundResult = null;
+    if (res.ok && (orderId || paymentIntentId)) {
+      try {
+        let pi = paymentIntentId;
+        let ord = null;
+        if (orderId) {
+          ord = await getOrder(orderId);
+          if (ord?.payment_intent_id) {
+            pi = ord.payment_intent_id;
+          }
+        }
+        if (pi && process.env.STRIPE_SECRET_KEY) {
+          const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {});
+          const refund = await stripe.refunds.create({
+            payment_intent: pi,
+            reason: "requested_by_customer",
+          });
+          refundResult = { id: refund.id, status: refund.status };
+          if (ord) {
+            await saveOrder({
+              ...ord,
+              status: "refunded",
+              lastError: undefined,
+            });
+          }
+        }
+      } catch (refundErr) {
+        console.error("[cancel-route] Stripe refund error:", refundErr);
+      }
+    }
+
     if (handoffId) {
       await emitDccSatelliteEvent({
         handoffId: String(handoffId),
@@ -65,10 +100,11 @@ export async function POST(req: Request) {
         },
       });
     }
-    return Response.json(data, { status: res.status });
-  } catch (err: any) {
+    return Response.json({ ...data, refund: refundResult }, { status: res.status });
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
     return Response.json(
-      { error: err.message || "Cancel failed" },
+      { error: message || "Cancel failed" },
       { status: 500 }
     );
   }

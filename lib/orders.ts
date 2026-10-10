@@ -8,7 +8,9 @@ export type OrderStatus =
   | "paid"
   | "booking_pending"
   | "booked"
-  | "booking_failed";
+  | "booking_failed"
+  | "cancelled"
+  | "refunded";
 
 export type OrderLine = {
   company: string;

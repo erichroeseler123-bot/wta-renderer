@@ -6,7 +6,7 @@ export async function POST(req: Request) {
     const { bookingUuid, newAvailabilityPk } = await req.json();
 
     const res = await fetch(
-      `https://demo.fareharbor.com/api/external/v1/bookings/${bookingUuid}/rebook/`,
+      `https://fareharbor.com/api/external/v1/bookings/${bookingUuid}/rebook/`,
       {
         method: "POST",
         headers: {
@@ -22,9 +22,10 @@ export async function POST(req: Request) {
 
     const data = await res.json();
     return Response.json(data, { status: res.status });
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
     return Response.json(
-      { error: err.message || "Rebook failed" },
+      { error: message || "Rebook failed" },
       { status: 500 }
     );
   }
