@@ -151,14 +151,10 @@ async function sendViaResend(order: OrderSnapshot): Promise<SendResult> {
   if (!apiKey) return { sent: false, reason: "RESEND_API_KEY not configured" };
 
   const from = String(
-    process.env.BOOKING_EMAIL_FROM || process.env.RESEND_FROM_EMAIL || "",
+    process.env.BOOKING_EMAIL_FROM ||
+      process.env.RESEND_FROM_EMAIL ||
+      "Welcome To Alaska Tours <onboarding@resend.dev>",
   ).trim();
-  if (!from) {
-    return {
-      sent: false,
-      reason: "BOOKING_EMAIL_FROM (or RESEND_FROM_EMAIL) not configured",
-    };
-  }
 
   const payload = {
     from,

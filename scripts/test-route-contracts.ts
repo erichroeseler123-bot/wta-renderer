@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { NextRequest } from "next/server";
 import { GET as receiptHandler } from "../app/api/receipt/route";
 import { POST as cancelHandler } from "../app/api/fareharbor/cancel/route";
+import { POST as finalizeHandler } from "../app/api/stripe/finalize/route";
 import { saveOrder, getOrder, makeOrderCancelToken, hashClientSecret, type OrderSnapshot } from "../lib/orders";
 
 process.env.USE_LOCAL_KV = "true";
@@ -222,6 +223,111 @@ async function runRouteTests() {
   });
 
   results.push({ test: "Privilege Check on Cancellation Reasons", status: "PASS", details: "Customer weather claim downgraded, admin weather approved" });
+
+  // ==================================================================
+  // CHECK 4: PAYMENT VERIFICATION IN FINALIZE ROUTE
+  // Proves that /api/stripe/finalize NEVER sets "booked" or "paidAt"
+  // when Stripe reports an unfinalized/unpaid intent
+  // ==================================================================
+  console.log("\n▶ TEST 4: Payment Verification in Finalize Route (/api/stripe/finalize)");
+
+  // 4a. Seed a pending order tied to an unpaid payment intent
+  const pendingOrderId = `ord_pending_${Date.now()}`;
+  const uncapturedPi = `pi_test_uncaptured_${Date.now()}`;
+  const pendingOrder: OrderSnapshot = {
+    ...controlledOrder,
+    order_id: pendingOrderId,
+    payment_intent_id: uncapturedPi,
+    status: "payment_pending",
+    paidAt: undefined,
+  };
+  await saveOrder(pendingOrder);
+
+  // 4b. Call finalize route for the unpaid payment intent
+  const reqFinalizeUnpaid = new NextRequest("https://welcometoalaskatours.com/api/stripe/finalize", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ payment_intent_id: uncapturedPi }),
+  });
+  const resFinalizeUnpaid = await finalizeHandler(reqFinalizeUnpaid);
+  const dataFinalizeUnpaid = await resFinalizeUnpaid.json();
+
+  // If Stripe returns 404 (or status !== 'succeeded'), finalize route MUST reject!
+  assert.equal(dataFinalizeUnpaid.success, false, "Finalize route MUST reject an unfinalized payment intent");
+  
+  // Verify order in KV remains strictly payment_pending, and paidAt is NOT set!
+  const orderAfterFinalize = await getOrder(pendingOrderId);
+  assert.equal(orderAfterFinalize?.status, "payment_pending", "Order must remain payment_pending");
+  assert.equal(orderAfterFinalize?.paidAt, undefined, "paidAt MUST NOT be set on unpaid intent");
+  console.log("  ✔ Finalize route strictly rejected unpaid intent. Order remains 'payment_pending' with paidAt undefined:", {
+    order_id: orderAfterFinalize?.order_id,
+    status: orderAfterFinalize?.status,
+    paidAt: orderAfterFinalize?.paidAt,
+    rejectionReason: dataFinalizeUnpaid.error,
+  });
+
+  results.push({
+    test: "Payment Verification in Finalize Route",
+    status: "PASS",
+    details: "Unpaid intent strictly rejected; order not marked booked or paidAt",
+  });
+
+  // ==================================================================
+  // CHECK 5: STAFF REFUND RETRY ON CANCELLED ORDERS
+  // Proves that already_cancelled does NOT permanently block staff
+  // from retrying an outstanding eligible refund
+  // ==================================================================
+  console.log("\n▶ TEST 5: Staff Outstanding Refund Retry vs. Blocking Cancellation");
+
+  // 5a. Seed a cancelled order where FareHarbor cancelled, but Stripe refund previously failed
+  const retryOrderId = `ord_retry_refund_${Date.now()}`;
+  const retryOrder: OrderSnapshot = {
+    ...controlledOrder,
+    order_id: retryOrderId,
+    status: "cancelled",
+    cancelledAt: new Date().toISOString(),
+    refundStatus: "pending",
+    lastError: "FareHarbor cancelled successfully, but Stripe refund failed: network timeout",
+    items: [
+      {
+        ...controlledOrder.items[0],
+        // Tour departing 5 days in the future (>72h full refund eligible)
+        startAt: new Date(Date.now() + 5 * 24 * 3600 * 1000).toISOString(),
+      },
+    ],
+  };
+  await saveOrder(retryOrder);
+
+  // 5b. Staff retries the refund via /api/fareharbor/cancel with admin authorization
+  const reqStaffRetry = new NextRequest("https://welcometoalaskatours.com/api/fareharbor/cancel", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-wta-admin-secret": process.env.WTA_ADMIN_SECRET || "",
+    },
+    body: JSON.stringify({
+      orderId: retryOrderId,
+      reason: "customer_request",
+    }),
+  });
+  const resStaffRetry = await cancelHandler(reqStaffRetry);
+  const dataStaffRetry = await resStaffRetry.json();
+
+  // The route must NOT short-circuit with already_cancelled: true!
+  // It evaluates the policy and attempts the refund
+  assert.notEqual(dataStaffRetry.already_cancelled, true, "Staff refund retry must NOT be blocked by already_cancelled");
+  assert.equal(dataStaffRetry.policy.allowedRefundCents, 9900, "Eligible refund of $99.00 must be evaluated for retry");
+  console.log("  ✔ Outstanding refund was NOT blocked by already_cancelled; staff retry was processed:", {
+    order_id: retryOrderId,
+    already_cancelled_blocked: Boolean(dataStaffRetry.already_cancelled),
+    eligible_refund_cents: dataStaffRetry.policy.allowedRefundCents,
+  });
+
+  results.push({
+    test: "Staff Outstanding Refund Retry Capability",
+    status: "PASS",
+    details: "Outstanding refund on cancelled order is retriable; not blocked by already_cancelled",
+  });
 
   console.log("\n==================================================================");
   console.log("ALL ROUTE LEVEL AUTHENTICATION & PRIVILEGE CHECKS PASSED");

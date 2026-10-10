@@ -112,7 +112,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Step 2: Idempotency & Repeated Request Guard
-    // If order is already completely refunded or already cancelled, return existing state safely
+    // If order is already completely refunded, return existing state safely to prevent duplicate refunds
     if (ord && (ord.status === "refunded" || (ord.refundStatus === "succeeded" && (ord.refundAmountCents || 0) >= ord.totalCents))) {
       return NextResponse.json({
         success: true,
@@ -127,7 +127,22 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    if (ord && ord.status === "cancelled") {
+    // For customers (non-admin), if the order was already cancelled, return existing state safely.
+    // This prevents customers from submitting duplicate cancellations or re-triggering provider calls.
+    // For authorized staff (isAdmin), allow proceeding so staff can retry an outstanding or failed refund.
+    if (ord && ord.status === "cancelled" && !isAdmin) {
+      return NextResponse.json({
+        success: true,
+        already_cancelled: true,
+        status: ord.status,
+        orderId: ord.order_id,
+        refund: ord.refundId ? { id: ord.refundId, status: ord.refundStatus, amountCents: ord.refundAmountCents } : null,
+      });
+    }
+
+    // For staff (isAdmin), if the order was cancelled and was explicitly non-refundable ($0 eligible)
+    // with no pending or failed refund, return already_cancelled.
+    if (ord && ord.status === "cancelled" && ord.refundStatus === "none" && !ord.lastError) {
       return NextResponse.json({
         success: true,
         already_cancelled: true,
@@ -201,7 +216,12 @@ export async function POST(req: NextRequest) {
     let fhStatus = 200;
 
     if (bookingUuid) {
-      const { appKey, userKey } = getFareHarborCredentials();
+      if (ord && ord.status === "cancelled" && ord.cancelledAt) {
+        // FareHarbor cancellation was already completed on an earlier run.
+        // Proceed directly with processing the outstanding refund without duplicate FH cancellation.
+        fhOk = true;
+      } else {
+        const { appKey, userKey } = getFareHarborCredentials();
       const fhRes = await fetch(
         `https://fareharbor.com/api/external/v1/bookings/${encodeURIComponent(bookingUuid)}/cancel/`,
         {
@@ -233,6 +253,7 @@ export async function POST(req: NextRequest) {
           },
           { status: fhStatus || 400 }
         );
+      }
       }
     } else {
       // If no bookingUuid (e.g. manual order cancellation or pre-booking failure)
