@@ -48,7 +48,7 @@ const comparisonRows = [
   },
   {
     feature: "Back-to-Ship Safety Buffer",
-    independent: "Strict 60–90 minute return cushion prior to all-aboard • Comprehensive return guarantees",
+    independent: "Strict 60–90 minute return cushion prior to all-aboard • 100% missed-port refund protection",
     cruiseShip: "Ship will hold the gangway or arrange transit if an official ship tour is delayed",
     diyWalkUp: "ZERO protection • You bear 100% financial and logistical liability if a taxi breaks down",
   },
@@ -64,7 +64,7 @@ const faqs = [
   {
     question: "Will the cruise ship leave without me if I book an independent excursion?",
     answer:
-      "No. Professional independent operators schedule all excursions with a conservative 60 to 90-minute safety buffer prior to the ship's published all-aboard time. In the extremely rare event of a road or mechanical delay, reputable independent tour providers carry comprehensive contingency insurance to transport you to the ship's next port of call. In reality, local operators have perfect on-time track records because their livelihoods depend on never stranding a cruise guest.",
+      "No. Professional independent operators schedule excursions with a conservative 60 to 90-minute safety buffer prior to the ship's published all-aboard time. In reality, local operators have outstanding on-time track records because their businesses depend on smooth, timely coordination with cruise port schedules, and excursions are backed by a 100% refund policy if the ship bypasses port.",
   },
   {
     question: "Are independent Alaska shore excursions cheaper than booking through the cruise line?",
@@ -229,7 +229,7 @@ export default function CruiseShipVsIndependentGuide() {
                 In reality, independent excursion providers in Southeast Alaska—including Juneau, Skagway, and Ketchikan—live and breathe the maritime cruise schedules. Every morning, independent dispatchers verify port arrival logs, gangway clearance times, and published all-aboard deadlines directly with local harbor masters.
               </p>
               <p>
-                Independent tour itineraries are deliberately built with <strong>60 to 90-minute return safety buffers</strong> before all-aboard. If your all-aboard is 4:30 PM, your tour will return you to the dock by 3:00 PM or 3:30 PM at the latest. Furthermore, reputable operators provide a formal <strong>Back-to-Ship Guarantee</strong>, backing every passenger with travel liability coverage to transport you to the next port at the operator's expense if an unforeseen delay were ever to occur.
+                Independent tour itineraries are deliberately built with <strong>60 to 90-minute return safety buffers</strong> before all-aboard. If your all-aboard is 4:30 PM, your tour will return you to the dock by 3:00 PM or 3:30 PM at the latest. Furthermore, every tour booked through Welcome to Alaska Tours is backed by a <strong>100% Missed-Port Refund Policy</strong> if weather or maritime changes prevent your ship from docking or cause a missed excursion.
               </p>
             </div>
           </div>
@@ -359,7 +359,7 @@ export default function CruiseShipVsIndependentGuide() {
             Ready to Plan Your Perfect Alaska Cruise Day?
           </h2>
           <p className="max-w-2xl mx-auto text-sky-100 mb-8 text-base sm:text-lg">
-            Compare connected small-group shore excursions across Juneau, Skagway, and Ketchikan with live calendars and guaranteed on-time ship return.
+            Compare connected small-group shore excursions across Juneau, Skagway, and Ketchikan with live calendars and reliable cruise-day timing.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

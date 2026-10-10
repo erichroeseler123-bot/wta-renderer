@@ -59,6 +59,47 @@ export default function AboutPage() {
           ))}
         </div>
 
+        {/* Who We Are & Experience */}
+        <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Our Background & Mission</div>
+          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">Built by Alaska travel and maritime specialists</h2>
+          <div className="mt-4 space-y-4 text-sm leading-7 text-slate-300">
+            <p>
+              Welcome to Alaska Tours was founded by local Alaska travel professionals to solve a persistent cruise pain point: cruise passengers were forced to choose between paying 30% to 50% cruise line markups for crowded 100-passenger tour buses, or spending hours navigating fragmented local websites with unclear dock logistics and return buffers.
+            </p>
+            <p>
+              Our team brings decades of combined experience in Southeast Alaska tourism, maritime operations, and travel technology. We personally evaluate harbor meeting points, pier walking distances, and transit times across Juneau, Skagway, and Ketchikan to ensure every excursion recommendation fits comfortably within real-world port schedules.
+            </p>
+          </div>
+        </div>
+
+        {/* How Operators Are Selected */}
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Vetting & Safety Standards</div>
+          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">How we select and verify tour operators</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            We do not list unverified street vendors or unpermitted operators. Every partner connected to our catalog must satisfy strict commercial and regulatory criteria:
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">FAA Part 135 Aviation Certification</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">All helicopter (TEMSCO, Coastal, NorthStar) and floatplane (Taquan Air, Wings Airways) partners maintain FAA Part 135 air carrier certifications with experienced Alaska bush pilots and strict weather safety minimums.</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">USCG Licensed Captains & Inspected Vessels</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">All marine whale watching and fishing charter boats undergo annual United States Coast Guard safety inspections and are helmed by licensed USCG Master Captains with onboard VHF marine radios.</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">USFS Permits & Tongass Authorizations</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">Guiding companies operating in the Tongass National Forest and Mendenhall Glacier Recreation Area hold verified commercial special-use permits issued by the U.S. Forest Service.</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">Cruise Pier Logistics & Buffer Policies</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">Operators maintain convenient departure hubs walking distance from cruise berths and structure tour timetables with conservative safety buffers before ship all-aboard times.</p>
+            </div>
+          </div>
+        </div>
+
         <div className="mt-8">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-300 mb-4">Ports We Serve</h2>
           <div className="grid gap-4 sm:grid-cols-3">

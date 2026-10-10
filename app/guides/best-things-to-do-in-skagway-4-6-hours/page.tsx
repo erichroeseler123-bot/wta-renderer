@@ -223,7 +223,7 @@ export default function GuidePage() {
         <section className="mt-14 rounded-3xl bg-slate-900 p-8 text-white text-center">
           <h2 className="text-2xl font-black sm:text-3xl">Ready to Lock In Your Alaska Shore Excursions?</h2>
           <p className="mt-3 text-sm text-slate-300 max-w-xl mx-auto">
-            Book directly with verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, no hidden fees, and full back-to-ship guarantees.
+            Compare verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, transparent pricing, and 100% missed-port refund protection.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link

@@ -67,20 +67,43 @@ const BLOCKED_ITEM_IDS = new Set<number>([
   99962, // Hummer dock sales
   503982, // Coastal Christmas fundraiser
   625752, // Coastal Local's Day
+  589694, // Harley Davidson Rentals
+  15907, // Three Hour Scooter Rentals
+  439402, // Five Hour Scooter Rentals
+  522188, // KLR650
+  523466, // Honda Shadow
+  311577, // Boat Rentals
+  363065, // Boat Rentals
+  363066, // Boat Rentals
+  724815, // Boat Rentals
+  4162, // Gift Certificate
+  115876, // NorthStar Gift Card
+  210486, // BeyondAK Gift Card
+  214000, // Temsco Summercamp Gift Card
+  214814, // Temsco Air Juneau Gift Card
+  223870, // Moore Charters Gift Card
+  225574, // Kayak Ketchikan Gift Card
+  229563, // Alaska Rainforest Gift Cards
+  238867, // Skagway Scooters Gift Card
+  356274, // Ketchikan AdventureVue Gift Card
+  392963, // Taquan Air Gift Card
+  500992, // Alaska Galore Gift Card
 ]);
 
 const BLOCKED_TITLE_PATTERNS = [
   /\bgift\s*(card|certificate)\b/i,
+  /\bvoucher\b/i,
   /\blocal\s+membership\b/i,
   /\bmembership\s+rate\b/i,
   /\bdock\s+sales\b/i,
   /\bwater\s+taxi\b/i,
-  /^transfer$/i,
+  /\btransfer\b/i,
   /\bfundrais/i,
   /\blocal'?s\s+day\b/i,
   /\bboat\s+rentals?\b/i,
   /\bharley\s+davidson\s+rentals?\b/i,
   /\bscooter\s+rentals?\b/i,
+  /\brentals?\b/i,
   /^klr650$/i,
   /^honda\s+shadow$/i,
 ];
@@ -89,15 +112,16 @@ function slugify(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 }
 
-function inferCategory(title: string, description: string, explicit?: string) {
-  if (explicit) return explicit;
+function inferCategory(title: string, description: string, explicit?: string, port?: string) {
+  if (port === "ketchikan" && explicit === "Hiking & Glaciers") return "Adventures";
+  if (explicit && explicit !== "Hiking & Glaciers") return explicit;
   const text = `${title} ${description}`.toLowerCase();
   if (text.includes("summer camp") || text.includes("wheeled cart")) return "Dog Sledding";
   if (text.includes("whale")) return "Whale Watching";
   if (text.includes("dog") || text.includes("sled") || text.includes("husky")) return "Dog Sledding";
-  if (text.includes("helicopter") || text.includes("flightseeing") || text.includes("seaplane") || text.includes("flight")) return "Air Tours";
+  if (text.includes("helicopter") || text.includes("flightseeing") || text.includes("seaplane") || text.includes("floatplane") || text.includes("flight")) return "Air Tours";
   if (text.includes("fish") || text.includes("halibut") || text.includes("salmon fishing")) return "Fishing";
-  if (text.includes("glacier") || text.includes("hike") || text.includes("trek") || text.includes("walk")) return "Hiking & Glaciers";
+  if (port !== "ketchikan" && (text.includes("glacier") || text.includes("icefield") || text.includes("trek") || (text.includes("hike") && !text.includes("boardwalk")))) return "Hiking & Glaciers";
   return "Adventures";
 }
 
@@ -217,6 +241,14 @@ function normalizeTour(
     description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
   } else if (company === "temscoair-skagway" && pk === 213561) {
     description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Riding)";
+  } else if (company === "akduck" && pk === 4161) {
+    description = "90 Minutes • All Ages • Historic downtown Ketchikan & scenic harbor splash";
+  } else if (company === "alaskarainforest" && pk === 563489) {
+    description = "3.5 Hours • All Ages (Brewery 21+) • Rainforest boardwalk bear viewing & craft brewery tasting";
+  } else if (company === "taquanair" && pk === 392949) {
+    description = "Floatplane Flightseeing • 2 Hours • All Ages • Remote fjord water landing";
+  } else if (company === "taquanair" && pk === 392950) {
+    description = "Floatplane Bear Viewing • 3 Hours 15 Minutes • All Ages • Traitors Cove / Neets Bay";
   }
 
   const slugSource = String(tour.slug || title || "").trim();
@@ -234,10 +266,12 @@ function normalizeTour(
           ? "$439 Per Person (Flat Rate)"
           : company === "temscoair-skagway" && pk === 213561
             ? "$599 Per Person (Flat Rate)"
-            : snapshotTour.fromPrice ||
-              fareHarborTour.fromPrice ||
-              getNorthstarDisplayPrice({ company, description, pk }) ||
-              undefined;
+            : company === "akduck" && pk === 4161
+              ? "$79 Adult / $47 Child (Flat Rate)"
+              : snapshotTour.fromPrice ||
+                fareHarborTour.fromPrice ||
+                getNorthstarDisplayPrice({ company, description, pk }) ||
+                undefined;
 
   if (resolvedFromPrice && resolvedFromPrice.startsWith("From ")) {
     const d = extractDollarAmount(resolvedFromPrice);
@@ -254,7 +288,7 @@ function normalizeTour(
     company,
     port,
     fromPrice: resolvedFromPrice,
-    category: inferCategory(title, description, snapshotTour.category),
+    category: inferCategory(title, description, snapshotTour.category, port),
     hasInventory: null,
   };
 }
@@ -357,6 +391,21 @@ export async function getHelicopterTour(company: string, item: string): Promise<
   } else if (found.company === "temscoair-skagway" && (Number(found.pk) === 213561 || String(found.pk) === "213561")) {
     found.fromPrice = "$599 Per Person (Flat Rate)";
     found.description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
+  } else if (found.company === "akduck" && (Number(found.pk) === 4161 || String(found.pk) === "4161")) {
+    found.fromPrice = "$79 Adult / $47 Child (Flat Rate)";
+    found.description = "90 Minutes • All Ages • Historic downtown Ketchikan & scenic harbor splash";
+    found.category = "Adventures";
+  } else if (found.company === "alaskarainforest" && (Number(found.pk) === 563489 || String(found.pk) === "563489")) {
+    found.description = "3.5 Hours • All Ages (Brewery 21+) • Rainforest boardwalk bear viewing & craft brewery tasting";
+    found.category = "Adventures";
+  } else if (found.company === "taquanair" && (Number(found.pk) === 392949 || String(found.pk) === "392949")) {
+    found.fromPrice = "$369 Per Person (Flat Rate)";
+    found.description = "Floatplane Flightseeing • 2 Hours • All Ages • Remote fjord water landing";
+    found.category = "Air Tours";
+  } else if (found.company === "taquanair" && (Number(found.pk) === 392950 || String(found.pk) === "392950")) {
+    found.fromPrice = "$399 Per Person (Flat Rate)";
+    found.description = "Floatplane Bear Viewing • 3 Hours 15 Minutes • All Ages • Traitors Cove / Neets Bay";
+    found.category = "Air Tours";
   }
 
   const details = await getLiveItemDetails(found.company, found.pk);

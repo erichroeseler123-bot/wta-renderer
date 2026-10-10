@@ -22,11 +22,11 @@ export const metadata: Metadata = {
 const faqs = [
   {
     "question": "Why are independent excursions 20% to 40% cheaper than ship excursions?",
-    "answer": "Cruise lines act as retail middlemen, adding heavy profit markups to local operator rates. When you book directly through Welcome to Alaska Tours, you receive the direct local rate with smaller group sizes, identical safety standards, and full back-to-ship guarantees."
+    "answer": "Cruise lines act as retail middlemen, adding heavy profit markups to local operator rates. When you book directly through Welcome to Alaska Tours, you receive the direct local rate with smaller group sizes, identical safety standards, and 100% missed-port refund protection."
   },
   {
     "question": "What happens if our ship cancels the port call due to weather?",
-    "answer": "All tours booked through Welcome to Alaska Tours carry a 100% full refund guarantee if your cruise ship misses the port due to weather, mechanical issues, or medical emergencies."
+    "answer": "All tours booked through Welcome to Alaska Tours carry a 100% full refund policy if your cruise ship misses the port due to weather, mechanical issues, or medical emergencies."
   }
 ];
 
@@ -249,7 +249,7 @@ export default function GuidePage() {
         <section className="mt-14 rounded-3xl bg-slate-900 p-8 text-white text-center">
           <h2 className="text-2xl font-black sm:text-3xl">Ready to Lock In Your Alaska Shore Excursions?</h2>
           <p className="mt-3 text-sm text-slate-300 max-w-xl mx-auto">
-            Book directly with verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, no hidden fees, and full back-to-ship guarantees.
+            Compare verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, transparent pricing, and 100% missed-port refund protection.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link

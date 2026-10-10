@@ -63,6 +63,17 @@ function itemToTour(item: any, shortname: string): Tour {
   } else if (shortname === "temscoair-skagway" && (Number(item?.pk) === 213561 || String(item?.pk) === "213561")) {
     fromPrice = "$599 Per Person (Flat Rate)";
     desc = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
+  } else if (shortname === "akduck" && (Number(item?.pk) === 4161 || String(item?.pk) === "4161")) {
+    fromPrice = "$79 Adult / $47 Child (Flat Rate)";
+    desc = "90 Minutes • All Ages • Historic downtown Ketchikan & scenic harbor splash";
+  } else if (shortname === "alaskarainforest" && (Number(item?.pk) === 563489 || String(item?.pk) === "563489")) {
+    desc = "3.5 Hours • All Ages (Brewery 21+) • Rainforest boardwalk bear viewing & craft brewery tasting";
+  } else if (shortname === "taquanair" && (Number(item?.pk) === 392949 || String(item?.pk) === "392949")) {
+    fromPrice = "$369 Per Person (Flat Rate)";
+    desc = "Floatplane Flightseeing • 2 Hours • All Ages • Remote fjord water landing";
+  } else if (shortname === "taquanair" && (Number(item?.pk) === 392950 || String(item?.pk) === "392950")) {
+    fromPrice = "$399 Per Person (Flat Rate)";
+    desc = "Floatplane Bear Viewing • 3 Hours 15 Minutes • All Ages • Traitors Cove / Neets Bay";
   }
   desc = desc.replace(/^Starting at\s+/i, "");
 
@@ -71,7 +82,7 @@ function itemToTour(item: any, shortname: string): Tour {
     slug,
     title: name,
     description: desc,
-    duration: item?.duration_minutes ? `${Math.round(item.duration_minutes / 60 * 10) / 10} Hours` : undefined,
+    duration: item?.duration_minutes ? `${Math.round(item.duration_minutes / 60 * 10) / 10} Hours` : (shortname === "akduck" ? "1.5 Hours" : undefined),
     fromPrice,
     image: item?.hero_image_url || item?.image_cdn_url || undefined,
     port: shortname,

@@ -96,23 +96,39 @@ function parseTourDescriptionDetails(
 
   if (isNorthStar405050) {
     duration = "2 Hours 15 Minutes";
+  } else if (!duration) {
+    const minMatch = desc.match(/\b(\d+)\s*Minutes?\b/i);
+    if (minMatch) {
+      const mins = parseInt(minMatch[1], 10);
+      duration = mins === 90 ? "90 Minutes (1.5 Hours)" : `${mins} Minutes`;
+    }
+  }
+
+  if (compLower === "akduck" && String(pk) === "4161") {
+    duration = "90 Minutes (1.5 Hours)";
   }
 
   // 2. Activity Level / Difficulty
   let activityLevel = "";
-  const difficultyMatch =
-    desc.match(/Difficulty:\s*([^|]+)/i) ||
-    desc.match(/Difficulty\s*([^|]+)/i) ||
-    desc.match(/Activity Level:\s*([^|]+)/i);
-  if (difficultyMatch) {
-    activityLevel = difficultyMatch[1].trim();
+  if (compLower === "akduck") {
+    activityLevel = "Easy (Amphibious Sightseeing)";
+  } else if (compLower === "alaskarainforest" && String(pk) === "563489") {
+    activityLevel = "Easy to Moderate (Boardwalk Nature Walk)";
   } else {
-    if (lower.includes("strenuous") || lower.includes("trek") || lower.includes("active") || lower.includes("hike")) {
-      activityLevel = "Moderate to Strenuous";
-    } else if (lower.includes("easy") || lower.includes("light") || lower.includes("flightseeing")) {
-      activityLevel = "Easy";
+    const difficultyMatch =
+      desc.match(/Difficulty:\s*([^|]+)/i) ||
+      desc.match(/Difficulty\s*([^|]+)/i) ||
+      desc.match(/Activity Level:\s*([^|]+)/i);
+    if (difficultyMatch) {
+      activityLevel = difficultyMatch[1].trim();
     } else {
-      activityLevel = "Easy to Moderate";
+      if (lower.includes("strenuous") || lower.includes("trek") || lower.includes("active") || lower.includes("hike")) {
+        activityLevel = "Moderate to Strenuous";
+      } else if (lower.includes("easy") || lower.includes("light") || lower.includes("flightseeing")) {
+        activityLevel = "Easy";
+      } else {
+        activityLevel = "Easy to Moderate";
+      }
     }
   }
 
@@ -162,9 +178,12 @@ function parseDurationMinutes(durationStr: string): number {
   return Math.round(total);
 }
 
-function getCruiseFitSubtitle(isHeliOrAir: boolean, isBoat: boolean, portName: string) {
-  if (isHeliOrAir) {
-    return `Helicopter flights and glacial excursions in ${portName} require tight alignment with flight clearances and your port timeline. Evaluate the metrics below before final booking.`;
+function getCruiseFitSubtitle(isHelicopter: boolean, isFloatplane: boolean, isBoat: boolean, portName: string) {
+  if (isHelicopter) {
+    return `Helicopter flights and glacial icefield landings in ${portName} require tight alignment with flight clearances and your port timeline. Evaluate the metrics below before final booking.`;
+  }
+  if (isFloatplane) {
+    return `Seaplane and floatplane excursions in ${portName} depart from coastal harbor slips and depend on visual flying visibility. Evaluate the metrics below to ensure a smooth return before your ship's all-aboard.`;
   }
   if (isBoat) {
     return `Catamaran, whale watching, and marine excursions in ${portName} depart from local harbors on fixed schedules. Evaluate the metrics below to ensure a smooth return before your ship's all-aboard.`;
@@ -172,9 +191,12 @@ function getCruiseFitSubtitle(isHeliOrAir: boolean, isBoat: boolean, portName: s
   return `Shore excursions in ${portName} require alignment with your cruise ship's arrival and all-aboard schedule. Evaluate the metrics below before final booking.`;
 }
 
-function getTimingBufferNote(isHeliOrAir: boolean, isBoat: boolean) {
-  if (isHeliOrAir) {
+function getTimingBufferNote(isHelicopter: boolean, isFloatplane: boolean, isBoat: boolean) {
+  if (isHelicopter) {
     return "Mountain weather cancellations or delays can happen due to high-altitude cloud cover or visibility checks. Always schedule flights earlier in your port day to ensure proper safety room.";
+  }
+  if (isFloatplane) {
+    return "Coastal floatplane flights operate under visual flight rules in Southeast Alaska's fjords and mountain passes. Booking earlier in your port stay provides the most relaxed cushion before your ship's all-aboard.";
   }
   if (isBoat) {
     return "Marine wildlife excursions navigate sheltered coastal passages and operate rain or shine. Booking earlier in your port stay provides the most relaxed cushion before your ship's all-aboard.";
@@ -182,12 +204,19 @@ function getTimingBufferNote(isHeliOrAir: boolean, isBoat: boolean) {
   return "Local excursions operate rain or shine across Southeast Alaska. We recommend scheduling departures with sufficient buffer before your ship's scheduled all-aboard time.";
 }
 
-function getCheckInMappingText(isHeliOrAir: boolean, isBoat: boolean, portName: string, company?: string) {
-  if (company?.toLowerCase().startsWith("temsco") && portName.toLowerCase() === "skagway") {
+function getCheckInMappingText(isHelicopter: boolean, isFloatplane: boolean, isBoat: boolean, portName: string, company?: string) {
+  const comp = (company || "").toLowerCase();
+  if (comp.startsWith("temsco") && portName.toLowerCase() === "skagway") {
     return "Check in directly at TEMSCO's Skagway heliport base (101 Terminal Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transfer back to downtown Skagway and cruise berths is provided following the tour.";
   }
-  if (isHeliOrAir) {
+  if (comp.includes("taquanair")) {
+    return `Check in at the Taquan Air Harbor Base (1007 Water St, Ketchikan). Dedicated round-trip shuttle transportation is provided directly between downtown Ketchikan cruise ship berths and the seaplane float base.`;
+  }
+  if (isHelicopter) {
     return `Departures include round-trip shuttle service from downtown ${portName} cruise terminal staging points directly to the heliport. Complete pickup coordinates, vehicle signage, and departure times are emailed directly upon checkout confirmation.`;
+  }
+  if (isFloatplane) {
+    return `Departures stage from coastal harbor float slips in ${portName}. Round-trip shuttle transfers or walking directions from your specific cruise berth are emailed directly upon checkout confirmation.`;
   }
   if (isBoat) {
     return `Tours stage from designated cruise berth loading zones or harbor docks in ${portName}. Round-trip pier transfers or walking directions from your specific ship dock are emailed directly upon checkout confirmation.`;
@@ -199,13 +228,25 @@ function getCancellationPolicyText(company: string, pk?: number | string, livePo
   return getOperatorCancellationPolicy(company, pk, livePolicy).overviewCardText;
 }
 
-function getWhoItIsBestFor(title: string, category: string, company?: string, pk?: string | number) {
+function getWhoItIsBestFor(title: string, category: string, company?: string, pk?: string | number, port?: string) {
   const text = (title + " " + category).toLowerCase();
-  if (company?.toLowerCase().startsWith("temsco") && String(pk) === "213561") {
+  const comp = (company || "").toLowerCase();
+  const p = (port || "").toLowerCase();
+
+  if (comp.startsWith("temsco") && String(pk) === "213561") {
     return "Best for travelers seeking an alpine helicopter flight, authentic sled dog mushing demonstration, and husky puppy interaction (note: guests observe the demonstration rather than riding the sled).";
   }
-  if (text.includes("helicopter") || text.includes("flight") || text.includes("air")) {
-    return "Best for travelers seeking once-in-a-lifetime glacier views and flightseeing.";
+  if (comp.includes("akduck") || text.includes("duck")) {
+    return "Best for families, seniors, and cruise passengers seeking a lighthearted, low-walking sightseeing tour of historic Ketchikan by land and water.";
+  }
+  if (text.includes("boardwalk") || (comp.includes("alaskarainforest") && text.includes("brew"))) {
+    return "Best for nature lovers and food/craft beverage fans wanting an accessible rainforest walk, bear-viewing platforms, and local craft beer tasting.";
+  }
+  if (comp.includes("taquanair") || (p === "ketchikan" && (text.includes("flight") || text.includes("air")))) {
+    return "Best for travelers wanting awe-inspiring aerial views of Misty Fjords waterfalls and granite cliffs or remote fly-in bear viewing by Alaskan bush floatplane.";
+  }
+  if (text.includes("helicopter")) {
+    return "Best for travelers seeking once-in-a-lifetime glacier views and helicopter flightseeing.";
   }
   if (text.includes("dog") || text.includes("husky") || text.includes("sled")) {
     return "Best for active families and travelers wanting a mushing dog sled experience.";
@@ -213,22 +254,22 @@ function getWhoItIsBestFor(title: string, category: string, company?: string, pk
   if (text.includes("whale") || text.includes("marine") || text.includes("boat")) {
     return "Best for wildlife enthusiasts and families looking for marine humpback views.";
   }
-  if (text.includes("hike") || text.includes("trek") || text.includes("glacier")) {
+  if (p !== "ketchikan" && (text.includes("hike") || text.includes("trek") || text.includes("glacier"))) {
     return "Best for active travelers who want to hike or trek on ice fields.";
   }
   return "Best for cruise travelers seeking a premium port excursion.";
 }
 
-function getWhoShouldSkip(title: string, activityLevel: string, ageConstraint: string) {
+function getWhoShouldSkip(title: string, activityLevel: string, ageConstraint: string, port?: string) {
   const skip = [];
   const text = (title + " " + activityLevel).toLowerCase();
-  if (text.includes("helicopter") || text.includes("flight") || text.includes("air")) {
-    skip.push("Not recommended for guests with a severe fear of heights.");
+  if (text.includes("helicopter") || text.includes("flight") || text.includes("air") || text.includes("seaplane")) {
+    skip.push("Not recommended for guests with a severe fear of flying or heights.");
   }
-  if (activityLevel.toLowerCase().includes("strenuous") || activityLevel.toLowerCase().includes("moderate")) {
+  if (activityLevel.toLowerCase().includes("strenuous") || activityLevel.toLowerCase().includes("moderate to strenuous")) {
     skip.push("Not recommended for travelers with severe mobility limitations or joint concerns.");
   }
-  if (ageConstraint) {
+  if (ageConstraint && !ageConstraint.toLowerCase().includes("all ages")) {
     skip.push(`Not suitable for children under the minimum age requirement (${ageConstraint}).`);
   }
   if (skip.length === 0) {
@@ -237,8 +278,46 @@ function getWhoShouldSkip(title: string, activityLevel: string, ageConstraint: s
   return skip.join(" ");
 }
 
-function getCategoryLink(categoryName: string, title: string) {
+function getCategoryLink(categoryName: string, title: string, port?: string, company?: string) {
   const text = (title + " " + categoryName).toLowerCase();
+  const p = (port || "").toLowerCase();
+  const comp = (company || "").toLowerCase();
+
+  if (p === "ketchikan") {
+    if (comp.includes("taquan") || text.includes("flight") || text.includes("air") || text.includes("misty")) {
+      return { href: "/ketchikan/misty-fjords", label: "Misty Fjords & Flightseeing" };
+    }
+    if (text.includes("duck") || text.includes("trolley") || text.includes("saxman") || comp.includes("akduck")) {
+      return { href: "/ketchikan/easy-shore-excursions", label: "Easy Shore Excursions" };
+    }
+    if (text.includes("bear") || text.includes("boardwalk") || comp.includes("alaskarainforest")) {
+      return { href: "/ketchikan/bear-tours", label: "Bear & Wildlife Tours" };
+    }
+    if (text.includes("kayak") || text.includes("canoe")) {
+      return { href: "/ketchikan/kayaking", label: "Kayaking & Canoeing" };
+    }
+    if (text.includes("kart") || text.includes("adventure") || text.includes("zipline")) {
+      return { href: "/ketchikan/adventure-tours", label: "Ketchikan Adventures" };
+    }
+    return { href: "/ports/ketchikan", label: "Ketchikan Excursions" };
+  }
+
+  if (p === "skagway") {
+    if (text.includes("scooter") || text.includes("kart")) {
+      return { href: "/skagway/adventure-tours", label: "Skagway Adventure Tours" };
+    }
+    if (text.includes("salmon bake") || text.includes("gold rush") || text.includes("liarsville")) {
+      return { href: "/skagway/gold-rush-tours", label: "Gold Rush Tours" };
+    }
+    if (text.includes("dog") || text.includes("sled")) {
+      return { href: "/skagway/dog-sledding", label: "Dog Sledding" };
+    }
+    if (text.includes("helicopter") || text.includes("flight")) {
+      return { href: "/skagway/helicopter-tours", label: "Helicopter Tours" };
+    }
+    return { href: "/ports/skagway", label: "Skagway Excursions" };
+  }
+
   if (text.includes("helicopter") || text.includes("flight") || text.includes("air")) {
     return { href: "/categories/juneau-helicopter-tours", label: "Helicopter Tours" };
   }
@@ -333,8 +412,8 @@ export default async function TourDetailPage({
     safeTour.pk || item,
     safeTour.cancellationPolicy,
   );
-  const bestForText = getWhoItIsBestFor(safeTour.title, categoryName, safeTour.company, safeTour.pk || item);
-  const skipText = getWhoShouldSkip(safeTour.title, activityLevel, ageConstraint);
+  const bestForText = getWhoItIsBestFor(safeTour.title, categoryName, safeTour.company, safeTour.pk || item, safeTour.port);
+  const skipText = getWhoShouldSkip(safeTour.title, activityLevel, ageConstraint, safeTour.port);
 
   const hasRealOperatorImage = Boolean(safeTour.image && String(safeTour.image).trim());
   const fallbackHero = safeTour.port === "ketchikan" ? "/hero/ketchikan.png" : safeTour.port === "skagway" ? "/hero/skagway.jpg" : "/hero/juneau.jpg";
@@ -350,7 +429,7 @@ export default async function TourDetailPage({
   description = description.replace(/^Starting at\s+/i, "");
 
   const hasNextAvailability = Boolean(safeTour.nextAvailableDate);
-  const categoryLink = getCategoryLink(categoryName, safeTour.title);
+  const categoryLink = getCategoryLink(categoryName, safeTour.title, safeTour.port, safeTour.company);
 
   // Cruise Timing calculation
   const cruiseShip = getParam(sp.cruiseShip);
@@ -370,7 +449,9 @@ export default async function TourDetailPage({
     }
   }
 
-  const isHeliOrAir = /helicopter|flight|air|seaplane|floatplane/i.test(safeTour.title);
+  const isHelicopter = /helicopter/i.test(safeTour.title) || safeTour.company.includes("temsco") || safeTour.company.includes("coastal") || safeTour.company.includes("northstar");
+  const isFloatplane = /seaplane|floatplane/i.test(safeTour.title) || safeTour.company.includes("taquan") || safeTour.company.includes("wings");
+  const isHeliOrAir = isHelicopter || isFloatplane || /flight|air tour/i.test(safeTour.title);
   const isBoat = /whale|boat|catamaran|marine|fishing|charter|cruise|water/i.test(safeTour.title);
   const isKartOrScooter = /kart|scooter|utv|atv|jeep/i.test(safeTour.title);
   const isPrivate = /private|charter/i.test(safeTour.title) || (safeTour.fromPrice && safeTour.fromPrice.toLowerCase().includes("private"));
@@ -515,7 +596,7 @@ export default async function TourDetailPage({
         safeTour.port === "juneau"
           ? "Departures stage near the Mt. Roberts Tramway parking lot (490 S Franklin St), an easy 5-minute flat walk from downtown docks (Franklin, CT, and IVF berths). If your ship docks at the south AJ Dock, take the $5 port shuttle directly to the tram lot for your tour check-in."
           : safeTour.port === "ketchikan"
-          ? "Tours meet along the downtown Ketchikan waterfront right near Berths 1, 2, and 3. If your ship berths at Ward Cove (Berth 4, 7 miles north), allow 15 to 20 minutes to ride the port shuttle to the downtown meeting point before tour check-in."
+          ? "Tours meet along the downtown Ketchikan waterfront right near downtown Berths 1, 2, 3, and 4. If your ship docks at Ward Cove (the private terminal facility located 7 miles north of downtown Ketchikan), allow 20 to 30 minutes to ride the complimentary port shuttle to the downtown shuttle drop-off prior to your tour check-in."
           : isTemsco && safeTour.port === "skagway"
           ? "Guests check in directly at the TEMSCO Skagway heliport base (101 Terminal Way, adjacent to the ferry terminal and walkable from Broadway/Ore cruise docks) 30 minutes prior to departure. Complimentary return transportation back to downtown Skagway and cruise docks is provided after your tour."
           : "Departures stage in downtown Skagway along 2nd Avenue or at the Small Boat Harbor, a level 5 to 10-minute walk from the Railroad Dock, Broadway Dock, and Ore Dock.",
@@ -527,8 +608,10 @@ export default async function TourDetailPage({
     {
       question: "How much walking, climbing, or boarding assistance is involved?",
       answer:
-        isHeliOrAir
+        isHelicopter
           ? "Moderate mobility is required. Guests must climb 2–3 steep steps into the aircraft with staff assistance. Glacier landings involve walking 200–400 yards over natural ice; sturdy overboots or crampons are fitted on site."
+          : isFloatplane
+          ? "Easy to moderate mobility. Boarding is via marina ramps and 2–3 low steps onto aircraft pontoons. No mountain hiking or glacier ice walking is involved. Flightseeing takes place seated with scenic window views."
           : isBoat
           ? "Low physical exertion. Boarding is via dock gangway ramps. Enclosed heated cabins feature comfortable seating and wide outdoor viewing decks. Folding wheelchairs can be stowed on board."
           : isKartOrScooter
@@ -549,8 +632,8 @@ export default async function TourDetailPage({
     {
       question: "Is the listed price per person or for the entire group, and what is included?",
       answer: isPrivate
-        ? "This is a private charter flat rate. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service."
-        : `The price (${safeTour.fromPrice || "listed rate"}) is a verified flat rate per person (or per adult where age tiers apply). It includes all required local port staging, certified guide service, and gear. Taxes are transparently itemized with zero surprise booking fees at checkout.${isNorthStar405050 ? " Note: NorthStar applies a $150 weight surcharge for passengers 250+ lbs." : isTemsco ? " Note: TEMSCO applies a $150 weight surcharge for passengers 250+ lbs (calculated including clothing and footwear)." : ""}`,
+        ? "This is a private charter base rate. The price covers your entire private party up to the vessel or vehicle's maximum licensed capacity, with dedicated exclusive guide and captain service. Applicable local port fees and sales taxes are itemized at checkout."
+        : `The price (${safeTour.fromPrice || "listed rate"}) is the verified base fare per person (or per adult where age tiers apply; child and infant rates are selected during checkout). It includes all scheduled staging, equipment, and certified guide service. Applicable local municipal sales taxes and port fees are transparently itemized before final payment with zero hidden booking surcharges.${isNorthStar405050 ? " Note: NorthStar applies a $150 weight surcharge for passengers 250+ lbs." : isTemsco ? " Note: TEMSCO applies a $150 weight surcharge for passengers 250+ lbs (calculated including clothing and footwear)." : ""}`,
     },
   ];
 
@@ -895,7 +978,7 @@ export default async function TourDetailPage({
               Cruise Ship Compatibility Evaluation
             </h2>
             <p className="mt-2 text-xs leading-relaxed text-slate-500 max-w-3xl">
-              {getCruiseFitSubtitle(isHeliOrAir, isBoat, portName)}
+              {getCruiseFitSubtitle(isHelicopter, isFloatplane, isBoat, portName)}
             </p>
           </div>
           
@@ -914,7 +997,7 @@ export default async function TourDetailPage({
             <div className="rounded-2xl border border-slate-100 bg-slate-50 p-5 space-y-4">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-800">Timing & Buffer Note</h3>
               <p className="text-xs leading-relaxed text-slate-600">
-                {getTimingBufferNote(isHeliOrAir, isBoat)}
+                {getTimingBufferNote(isHelicopter, isFloatplane, isBoat)}
               </p>
               <div className="rounded-xl border border-amber-100 bg-amber-50 p-3 text-[10px] text-amber-900">
                 <strong>🚨 Return Buffer Rule:</strong> Keep a minimum {bufferMinutes}-minute buffer between the tour return time and your ship's scheduled all-aboard time. Confirm your ship's exact all-aboard time before booking.
@@ -944,7 +1027,7 @@ export default async function TourDetailPage({
             <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-2">
               <h3 className="text-xs font-black uppercase tracking-wider text-slate-700">Check-in Mappings</h3>
               <p className="text-xs leading-relaxed text-slate-600">
-                {getCheckInMappingText(isHeliOrAir, isBoat, portName, safeTour.company)}
+                {getCheckInMappingText(isHelicopter, isFloatplane, isBoat, portName, safeTour.company)}
               </p>
             </div>
             <div className="rounded-2xl border border-slate-100 bg-white p-5 space-y-2">

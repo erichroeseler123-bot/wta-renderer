@@ -16,6 +16,7 @@ export type BuildShortlistOptions<TCandidate, TMeta = unknown> = {
   candidates: readonly TCandidate[];
   evaluate: (candidate: TCandidate) => RecommendationEvaluation<TMeta>;
   limit?: number;
+  diversityKey?: (candidate: TCandidate) => string;
   tieBreak?: (
     a: RankedRecommendation<TCandidate, TMeta>,
     b: RankedRecommendation<TCandidate, TMeta>
@@ -39,6 +40,7 @@ export function buildRecommendationShortlist<TCandidate, TMeta = unknown>({
   candidates,
   evaluate,
   limit = 4,
+  diversityKey,
   tieBreak,
 }: BuildShortlistOptions<TCandidate, TMeta>): RecommendationShortlist<TCandidate, TMeta> {
   const safeLimit = Number.isFinite(limit) ? Math.max(0, Math.floor(limit)) : 4;
@@ -61,8 +63,22 @@ export function buildRecommendationShortlist<TCandidate, TMeta = unknown>({
 
   const recommendations: RankedRecommendation<TCandidate, TMeta>[] = [];
   const selectedKeys = new Set<string>();
+  const pool = [...exact, ...scored];
 
-  for (const item of [...exact, ...scored]) {
+  if (diversityKey) {
+    const seenDiversity = new Set<string>();
+    for (const item of pool) {
+      if (selectedKeys.has(item.key)) continue;
+      const dKey = diversityKey(item.candidate);
+      if (dKey && seenDiversity.has(dKey)) continue;
+      if (dKey) seenDiversity.add(dKey);
+      selectedKeys.add(item.key);
+      recommendations.push(item);
+      if (recommendations.length >= safeLimit) break;
+    }
+  }
+
+  for (const item of pool) {
     if (selectedKeys.has(item.key)) continue;
     selectedKeys.add(item.key);
     recommendations.push(item);

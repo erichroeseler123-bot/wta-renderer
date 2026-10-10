@@ -30,7 +30,7 @@
     "company": "beyondak",
     "fromPrice": "$809 Per Person (Flat Rate)",
     "rateSummary": "809 • 4854",
-    "category": "Hiking & Glaciers"
+    "category": "Air Tours"
   },
   {
     "pk": 195597,
@@ -118,28 +118,6 @@
     "company": "alaska-galore-juneau-whale-watching",
     "fromPrice": "$189 Per Person (Flat Rate)",
     "rateSummary": "189 • 199",
-    "category": "Whale Watching"
-  },
-  {
-    "pk": 708105,
-    "title": "Local Membership",
-    "slug": "local-membership",
-    "description": "pricing: * $250 initial membership fee for the season * $50 per person whale watch for members (applies to designated tours) description: Harv & Marv's local membership offers Juneau residents a simple way to get out on the water with family all season. For a one-time $250 investment, the membership lets the purchaser and their immediate family book select whale-watching tours at a reduced rate of $50 per person. Members can enjoy encounters with whales, orcas, sea lions and other wildlife on three-hour outings that depart from Statter Harbor in Auke Bay. Membership seats are space-available and subject to confirmation 48 hours before each departure. restrictions: Memberships are valid for one family unit defined as parents and their children. Membership pricing does not apply to private or small boat tours. Memberships expire at the end of the operating season they are activated. Space is available by member booking and seats will be released 48 hours before the tour. disclaimers: Membership seats are space available and will be released 48 hours before the tour. Harv & Marv's reserves the right to cancel a membership at any time.",
-    "image": "https://cdn.filestackcontent.com/IibOfqmITjGpF0ToBWQF",
-    "company": "alaska-galore-juneau-whale-watching",
-    "fromPrice": "$250 Per Person (Flat Rate)",
-    "rateSummary": "250",
-    "category": "Adventures"
-  },
-  {
-    "pk": 711990,
-    "title": "Whale Watch - Local Membership Rate",
-    "slug": "whale-watch-local-membership-rate",
-    "description": "Our most popular tour at a price even a local can love",
-    "image": "https://cdn.filestackcontent.com/ZWCp1kQSejE9jZVWgWAL",
-    "company": "alaska-galore-juneau-whale-watching",
-    "fromPrice": "$50 Per Person (Flat Rate)",
-    "rateSummary": "50",
     "category": "Whale Watching"
   },
   {
@@ -251,17 +229,6 @@
     "fromPrice": "$199 Per Person (Flat Rate)",
     "rateSummary": "199 • 239",
     "category": "Whale Watching"
-  },
-  {
-    "pk": 143422,
-    "title": "Water Taxi",
-    "slug": "water-taxi",
-    "description": "description: Water Taxi",
-    "image": "",
-    "company": "alaskatales",
-    "fromPrice": "Check Price",
-    "rateSummary": "",
-    "category": "Adventures"
   },
   {
     "pk": 273539,
@@ -759,61 +726,6 @@
     "category": "Whale Watching"
   },
   {
-    "pk": 54996,
-    "title": "Water Taxi",
-    "slug": "water-taxi",
-    "description": "description: ##Call or Email to book for any time of the year",
-    "image": "https://cdn.filestackcontent.com/gpuxFjktSuCxIXs2gxEH",
-    "company": "moorecharters",
-    "fromPrice": "Check Price",
-    "rateSummary": "",
-    "category": "Adventures"
-  },
-  {
-    "pk": 311577,
-    "title": "Boat Rentals - 23' Sea Pro, \"REEL FISH\"",
-    "slug": "boat-rentals-23-sea-pro-reel-fish",
-    "description": "Daily or Weekly Rentals • Up to 5 People",
-    "image": "https://cdn.filestackcontent.com/LwwIXumfTGaHhJRGfbLp",
-    "company": "moorecharters",
-    "fromPrice": "$550 Per Person (Flat Rate)",
-    "rateSummary": "550 • 1100 • 1650 +12 more",
-    "category": "Fishing"
-  },
-  {
-    "pk": 363065,
-    "title": "Boat Rentals - 22' Hewescraft \"Nomad\"",
-    "slug": "boat-rentals-22-hewescraft-nomad",
-    "description": "Daily or Weekly Rentals • Up to 6 People",
-    "image": "https://cdn.filestackcontent.com/U6EIsEqT5uaBh8s1mndI",
-    "company": "moorecharters",
-    "fromPrice": "$850 Per Person (Flat Rate)",
-    "rateSummary": "850 • 1700 • 2550 +12 more",
-    "category": "Adventures"
-  },
-  {
-    "pk": 363066,
-    "title": "Boat Rentals - Scavenger 26' Northriver aluminum",
-    "slug": "boat-rentals-scavenger-26-northriver-aluminum",
-    "description": "Daily or Weekly Rentals • Up to 6 People",
-    "image": "https://cdn.filestackcontent.com/HWuE3SWCTfmQWVyt0X7w",
-    "company": "moorecharters",
-    "fromPrice": "$1,199 Per Person (Flat Rate)",
-    "rateSummary": "1199 • 2398 • 3597 +12 more",
-    "category": "Adventures"
-  },
-  {
-    "pk": 724815,
-    "title": "Boat Rentals - 30' Kingfisher, SABLEFISH",
-    "slug": "boat-rentals-30-kingfisher-sablefish",
-    "description": "Daily or Weekly Rentals • Up to 8 People",
-    "image": "https://cdn.filestackcontent.com/GR63weBnRUWX6KpOBp2J",
-    "company": "moorecharters",
-    "fromPrice": "$1,600 Per Person (Flat Rate)",
-    "rateSummary": "1600 • 3200 • 4800 +12 more",
-    "category": "Fishing"
-  },
-  {
     "pk": 64239,
     "title": "Rainforest Canopy & Zipline Adventure - Ketchikan",
     "slug": "rainforest-canopy-zipline-adventure-ketchikan",
@@ -861,12 +773,12 @@
     "pk": 563489,
     "title": "Bears, Brews, & Boardwalk",
     "slug": "bears-brews-boardwalk",
-    "description": "Bears, Brews, & Boardwalk",
+    "description": "Rainforest Sanctuary Nature Walk & Craft Brewery Tasting | 3 Hours | Activity Level: Moderate | Ages 21+",
     "image": "https://cdn.filestackcontent.com/D4MvvjXT5KP8hKO3LOst",
     "company": "alaskarainforest",
     "fromPrice": "$100 Per Person (Flat Rate)",
     "rateSummary": "100",
-    "category": "Hiking & Glaciers"
+    "category": "Adventures"
   },
   {
     "pk": 356271,
@@ -894,22 +806,11 @@
     "pk": 4161,
     "title": "Ketchikan Duck Tour",
     "slug": "ketchikan-duck-tour",
-    "description": "90 minutes • All Ages",
+    "description": "$79 Adult / $47 Child | 90 Minutes (1.5 Hours) | All Ages | Historic Ketchikan Amphibious Duck Tour",
     "image": "https://www.filepicker.io/api/file/UnNmoUQdQeSGBjKksDk6",
     "company": "akduck",
-    "fromPrice": "$15 Per Person (Flat Rate)",
-    "rateSummary": "15 • 21 • 29 +6 more",
-    "category": "Adventures"
-  },
-  {
-    "pk": 328657,
-    "title": "Transfer",
-    "slug": "transfer",
-    "description": "",
-    "image": "",
-    "company": "akduck",
-    "fromPrice": "$13 Per Person (Flat Rate)",
-    "rateSummary": "13",
+    "fromPrice": "$79 Adult / $47 Child (Flat Rate)",
+    "rateSummary": "79",
     "category": "Adventures"
   },
   {
@@ -1023,28 +924,6 @@
     "category": "Adventures"
   },
   {
-    "pk": 15907,
-    "title": "Three Hour Scooter Rentals",
-    "slug": "three-hour-scooter-rentals",
-    "description": "Free Lesson Included!",
-    "image": "https://www.filepicker.io/api/file/QqA2K78tQRCfuheJy3JI",
-    "company": "skagwayscooters",
-    "fromPrice": "$139 Per Person (Flat Rate)",
-    "rateSummary": "139",
-    "category": "Adventures"
-  },
-  {
-    "pk": 439402,
-    "title": "Five Hour Scooter Rentals",
-    "slug": "five-hour-scooter-rentals",
-    "description": "Free Lesson Included!",
-    "image": "https://www.filepicker.io/api/file/QqA2K78tQRCfuheJy3JI",
-    "company": "skagwayscooters",
-    "fromPrice": "$159 Per Person (Flat Rate)",
-    "rateSummary": "159",
-    "category": "Adventures"
-  },
-  {
     "pk": 522188,
     "title": "KLR650",
     "slug": "klr650",
@@ -1081,7 +960,7 @@
     "pk": 392949,
     "title": "Misty Fjords Flightseeing",
     "slug": "misty-fjords-flightseeing",
-    "description": "For all ages! • 2 Hours • Enjoy the misty fjords national monument!",
+    "description": "Misty Fjords National Monument Floatplane Flightseeing with Remote Alpine Fjord Water Landing | 2 Hours 15 Minutes | All Ages | De Havilland Seaplane",
     "image": "https://cdn.filestackcontent.com/F68TIQZRJSNvKvyDfnyl",
     "company": "taquanair",
     "fromPrice": "$369 Per Person (Flat Rate)",
@@ -1092,7 +971,7 @@
     "pk": 392950,
     "title": "Alaska Bear Adventure & Flightseeing",
     "slug": "alaska-bear-adventure-flightseeing",
-    "description": "• 3 hour 15 minute tour •",
+    "description": "Neets Bay Bear Viewing by Floatplane | 3 Hours | Guided Remote Rainforest Black Bear Observation | Peak July–Sept",
     "image": "https://cdn.filestackcontent.com/KhMtDlBDSmatswfjT46t",
     "company": "taquanair",
     "fromPrice": "$399 Per Person (Flat Rate)",
@@ -1103,7 +982,7 @@
     "pk": 560411,
     "title": "Anan Creek Bear Adventure & Flightseeing",
     "slug": "anan-creek-bear-adventure-flightseeing",
-    "description": "Anan Creek",
+    "description": "Traitors Cove Bear Viewing Wilderness Floatplane Expedition | 3 Hours 15 Minutes | Rainforest Boardwalk & Platform",
     "image": "https://cdn.filestackcontent.com/vDUJNUfR02ch2R1D84wl",
     "company": "taquanair",
     "fromPrice": "$999 Per Person (Flat Rate)",
@@ -1194,9 +1073,9 @@
     "description": "3 Hours in Total • 5 Massive Glaciers • Juneaus Only Glacier View Dining!",
     "image": "https://cdn.filestackcontent.com/JBg9RXGORgirJyYqllya",
     "company": "wingsairways",
-    "fromPrice": "$455 Per Person (Flat Rate)",
-    "rateSummary": "455 • 499",
-    "category": "Hiking & Glaciers"
+    "fromPrice": "$465 Per Person (Flat Rate)",
+    "rateSummary": "465 • 510",
+    "category": "Air Tours"
   },
   {
     "pk": 256881,
@@ -1205,8 +1084,8 @@
     "description": "40 Minutes of Airtime • 5 Massive Glaciers • Everyone Enjoys A Window Seat!",
     "image": "https://cdn.filestackcontent.com/LweNqQBTkeJJYOdlqQg3",
     "company": "wingsairways",
-    "fromPrice": "$315 Per Person (Flat Rate)",
-    "rateSummary": "315 • 359",
-    "category": "Hiking & Glaciers"
+    "fromPrice": "$325 Per Person (Flat Rate)",
+    "rateSummary": "325 • 370",
+    "category": "Air Tours"
   }
 ]

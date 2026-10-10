@@ -26,6 +26,31 @@ const WIDGET_ALLOWED_ITEMS = new Map([
   ["temsco-summercamp-juneau", new Set([213994])],
 ]);
 
+const BLOCKED_ITEM_IDS = new Set([
+  214815, 214816, 213564, 213565, 413098, 116039,
+  247714, 247716, 247717, 247718, 247719, 247720, 247721,
+  328657, 563490, 563491, 563492, 563493,
+  563494, 563495, 563496, 563497, 563498, 563499,
+]);
+
+const BLOCKED_TITLE_PATTERNS = [
+  /gift\s*card/i,
+  /gift\s*certificate/i,
+  /voucher/i,
+  /membership/i,
+  /pass\b/i,
+  /transfer\b/i,
+  /shuttle\s*only/i,
+  /water\s*taxi/i,
+  /bike\s*rental/i,
+  /scooter\s*rental/i,
+  /boat\s*rental/i,
+  /gear\s*rental/i,
+  /drysuit\s*rental/i,
+  /kayak\s*rental/i,
+  /ferry/i,
+];
+
 // load env (works locally + prod)
 try {
   require("dotenv").config({ path: ".env.local" });
@@ -250,10 +275,12 @@ function categorize(name, company) {
   const comp = String(company || "").toLowerCase();
   if (comp.includes("summercamp")) return "Dog Sledding";
   const title = String(name || "").toLowerCase();
-  if (title.includes("helicopter") || title.includes("flight")) return "Air Tours";
+  if (title.includes("boardwalk") || comp.includes("alaskarainforest") || comp.includes("akduck")) return "Adventures";
+  if (title.includes("helicopter") || title.includes("flight") || title.includes("seaplane") || title.includes("floatplane")) return "Air Tours";
   if (title.includes("whale")) return "Whale Watching";
   if (title.includes("dog") || title.includes("husky")) return "Dog Sledding";
-  if (title.includes("hike") || title.includes("walk") || title.includes("glacier")) return "Hiking & Glaciers";
+  if (title.includes("glacier") || title.includes("ice trek")) return "Hiking & Glaciers";
+  if ((title.includes("hike") || title.includes("walk")) && !title.includes("boardwalk")) return "Hiking & Glaciers";
   if (title.includes("fish")) return "Fishing";
   return "Adventures";
 }
@@ -467,6 +494,9 @@ async function buildTours() {
               }
             }
 
+            if (BLOCKED_ITEM_IDS.has(pk)) return null;
+            if (BLOCKED_TITLE_PATTERNS.some((pat) => pat.test(item.name || ""))) return null;
+
             let itemDescription = cleanDescription(item.headline || item.description || "");
             if (shortname === "northstartrekking" && pk === 405050) {
               fromPrice = "$419 Per Person (Flat Rate)";
@@ -480,6 +510,18 @@ async function buildTours() {
               fromPrice = "$599 Per Person (Flat Rate)";
               itemDescription = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Riding)";
               rateSummary = "599";
+            } else if (shortname === "akduck" && pk === 4161) {
+              fromPrice = "$79 Adult / $47 Child (Flat Rate)";
+              itemDescription = "$79 Adult / $47 Child | 90 Minutes (1.5 Hours) | All Ages | Historic Ketchikan Amphibious Duck Tour";
+              rateSummary = "79";
+            } else if (shortname === "alaskarainforest" && pk === 563489) {
+              itemDescription = "Rainforest Sanctuary Nature Walk & Craft Brewery Tasting | 3 Hours | Activity Level: Moderate | Ages 21+";
+            } else if (shortname === "taquanair" && pk === 392949) {
+              itemDescription = "Misty Fjords National Monument Floatplane Flightseeing with Remote Alpine Fjord Water Landing | 2 Hours 15 Minutes | All Ages | De Havilland Seaplane";
+            } else if (shortname === "taquanair" && pk === 392950) {
+              itemDescription = "Neets Bay Bear Viewing by Floatplane | 3 Hours | Guided Remote Rainforest Black Bear Observation | Peak July–Sept";
+            } else if (shortname === "taquanair" && pk === 560411) {
+              itemDescription = "Traitors Cove Bear Viewing Wilderness Floatplane Expedition | 3 Hours 15 Minutes | Rainforest Boardwalk & Platform";
             }
 
             return {
@@ -499,7 +541,7 @@ async function buildTours() {
           })
         );
 
-        allTours.push(...chunkTours);
+        allTours.push(...chunkTours.filter(Boolean));
       }
 
       console.log(`✅ ${shortname}: ${items.length} items processed`);
