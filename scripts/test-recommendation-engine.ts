@@ -53,4 +53,34 @@ const zeroLimit = buildRecommendationShortlist({
 });
 assert.deepEqual(zeroLimit.recommendations, []);
 
+const diverseCandidates = Array.from({ length: 8 }, (_, index) => ({
+  id: `tour-${index}`,
+  operator: `operator-${index}`,
+  score: 100 - index,
+}));
+for (const limit of [1, 2, 4]) {
+  const diverse = buildRecommendationShortlist({
+    candidates: diverseCandidates,
+    limit,
+    diversityKey: (candidate) => candidate.operator,
+    evaluate: (candidate) => ({
+      key: candidate.id,
+      score: candidate.score,
+      exactMatch: true,
+      reason: "direct match",
+    }),
+  });
+  assert.equal(diverse.recommendations.length, limit, "a full diversity pass must not append an extra recommendation");
+  assert.deepEqual(diverse.recommendations.map((item) => item.key), diverseCandidates.slice(0, limit).map((item) => item.id));
+}
+
+const repeatedOperator = buildRecommendationShortlist({
+  candidates: diverseCandidates.map((candidate) => ({ ...candidate, operator: "same-operator" })),
+  limit: 4,
+  diversityKey: (candidate) => candidate.operator,
+  evaluate: (candidate) => ({ key: candidate.id, score: candidate.score, exactMatch: true, reason: "direct match" }),
+});
+assert.equal(repeatedOperator.recommendations.length, 4, "fallback pass should fill a partial diversity shortlist");
+
 console.log("recommendation engine regression: PASS");
+

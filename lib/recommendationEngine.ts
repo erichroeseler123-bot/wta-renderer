@@ -79,6 +79,7 @@ export function buildRecommendationShortlist<TCandidate, TMeta = unknown>({
   }
 
   for (const item of pool) {
+    if (recommendations.length >= safeLimit) break;
     if (selectedKeys.has(item.key)) continue;
     selectedKeys.add(item.key);
     recommendations.push(item);
@@ -91,3 +92,4 @@ export function buildRecommendationShortlist<TCandidate, TMeta = unknown>({
     scored,
   };
 }
+

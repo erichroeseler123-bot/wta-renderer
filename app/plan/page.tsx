@@ -114,6 +114,8 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
                 resolvedLane: style,
                 degradedFallback: String(degradedFallback),
               });
+              if (date) contextParams.set("date", date);
+              if (ship) contextParams.set("cruiseShip", ship);
               const detailHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}?${contextParams.toString()}`;
               const calendarParams = new URLSearchParams(contextParams);
               if (date) calendarParams.set("date", date);
@@ -184,3 +186,4 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
     </main>
   );
 }
+

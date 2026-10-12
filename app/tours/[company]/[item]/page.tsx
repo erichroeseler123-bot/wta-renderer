@@ -545,7 +545,7 @@ export default async function TourDetailPage({
   if (!qs.get("productSlug")) qs.set("productSlug", safeTour.slug);
 
   let bookingPageHref = `/tours/${safeTour.company}/${safeTour.pk}/calendar?${qs.toString()}`;
-  if (safeTour.nextAvailableDate) {
+  if (safeTour.nextAvailableDate && !qs.get("date") && !qs.get("month")) {
     const d = new Date(safeTour.nextAvailableDate);
     if (!Number.isNaN(d.getTime())) {
       const month = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
@@ -727,7 +727,7 @@ export default async function TourDetailPage({
                   )}
                 </div>
                 <Link
-                  href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
+                  href={bookingPageHref}
                   className="flex-1 max-w-[200px] rounded-xl bg-slate-900 py-2.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
                 >
                   {isNorthStar405050 ? "Check Departures" : "Book Now"}
@@ -820,7 +820,7 @@ export default async function TourDetailPage({
                 </p>
                 <div className="pt-1 flex flex-col gap-1.5 text-[11px]">
                   <Link
-                    href={`/tours/${company}/${item}/calendar`}
+                    href={bookingPageHref}
                     className="font-semibold text-sky-800 underline hover:text-sky-950"
                   >
                     Check Tour Calendar &rarr;
@@ -857,7 +857,7 @@ export default async function TourDetailPage({
                 </div>
               )}
               <Link
-                href={isNorthStar405050 ? `/tours/${company}/${item}/calendar` : bookingPageHref}
+                href={bookingPageHref}
                 className="w-full rounded-2xl bg-slate-900 py-3.5 text-center text-xs font-bold text-white hover:bg-slate-800 transition uppercase tracking-wider"
               >
                 {hasNextAvailability
@@ -1060,3 +1060,4 @@ export default async function TourDetailPage({
     </>
   );
 }
+
