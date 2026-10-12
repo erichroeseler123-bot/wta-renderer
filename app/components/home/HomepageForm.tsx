@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { FinderChoices } from "@/lib/finderChoices";
 
 const TRIP_STYLES = [
   { value: "best-overall", label: "Best overall", hint: "Start with the strongest all-around choices" },
@@ -17,13 +18,15 @@ const TRIP_STYLES = [
 
 export default function HomepageForm({
   approvedPorts,
+  initialChoices,
 }: {
   approvedPorts: { slug: string; title: string }[];
+  initialChoices: FinderChoices;
 }) {
   const router = useRouter();
-  const [port, setPort] = useState(approvedPorts[0]?.slug || "juneau");
-  const [style, setStyle] = useState("best-overall");
-  const [date, setDate] = useState("");
+  const [port, setPort] = useState(initialChoices.port);
+  const [style, setStyle] = useState(initialChoices.topic);
+  const [date, setDate] = useState(initialChoices.date);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
