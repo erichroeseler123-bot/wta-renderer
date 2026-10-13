@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { buildRecommendationShortlist } from "../lib/recommendationEngine";
+import { finderReturnHref, readFinderChoices } from "../lib/finderChoices";
 
 type Candidate = { id: string; kind: "exact" | "fallback"; score: number };
 
@@ -84,3 +85,17 @@ assert.equal(repeatedOperator.recommendations.length, 4, "fallback pass should f
 
 console.log("recommendation engine regression: PASS");
 
+
+const originalChoices = { port: "ketchikan", topic: "adventure", date: "2027-07-15", _vercel_share: "private-token" };
+const returnUrl = new URL(finderReturnHref(originalChoices), "https://example.invalid");
+assert.equal(returnUrl.hash, "#find-your-port-day");
+assert.deepEqual([...returnUrl.searchParams.keys()], ["port", "topic", "date"], "return links must allowlist form fields");
+assert.deepEqual(readFinderChoices(Object.fromEntries(returnUrl.searchParams)), { port: "ketchikan", topic: "adventure", date: "2027-07-15" }, "editing a shortlist should restore the original finder values");
+assert.deepEqual(readFinderChoices(), { port: "juneau", topic: "best-overall", date: "" });
+assert.deepEqual(readFinderChoices({ port: ["SKAGWAY", "ketchikan"], topic: " fishing ", date: "2028-02-29" }), { port: "skagway", topic: "fishing", date: "2028-02-29" });
+assert.deepEqual(readFinderChoices({ port: "unknown", topic: "unknown", date: "2027-02-29" }), { port: "juneau", topic: "best-overall", date: "" });
+for (const date of ["2027-02-30", "2027-13-01", "2027-00-15", "2027-07-00", "07/15/2027", "<script>", ""]) {
+  assert.equal(readFinderChoices({ date }).date, "", "invalid dates must not hydrate the native input");
+}
+assert.equal(new URL(finderReturnHref({ port: "skagway", topic: "easy-day" }), "https://example.invalid").searchParams.has("date"), false);
+console.log("finder choice round-trip regression: PASS");

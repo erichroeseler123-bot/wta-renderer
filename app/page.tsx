@@ -3,6 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import HomepageForm from "@/app/components/home/HomepageForm";
 import JsonLd from "@/components/seo/JsonLd";
+import { readFinderChoices, type FinderSearchParams } from "@/lib/finderChoices";
 
 export const metadata: Metadata = {
   title: "Alaska Cruise Port Excursions | Welcome To Alaska Tours",
@@ -120,7 +121,8 @@ const TOP_LINKS = [
   ["All tours", "/tours"],
 ] as const;
 
-export default function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams: Promise<FinderSearchParams> }) {
+  const initialChoices = readFinderChoices(await searchParams);
   return (
     <main className="min-h-screen overflow-hidden bg-[#f4f0e7] text-[#123632]">
       <JsonLd data={HOME_FAQ_SCHEMA} />
@@ -193,7 +195,7 @@ export default function HomePage() {
             </div>
 
             <div id="find-your-port-day" className="scroll-mt-6 lg:pt-4">
-              <HomepageForm approvedPorts={APPROVED_PORTS} />
+              <HomepageForm key={JSON.stringify(initialChoices)} approvedPorts={APPROVED_PORTS} initialChoices={initialChoices} />
             </div>
           </div>
         </div>
