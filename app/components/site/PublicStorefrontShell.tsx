@@ -102,6 +102,8 @@ export default function PublicStorefrontShell({ children }: { children: React.Re
             <Link href="/tours" className="hover:text-white">Tours</Link>
             <Link href="/guides" className="hover:text-white">Guides</Link>
             <Link href="/contact-us" className="hover:text-white">Contact</Link>
+            <Link href="/editorial-policy" className="hover:text-white">Editorial policy</Link>
+            <Link href="/authors/erich" className="hover:text-white">Erich</Link>
             <Link href="/privacy" className="hover:text-white">Privacy</Link>
             <Link href="/terms" className="hover:text-white">Terms</Link>
           </div>
