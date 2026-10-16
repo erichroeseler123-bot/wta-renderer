@@ -45,8 +45,8 @@ export default function PublicStorefrontShell({ children }: { children: React.Re
   return (
     <div className={`wta-storefront ${routeClass(pathname)} min-h-screen bg-[#f4ede4] text-[#2b211b]`}>
       <header className="wta-site-header sticky top-0 z-50 border-b border-white/10 bg-[#1b1714]/95 text-white shadow-[0_10px_35px_rgba(27,23,20,.18)] backdrop-blur-xl">
-        <div className="mx-auto flex h-[78px] max-w-7xl items-center justify-between gap-5 px-4 sm:px-6 lg:px-8">
-          <Link href="/" className="group inline-flex min-w-0 items-center gap-3">
+        <div className="mx-auto flex min-h-[78px] max-w-7xl flex-wrap items-center justify-between gap-x-3 gap-y-2.5 px-4 py-2.5 sm:px-6 md:h-[78px] md:flex-nowrap md:gap-5 md:py-0 lg:px-8">
+          <Link href="/" className="group inline-flex min-w-0 flex-1 items-center gap-2.5 sm:flex-initial sm:gap-3">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-white/25 bg-white/8 text-[11px] font-black tracking-[0.16em] transition group-hover:border-[#ff8a3d] group-hover:bg-[#ff8a3d] group-hover:text-[#1b1714]">
               AK
             </span>
@@ -56,13 +56,17 @@ export default function PublicStorefrontShell({ children }: { children: React.Re
             </span>
           </Link>
 
-          <nav className="hidden items-center gap-6 md:flex">
+          <nav
+            aria-label="Primary navigation"
+            className="order-3 flex w-full flex-wrap items-center gap-x-5 gap-y-2 border-t border-white/10 pt-2.5 md:order-none md:w-auto md:flex-nowrap md:gap-6 md:border-t-0 md:pt-0"
+          >
             {NAV_LINKS.map(([label, href]) => {
               const active = pathname === href || pathname.startsWith(`${href}/`);
               return (
                 <Link
                   key={href}
                   href={href}
+                  aria-current={active ? "page" : undefined}
                   className={`text-sm font-bold transition ${active ? "text-[#ffb77f]" : "text-white/68 hover:text-white"}`}
                 >
                   {label}
