@@ -396,6 +396,234 @@ export default async function HomePage({ searchParams }: { searchParams: Promise
               </Link>
             ))}
           </div>
+
+          <div
+            id="port-decision-comparison"
+            aria-labelledby="port-decision-comparison-heading"
+            className="mt-14 lg:mt-24 rounded-[2.5rem] border border-[#123632]/12 bg-[#fffdf8] p-5 shadow-[0_24px_80px_rgba(8,37,34,.08)] sm:p-8 lg:p-12"
+          >
+            <div className="max-w-3xl">
+              <div className="inline-flex items-center gap-2 rounded-full bg-[#e8f2ee] px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-[#163d37]">
+                Port Guides &amp; Planner Shortlists
+              </div>
+              <h2
+                id="port-decision-comparison-heading"
+                className="mt-3 text-2xl font-black leading-tight tracking-[-0.035em] text-[#082522] sm:text-4xl"
+              >
+                Browse by Port Guide or 4-Tour Planner Shortlist
+              </h2>
+              <p className="mt-3 text-sm leading-6 text-[#4f6965] sm:text-base sm:leading-7">
+                Open a port guide to browse connected excursions by category, read port planning guides, or go directly to a four-tour planner shortlist for Juneau, Skagway, or Ketchikan.
+              </p>
+            </div>
+
+            <div className="mt-8 grid gap-5 lg:grid-cols-3">
+              <article className="flex min-w-0 flex-col justify-between rounded-[2rem] border border-[#123632]/10 bg-[#f7f4ec] p-5 sm:p-6">
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="rounded-full bg-[#082522] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#d7ff76]">
+                      Port 01 · Juneau
+                    </span>
+                    <Link
+                      href="/ports/juneau"
+                      className="text-xs font-black text-[#163d37] underline decoration-[#8ebc3d] decoration-2 underline-offset-4 hover:text-[#082522]"
+                    >
+                      Juneau port guide →
+                    </Link>
+                  </div>
+                  <h3 className="mt-3 text-2xl font-black tracking-tight text-[#082522]">
+                    Juneau
+                  </h3>
+                  <p className="mt-2 text-xs leading-5 text-[#274743] sm:text-sm sm:leading-6">
+                    Whales, Mendenhall, glacier flights, dog sledding, fishing and adventure.
+                  </p>
+                  <div className="mt-4">
+                    <div className="text-[10px] font-black uppercase tracking-[0.16em] text-[#4b6e68]">
+                      Juneau Planning Guides
+                    </div>
+                    <ul className="mt-2 space-y-1.5 text-xs leading-5 sm:text-sm">
+                      <li>
+                        <Link href="/guides/best-shore-excursions-in-juneau" className="font-bold text-[#123632] underline decoration-[#123632]/30 underline-offset-4 hover:text-[#082522]">
+                          Best Shore Excursions in Juneau
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/guides/how-to-get-to-mendenhall-glacier-from-cruise-port" className="font-bold text-[#123632] underline decoration-[#123632]/30 underline-offset-4 hover:text-[#082522]">
+                          How to Get to Mendenhall Glacier from Cruise Port
+                        </Link>
+                      </li>
+                      <li>
+                        <Link href="/guides/juneau-whale-watching-vs-mendenhall" className="font-bold text-[#123632] underline decoration-[#123632]/30 underline-offset-4 hover:text-[#082522]">
+                          Juneau Whale Watching vs Mendenhall Glacier
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-6 border-t border-[#123632]/10 pt-4">
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-[#4b6e68]">
+                    Planner Shortlists &amp; Port Page
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    <Link
+                      href="/plan?port=juneau&topic=best-overall&sourcePage=/"
+                      className="inline-flex items-center rounded-xl bg-[#082522] px-3 py-2 text-xs font-black text-[#d7ff76] transition hover:bg-[#143d38]"
+                    >
+                      Juneau best overall shortlist →
+                    </Link>
+                    <Link
+                      href="/plan?port=juneau&topic=wildlife-whales&sourcePage=/"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/20 bg-white px-3 py-2 text-xs font-black text-[#082522] transition hover:bg-[#e8f2ee]"
+                    >
+                      Wildlife &amp; whales shortlist →
+                    </Link>
+                    <Link
+                      href="/plan?port=juneau&topic=glaciers&sourcePage=/"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/20 bg-white px-3 py-2 text-xs font-black text-[#082522] transition hover:bg-[#e8f2ee]"
+                    >
+                      Glaciers shortlist →
+                    </Link>
+                    <Link
+                      href="/ports/juneau"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/15 bg-[#e8f2ee] px-3 py-2 text-xs font-black text-[#123632] transition hover:bg-[#d7ebe4]"
+                    >
+                      Explore Juneau →
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              <article className="flex min-w-0 flex-col justify-between rounded-[2rem] border border-[#123632]/10 bg-[#f7f4ec] p-5 sm:p-6">
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="rounded-full bg-[#082522] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#d7ff76]">
+                      Port 02 · Skagway
+                    </span>
+                    <Link
+                      href="/ports/skagway"
+                      className="text-xs font-black text-[#163d37] underline decoration-[#8ebc3d] decoration-2 underline-offset-4 hover:text-[#082522]"
+                    >
+                      Skagway port guide →
+                    </Link>
+                  </div>
+                  <h3 className="mt-3 text-2xl font-black tracking-tight text-[#082522]">
+                    Skagway
+                  </h3>
+                  <p className="mt-2 text-xs leading-5 text-[#274743] sm:text-sm sm:leading-6">
+                    Glacier flights, Gold Rush experiences, scooters and cruise-day adventures.
+                  </p>
+                  <div className="mt-4">
+                    <div className="text-[10px] font-black uppercase tracking-[0.16em] text-[#4b6e68]">
+                      Skagway Planning Guides
+                    </div>
+                    <ul className="mt-2 space-y-1.5 text-xs leading-5 sm:text-sm">
+                      <li>
+                        <Link href="/guides/best-things-to-do-in-skagway-4-6-hours" className="font-bold text-[#123632] underline decoration-[#123632]/30 underline-offset-4 hover:text-[#082522]">
+                          Best Things to Do in Skagway in 4 to 6 Hours
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-6 border-t border-[#123632]/10 pt-4">
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-[#4b6e68]">
+                    Planner Shortlists &amp; Port Page
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    <Link
+                      href="/plan?port=skagway&topic=best-overall&sourcePage=/"
+                      className="inline-flex items-center rounded-xl bg-[#082522] px-3 py-2 text-xs font-black text-[#d7ff76] transition hover:bg-[#143d38]"
+                    >
+                      Skagway best overall shortlist →
+                    </Link>
+                    <Link
+                      href="/plan?port=skagway&topic=dog-sledding&sourcePage=/"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/20 bg-white px-3 py-2 text-xs font-black text-[#082522] transition hover:bg-[#e8f2ee]"
+                    >
+                      Dog sledding shortlist →
+                    </Link>
+                    <Link
+                      href="/plan?port=skagway&topic=flightseeing&sourcePage=/"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/20 bg-white px-3 py-2 text-xs font-black text-[#082522] transition hover:bg-[#e8f2ee]"
+                    >
+                      Flightseeing shortlist →
+                    </Link>
+                    <Link
+                      href="/ports/skagway"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/15 bg-[#e8f2ee] px-3 py-2 text-xs font-black text-[#123632] transition hover:bg-[#d7ebe4]"
+                    >
+                      Explore Skagway →
+                    </Link>
+                  </div>
+                </div>
+              </article>
+
+              <article className="flex min-w-0 flex-col justify-between rounded-[2rem] border border-[#123632]/10 bg-[#f7f4ec] p-5 sm:p-6">
+                <div>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="rounded-full bg-[#082522] px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-[#d7ff76]">
+                      Port 03 · Ketchikan
+                    </span>
+                    <Link
+                      href="/ports/ketchikan"
+                      className="text-xs font-black text-[#163d37] underline decoration-[#8ebc3d] decoration-2 underline-offset-4 hover:text-[#082522]"
+                    >
+                      Ketchikan port guide →
+                    </Link>
+                  </div>
+                  <h3 className="mt-3 text-2xl font-black tracking-tight text-[#082522]">
+                    Ketchikan
+                  </h3>
+                  <p className="mt-2 text-xs leading-5 text-[#274743] sm:text-sm sm:leading-6">
+                    Misty Fjords, bears, rainforest, kayaking, UTVs, snorkeling and more.
+                  </p>
+                  <div className="mt-4">
+                    <div className="text-[10px] font-black uppercase tracking-[0.16em] text-[#4b6e68]">
+                      Ketchikan Planning Guides
+                    </div>
+                    <ul className="mt-2 space-y-1.5 text-xs leading-5 sm:text-sm">
+                      <li>
+                        <Link href="/guides/first-time-in-ketchikan-shore-excursions" className="font-bold text-[#123632] underline decoration-[#123632]/30 underline-offset-4 hover:text-[#082522]">
+                          First Time in Ketchikan Shore Excursions
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-6 border-t border-[#123632]/10 pt-4">
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-[#4b6e68]">
+                    Planner Shortlists &amp; Port Page
+                  </div>
+                  <div className="mt-2.5 flex flex-wrap gap-2">
+                    <Link
+                      href="/plan?port=ketchikan&topic=best-overall&sourcePage=/"
+                      className="inline-flex items-center rounded-xl bg-[#082522] px-3 py-2 text-xs font-black text-[#d7ff76] transition hover:bg-[#143d38]"
+                    >
+                      Ketchikan best overall shortlist →
+                    </Link>
+                    <Link
+                      href="/plan?port=ketchikan&topic=flightseeing&sourcePage=/"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/20 bg-white px-3 py-2 text-xs font-black text-[#082522] transition hover:bg-[#e8f2ee]"
+                    >
+                      Flightseeing shortlist →
+                    </Link>
+                    <Link
+                      href="/plan?port=ketchikan&topic=wildlife-whales&sourcePage=/"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/20 bg-white px-3 py-2 text-xs font-black text-[#082522] transition hover:bg-[#e8f2ee]"
+                    >
+                      Wildlife &amp; whales shortlist →
+                    </Link>
+                    <Link
+                      href="/ports/ketchikan"
+                      className="inline-flex items-center rounded-xl border border-[#123632]/15 bg-[#e8f2ee] px-3 py-2 text-xs font-black text-[#123632] transition hover:bg-[#d7ebe4]"
+                    >
+                      Explore Ketchikan →
+                    </Link>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
         </div>
       </section>
 
