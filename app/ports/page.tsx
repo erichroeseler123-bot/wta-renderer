@@ -42,7 +42,7 @@ export default function PortsPage() {
               Alaska Cruise Port Excursion Planners
             </h1>
             <p className="max-w-2xl text-sm leading-relaxed text-white/80">
-              Check disembarkation margins, compare what each Inside Passage stop does best, and view compatible excursions tailored to your port window for Juneau, Skagway, and Ketchikan.
+              Check disembarkation margins and view compatible excursions tailored to your port window for Juneau, Skagway, and Ketchikan.
             </p>
           </div>
         </section>
@@ -95,16 +95,16 @@ export default function PortsPage() {
         >
           <div className="max-w-3xl">
             <div className="inline-flex items-center rounded-full bg-sky-50 px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-sky-900">
-              Multi-Port Cruise Strategy
+              Port Guides &amp; Planner Shortlists
             </div>
             <h2
               id="port-decision-comparison-heading"
               className="mt-3 text-2xl font-black leading-tight tracking-tight text-slate-950 sm:text-4xl"
             >
-              What Each Alaska Port Does Best (So You Don&apos;t Book the Same Tour Twice)
+              Browse by Port Guide or 4-Tour Planner Shortlist
             </h2>
             <p className="mt-3 text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">
-              When your ship calls at Juneau, Skagway, and Ketchikan on the same voyage, match each port to its signature geographic specialty first. Use this side-by-side planner to avoid duplicating similar boat rides or flight paths across your cruise week.
+              Open a port guide to browse connected excursions by category, read port planning guides, or go directly to a four-tour planner shortlist for Juneau, Skagway, or Ketchikan.
             </p>
           </div>
 
@@ -115,45 +115,70 @@ export default function PortsPage() {
                   <span className="rounded-full bg-slate-950 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
                     Juneau
                   </span>
-                  <span className="text-[11px] font-bold text-sky-800">Whales &amp; Glacier Ice</span>
+                  <Link
+                    href="/ports/juneau"
+                    className="text-xs font-black text-sky-800 underline decoration-sky-400 decoration-2 underline-offset-4 hover:text-sky-950"
+                  >
+                    Juneau port guide →
+                  </Link>
                 </div>
                 <h3 className="mt-3 text-xl font-black tracking-tight text-slate-950">
-                  Humpback Whale Watching, Mendenhall Glacier &amp; Icefield Helicopters
+                  Juneau
                 </h3>
-                <ul className="mt-4 space-y-2.5 text-xs leading-5 text-slate-700 sm:text-sm sm:leading-6">
-                  <li>
-                    <strong className="font-black text-slate-950">Humpback whale watching:</strong> Auke Bay &amp; Favorite Channel feeding waters offer 100% sighting guarantees ($165–$195 standalone; $245–$295 with Mendenhall).
-                  </li>
-                  <li>
-                    <strong className="font-black text-slate-950">Mendenhall Glacier &amp; icefield helicopter landings:</strong> Walk to Nugget Falls ($45–$95 shuttle/tour) or land by helicopter on Herbert, Norris, or Mendenhall Glacier ($409–$429 flat rate).
-                  </li>
-                  <li>
-                    <strong className="font-black text-slate-950">Save for other ports:</strong> Book your primary whale boat and glacier walk here; save mountain rail for Skagway and floatplanes/totems for Ketchikan.
-                  </li>
-                </ul>
+                <p className="mt-2 text-xs leading-5 text-slate-700 sm:text-sm sm:leading-6">
+                  Whales, Mendenhall, glacier flights, dog sledding, fishing and adventure.
+                </p>
+                <div className="mt-4">
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    Juneau Planning Guides
+                  </div>
+                  <ul className="mt-2 space-y-1.5 text-xs leading-5 sm:text-sm">
+                    <li>
+                      <Link href="/guides/best-shore-excursions-in-juneau" className="font-bold text-slate-800 underline decoration-slate-300 underline-offset-4 hover:text-sky-900">
+                        Best Shore Excursions in Juneau
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/guides/how-to-get-to-mendenhall-glacier-from-cruise-port" className="font-bold text-slate-800 underline decoration-slate-300 underline-offset-4 hover:text-sky-900">
+                        How to Get to Mendenhall Glacier from Cruise Port
+                      </Link>
+                    </li>
+                    <li>
+                      <Link href="/guides/juneau-whale-watching-vs-mendenhall" className="font-bold text-slate-800 underline decoration-slate-300 underline-offset-4 hover:text-sky-900">
+                        Juneau Whale Watching vs Mendenhall Glacier
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
               </div>
               <div className="mt-6 border-t border-slate-200 pt-4">
                 <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
-                  1-Click Shortlists &amp; Guide
+                  Planner Shortlists &amp; Port Page
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   <Link
-                    href="/plan?port=juneau&topic=wildlife-whales&sourcePage=/ports"
+                    href="/plan?port=juneau&topic=best-overall&sourcePage=/ports"
                     className="inline-flex items-center rounded-xl bg-sky-800 px-3 py-2 text-xs font-black text-white transition hover:bg-sky-900"
                   >
-                    Whale /plan shortlist →
+                    Juneau best overall shortlist →
+                  </Link>
+                  <Link
+                    href="/plan?port=juneau&topic=wildlife-whales&sourcePage=/ports"
+                    className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 transition hover:bg-slate-100"
+                  >
+                    Wildlife &amp; whales shortlist →
                   </Link>
                   <Link
                     href="/plan?port=juneau&topic=glaciers&sourcePage=/ports"
                     className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 transition hover:bg-slate-100"
                   >
-                    Glacier &amp; heli /plan →
+                    Glaciers shortlist →
                   </Link>
                   <Link
                     href="/ports/juneau"
                     className="inline-flex items-center rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-black text-sky-950 transition hover:bg-sky-100"
                   >
-                    Juneau port guide →
+                    Explore Juneau →
                   </Link>
                 </div>
               </div>
@@ -165,45 +190,60 @@ export default function PortsPage() {
                   <span className="rounded-full bg-slate-950 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
                     Skagway
                   </span>
-                  <span className="text-[11px] font-bold text-sky-800">Rail, Summit &amp; Huskies</span>
+                  <Link
+                    href="/ports/skagway"
+                    className="text-xs font-black text-sky-800 underline decoration-sky-400 decoration-2 underline-offset-4 hover:text-sky-950"
+                  >
+                    Skagway port guide →
+                  </Link>
                 </div>
                 <h3 className="mt-3 text-xl font-black tracking-tight text-slate-950">
-                  White Pass &amp; Yukon Route Rail, Klondike Summit &amp; Sled-Dog Camps
+                  Skagway
                 </h3>
-                <ul className="mt-4 space-y-2.5 text-xs leading-5 text-slate-700 sm:text-sm sm:leading-6">
-                  <li>
-                    <strong className="font-black text-slate-950">White Pass &amp; Yukon Route rail:</strong> Historic narrow-gauge mountain railway climbing steep cliffside trestles above the 1898 Trail of &apos;98.
-                  </li>
-                  <li>
-                    <strong className="font-black text-slate-950">Klondike summit &amp; sled-dog camps:</strong> Pair White Pass summit overlooks and Liarsville Gold Rush camp ($65–$95) with Dyea wheeled sled-dog camps ($140–$180) or the $599 Denver Glacier helicopter dogsledding demonstration (guests observe the demonstration only—no sled riding).
-                  </li>
-                  <li>
-                    <strong className="font-black text-slate-950">Save for other ports:</strong> Skip marine wildlife cruises in upper Lynn Canal—do whales in Juneau and dedicate Skagway to rail, summit routes, and sled dogs.
-                  </li>
-                </ul>
+                <p className="mt-2 text-xs leading-5 text-slate-700 sm:text-sm sm:leading-6">
+                  Glacier flights, Gold Rush experiences, scooters and cruise-day adventures.
+                </p>
+                <div className="mt-4">
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    Skagway Planning Guides
+                  </div>
+                  <ul className="mt-2 space-y-1.5 text-xs leading-5 sm:text-sm">
+                    <li>
+                      <Link href="/guides/best-things-to-do-in-skagway-4-6-hours" className="font-bold text-slate-800 underline decoration-slate-300 underline-offset-4 hover:text-sky-900">
+                        Best Things to Do in Skagway in 4 to 6 Hours
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
               </div>
               <div className="mt-6 border-t border-slate-200 pt-4">
                 <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
-                  1-Click Shortlists &amp; Guide
+                  Planner Shortlists &amp; Port Page
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   <Link
                     href="/plan?port=skagway&topic=best-overall&sourcePage=/ports"
                     className="inline-flex items-center rounded-xl bg-sky-800 px-3 py-2 text-xs font-black text-white transition hover:bg-sky-900"
                   >
-                    Skagway /plan shortlist →
+                    Skagway best overall shortlist →
                   </Link>
                   <Link
                     href="/plan?port=skagway&topic=dog-sledding&sourcePage=/ports"
                     className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 transition hover:bg-slate-100"
                   >
-                    Sled-dog /plan →
+                    Dog sledding shortlist →
+                  </Link>
+                  <Link
+                    href="/plan?port=skagway&topic=flightseeing&sourcePage=/ports"
+                    className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 transition hover:bg-slate-100"
+                  >
+                    Flightseeing shortlist →
                   </Link>
                   <Link
                     href="/ports/skagway"
                     className="inline-flex items-center rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-black text-sky-950 transition hover:bg-sky-100"
                   >
-                    Skagway port guide →
+                    Explore Skagway →
                   </Link>
                 </div>
               </div>
@@ -215,157 +255,64 @@ export default function PortsPage() {
                   <span className="rounded-full bg-slate-950 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-cyan-200">
                     Ketchikan
                   </span>
-                  <span className="text-[11px] font-bold text-sky-800">Floatplanes, Crab &amp; Totems</span>
+                  <Link
+                    href="/ports/ketchikan"
+                    className="text-xs font-black text-sky-800 underline decoration-sky-400 decoration-2 underline-offset-4 hover:text-sky-950"
+                  >
+                    Ketchikan port guide →
+                  </Link>
                 </div>
                 <h3 className="mt-3 text-xl font-black tracking-tight text-slate-950">
-                  Misty Fjords Floatplanes, Bering Sea Crab Boat &amp; Totem Parks
+                  Ketchikan
                 </h3>
-                <ul className="mt-4 space-y-2.5 text-xs leading-5 text-slate-700 sm:text-sm sm:leading-6">
-                  <li>
-                    <strong className="font-black text-slate-950">Misty Fjords floatplanes:</strong> Bush seaplane flightseeing over 3,000-foot granite cliffs with an alpine lake or fjord pontoon landing ($330–$395, 1.5–2h).
-                  </li>
-                  <li>
-                    <strong className="font-black text-slate-950">Bering Sea crab boat &amp; totem parks:</strong> Live King crab &amp; bald eagle deck excursions, Herring Cove black bears ($120–$180), and Saxman Native Village / Totem Bight totem parks.
-                  </li>
-                  <li>
-                    <strong className="font-black text-slate-950">Save for other ports:</strong> Ketchikan has no roadside glaciers—book glacier landings in Juneau/Skagway and save Ketchikan for floatplanes, crab boats, bears, and totems.
-                  </li>
-                </ul>
+                <p className="mt-2 text-xs leading-5 text-slate-700 sm:text-sm sm:leading-6">
+                  Misty Fjords, bears, rainforest, kayaking, UTVs, snorkeling and more.
+                </p>
+                <div className="mt-4">
+                  <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    Ketchikan Planning Guides
+                  </div>
+                  <ul className="mt-2 space-y-1.5 text-xs leading-5 sm:text-sm">
+                    <li>
+                      <Link href="/guides/first-time-in-ketchikan-shore-excursions" className="font-bold text-slate-800 underline decoration-slate-300 underline-offset-4 hover:text-sky-900">
+                        First Time in Ketchikan Shore Excursions
+                      </Link>
+                    </li>
+                  </ul>
+                </div>
               </div>
               <div className="mt-6 border-t border-slate-200 pt-4">
                 <div className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
-                  1-Click Shortlists &amp; Guide
+                  Planner Shortlists &amp; Port Page
                 </div>
                 <div className="mt-2.5 flex flex-wrap gap-2">
                   <Link
-                    href="/plan?port=ketchikan&topic=flightseeing&sourcePage=/ports"
+                    href="/plan?port=ketchikan&topic=best-overall&sourcePage=/ports"
                     className="inline-flex items-center rounded-xl bg-sky-800 px-3 py-2 text-xs font-black text-white transition hover:bg-sky-900"
                   >
-                    Misty Fjords /plan →
+                    Ketchikan best overall shortlist →
+                  </Link>
+                  <Link
+                    href="/plan?port=ketchikan&topic=flightseeing&sourcePage=/ports"
+                    className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 transition hover:bg-slate-100"
+                  >
+                    Flightseeing shortlist →
                   </Link>
                   <Link
                     href="/plan?port=ketchikan&topic=wildlife-whales&sourcePage=/ports"
                     className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 transition hover:bg-slate-100"
                   >
-                    Wildlife /plan shortlist →
+                    Wildlife &amp; whales shortlist →
                   </Link>
                   <Link
                     href="/ports/ketchikan"
                     className="inline-flex items-center rounded-xl border border-sky-200 bg-sky-50 px-3 py-2 text-xs font-black text-sky-950 transition hover:bg-sky-100"
                   >
-                    Ketchikan port guide →
+                    Explore Ketchikan →
                   </Link>
                 </div>
               </div>
             </article>
-          </div>
-
-          <div className="mt-8 overflow-hidden rounded-[1.75rem] border border-slate-200 bg-white">
-            <table className="w-full border-collapse text-left text-xs sm:text-sm">
-              <caption className="sr-only">
-                Side-by-side comparison of what Juneau, Skagway, and Ketchikan do best for multi-port Alaska cruise visitors
-              </caption>
-              <thead className="sr-only md:not-sr-only md:border-b md:border-slate-200 md:bg-slate-950 md:text-[11px] md:font-black md:uppercase md:tracking-[0.16em] md:text-cyan-200">
-                <tr>
-                  <th scope="col" className="px-5 py-3.5">Port &amp; Best Role</th>
-                  <th scope="col" className="px-5 py-3.5">Signature #1 &amp; #2 to Book Here</th>
-                  <th scope="col" className="px-5 py-3.5">Skip Here / Save for Another Port</th>
-                  <th scope="col" className="px-5 py-3.5">Dock Logistics &amp; Buffer</th>
-                  <th scope="col" className="px-5 py-3.5">Direct Action Links</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                <tr className="block p-4 md:table-row md:p-0">
-                  <th scope="row" className="block font-black text-slate-950 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="text-base md:text-sm">Juneau</span>
-                    <span className="mt-0.5 block text-[11px] font-bold text-sky-800">Whales &amp; Glacier Ice</span>
-                  </th>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Book Here:</span>
-                    Auke Bay humpback whale watching ($165–$195), Mendenhall Glacier combos ($245–$295), and Juneau Icefield helicopter glacier landings ($409–$429).
-                  </td>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Avoid Duplicating:</span>
-                    Skip generic town trolleys—save historic rail for Skagway and totem parks or bush floatplanes for Ketchikan.
-                  </td>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Dock &amp; Buffer:</span>
-                    Mt. Roberts Tram Plaza pickup (AJ Dock uses 5-min shuttle). Keep a 45–60 min all-aboard buffer.
-                  </td>
-                  <td className="mt-3 block md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <div className="flex flex-wrap gap-2">
-                      <Link href="/plan?port=juneau&topic=best-overall&sourcePage=/ports" className="font-black text-sky-800 underline decoration-sky-400 decoration-2 underline-offset-4 hover:text-sky-950">
-                        Juneau /plan shortlist
-                      </Link>
-                      <span className="text-slate-300">·</span>
-                      <Link href="/ports/juneau" className="font-bold text-slate-700 hover:underline">
-                        /ports/juneau
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr className="block bg-slate-50/70 p-4 md:table-row md:p-0">
-                  <th scope="row" className="block font-black text-slate-950 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="text-base md:text-sm">Skagway</span>
-                    <span className="mt-0.5 block text-[11px] font-bold text-sky-800">Rail, Summit &amp; Sled Dogs</span>
-                  </th>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Book Here:</span>
-                    White Pass &amp; Yukon Route narrow-gauge rail, Klondike summit &amp; 1898 Gold Rush camps ($65–$120), plus Dyea wheeled sled-dog camps ($140–$180) or the $599 Denver Glacier helicopter dogsledding demonstration (observation only, no riding).
-                  </td>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Avoid Duplicating:</span>
-                    Don&apos;t book whale watching in upper Lynn Canal—do whales in Juneau and keep Skagway for mountain rail, summit overlooks, and huskies.
-                  </td>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Dock &amp; Buffer:</span>
-                    5–15 min flat walk from Ore/Broadway Docks (shuttle at Railroad Dock). Keep 45+ min return cushion.
-                  </td>
-                  <td className="mt-3 block md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <div className="flex flex-wrap gap-2">
-                      <Link href="/plan?port=skagway&topic=best-overall&sourcePage=/ports" className="font-black text-sky-800 underline decoration-sky-400 decoration-2 underline-offset-4 hover:text-sky-950">
-                        Skagway /plan shortlist
-                      </Link>
-                      <span className="text-slate-300">·</span>
-                      <Link href="/ports/skagway" className="font-bold text-slate-700 hover:underline">
-                        /ports/skagway
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-
-                <tr className="block p-4 md:table-row md:p-0">
-                  <th scope="row" className="block font-black text-slate-950 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="text-base md:text-sm">Ketchikan</span>
-                    <span className="mt-0.5 block text-[11px] font-bold text-sky-800">Floatplanes, Crab &amp; Totems</span>
-                  </th>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Book Here:</span>
-                    Misty Fjords floatplanes with water landing ($330–$395), Bering Sea crab boat &amp; Herring Cove black bears ($120–$215), and Saxman / Totem Bight totem parks.
-                  </td>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Avoid Duplicating:</span>
-                    No roadside glaciers in Ketchikan—save glacier ice walks for Juneau/Skagway and prioritize floatplanes, crab boats, bears, and totems here.
-                  </td>
-                  <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Dock &amp; Buffer:</span>
-                    Berths 1–4 step right downtown (45–60 min buffer); Ward Cove is 9 mi north via 20-min shuttle (allow 90-min buffer).
-                  </td>
-                  <td className="mt-3 block md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
-                    <div className="flex flex-wrap gap-2">
-                      <Link href="/plan?port=ketchikan&topic=best-overall&sourcePage=/ports" className="font-black text-sky-800 underline decoration-sky-400 decoration-2 underline-offset-4 hover:text-sky-950">
-                        Ketchikan /plan shortlist
-                      </Link>
-                      <span className="text-slate-300">·</span>
-                      <Link href="/ports/ketchikan" className="font-bold text-slate-700 hover:underline">
-                        /ports/ketchikan
-                      </Link>
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
           </div>
         </section>
       </div>
