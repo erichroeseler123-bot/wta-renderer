@@ -175,7 +175,7 @@ export default function PortsPage() {
                     <strong className="font-black text-slate-950">White Pass &amp; Yukon Route rail:</strong> Historic narrow-gauge mountain railway climbing steep cliffside trestles above the 1898 Trail of &apos;98.
                   </li>
                   <li>
-                    <strong className="font-black text-slate-950">Klondike summit &amp; sled-dog camps:</strong> Pair White Pass summit overlooks and Liarsville Gold Rush camp ($65–$95) with Dyea wheeled sled-dog camps ($140–$180) or Denver Glacier helicopter mushing ($599).
+                    <strong className="font-black text-slate-950">Klondike summit &amp; sled-dog camps:</strong> Pair White Pass summit overlooks and Liarsville Gold Rush camp ($65–$95) with Dyea wheeled sled-dog camps ($140–$180) or the $599 Denver Glacier helicopter dogsledding demonstration (guests observe the demonstration only—no sled riding).
                   </li>
                   <li>
                     <strong className="font-black text-slate-950">Save for other ports:</strong> Skip marine wildlife cruises in upper Lynn Canal—do whales in Juneau and dedicate Skagway to rail, summit routes, and sled dogs.
@@ -247,7 +247,7 @@ export default function PortsPage() {
                     href="/plan?port=ketchikan&topic=wildlife-whales&sourcePage=/ports"
                     className="inline-flex items-center rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-black text-slate-900 transition hover:bg-slate-100"
                   >
-                    Crab &amp; wildlife /plan →
+                    Wildlife /plan shortlist →
                   </Link>
                   <Link
                     href="/ports/ketchikan"
@@ -312,7 +312,7 @@ export default function PortsPage() {
                   </th>
                   <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
                     <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Book Here:</span>
-                    White Pass &amp; Yukon Route narrow-gauge rail, Klondike summit &amp; 1898 Gold Rush camps ($65–$120), plus Dyea or Denver Glacier sled-dog camps ($140–$599).
+                    White Pass &amp; Yukon Route narrow-gauge rail, Klondike summit &amp; 1898 Gold Rush camps ($65–$120), plus Dyea wheeled sled-dog camps ($140–$180) or the $599 Denver Glacier helicopter dogsledding demonstration (observation only, no riding).
                   </td>
                   <td className="mt-2 block text-slate-700 md:mt-0 md:table-cell md:px-5 md:py-4 md:align-top">
                     <span className="block text-[10px] font-black uppercase tracking-wider text-slate-500 md:hidden">Avoid Duplicating:</span>
