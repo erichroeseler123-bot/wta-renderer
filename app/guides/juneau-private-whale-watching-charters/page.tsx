@@ -135,6 +135,7 @@ export default function JuneauPrivateWhaleWatchingPage() {
     datePublished: "2026-09-23",
     dateModified: "2026-09-23",
     mainEntityOfPage: canonical,
+    author: { "@type": "Organization", name: "Welcome to Alaska Tours", url: "https://www.welcometoalaskatours.com" },
     publisher: { "@type": "Organization", name: "Welcome To Alaska Tours" },
   };
 

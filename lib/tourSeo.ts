@@ -1,20 +1,50 @@
 import type { HelicopterTour } from "@/lib/helicopterTours";
 
-export function getProductOneLiner(tour: { title?: string | null; category?: string | null; port?: string | null }) {
+export function getProductOneLiner(tour: { title?: string | null; category?: string | null; port?: string | null; company?: string | null; pk?: number | string | null }) {
   const title = (tour.title || "").toLowerCase();
   const category = (tour.category || "").toLowerCase();
   const port = (tour.port || "juneau").toLowerCase();
   const portName = port.charAt(0).toUpperCase() + port.slice(1);
+  const comp = String(tour.company || "").toLowerCase();
 
-  if (title.includes("trek") || title.includes("walk") || title.includes("hike")) {
-    return `Ice trekking and guided glacier walks optimized for active cruise days in ${portName}.`;
+  // Floatplane / seaplane flightseeing (e.g. Taquan Air in Ketchikan or Wings Airways in Juneau)
+  if (comp.includes("taquan") || title.includes("seaplane") || title.includes("floatplane") || (port === "ketchikan" && (title.includes("flight") || category.includes("air")))) {
+    if (title.includes("bear")) {
+      return `Remote floatplane wilderness flightseeing and coastal bear viewing in ${portName}.`;
+    }
+    return `Scenic floatplane flightseeing across Misty Fjords National Monument from ${portName}.`;
   }
-  if (title.includes("dog") || title.includes("sled") || title.includes("mush")) {
-    return `Premium glacier flightseeing and husky dog sledding tailored to fit your ${portName} timetable.`;
-  }
-  if (title.includes("helicopter") || title.includes("flight") || category.includes("air")) {
+
+  // Helicopter flightseeing
+  if (title.includes("helicopter") || (category.includes("air") && port !== "ketchikan")) {
+    if (title.includes("dog") || title.includes("sled")) {
+      return `Glacier helicopter flightseeing and alpine husky dog sledding camp in ${portName}.`;
+    }
     return `Helicopter flightseeing and glacier landing built for a shorter ${portName} port window.`;
   }
+
+  if (title.includes("dog") || title.includes("sled") || title.includes("mush")) {
+    return `Authentic sled dog demonstration and musher experience tailored to your ${portName} timetable.`;
+  }
+
+  // Ketchikan Duck Tour
+  if (comp.includes("akduck") || title.includes("duck")) {
+    return `Classic 90-minute amphibious sightseeing tour through historic downtown and Ketchikan harbor.`;
+  }
+
+  // Boardwalk / Rainforest / Bear tours
+  if (title.includes("boardwalk") || title.includes("bear") || comp.includes("alaskarainforest")) {
+    return `Rainforest wildlife sanctuary and boardwalk nature walk in ${portName}.`;
+  }
+
+  // Hiking & Glaciers (only if glacier or actual mountain trek)
+  if ((title.includes("trek") || title.includes("glacier") || title.includes("ice")) && !title.includes("boardwalk")) {
+    return `Ice trekking and guided glacier walks optimized for active cruise days in ${portName}.`;
+  }
+  if (title.includes("hike") && !title.includes("boardwalk")) {
+    return `Guided rainforest and mountain hiking optimized for active cruise days in ${portName}.`;
+  }
+
   if (title.includes("whale") || title.includes("watching") || category.includes("whale")) {
     return `Marine wildlife and whale watching timed for a safe return during your ${portName} port day.`;
   }
@@ -59,15 +89,20 @@ export function buildTourUrl(tour: Pick<HelicopterTour, "company" | "pk">) {
   return `https://www.welcometoalaskatours.com/tours/${tour.company}/${tour.pk}`;
 }
 
-export function sanitizeTour<T extends Pick<HelicopterTour, "description"> & { company?: string; pk?: number | string; fromPrice?: string }>(tour: T): T {
+export function sanitizeTour<T extends Pick<HelicopterTour, "description"> & { company?: string; pk?: number | string; fromPrice?: string; category?: string }>(tour: T): T {
   const comp = String(tour.company || "").toLowerCase();
   const pkStr = String(tour.pk || "");
   const isNorthStar405050 = comp === "northstartrekking" && pkStr === "405050";
   const isTemsco556 = comp === "temscoair-skagway" && pkStr === "213556";
   const isTemsco561 = comp === "temscoair-skagway" && pkStr === "213561";
+  const isAkDuck4161 = comp === "akduck" && pkStr === "4161";
+  const isBearsBrews563489 = comp === "alaskarainforest" && pkStr === "563489";
+  const isTaquan392949 = comp === "taquanair" && pkStr === "392949";
+  const isTaquan392950 = comp === "taquanair" && pkStr === "392950";
 
   let fromPrice = tour.fromPrice;
   let description = cleanTourDescription(tour.description);
+  let category = tour.category;
 
   if (isNorthStar405050) {
     fromPrice = "$419 Per Person (Flat Rate)";
@@ -80,6 +115,21 @@ export function sanitizeTour<T extends Pick<HelicopterTour, "description"> & { c
   } else if (isTemsco561) {
     fromPrice = "$599 Per Person (Flat Rate)";
     description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
+  } else if (isAkDuck4161) {
+    fromPrice = "$79 Adult / $47 Child (Flat Rate)";
+    description = "90 Minutes • All Ages • Historic downtown Ketchikan & scenic harbor splash";
+    category = "Adventures";
+  } else if (isBearsBrews563489) {
+    description = "3.5 Hours • All Ages (Brewery 21+) • Rainforest boardwalk bear viewing & craft brewery tasting";
+    category = "Adventures";
+  } else if (isTaquan392949) {
+    fromPrice = "$369 Per Person (Flat Rate)";
+    description = "Floatplane Flightseeing • 2 Hours • All Ages • Remote fjord water landing";
+    category = "Air Tours";
+  } else if (isTaquan392950) {
+    fromPrice = "$399 Per Person (Flat Rate)";
+    description = "Floatplane Bear Viewing • 3 Hours 15 Minutes • All Ages • Traitors Cove / Neets Bay";
+    category = "Air Tours";
   }
 
   description = description.replace(/^Starting at\s+/i, "");
@@ -88,6 +138,7 @@ export function sanitizeTour<T extends Pick<HelicopterTour, "description"> & { c
     ...tour,
     description,
     fromPrice,
+    category,
   };
 }
 

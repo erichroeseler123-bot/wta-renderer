@@ -59,6 +59,47 @@ export default function AboutPage() {
           ))}
         </div>
 
+        {/* Who We Are & Experience */}
+        <div className="mt-10 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Our Role & Approach</div>
+          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">Independent shore excursion comparison for Alaska cruisers</h2>
+          <div className="mt-4 space-y-4 text-sm leading-7 text-slate-300">
+            <p>
+              Welcome to Alaska Tours is an independent directory and booking resource for cruise passengers visiting Juneau, Skagway, and Ketchikan. We built this platform to provide a clear alternative to cruise-line excursion desks and scattered operator websites.
+            </p>
+            <p>
+              By aggregating tour inventory from local operators into standardized categories, we help travelers compare tour formats, durations, base pricing, and live departure times in one place. Our planning tools focus on the practical details cruise passengers need: published meeting hubs, walking distances from berths, and return buffers before scheduled ship departure.
+            </p>
+          </div>
+        </div>
+
+        {/* How Operators Are Selected */}
+        <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.03] p-6 sm:p-8">
+          <div className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Catalog Criteria</div>
+          <h2 className="mt-2 text-xl font-black text-white sm:text-2xl">How tours and operators are featured</h2>
+          <p className="mt-3 text-sm leading-7 text-slate-300">
+            Our catalog connects travelers to established commercial excursion operators operating in Southeast Alaska:
+          </p>
+          <div className="mt-6 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">Direct Reservation Connectivity</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">We integrate with live reservation software (such as FareHarbor) so travelers view real-time departures, live seat availability, and operator-direct booking terms.</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">Established Local Operators</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">Featured companies are established commercial businesses licensed to operate in Juneau, Skagway, or Ketchikan, ranging from marine wildlife operators to flightseeing bases.</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">Cruise Port Alignment</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">We feature tours whose departures, staging locations, and durations are designed to fit within standard cruise-day port call schedules.</p>
+            </div>
+            <div className="rounded-xl border border-white/10 bg-black/20 p-4">
+              <div className="font-bold text-white text-sm">Transparent Policy Disclosures</div>
+              <p className="mt-1 text-xs leading-5 text-slate-400">We display each operator&apos;s specific cancellation deadlines, weather policies, and meeting instructions before booking so travelers know exact terms up front.</p>
+            </div>
+          </div>
+        </div>
+
         <div className="mt-8">
           <h2 className="text-sm font-black uppercase tracking-wider text-slate-300 mb-4">Ports We Serve</h2>
           <div className="grid gap-4 sm:grid-cols-3">

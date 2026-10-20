@@ -206,6 +206,7 @@ export function buildAlaskaTourShortlist(
   const shortlist = buildRecommendationShortlist({
     candidates: tours,
     limit,
+    diversityKey: (tour) => tour.company,
     evaluate: (tour) => evaluateTour(tour, style),
     tieBreak: (a, b) => {
       const aPrice = a.meta?.price ?? Number.MAX_SAFE_INTEGER;

@@ -203,11 +203,13 @@ const OPERATOR_POLICIES: Record<
   "skagwayscooters": {
     operatorName: "Skagway Scooters",
     weatherPolicy: "100% full refund in case of operator cancellation or unforeseen circumstances.",
-    guestCutoffNotice: "72+ hours notice of cancellation (100% refund); non-refundable within 48 hours of departure.",
-    shortSummary: "100% refund for operator cancellation. Guest cancellations: 72+ hours notice (100%), non-refundable within 48 hours.",
+    guestCutoffNotice: "Full refund with at least 72 hours notice; non-refundable within 48 hours of departure. Inquiries regarding cancellations or unforeseen circumstances should be directed to the operator at skagwayscooters@gmail.com or 907-302-9851.",
+    shortSummary: "100% refund for operator cancellation or unforeseen circumstances. Guest cancellations: 100% refund with 72+ hours notice; non-refundable within 48 hours.",
     detailedBullets: [
       "72+ hours notice of cancellation: 100% full refund.",
       "Within 48 hours of departure: Non-refundable.",
+      "Cancellations or unforeseen circumstances: Contact operator directly at skagwayscooters@gmail.com or 907-302-9851.",
+      "No-shows are charged full price.",
     ],
   },
   "snorkelalaska": {

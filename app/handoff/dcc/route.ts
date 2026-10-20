@@ -23,12 +23,23 @@ function parseHandoffFromRequest(req: NextRequest): DccToWtaHandoff {
   }
 
   const sig = req.nextUrl.searchParams.get("sig");
-  const secret = String(process.env.DCC_WTA_HANDOFF_SIG_SECRET || "").trim();
-  if (sig && !secret) {
+  const secret = String(
+    process.env.DCC_WTA_HANDOFF_SIG_SECRET ||
+    process.env.DCC_WTA_HANDOFF_SECRET ||
+    process.env.WTA_HANDOFF_SIG_SECRET ||
+    process.env.WTA_HANDOFF_SECRET ||
+    ""
+  ).trim();
+
+  if (secret) {
+    if (!sig) {
+      throw new Error("Missing handoff signature");
+    }
+    if (!verifyDccHandoffSignature(payload, sig, secret)) {
+      throw new Error("Invalid handoff signature");
+    }
+  } else if (sig) {
     throw new Error("Missing DCC_WTA_HANDOFF_SIG_SECRET");
-  }
-  if (sig && secret && !verifyDccHandoffSignature(payload, sig, secret)) {
-    throw new Error("Invalid handoff signature");
   }
 
   const decoded = decodeHandoffPayload(payload);

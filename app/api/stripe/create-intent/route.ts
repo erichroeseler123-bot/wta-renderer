@@ -3,6 +3,8 @@ import Stripe from "stripe";
 import { getKV } from "@/lib/kv";
 import {
   saveOrder,
+  makeOrderCancelToken,
+  hashClientSecret,
   type OrderAttribution,
   type OrderLine,
   type OrderSnapshot,
@@ -263,6 +265,7 @@ export async function POST(req: NextRequest) {
       attribution,
       status: "payment_pending",
       bookingAttempts: 0,
+      cancel_token: makeOrderCancelToken(order_id, email),
     };
 
     await saveOrder(draft);
@@ -346,6 +349,7 @@ export async function POST(req: NextRequest) {
     const withPI: OrderSnapshot = {
       ...draft,
       payment_intent_id: pi.id,
+      client_secret_hash: pi.client_secret ? hashClientSecret(pi.client_secret) : undefined,
       status: "payment_pending",
     };
 

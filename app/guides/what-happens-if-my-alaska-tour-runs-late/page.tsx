@@ -7,12 +7,12 @@ import GeoDirectAnswerCard from "@/components/seo/GeoDirectAnswerCard";
 const canonical = "https://www.welcometoalaskatours.com/guides/what-happens-if-my-alaska-tour-runs-late";
 
 export const metadata: Metadata = {
-  title: "What Happens If Your Alaska Tour Runs Late? (Safety Guarantee)",
-  description: "Cruise passenger safety guide: how independent Alaska tour operators guarantee on-time ship return, strict safety buffers, and comprehensive contingency protections.",
+  title: "What Happens If Your Alaska Tour Runs Late? (Timing Rules & Port Safety)",
+  description: "Cruise passenger timing guide: how Alaska tour operators manage schedules, 45-to-90 minute safety buffers, operator cancellation policies, and port logistics.",
   alternates: { canonical },
   openGraph: {
-    title: "What Happens If Your Alaska Tour Runs Late? (Safety Guarantee)",
-    description: "Cruise passenger safety guide: how independent Alaska tour operators guarantee on-time ship return, strict safety buffers, and comprehensive contingency protections.",
+    title: "What Happens If Your Alaska Tour Runs Late? (Timing Rules & Port Safety)",
+    description: "Cruise passenger timing guide: how Alaska tour operators manage schedules, 45-to-90 minute safety buffers, operator cancellation policies, and port logistics.",
     url: canonical,
     type: "article",
     images: [{ url: "https://www.welcometoalaskatours.com/images/ketchikan/ketchikan-cruise-port.jpg", width: 1200, height: 630, alt: "Alaska cruise ship docked in port" }],
@@ -21,12 +21,16 @@ export const metadata: Metadata = {
 
 const faqs = [
   {
-    "question": "Has a Welcome to Alaska Tours guest ever missed their cruise ship?",
-    "answer": "No. Our verified local partners have a 100% on-time record across thousands of passenger departures. Operators schedule conservative timing buffers specifically to eliminate risk."
+    "question": "What is the recommended buffer between tour return and ship all-aboard?",
+    "answer": "We recommend choosing excursions that conclude at least 45 to 60 minutes prior to your ship's all-aboard time (which is typically 30 to 60 minutes before departure). This gives you ample cushion to walk through the security terminal and board stress-free."
+  },
+  {
+    "question": "What happens if our cruise ship misses the port or docks late?",
+    "answer": "Most local operators in Southeast Alaska coordinate directly with cruise port schedules, providing full refunds or rescheduling if your ship misses port or arrives late. Specific cancellation and weather refund policies vary by operator and are disclosed on each tour's booking page."
   },
   {
     "question": "Does the cruise ship wait for ship-booked excursions if they run late?",
-    "answer": "While ships will wait for ship-sponsored excursions if feasible, even cruise-line tours must adhere to tidal and maritime schedules. Independent operators maintain direct radio contact with port dispatchers and harbor pilots."
+    "answer": "While cruise lines may attempt to wait for large ship-sponsored groups when feasible, all vessels operate under strict tidal windows and departure clearances. Independent operators in Southeast Alaska work in direct coordination with port schedules, scheduling returns well before all-aboard."
   }
 ];
 
@@ -51,6 +55,7 @@ export default function GuidePage() {
     datePublished: "2026-08-24",
     dateModified: "2026-09-13",
     mainEntityOfPage: canonical,
+    author: { "@type": "Organization", name: "Welcome to Alaska Tours", url: "https://www.welcometoalaskatours.com" },
     publisher: { "@type": "Organization", name: "Welcome To Alaska Tours" },
   };
 
@@ -113,11 +118,11 @@ export default function GuidePage() {
         <section className="mt-8 rounded-[2rem] border border-sky-100 bg-white p-6 shadow-sm sm:p-8">
           <div className="text-[10px] font-black uppercase tracking-[0.2em] text-sky-700">Quick Decision Summary</div>
           <p className="mt-3 text-lg font-bold leading-8 text-slate-900">
-            {"Independent tour operators operate under a mandatory safety rule: tour end time + 45 minutes <= ship all-aboard time. Because Alaska ports (Juneau, Skagway, Ketchikan) have compact, single-corridor road networks, traffic jams do not exist. In the extraordinarily rare event of a mechanical delay, operators communicate directly with harbor pilots, deploy backup transport, and carry comprehensive 100% back-to-ship guarantees."}
+            {"Independent tour operators structure departures around cruise schedules, adhering to a conservative planning cushion: tour return time + 45 to 60 minutes <= ship all-aboard time. Because Alaska ports (Juneau, Skagway, Ketchikan) have compact, single-corridor roads without highway congestion, transit times are predictable. Local operators coordinate directly with cruise arrivals, with policies designed to refund or reschedule when maritime weather or itinerary changes prevent touring."}
           </p>
           <div className="mt-4 rounded-xl bg-amber-50 border border-amber-200 p-4 text-xs font-semibold text-amber-900">
-            <strong>Cruise Safety Buffer:</strong> We enforce the verified formula:{" "}
-            <code className="rounded bg-amber-100 px-1 py-0.5 font-mono text-amber-950">tour end time + 45 minutes &le; ship all-aboard time</code>. If timing cannot be verified, an excursion is never labeled cruise-safe.
+            <strong>Recommended Cruise Safety Buffer:</strong> We recommend selecting excursions using the formula:{" "}
+            <code className="rounded bg-amber-100 px-1 py-0.5 font-mono text-amber-950">tour return time + 45 to 60 minutes &le; ship all-aboard time</code>. Always verify your cruise ship's daily all-aboard notice onboard.
           </div>
         </section>
 
@@ -141,8 +146,8 @@ export default function GuidePage() {
               </div>
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-lg font-black text-slate-900">{"Tour End Time + 45 Minutes &le; All-Aboard"}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">{"All-aboard is typically 30 to 60 minutes before scheduled ship departure. Reputable independent tours finish a minimum of 45 to 90 minutes prior to all-aboard. If your all-aboard is 4:30 PM, your tour must return to the dock by 3:45 PM or earlier."}</p>
+                  <h3 className="text-lg font-black text-slate-900">{"Tour Return + 45–60 Min &le; All-Aboard"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"All-aboard is typically 30 to 60 minutes before scheduled ship departure. Reputable independent tours finish a minimum of 45 to 90 minutes prior to all-aboard. If your all-aboard is 4:30 PM, choose an excursion returning to the dock by 3:30 PM to 3:45 PM."}</p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-slate-100">
                   <Link href="/guides/cruise-ship-vs-independent-alaska-excursions" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
@@ -168,7 +173,7 @@ export default function GuidePage() {
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div>
                   <h3 className="text-lg font-black text-slate-900">{"Why Alaska Ports Are Low-Risk"}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Unlike sprawling metropolitan ports like Rome, Barcelona, or Miami where cruise ships dock 60 miles away from city centers through heavy freeway traffic, Alaska ports are tiny towns. In Juneau, the airport is 15 minutes away; in Skagway, the town is 7 blocks long."}</p>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"Unlike sprawling metropolitan ports like Rome or Miami where cruise ships dock 60 miles away through heavy freeway traffic, Alaska ports are small communities. In Juneau, the airport is 15 minutes away; in Skagway, the town is 7 blocks long."}</p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-slate-100">
                   <Link href="/guides/how-long-does-it-take-to-get-off-the-ship-in-juneau" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
@@ -178,7 +183,7 @@ export default function GuidePage() {
               </div>
             </div>
 
-            <div key={"Our 100% Back-to-Ship Guarantee"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
+            <div key={"Operator Port & Weather Policies"} className="overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm hover:shadow-md transition flex flex-col">
               <div className="relative h-48 w-full bg-slate-100">
                 <Image
                   src="/images/ketchikan/ketchikan-cruise-port.jpg"
@@ -188,13 +193,13 @@ export default function GuidePage() {
                   className="object-cover"
                 />
                 <span className="absolute bottom-3 left-3 rounded-full bg-slate-950/80 px-3 py-1 text-[11px] font-bold text-white backdrop-blur">
-                  Back-To-Ship Guarantee
+                  Operator Terms
                 </span>
               </div>
               <div className="p-6 flex-1 flex flex-col justify-between">
                 <div>
-                  <h3 className="text-lg font-black text-slate-900">{"100% Back-to-Ship Guarantee"}</h3>
-                  <p className="mt-3 text-sm leading-6 text-slate-600">{"In the virtually non-existent event that an operator delay causes you to miss your ship, reputable operators provide full contingency coverage: arranging and paying for air transportation, meals, and lodging to deliver you to the next port."}</p>
+                  <h3 className="text-lg font-black text-slate-900">{"Operator Port & Weather Policies"}</h3>
+                  <p className="mt-3 text-sm leading-6 text-slate-600">{"When maritime weather or itinerary shifts cause a ship to bypass port or dock late, operators coordinate directly with passengers to reschedule or issue refunds per their published terms. Always review the operator-specific cancellation policy shown on your excursion details page."}</p>
                 </div>
                 <div className="mt-5 pt-4 border-t border-slate-100">
                   <Link href="/ports" className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-wider text-sky-700 hover:text-sky-900">
@@ -223,7 +228,7 @@ export default function GuidePage() {
         <section className="mt-14 rounded-3xl bg-slate-900 p-8 text-white text-center">
           <h2 className="text-2xl font-black sm:text-3xl">Ready to Lock In Your Alaska Shore Excursions?</h2>
           <p className="mt-3 text-sm text-slate-300 max-w-xl mx-auto">
-            Book directly with verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, no hidden fees, and full back-to-ship guarantees.
+            Compare verified local operators in Juneau, Skagway, and Ketchikan with live calendar availability, transparent pricing, and clear operator cancellation policies.
           </p>
           <div className="mt-6 flex flex-wrap justify-center gap-4">
             <Link

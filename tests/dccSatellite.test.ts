@@ -29,17 +29,33 @@ test("payload decode round-trips the DCC handoff body", () => {
   assert.equal(decoded.destination?.portSlug, "juneau");
 });
 
-test("signature verification accepts valid sig and rejects invalid sig", () => {
+test("signature verification accepts valid base64url and hex sigs, rejects invalid and tampered sigs", () => {
   const payload = encodeHandoffPayload({
     source: "dcc",
     version: "1",
     handoffId: "ho_sig_123",
   });
   const secret = "sig-secret";
-  const sig = signDccHandoffPayload(payload, secret);
+  
+  // base64url signature (DCC standard)
+  const b64Sig = signDccHandoffPayload(payload, secret, "base64url");
+  assert.equal(verifyDccHandoffSignature(payload, b64Sig, secret), true);
 
-  assert.equal(verifyDccHandoffSignature(payload, sig, secret), true);
+  // hex signature (fallback)
+  const hexSig = signDccHandoffPayload(payload, secret, "hex");
+  assert.equal(verifyDccHandoffSignature(payload, hexSig, secret), true);
+
+  // invalid signature
   assert.equal(verifyDccHandoffSignature(payload, "bad-signature", secret), false);
+
+  // tampered payload
+  const tamperedPayload = encodeHandoffPayload({
+    source: "dcc",
+    version: "1",
+    handoffId: "ho_tampered_999",
+  });
+  assert.equal(verifyDccHandoffSignature(tamperedPayload, b64Sig, secret), false);
+  assert.equal(verifyDccHandoffSignature(tamperedPayload, hexSig, secret), false);
 });
 
 test("buildDccReturnUrl appends tracking params to a valid DCC URL", () => {

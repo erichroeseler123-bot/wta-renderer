@@ -14,8 +14,8 @@ const APPROVED_PORTS = ["juneau", "skagway", "ketchikan"];
 
 const PORT_INFO: Record<string, { title: string; description: string; problem: string }> = {
   juneau: {
-    title: "Juneau Shore Excursions: Whale Watching, Mendenhall & Helicopter Tours (2026)",
-    description: "Compare Juneau whale watching, Mendenhall Glacier combos, helicopter glacier treks, dog sledding, and fishing charters. Operator weather refunds and cruise dock shuttles.",
+    title: "Juneau Shore Excursions & Shore Tours | 2026 Alaska Cruise Port Guide",
+    description: "Compare verified Juneau shore excursions and cruise shore tours for 2026: whale watching catamarans, Mendenhall Glacier combos, helicopter icefield treks, and salmon or halibut fishing charters with cruise dock pickup.",
     problem: "Juneau has Alaska's largest excursion menu. The key is coordinating signature highlights like whale watching and Mendenhall Glacier with your ship's specific port window and a 45–60 minute return safety buffer.",
   },
   skagway: {
@@ -37,7 +37,7 @@ const MONEY_LINKS: Record<string, Array<{ href: string; title: string; text: str
     { href: "/juneau/glacier-tours", title: "Glacier tours & icefield treks", text: "Icefield flights, crampon treks, lake paddles, and ice walking." },
     { href: "/juneau/helicopter-tours", title: "Helicopter tours & prices", text: "Compare glacier landings, guided walks, treks and dog sledding flights." },
     { href: "/juneau/dog-sledding", title: "Dog sledding", text: "Summer camps and helicopter-accessed glacier dog experiences." },
-    { href: "/juneau/fishing", title: "Fishing charters", text: "Compare guided salmon, halibut, combination and private fishing trips." },
+    { href: "/juneau/fishing", title: "Fishing charters", text: "Guided King and Silver salmon, deep-sea halibut, combo trips and 6-passenger private boats." },
     { href: "/juneau/gold-panning", title: "Gold panning", text: "Hands-on gold panning, mining history and salmon-bake combinations." },
     { href: "/juneau/easy-shore-excursions", title: "Easy shore excursions", text: "Comfortable, low-walking tours: covered catamarans and scenic drives." },
     { href: "/juneau/private-tours", title: "Private charters", text: "Exclusive private whale-watching boats, fishing charters, and vans." },
@@ -148,7 +148,7 @@ export default async function PortPage({ params, searchParams }: { params: Promi
   const groups = [
     { title: "Best for first-time visitors", blurb: `A fast starting point if this is your first cruise stop in ${portTitle}.`, tours: evaluatedTours.filter((tour) => firstTimerTerms[slug].some((term) => searchable(tour).includes(term))).slice(0, 6) },
     { title: "Under $200", blurb: "Lower-cost choices that still feel like a real Alaska port-day experience.", tours: evaluatedTours.filter((tour) => { const price = priceDollars(tour.fromPrice); return price !== null && price < 200; }).sort((a, b) => (priceDollars(a.fromPrice) || 99999) - (priceDollars(b.fromPrice) || 99999)).slice(0, 6) },
-    { title: "Wildlife", blurb: "Whales, bears, rainforest wildlife, and marine-life experiences.", tours: evaluatedTours.filter((tour) => /(whale|bear|wildlife|orca|salmon)/i.test(searchable(tour))).slice(0, 6) },
+    { title: "Wildlife", blurb: "Whales, bears, rainforest wildlife, and marine-life experiences.", tours: evaluatedTours.filter((tour) => { const text = searchable(tour); if (/salmon\s*bake/i.test(text) && !/(whale|bear|orca)/i.test(text)) return false; return /(whale|bear|wildlife|orca|salmon)/i.test(text); }).slice(0, 6) },
     { title: "Bucket-list Alaska", blurb: "The big-ticket, tell-everyone-about-it experiences.", tours: evaluatedTours.filter((tour) => /(helicopter|dog sled|flightseeing|seaplane|misty fjords|glacier|bear viewing)/i.test(searchable(tour))).sort((a, b) => (priceDollars(b.fromPrice) || 0) - (priceDollars(a.fromPrice) || 0)).slice(0, 6) },
     { title: "Families & easier days", blurb: "Experiences that read as broadly accessible, all-ages, scenic, or less strenuous in the operator descriptions.", tours: evaluatedTours.filter((tour) => /(all ages|family|visitor center|salmon bake|duck tour|wildlife sanctuary|sightseeing|lighthouse|feast)/i.test(searchable(tour))).slice(0, 6) },
     { title: "Shorter port-day options", blurb: "Useful when you do not want one excursion to consume the entire stop.", tours: evaluatedTours.filter((tour) => tour.hours > 0 && tour.hours <= 3.5).sort((a, b) => a.hours - b.hours).slice(0, 6) },
@@ -191,7 +191,7 @@ export default async function PortPage({ params, searchParams }: { params: Promi
 
         <section className="relative mt-6 overflow-hidden rounded-[2.5rem] bg-slate-950 text-white shadow-lg">
           <div className="absolute inset-0"><img src={slug === "juneau" ? "/hero/juneau.jpg" : slug === "skagway" ? "/hero/skagway.jpg" : "/hero/ketchikan.png"} alt={`${portTitle} Shore Excursions`} className="h-full w-full object-cover opacity-55" /><div className="absolute inset-0 bg-gradient-to-r from-slate-950/95 via-slate-950/75 to-slate-950/20" /></div>
-          <div className="relative max-w-3xl p-7 sm:p-12"><div className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300">{portTours.length} excursion choices</div><h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">What should you do in {portTitle}?</h1><p className="mt-4 max-w-2xl text-sm leading-6 text-slate-200">Start with the kind of day you want. We grouped the available FareHarbor inventory so you do not have to compare every tour one by one.</p></div>
+          <div className="relative max-w-3xl p-7 sm:p-12"><div className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300">{portTours.length} excursion choices</div><h1 className="mt-3 text-4xl font-black tracking-tight sm:text-5xl">{slug === "juneau" ? "Juneau Shore Excursions & Shore Tours (2026)" : `What should you do in ${portTitle}?`}</h1><p className="mt-4 max-w-2xl text-sm leading-6 text-slate-200">{slug === "juneau" ? "Explore top-rated Juneau shore excursions and cruise shore tours tailored for cruise passengers. From humpback whale watching in Auke Bay and Mendenhall Glacier combos to helicopter icefield flights and deep-sea salmon or halibut fishing charters, compare verified local operators with guaranteed cruise dock transfers and ship-safe timing buffers." : "Start with the kind of day you want. We grouped the available FareHarbor inventory so you do not have to compare every tour one by one."}</p></div>
         </section>
 
         {/* DIRECT ANSWER CARD FOR GOOGLE AI OVERVIEWS */}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import PlanTelemetry from "@/app/components/plan/PlanTelemetry";
+import { finderReturnHref } from "@/lib/finderChoices";
 import { getHelicopterToursSnapshot, type HelicopterTour } from "@/lib/helicopterTours";
 import { sanitizeTours } from "@/lib/tourSeo";
 import {
@@ -42,6 +43,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
   const date = readParam(params.date).trim();
   const sourcePage = readParam(params.sourcePage).trim() || "/";
   const styleCopy = STYLE_COPY[style];
+  const returnToFinder = finderReturnHref({ port, topic: style, date });
 
   const allTours = sanitizeTours(await getHelicopterToursSnapshot()) as HelicopterTour[];
   const portTours = allTours.filter((tour) => tour.port === port);
@@ -70,7 +72,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
       />
 
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-10">
-        <Link href="/#find-your-port-day" className="text-sm font-bold text-sky-800 hover:text-sky-950">← Change my choices</Link>
+        <Link href={returnToFinder} className="text-sm font-bold text-sky-800 hover:text-sky-950">← Change my choices</Link>
 
         <section className="mt-4 overflow-hidden rounded-[2.25rem] border border-sky-100 bg-[linear-gradient(135deg,#082f49_0%,#0f172a_52%,#164e63_100%)] p-6 text-white shadow-[0_24px_80px_rgba(15,23,42,0.14)] sm:p-8">
           <div className="max-w-3xl">
@@ -96,7 +98,7 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
             <p className="mt-3 text-sm text-slate-600">Browse the full catalog or choose another port while inventory is refreshed.</p>
             <div className="mt-5 flex flex-wrap justify-center gap-3">
               <Link href="/tours" className="rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white">Browse all tours</Link>
-              <Link href="/#find-your-port-day" className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900">Choose another port</Link>
+              <Link href={returnToFinder} className="rounded-xl border border-slate-200 bg-white px-5 py-3 text-sm font-bold text-slate-900">Choose another port</Link>
             </div>
           </section>
         ) : (
@@ -114,6 +116,8 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
                 resolvedLane: style,
                 degradedFallback: String(degradedFallback),
               });
+              if (date) contextParams.set("date", date);
+              if (ship) contextParams.set("cruiseShip", ship);
               const detailHref = `/tours/${recommendation.tour.company}/${recommendation.tour.pk}?${contextParams.toString()}`;
               const calendarParams = new URLSearchParams(contextParams);
               if (date) calendarParams.set("date", date);
@@ -184,3 +188,4 @@ export default async function PlanPage({ searchParams }: { searchParams: SearchP
     </main>
   );
 }
+

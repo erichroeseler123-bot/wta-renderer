@@ -8,7 +8,11 @@ export type OrderStatus =
   | "paid"
   | "booking_pending"
   | "booked"
-  | "booking_failed";
+  | "booking_failed"
+  | "cancelled"
+  | "refund_pending"
+  | "partially_refunded"
+  | "refunded";
 
 export type OrderLine = {
   company: string;
@@ -91,6 +95,13 @@ export type OrderSnapshot = {
   confirmationEmailProvider?: string;
   confirmationEmailId?: string;
   confirmationEmailError?: string;
+  refundId?: string;
+  refundAmountCents?: number;
+  refundStatus?: string;
+  cancelledAt?: string;
+  cancellationReason?: string;
+  cancel_token?: string;
+  client_secret_hash?: string;
 };
 
 function nowIso() {
@@ -131,7 +142,9 @@ export async function saveOrder(order: OrderSnapshot) {
 
   const needsAttention = await readIndex("orders:needs_attention");
   const has = needsAttention.includes(updated.order_id);
-  const shouldInclude = updated.status === "booking_failed";
+  const shouldInclude =
+    updated.status === "booking_failed" ||
+    (Boolean(updated.lastError) && (updated.status === "cancelled" || updated.status === "refund_pending"));
 
   if (shouldInclude && !has) {
     await writeIndex("orders:needs_attention", [updated.order_id, ...needsAttention]);
@@ -160,6 +173,8 @@ export async function saveOrder(order: OrderSnapshot) {
         confirmationEmailProvider: updated.confirmationEmailProvider || null,
         confirmationEmailId: updated.confirmationEmailId || null,
         confirmationEmailError: updated.confirmationEmailError || null,
+        cancel_token: updated.cancel_token || null,
+        client_secret_hash: updated.client_secret_hash || null,
         updatedAt: updated.updatedAt,
       },
       { ex: ORDER_TTL_SECONDS },
@@ -222,6 +237,49 @@ export async function releaseOrderLock(orderId: string) {
   const kv = await getKV();
   if (!kv) return;
   await kv.del(`lock:order:${orderId}`);
+}
+
+import crypto from "crypto";
+
+export function makeOrderCancelToken(orderId: string, email?: string): string {
+  const secret = process.env.ORDER_SIGNING_SECRET || "";
+  const randomSalt = crypto.randomBytes(16).toString("hex");
+  if (secret) {
+    const sig = crypto.createHmac("sha256", secret).update(`${orderId}:${(email || "").toLowerCase().trim()}:${randomSalt}`).digest("hex");
+    return `${randomSalt}.${sig}`;
+  }
+  return crypto.randomBytes(24).toString("hex");
+}
+
+export function verifyOrderCancelToken(order: OrderSnapshot, providedToken: string): boolean {
+  if (!providedToken || typeof providedToken !== "string") return false;
+  const token = providedToken.trim();
+  if (order.cancel_token && order.cancel_token === token) return true;
+
+  const secret = process.env.ORDER_SIGNING_SECRET || "";
+  if (secret && token.includes(".")) {
+    const [salt, sig] = token.split(".");
+    if (salt && sig) {
+      const expected = crypto.createHmac("sha256", secret).update(`${order.order_id}:${(order.contact?.email || "").toLowerCase().trim()}:${salt}`).digest("hex");
+      if (expected === sig) return true;
+    }
+  }
+  return false;
+}
+
+export function hashClientSecret(clientSecret: string): string {
+  return crypto.createHash("sha256").update(String(clientSecret || "").trim()).digest("hex");
+}
+
+export function verifyClientSecret(providedSecret: string, storedHash?: string | null): boolean {
+  if (!providedSecret || !storedHash) return false;
+  const providedHash = hashClientSecret(providedSecret);
+  if (providedHash.length !== storedHash.length) return false;
+  try {
+    return crypto.timingSafeEqual(Buffer.from(providedHash), Buffer.from(storedHash));
+  } catch {
+    return false;
+  }
 }
 
 export { ORDER_TTL_SECONDS };

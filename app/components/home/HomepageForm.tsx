@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import type { FinderChoices } from "@/lib/finderChoices";
 
 const TRIP_STYLES = [
   { value: "best-overall", label: "Best overall", hint: "Start with the strongest all-around choices" },
@@ -17,13 +18,15 @@ const TRIP_STYLES = [
 
 export default function HomepageForm({
   approvedPorts,
+  initialChoices,
 }: {
   approvedPorts: { slug: string; title: string }[];
+  initialChoices: FinderChoices;
 }) {
   const router = useRouter();
-  const [port, setPort] = useState(approvedPorts[0]?.slug || "juneau");
-  const [style, setStyle] = useState("best-overall");
-  const [date, setDate] = useState("");
+  const [port, setPort] = useState(initialChoices.port);
+  const [style, setStyle] = useState(initialChoices.topic);
+  const [date, setDate] = useState(initialChoices.date);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +78,13 @@ export default function HomepageForm({
             <label htmlFor="style-select" className="block text-[10px] font-black uppercase tracking-[0.17em] text-[#5d7773]">
               02 · What kind of day?
             </label>
-            <select id="style-select" value={style} onChange={(e) => setStyle(e.target.value)} className={inputClass}>
+            <select
+              id="style-select"
+              aria-describedby="style-select-hint"
+              value={style}
+              onChange={(e) => setStyle(e.target.value)}
+              className={inputClass}
+            >
               {TRIP_STYLES.map((item) => (
                 <option key={item.value} value={item.value}>{item.label}</option>
               ))}
@@ -83,7 +92,12 @@ export default function HomepageForm({
           </div>
         </div>
 
-        <div className="mt-3 rounded-2xl bg-[#e8f2ee] px-4 py-3 text-xs font-semibold leading-5 text-[#496762]">
+        <div
+          id="style-select-hint"
+          role="status"
+          aria-live="polite"
+          className="mt-3 rounded-2xl bg-[#e8f2ee] px-4 py-3 text-xs font-semibold leading-5 text-[#496762]"
+        >
           {TRIP_STYLES.find((item) => item.value === style)?.hint}
         </div>
 

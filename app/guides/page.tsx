@@ -34,7 +34,7 @@ const GUIDES = [
   {
     slug: "what-happens-if-my-alaska-tour-runs-late",
     title: "What Happens If My Alaska Tour Runs Late?",
-    description: "Strict cruise-safety buffers: tour end time + 45 min <= all-aboard, traffic-free port routes, and back-to-ship guarantees.",
+    description: "Cruise-safety timing: tour return time + 45–60 min <= all-aboard, traffic-free port routes, and 100% missed-port refund protection.",
   },
   {
     slug: "easy-alaska-shore-excursions",
@@ -49,12 +49,12 @@ const GUIDES = [
   {
     slug: "juneau-private-whale-watching-charters",
     title: "Private Charters for Whale Watching in Juneau, AK",
-    description: "Compare boat sizes (6 to 14+ guests), per-person economics ($193–$338), Auke Bay marina logistics, and back-to-ship timing guarantees.",
+    description: "Compare boat sizes (6 to 14+ guests), per-person economics ($193–$338), Auke Bay marina logistics, and dock return timing.",
   },
   {
     slug: "cruise-ship-vs-independent-alaska-excursions",
     title: "Independent vs Cruise Ship Excursions",
-    description: "Compare pricing, group sizes, back-to-ship guarantees, and port logistics between independent operators and ship tours.",
+    description: "Compare pricing, group sizes, timing buffers, and 100% missed-port refund protection between independent operators and ship tours.",
   },
   {
     slug: "how-long-does-it-take-to-get-off-the-ship-in-juneau",

@@ -209,12 +209,21 @@ export default async function Page({
               </div>
             </div>
           ) : !hasAnyAvailabilityThisMonth ? (
-            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-900">
-              {nextAvailabilityStartAt
-                ? isShowingNextAvailableMonth
-                  ? `No live departures are posted yet for ${monthLabel}.`
-                  : `No live departures are posted for ${monthLabel}. The next available date is ${nextAvailabilityStartAt}.`
-                : "No live departures are posted for this tour right now."}
+            <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-amber-950 space-y-2">
+              <div className="flex items-center gap-2 font-bold text-xs uppercase tracking-wider text-amber-800">
+                <span>🗓️</span>
+                <span>Seasonal Cruise Availability Notice</span>
+              </div>
+              <p className="text-xs leading-relaxed text-slate-700">
+                {nextAvailabilityStartAt
+                  ? isShowingNextAvailableMonth
+                    ? `No live departures are posted yet for ${monthLabel}. Alaska shore excursions operate seasonally between May and September to align with cruise ship calls.`
+                    : `No live departures are posted for ${monthLabel}. The next available date on record is ${nextAvailabilityStartAt}.`
+                  : `No live departures are posted for ${monthLabel}. Most Alaska shore excursions operate seasonally from May through September. Operators publish next-season calendars on a rolling basis between January and April.`}
+              </p>
+              <p className="text-[11px] text-slate-500">
+                Planning ahead for summer 2026? Check the summer months (May–September) or contact operator dispatch if your sailing dates are not yet visible.
+              </p>
             </div>
           ) : null}
         </div>
