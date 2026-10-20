@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Editorial policy | Welcome to Alaska Tours",
+  title: { absolute: "Editorial policy | Welcome to Alaska Tours" },
   description: "How Welcome to Alaska Tours attributes articles, uses AI assistance and separates facts from recommendations.",
   alternates: { canonical: "https://www.welcometoalaskatours.com/editorial-policy" },
 };

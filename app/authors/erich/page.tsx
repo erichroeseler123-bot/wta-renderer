@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Erich | Welcome to Alaska Tours",
+  title: { absolute: "Erich | Welcome to Alaska Tours" },
   description: "Erich has worked in independent tours and transportation for 30 years and has lived in Juneau, Skagway and Ketchikan. His Alaska guides draw on that port-town experience, with current operator details checked separately. He now lives in Denver.",
   alternates: { canonical: "https://www.welcometoalaskatours.com/authors/erich" },
 };
