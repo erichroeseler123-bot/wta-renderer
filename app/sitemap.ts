@@ -78,6 +78,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ['/guides', 'weekly', 0.6],
     ['/ships', 'weekly', 0.6],
     ['/about', 'monthly', 0.5],
+    ['/authors/erich', 'monthly', 0.4],
+    ['/editorial-policy', 'monthly', 0.4],
     ['/contact-us', 'monthly', 0.5],
     ['/privacy', 'yearly', 0.3],
     ['/terms', 'yearly', 0.3],

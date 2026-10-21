@@ -76,6 +76,7 @@ export default function JuneauWhalesVsMendenhallGuide() {
     datePublished: "2026-08-24",
     dateModified: "2026-09-17",
     mainEntityOfPage: canonical,
+    author: { "@type": "Organization", name: "Welcome to Alaska Tours", url: "https://www.welcometoalaskatours.com" },
     publisher: { "@type": "Organization", name: "Welcome To Alaska Tours" },
   };
 
