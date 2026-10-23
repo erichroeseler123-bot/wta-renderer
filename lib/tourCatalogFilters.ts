@@ -44,18 +44,17 @@ export function normalizePortFilter(value?: string | string[] | null): string {
 export function normalizeCategoryFilter(value?: string | string[] | null): string {
   const raw = firstString(value);
   const key = raw.toLowerCase().replace(/\s+/g, " ");
+  const slug = key.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
   if (
-    !key ||
-    key === "all" ||
-    key === "all-categories" ||
-    key === "all categories" ||
-    key === "all-experiences" ||
-    key === "all experiences"
+    !slug ||
+    slug === "all" ||
+    slug === "all-categories" ||
+    slug === "all-experiences" ||
+    slug === "shore-excursion" ||
+    slug === "shore-excursions"
   ) {
     return "all";
   }
-
-  const slug = key.replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
   if (
     slug === "air-tours" ||
@@ -72,6 +71,8 @@ export function normalizeCategoryFilter(value?: string | string[] | null): strin
     slug === "whale-watching" ||
     slug === "whales" ||
     slug === "whale" ||
+    slug === "wildlife" ||
+    slug === "wildlife-tours" ||
     slug === "wildlife-whales"
   ) {
     return "Whale Watching";
@@ -96,11 +97,30 @@ export function normalizeCategoryFilter(value?: string | string[] | null): strin
     return "Fishing";
   }
 
-  if (slug === "adventures" || slug === "adventure" || slug === "adventure-tours") {
+  if (
+    slug === "adventures" ||
+    slug === "adventure" ||
+    slug === "adventure-tours" ||
+    slug === "city-tour" ||
+    slug === "city-tours" ||
+    slug === "sightseeing"
+  ) {
     return "Adventures";
   }
 
   return raw;
+}
+
+export function buildCatalogOutboundSearchParams(
+  searchString: string,
+  handoffCategory?: string | null,
+): URLSearchParams {
+  const params = new URLSearchParams(searchString);
+  params.delete("port");
+  if (handoffCategory && handoffCategory.trim()) {
+    params.set("category", handoffCategory.trim());
+  }
+  return params;
 }
 
 export function formatPortFilterLabel(port?: string | null): string {

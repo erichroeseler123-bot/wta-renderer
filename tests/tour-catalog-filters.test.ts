@@ -4,6 +4,7 @@ import path from "node:path";
 import type { HelicopterTour } from "../lib/helicopterTours";
 import { buildTourPriceLabel, getProductOneLiner } from "../lib/tourSeo";
 import {
+  buildCatalogOutboundSearchParams,
   buildTourFilterStatusMessage,
   filterCatalogTours,
   formatCategoryFilterLabel,
@@ -116,6 +117,7 @@ assert.equal(normalizePortFilter(" JUNEAU "), "juneau");
 assert.equal(normalizePortFilter(["Skagway", "juneau"]), "skagway");
 assert.equal(normalizePortFilter("all-ports"), "all");
 assert.equal(normalizePortFilter(""), "all");
+assert.equal(normalizePortFilter(null), "all");
 assert.equal(formatPortFilterLabel("juneau"), "Juneau");
 assert.equal(formatPortFilterLabel("all"), "All Ports");
 
@@ -144,15 +146,38 @@ assert.equal(
   "Showing 1 tour of 6 matching Ketchikan · All Categories",
 );
 
-// 3. Category filter normalization, aliases, and status count announcement
+// 3. Category filter normalization, aliases, DCC handoff categories, and status count announcement
 assert.equal(normalizeCategoryFilter("whale-watching"), "Whale Watching");
+assert.equal(normalizeCategoryFilter("wildlife"), "Whale Watching");
 assert.equal(normalizeCategoryFilter("flightseeing"), "Air Tours");
+assert.equal(normalizeCategoryFilter("helicopter"), "Air Tours");
 assert.equal(normalizeCategoryFilter("juneau-helicopter-tours"), "Air Tours");
 assert.equal(normalizeCategoryFilter("glacier-tours"), "Hiking & Glaciers");
+assert.equal(normalizeCategoryFilter("glacier"), "Hiking & Glaciers");
 assert.equal(normalizeCategoryFilter("mendenhall-glacier"), "Hiking & Glaciers");
 assert.equal(normalizeCategoryFilter("dog-sledding"), "Dog Sledding");
+assert.equal(normalizeCategoryFilter("fishing"), "Fishing");
+assert.equal(normalizeCategoryFilter("city-tour"), "Adventures");
+assert.equal(normalizeCategoryFilter("shore-excursion"), "all");
 assert.equal(normalizeCategoryFilter("all-categories"), "all");
+assert.equal(normalizeCategoryFilter(null), "all");
 assert.equal(formatCategoryFilterLabel("whale-watching"), "Whale Watching");
+
+for (const dccCategory of [
+  "whale-watching",
+  "glacier",
+  "fishing",
+  "wildlife",
+  "helicopter",
+  "city-tour",
+  "shore-excursion",
+]) {
+  const matched = filterCatalogTours(SAMPLE_TOURS, { port: "all", category: dccCategory });
+  assert.ok(
+    matched.length > 0,
+    `DCC handoff category "${dccCategory}" must normalize to a non-empty catalog selection`,
+  );
+}
 
 const airTours = filterCatalogTours(SAMPLE_TOURS, { port: "all", category: "flightseeing" });
 assert.equal(airTours.length, 2);
@@ -203,7 +228,25 @@ assert.equal(airPorts.find((opt) => opt.value === "juneau")?.count, 1);
 assert.equal(airPorts.find((opt) => opt.value === "skagway")?.count, 1);
 assert.equal(airPorts.find((opt) => opt.value === "ketchikan")?.count, 0);
 
-// 6. Verify TourCatalogFilter & ToursPage source wiring for accessibility and 320px/375px layout safety
+// 6. Outbound search params preserve handoff category attribution while stripping UI port filter
+const handoffOutbound = buildCatalogOutboundSearchParams(
+  "source=dcc&handoff_id=h-123&port=juneau&category=wildlife",
+  "wildlife",
+);
+assert.equal(handoffOutbound.get("category"), "wildlife", "DCC handoff category must be preserved on outbound links");
+assert.equal(handoffOutbound.get("port"), null, "UI port filter should not leak onto outbound links");
+
+const handoffAfterReset = buildCatalogOutboundSearchParams(
+  "source=dcc&handoff_id=h-123",
+  "wildlife",
+);
+assert.equal(
+  handoffAfterReset.get("category"),
+  "wildlife",
+  "DCC handoff category must remain preserved even after UI filter reset removes category from window.location.search",
+);
+
+// 7. Verify TourCatalogFilter & ToursPage source wiring for accessibility and 320px/375px layout safety
 const filterComponentSource = fs.readFileSync(
   path.join(process.cwd(), "app", "tours", "TourCatalogFilter.tsx"),
   "utf8",
@@ -223,6 +266,16 @@ assert.match(
   filterComponentSource,
   /overflow-x-clip/,
   "TourCatalogFilter must prevent horizontal overflow at 320px and 375px",
+);
+assert.match(
+  filterComponentSource,
+  /setSelectedPort\(normalizePortFilter\(params\.get\("port"\)\)\)/,
+  "TourCatalogFilter must reset port state when query parameter disappears",
+);
+assert.match(
+  filterComponentSource,
+  /setSelectedCategory\(normalizeCategoryFilter\(params\.get\("category"\)\)\)/,
+  "TourCatalogFilter must reset category state when query parameter disappears",
 );
 
 console.log("tour catalog filter & status announcement regression: PASS");

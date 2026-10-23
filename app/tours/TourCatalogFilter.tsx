@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import type { HelicopterTour } from "@/lib/helicopterTours";
@@ -15,6 +15,7 @@ import {
   widgetViewStorageKey,
 } from "@/components/widget/widgetLifecycle";
 import {
+  buildCatalogOutboundSearchParams,
   buildTourFilterStatusMessage,
   filterCatalogTours,
   formatCategoryFilterLabel,
@@ -69,14 +70,8 @@ export default function TourCatalogFilter({
 
   useEffect(() => {
     const params = new URLSearchParams(searchString);
-    const urlPort = params.get("port");
-    const urlCategory = params.get("category");
-    if (urlPort !== null) {
-      setSelectedPort(normalizePortFilter(urlPort));
-    }
-    if (urlCategory !== null) {
-      setSelectedCategory(normalizeCategoryFilter(urlCategory));
-    }
+    setSelectedPort(normalizePortFilter(params.get("port")));
+    setSelectedCategory(normalizeCategoryFilter(params.get("category")));
   }, [searchString]);
 
   const syncUrlParams = (nextPort: string, nextCategory: string) => {
@@ -118,11 +113,31 @@ export default function TourCatalogFilter({
     syncUrlParams(reset.port, reset.category);
   };
 
+  const handoffKeyRef = useRef<string | null>(null);
+  const handoffCategoryRef = useRef<string | undefined>(undefined);
+
   const baseSearchParams = useMemo(() => {
     const params = new URLSearchParams(searchString);
-    params.delete("port");
-    params.delete("category");
-    return params;
+    const handoffKey =
+      params.get("handoff_id") ||
+      params.get("handoffId") ||
+      params.get("dcc_handoff_id") ||
+      (params.get("source") === "dcc" ? "dcc" : "");
+
+    if (handoffKey) {
+      if (handoffKeyRef.current !== handoffKey) {
+        handoffKeyRef.current = handoffKey;
+        handoffCategoryRef.current = params.get("category") || undefined;
+      }
+    } else {
+      handoffKeyRef.current = null;
+      handoffCategoryRef.current = undefined;
+    }
+
+    return buildCatalogOutboundSearchParams(
+      searchString,
+      handoffCategoryRef.current,
+    );
   }, [searchString]);
 
   const widgetContext = useMemo(
