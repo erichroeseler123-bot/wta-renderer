@@ -228,13 +228,33 @@ assert.equal(airPorts.find((opt) => opt.value === "juneau")?.count, 1);
 assert.equal(airPorts.find((opt) => opt.value === "skagway")?.count, 1);
 assert.equal(airPorts.find((opt) => opt.value === "ketchikan")?.count, 0);
 
-// 6. Outbound search params preserve handoff category attribution while stripping UI port filter
+// 6. Outbound search params preserve handoff category attribution while stripping UI port and ordinary category filters
 const handoffOutbound = buildCatalogOutboundSearchParams(
   "source=dcc&handoff_id=h-123&port=juneau&category=wildlife",
   "wildlife",
 );
 assert.equal(handoffOutbound.get("category"), "wildlife", "DCC handoff category must be preserved on outbound links");
 assert.equal(handoffOutbound.get("port"), null, "UI port filter should not leak onto outbound links");
+
+const ordinaryCatalogOutbound = buildCatalogOutboundSearchParams(
+  "port=ketchikan&category=fishing&utm_source=newsletter",
+  undefined,
+);
+assert.equal(
+  ordinaryCatalogOutbound.get("category"),
+  null,
+  "ordinary catalog category filter must not leak onto outbound product/calendar links without a DCC handoff",
+);
+assert.equal(
+  ordinaryCatalogOutbound.get("port"),
+  null,
+  "ordinary catalog port filter must not leak onto outbound product/calendar links",
+);
+assert.equal(
+  ordinaryCatalogOutbound.get("utm_source"),
+  "newsletter",
+  "non-filter query parameters should remain intact on outbound links",
+);
 
 const handoffAfterReset = buildCatalogOutboundSearchParams(
   "source=dcc&handoff_id=h-123",

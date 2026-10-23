@@ -117,6 +117,7 @@ export function buildCatalogOutboundSearchParams(
 ): URLSearchParams {
   const params = new URLSearchParams(searchString);
   params.delete("port");
+  params.delete("category");
   if (handoffCategory && handoffCategory.trim()) {
     params.set("category", handoffCategory.trim());
   }
