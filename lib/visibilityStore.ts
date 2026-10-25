@@ -1,6 +1,6 @@
 import path from "path";
 import { promises as fs } from "fs";
-import { getKV } from "@/lib/kv";
+import { getDurableKV } from "@/lib/kv";
 
 export type TourCatalogOverride = {
   title?: string;
@@ -18,13 +18,20 @@ export type VisibilityDB = {
   updatedAt: string;
 };
 
+export class DurableStorageUnavailableError extends Error {
+  readonly code = "durable_storage_unavailable";
+  readonly status = 503;
+
+  constructor(
+    message = "Durable storage (Redis/KV) is not configured. Changes that exist only in memory or a local file cannot be saved.",
+  ) {
+    super(message);
+    this.name = "DurableStorageUnavailableError";
+  }
+}
+
 const FILE = path.join(process.cwd(), "data", "visibility.json");
 const KV_KEY = "wta:visibility:v1";
-
-declare global {
-  // eslint-disable-next-line no-var
-  var __wtaVisibilityDB: VisibilityDB | undefined;
-}
 
 function normalizeDB(input: Partial<VisibilityDB> | null | undefined): VisibilityDB {
   return {
@@ -57,7 +64,7 @@ async function readFileDB(): Promise<VisibilityDB | null> {
 
 async function readKVDB(): Promise<VisibilityDB | null> {
   try {
-    const kv = await getKV();
+    const kv = await getDurableKV();
     if (!kv) return null;
     const stored = await kv.get<VisibilityDB>(KV_KEY);
     return stored ? normalizeDB(stored) : null;
@@ -68,46 +75,51 @@ async function readKVDB(): Promise<VisibilityDB | null> {
 
 async function readDB(): Promise<VisibilityDB> {
   const [fileDb, kvDb] = await Promise.all([readFileDB(), readKVDB()]);
-  const memDb = globalThis.__wtaVisibilityDB ? normalizeDB(globalThis.__wtaVisibilityDB) : null;
 
-  const candidates = [fileDb, kvDb, memDb].filter((c): c is VisibilityDB => Boolean(c));
-  if (!candidates.length) {
-    return {
-      providers: {},
-      tours: {},
-      overrides: {},
-      updatedAt: new Date().toISOString(),
-    };
+  if (fileDb && kvDb) {
+    const base = parseTimestamp(kvDb.updatedAt) >= parseTimestamp(fileDb.updatedAt) ? kvDb : fileDb;
+    return normalizeDB({
+      providers: { ...fileDb.providers, ...kvDb.providers },
+      tours: { ...fileDb.tours, ...kvDb.tours },
+      overrides: { ...(fileDb.overrides || {}), ...(kvDb.overrides || {}) },
+      updatedAt: base.updatedAt,
+    });
   }
 
-  candidates.sort((a, b) => parseTimestamp(b.updatedAt) - parseTimestamp(a.updatedAt));
-  const newest = normalizeDB(candidates[0]);
-  globalThis.__wtaVisibilityDB = newest;
-  return newest;
+  if (kvDb) return normalizeDB(kvDb);
+  if (fileDb) return normalizeDB(fileDb);
+
+  return {
+    providers: {},
+    tours: {},
+    overrides: {},
+    updatedAt: new Date(0).toISOString(),
+  };
 }
 
-async function writeDB(db: VisibilityDB) {
+async function writeDB(db: VisibilityDB): Promise<VisibilityDB> {
+  const kv = await getDurableKV();
+  if (!kv) {
+    throw new DurableStorageUnavailableError();
+  }
+
   db.updatedAt = new Date().toISOString();
   const normalized = normalizeDB(db);
-  globalThis.__wtaVisibilityDB = normalized;
 
-  // Persist to runtime KV (works on both serverless and local runtimes)
   try {
-    const kv = await getKV();
-    if (kv) {
-      await kv.set(KV_KEY, normalized);
+    await kv.set(KV_KEY, normalized);
+    const verified = await kv.get<VisibilityDB>(KV_KEY);
+    if (!verified || verified.updatedAt !== normalized.updatedAt) {
+      throw new DurableStorageUnavailableError("Durable storage write could not be verified.");
     }
-  } catch {
-    // Ignore KV errors if fallback file/memory is available
+  } catch (err) {
+    if (err instanceof DurableStorageUnavailableError) throw err;
+    throw new DurableStorageUnavailableError(
+      `Durable storage write failed: ${err instanceof Error ? err.message : String(err)}`,
+    );
   }
 
-  // Persist to data/visibility.json when filesystem is writable
-  try {
-    await fs.mkdir(path.dirname(FILE), { recursive: true });
-    await fs.writeFile(FILE, JSON.stringify(normalized, null, 2) + "\n", "utf8");
-  } catch {
-    // Read-only serverless filesystem (EROFS) is expected in production; KV + memory handle runtime state
-  }
+  return normalized;
 }
 
 export async function getVisibility(): Promise<VisibilityDB> {
@@ -116,12 +128,13 @@ export async function getVisibility(): Promise<VisibilityDB> {
 
 export async function setProviderHidden(company: string, hidden: boolean) {
   const db = await readDB();
-  db.providers[String(company).trim().toLowerCase()] = !!hidden;
-  await writeDB(db);
+  const normalizedCompany = String(company).trim().toLowerCase();
+  db.providers[normalizedCompany] = !!hidden;
+  const saved = await writeDB(db);
   return {
-    company: String(company).trim().toLowerCase(),
+    company: normalizedCompany,
     hidden: !!hidden,
-    updatedAt: db.updatedAt,
+    updatedAt: saved.updatedAt,
   };
 }
 
@@ -129,8 +142,8 @@ export async function setTourHidden(key: string, hidden: boolean) {
   const db = await readDB();
   const normalizedKey = String(key).trim().toLowerCase();
   db.tours[normalizedKey] = !!hidden;
-  await writeDB(db);
-  return { key: normalizedKey, hidden: !!hidden, updatedAt: db.updatedAt };
+  const saved = await writeDB(db);
+  return { key: normalizedKey, hidden: !!hidden, updatedAt: saved.updatedAt };
 }
 
 export async function setTourCatalogOverride(
@@ -148,12 +161,25 @@ export async function setTourCatalogOverride(
       ...override,
     };
   }
-  await writeDB(db);
+  const saved = await writeDB(db);
   return {
     key: normalizedKey,
-    override: db.overrides[normalizedKey] || null,
-    updatedAt: db.updatedAt,
+    override: saved.overrides?.[normalizedKey] || null,
+    updatedAt: saved.updatedAt,
   };
+}
+
+export async function deleteIsolatedTestVisibilityRecord(key: string) {
+  const normalizedKey = String(key).trim().toLowerCase();
+  if (!normalizedKey.startsWith("__test_isolated__:")) {
+    throw new Error("deleteIsolatedTestVisibilityRecord only allows __test_isolated__:* keys.");
+  }
+  const db = await readDB();
+  delete db.tours[normalizedKey];
+  if (db.overrides) {
+    delete db.overrides[normalizedKey];
+  }
+  return writeDB(db);
 }
 
 export async function isProviderHidden(company: string): Promise<boolean> {

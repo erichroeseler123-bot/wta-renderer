@@ -20,7 +20,7 @@ async function markOrderFailed(order: OrderSnapshot, reason: string) {
 }
 
 export async function POST(req: Request) {
-  const a = await requireAdmin();
+  const a = await requireAdmin(req);
   if (!a.ok) return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
 
   const body = await req.json().catch(() => ({}));

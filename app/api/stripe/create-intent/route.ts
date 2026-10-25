@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
 import { getKV } from "@/lib/kv";
 import {
   buildOrderAttributionFromLines,
@@ -10,6 +9,9 @@ import {
   type OrderLine,
   type OrderSnapshot,
 } from "@/lib/orders";
+import { checkBookingCapabilityReadiness } from "@/lib/fareharbor";
+import { resolveExactDeparturePrice } from "@/lib/fareharborAvailability";
+import { getStripeClient } from "@/lib/stripe";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
 import { sanitizePlacementLabel } from "@/lib/tourWidget";
 import { sanitizeEmbedDomain } from "@/lib/widgetContext";
@@ -32,7 +34,12 @@ type CartLine = {
   ratePk: number;
   qty: number;
   title?: string;
+  day?: string;
+  date?: string;
   startAt?: string;
+  expectedUnitCents?: number;
+  unitCents?: number;
+  price?: number;
   handoffSource?: string;
   handoffId?: string;
   sourceSlug?: string;
@@ -60,24 +67,14 @@ type CartLine = {
 
 function jsonError(message: string, status = 400, extra?: Record<string, unknown>) {
   return NextResponse.json(
-    { success: false, error: message, ...(extra ? { extra } : {}) },
+    {
+      success: false,
+      error: message,
+      ...(extra?.code ? { code: extra.code } : {}),
+      ...(extra ? { extra } : {}),
+    },
     { status },
   );
-}
-
-function getBaseUrl(req: NextRequest) {
-  const siteUrl = process.env.SITE_URL;
-  if (siteUrl) return siteUrl.replace(/\/+$/, "");
-
-  const origin = req.headers.get("origin") || req.headers.get("x-forwarded-host");
-  const proto = req.headers.get("x-forwarded-proto") || "https";
-
-  if (origin) {
-    if (origin.startsWith("http://") || origin.startsWith("https://")) return origin.replace(/\/+$/, "");
-    return `${proto}://${origin}`.replace(/\/+$/, "");
-  }
-
-  return "http://localhost:3000";
 }
 
 function clampQty(n: unknown) {
@@ -103,13 +100,29 @@ export async function POST(req: NextRequest) {
       return r;
     }
 
-    const stripeKey = process.env.STRIPE_SECRET_KEY;
-    if (!stripeKey) return jsonError("Payment service is not configured.", 500, { request_id: rid });
+    const bookingReady = checkBookingCapabilityReadiness();
+    if (!bookingReady.ok) {
+      logSecurityEvent("create_intent_booking_unavailable", {
+        rid,
+        ip,
+        code: bookingReady.code,
+      });
+      return jsonError(bookingReady.error, bookingReady.status, {
+        code: bookingReady.code,
+        request_id: rid,
+      });
+    }
+
+    const stripe = getStripeClient();
+    if (!stripe) return jsonError("Payment service is not configured.", 500, { request_id: rid });
 
     const kv = await getKV();
-    if (!kv) return jsonError("Booking storage is currently unavailable.", 500, { request_id: rid });
-
-    const stripe = new Stripe(stripeKey, {});
+    if (!kv) {
+      return jsonError("Booking storage is currently unavailable.", 503, {
+        code: "storage_unavailable",
+        request_id: rid,
+      });
+    }
 
     const body = await req.json().catch(() => null);
     if (!body) return jsonError("Invalid JSON body.", 400);
@@ -133,8 +146,6 @@ export async function POST(req: NextRequest) {
     if (!Array.isArray(lines) || lines.length < 1) return jsonError("Cart is empty.", 400);
     if (!name || !email) return jsonError("Missing contact.name or contact.email.", 400);
 
-    const baseUrl = getBaseUrl(req);
-
     let totalCents = 0;
     const computed: OrderLine[] = [];
 
@@ -149,38 +160,53 @@ export async function POST(req: NextRequest) {
         return jsonError("Bad cart line (missing company/itemPk/availabilityPk/ratePk).", 400, { it });
       }
 
-      const qs = new URLSearchParams({
+      const expectedUnit =
+        typeof it.expectedUnitCents === "number"
+          ? it.expectedUnitCents
+          : typeof it.unitCents === "number"
+            ? it.unitCents
+            : typeof it.price === "number"
+              ? it.price
+              : null;
+
+      const pj = await resolveExactDeparturePrice({
         company,
-        item_pk: String(itemPk),
-        availability_pk: String(availabilityPk),
-        customer_type_rate_pk: String(ratePk),
-        qty: String(qty),
+        itemPk,
+        availabilityPk,
+        customerTypeRatePk: ratePk,
+        date: it.day || it.date,
+        startAt: it.startAt,
+        qty,
+        expectedUnitCents: expectedUnit,
       });
 
-      const priceUrl = new URL(`/api/fareharbor/price?${qs.toString()}`, baseUrl).toString();
-      const pr = await fetch(priceUrl, { cache: "no-store" });
-      const pj = await pr.json().catch(() => null);
-
-      if (!pr.ok || (!pj?.success && !pj?.ok)) {
-        return jsonError("Pricing failed for a cart line.", 409, { line: it, details: pj });
+      if (!pj.ok) {
+        return jsonError(pj.error || "Pricing failed for a cart line.", pj.status, {
+          code: pj.code,
+          line: it,
+          details: pj,
+        });
       }
 
-      const currency = String(pj?.currency || "usd").toLowerCase();
-      const lineTotal = Number(pj?.lineTotalCents ?? pj?.totalCents ?? 0);
+      const currency = String(pj.currency || "usd").toLowerCase();
+      const lineTotal = Number(pj.lineTotalCents);
 
       if (!Number.isFinite(lineTotal) || lineTotal <= 0) {
-        return jsonError("Invalid line total returned from price endpoint.", 409, { line: it, details: pj });
+        return jsonError("Invalid line total returned from price resolution.", 409, {
+          line: it,
+          details: pj,
+        });
       }
 
       totalCents += Math.floor(lineTotal);
       computed.push({
-        company,
-        itemPk,
-        availabilityPk,
-        ratePk,
+        company: pj.company,
+        itemPk: pj.itemPk,
+        availabilityPk: pj.availabilityPk,
+        ratePk: pj.customerTypeRatePk,
         qty,
         title: it.title,
-        startAt: it.startAt,
+        startAt: pj.startAt || it.startAt,
         lineTotalCents: Math.floor(lineTotal),
         currency,
         handoffSource: typeof it.handoffSource === "string" ? it.handoffSource : undefined,

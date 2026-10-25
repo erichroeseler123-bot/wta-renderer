@@ -13,8 +13,8 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const auth = await requireAdmin();
+export async function GET(req?: Request) {
+  const auth = await requireAdmin(req);
   if (!auth.ok) {
     return NextResponse.json(
       { success: false, error: "Unauthorized" },

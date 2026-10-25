@@ -50,7 +50,23 @@ export type FareHarborBookingInput = {
   voucherNumber?: string;
 };
 
+export type FareHarborBookingHandler = (
+  input: FareHarborBookingInput,
+) => Promise<Record<string, unknown>>;
+
+let bookingHandlerOverrideForTests: FareHarborBookingHandler | null = null;
+
+export function setFareHarborBookingHandlerForTests(
+  handler: FareHarborBookingHandler | null,
+) {
+  bookingHandlerOverrideForTests = handler;
+}
+
 export async function createFareHarborBooking(input: FareHarborBookingInput) {
+  if (bookingHandlerOverrideForTests) {
+    return bookingHandlerOverrideForTests(input);
+  }
+
   const { appKey, userKey } = getFareHarborCredentials();
 
   const company = String(input.company || "").trim();
@@ -109,11 +125,42 @@ export async function createFareHarborBooking(input: FareHarborBookingInput) {
   return result;
 }
 
+export function isBookingsEnabled(): boolean {
+  return String(process.env.FH_BOOKINGS_ENABLED || "0").trim() === "1";
+}
+
 export function assertBookingsEnabled() {
-  const enabled = String(process.env.FH_BOOKINGS_ENABLED || "0") === "1";
-  if (!enabled) {
+  if (!isBookingsEnabled()) {
     throw new Error("Bookings are disabled (FH_BOOKINGS_ENABLED=0). This is a safety lock.");
   }
+}
+
+export function checkBookingCapabilityReadiness():
+  | { ok: true }
+  | { ok: false; code: string; error: string; status: number } {
+  if (!isBookingsEnabled()) {
+    return {
+      ok: false,
+      code: "bookings_disabled",
+      status: 503,
+      error:
+        "Online booking is currently disabled while operator reservation fulfillment is turned off. Your card has not been charged.",
+    };
+  }
+
+  try {
+    getFareHarborCredentials();
+  } catch {
+    return {
+      ok: false,
+      code: "provider_credentials_missing",
+      status: 503,
+      error:
+        "Operator reservation service credentials are not configured. Your card has not been charged.",
+    };
+  }
+
+  return { ok: true };
 }
 
 export function assertInternalSecret(req: Request) {

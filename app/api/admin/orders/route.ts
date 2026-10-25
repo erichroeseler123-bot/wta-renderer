@@ -9,12 +9,19 @@ import {
   requestId,
 } from "@/lib/security";
 
-const ADMIN_SECRET = String(process.env.WTA_ADMIN_SECRET || "").trim();
+import crypto from "crypto";
+import { isPlaceholderAdminSecret } from "@/lib/admin";
 
 function canUseSecretAuth(req: NextRequest) {
-  if (!ADMIN_SECRET || ADMIN_SECRET.length < 40) return false;
-  const provided = new URL(req.url).searchParams.get("secret");
-  return Boolean(provided && provided === ADMIN_SECRET);
+  const adminSecret = String(process.env.WTA_ADMIN_SECRET || "").trim();
+  if (!adminSecret || adminSecret.length < 40 || isPlaceholderAdminSecret(adminSecret)) {
+    return false;
+  }
+  const provided = String(new URL(req.url).searchParams.get("secret") || "").trim();
+  if (!provided) return false;
+  const a = crypto.createHash("sha256").update(provided).digest();
+  const b = crypto.createHash("sha256").update(adminSecret).digest();
+  return crypto.timingSafeEqual(a, b);
 }
 
 type StripePaymentSummary = {
@@ -86,7 +93,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Too many requests" }, { status: 429 });
   }
 
-  const a = await requireAdmin();
+  const a = await requireAdmin(req);
   const secretOk = canUseSecretAuth(req);
   if (!a.ok && !secretOk) {
     logSecurityEvent("admin_access_denied", { rid, ip, route: "/api/admin/orders" });

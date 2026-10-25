@@ -31,7 +31,9 @@ type PayloadItem = {
   ratePk: number;
   qty: number;
   title?: string;
+  day?: string;
   startAt?: string;
+  expectedUnitCents?: number;
   handoffSource?: string;
   handoffId?: string;
   sourceSlug?: string;
@@ -84,7 +86,14 @@ export default function CheckoutClient() {
       ratePk: Number(it.ratePk || 0),
       qty: Number(it.qty || 0),
       title: it.title ? String(it.title) : undefined,
+      day: it.day ? String(it.day) : undefined,
       startAt: it.startAt ? String(it.startAt) : undefined,
+      expectedUnitCents:
+        typeof it.unitCents === "number"
+          ? Number(it.unitCents)
+          : typeof it.price === "number"
+            ? Number(it.price)
+            : undefined,
       handoffSource: it.handoffSource ? String(it.handoffSource) : undefined,
       handoffId: it.handoffId ? String(it.handoffId) : undefined,
       sourceSlug: it.sourceSlug ? String(it.sourceSlug) : undefined,

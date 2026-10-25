@@ -240,35 +240,53 @@ test("buildOrderAttributionFromLines preserves multiple placements across a mult
 });
 
 test("getWidgetTourState reflects runtime visibility and catalog overrides and restores cleanly", async () => {
-  const initial = await getWidgetTourState("beyondak", "195602");
-  assert.equal(initial.status, "active");
-  assert.equal(initial.tour?.title, "Mendenhall Glacier Guided Hike");
-
-  // 1. Authorized runtime catalog override updates the tour price/title immediately
-  await setTourCatalogOverride("beyondak:195602", {
-    fromPrice: "$225 Per Person (Flat Rate)",
-    priceUpdatedAt: new Date().toISOString(),
+  const { setDurableKVOverrideForTests } = await import("../lib/kv");
+  const store = new Map<string, unknown>();
+  setDurableKVOverrideForTests({
+    async get<T = unknown>(k: string) {
+      return (store.get(k) as T) ?? null;
+    },
+    async set(k: string, v: unknown) {
+      store.set(k, v);
+    },
+    async del(k: string) {
+      store.delete(k);
+    },
   });
-  const updated = await getWidgetTourState("beyondak", "195602");
-  assert.equal(updated.status, "active");
-  assert.equal(updated.tour?.fromPrice, "$225 Per Person (Flat Rate)");
 
-  // 2. Authorized runtime visibility toggle marks the tour retired/unavailable immediately
-  await setTourHidden("beyondak:195602", true);
-  const hidden = await getWidgetTourState("beyondak", "195602");
-  assert.equal(hidden.status, "retired");
+  try {
+    const initial = await getWidgetTourState("beyondak", "195602");
+    assert.equal(initial.status, "active");
+    assert.equal(initial.tour?.title, "Mendenhall Glacier Guided Hike");
 
-  // 3. Restore original state
-  await setTourHidden("beyondak:195602", false);
-  await setTourCatalogOverride("beyondak:195602", null);
-  const restored = await getWidgetTourState("beyondak", "195602");
-  assert.equal(restored.status, "active");
-  assert.equal(restored.tour?.fromPrice, "$209 Per Person (Flat Rate)");
+    // 1. Authorized runtime catalog override updates the tour price/title immediately
+    await setTourCatalogOverride("beyondak:195602", {
+      fromPrice: "$225 Per Person (Flat Rate)",
+      priceUpdatedAt: new Date().toISOString(),
+    });
+    const updated = await getWidgetTourState("beyondak", "195602");
+    assert.equal(updated.status, "active");
+    assert.equal(updated.tour?.fromPrice, "$225 Per Person (Flat Rate)");
 
-  // Non-existent tour
-  const missing = await getWidgetTourState("beyondak", "99999999");
-  assert.equal(missing.status, "not_found");
-  assert.equal(missing.tour, null);
+    // 2. Authorized runtime visibility toggle marks the tour retired/unavailable immediately
+    await setTourHidden("beyondak:195602", true);
+    const hidden = await getWidgetTourState("beyondak", "195602");
+    assert.equal(hidden.status, "retired");
+
+    // 3. Restore original state
+    await setTourHidden("beyondak:195602", false);
+    await setTourCatalogOverride("beyondak:195602", null);
+    const restored = await getWidgetTourState("beyondak", "195602");
+    assert.equal(restored.status, "active");
+    assert.equal(restored.tour?.fromPrice, "$209 Per Person (Flat Rate)");
+
+    // Non-existent tour
+    const missing = await getWidgetTourState("beyondak", "99999999");
+    assert.equal(missing.status, "not_found");
+    assert.equal(missing.tour, null);
+  } finally {
+    setDurableKVOverrideForTests(null);
+  }
 });
 
 test("resize script validates origin, source, and bounds, and static fallback omits volatile claims", () => {

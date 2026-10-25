@@ -1,25 +1,33 @@
+import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { setAdminCookie } from "@/lib/admin";
+import { getConfiguredAdminPassword, setAdminCookie } from "@/lib/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(req: NextRequest) {
-  const body = await req.json().catch(() => null);
-  const password = String(body?.password || "");
+function passwordsMatch(provided: string, expected: string): boolean {
+  const a = crypto.createHash("sha256").update(provided).digest();
+  const b = crypto.createHash("sha256").update(expected).digest();
+  return crypto.timingSafeEqual(a, b);
+}
 
-  const expected = process.env.ADMIN_PASSWORD;
+export async function POST(req: NextRequest) {
+  const expected = getConfiguredAdminPassword();
   if (!expected) {
     return NextResponse.json(
-      { success: false, error: "Missing ADMIN_PASSWORD" },
-      { status: 500 }
+      { success: false, error: "Admin authentication is not configured" },
+      { status: 503 },
     );
   }
 
-  if (password !== expected) {
+  const body = await req.json().catch(() => null);
+  const rawPassword = typeof body?.password === "string" ? body.password : "";
+  const trimmedPassword = rawPassword.trim();
+
+  if (!trimmedPassword || (!passwordsMatch(rawPassword, expected) && !passwordsMatch(trimmedPassword, expected))) {
     return NextResponse.json(
       { success: false, error: "Invalid password" },
-      { status: 401 }
+      { status: 401 },
     );
   }
 

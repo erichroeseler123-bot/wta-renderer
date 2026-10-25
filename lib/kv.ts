@@ -1,9 +1,9 @@
-type KVGetOptions = {
+export type KVGetOptions = {
   ex?: number;
   nx?: boolean;
 };
 
-type KVClient = {
+export type KVClient = {
   get<T = unknown>(key: string): Promise<T | null>;
   set(key: string, value: unknown, opts?: KVGetOptions): Promise<unknown>;
   del(key: string): Promise<number>;
@@ -15,6 +15,7 @@ type LocalEntry = {
 };
 
 const localStore = new Map<string, LocalEntry>();
+let durableKVOverrideForTests: KVClient | null = null;
 
 function nowMs() {
   return Date.now();
@@ -42,7 +43,7 @@ const localKV: KVClient = {
   async get<T = unknown>(key: string) {
     cleanExpiredLocal(key);
     const entry = localStore.get(key);
-    return (entry ? (entry.value as T) : null);
+    return entry ? (entry.value as T) : null;
   },
   async set(key: string, value: unknown, opts?: KVGetOptions) {
     cleanExpiredLocal(key);
@@ -57,9 +58,26 @@ const localKV: KVClient = {
   },
 };
 
-export async function getKV(): Promise<KVClient | null> {
-  if (process.env.USE_LOCAL_KV === "true" || process.env.NEXT_PUBLIC_USE_LOCAL_KV === "true") {
-    return localKV;
+export function setDurableKVOverrideForTests(client: KVClient | null) {
+  durableKVOverrideForTests = client;
+}
+
+export function isDurableKVConfigured(): boolean {
+  if (durableKVOverrideForTests) return true;
+  const vercelUrl = readEnv("KV_REST_API_URL");
+  const vercelToken = readEnv("KV_REST_API_TOKEN");
+  if (vercelUrl && vercelToken) return true;
+
+  const upstashUrl = readEnv("UPSTASH_REDIS_REST_URL");
+  const upstashToken = readEnv("UPSTASH_REDIS_REST_TOKEN");
+  if (upstashUrl && upstashToken) return true;
+
+  return false;
+}
+
+export async function getDurableKV(): Promise<KVClient | null> {
+  if (durableKVOverrideForTests) {
+    return durableKVOverrideForTests;
   }
 
   const vercelUrl = readEnv("KV_REST_API_URL");
@@ -74,6 +92,19 @@ export async function getKV(): Promise<KVClient | null> {
   if (upstashUrl && upstashToken) {
     const mod = await import("@upstash/redis");
     return mod.Redis.fromEnv() as unknown as KVClient;
+  }
+
+  return null;
+}
+
+export async function getKV(): Promise<KVClient | null> {
+  if (process.env.USE_LOCAL_KV === "true" || process.env.NEXT_PUBLIC_USE_LOCAL_KV === "true") {
+    return localKV;
+  }
+
+  const durable = await getDurableKV();
+  if (durable) {
+    return durable;
   }
 
   if (process.env.NODE_ENV !== "production") {

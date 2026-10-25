@@ -90,8 +90,8 @@ function collectTours(root: any): TourLike[] {
   return out;
 }
 
-export async function GET() {
-  const a = await requireAdmin();
+export async function GET(req?: Request) {
+  const a = await requireAdmin(req);
   if (!a.ok) return jsonError("Unauthorized", 401);
 
   const toursPath = path.join(process.cwd(), "public", "data", "tours.json");
