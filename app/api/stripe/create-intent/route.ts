@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { getKV } from "@/lib/kv";
 import {
+  buildOrderAttributionFromLines,
   saveOrder,
   makeOrderCancelToken,
   hashClientSecret,
@@ -10,6 +11,8 @@ import {
   type OrderSnapshot,
 } from "@/lib/orders";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
+import { sanitizePlacementLabel } from "@/lib/tourWidget";
+import { sanitizeEmbedDomain } from "@/lib/widgetContext";
 import {
   clientIpFromHeaders,
   enforceRateLimit,
@@ -80,22 +83,6 @@ function getBaseUrl(req: NextRequest) {
 function clampQty(n: unknown) {
   const x = Math.floor(Number(n || 1));
   return Math.max(1, Math.min(99, x));
-}
-
-function pickFirstString(lines: CartLine[], key: keyof CartLine) {
-  for (const line of lines) {
-    const v = line[key];
-    if (typeof v === "string" && v.trim()) return v.trim();
-  }
-  return undefined;
-}
-
-function pickFirstNumber(lines: CartLine[], key: keyof CartLine) {
-  for (const line of lines) {
-    const n = Number(line[key]);
-    if (Number.isFinite(n) && n > 0) return Math.floor(n);
-  }
-  return undefined;
 }
 
 export async function POST(req: NextRequest) {
@@ -208,10 +195,19 @@ export async function POST(req: NextRequest) {
         category: typeof it.handoffCategory === "string" ? it.handoffCategory : undefined,
         handoffDate: typeof it.handoffDate === "string" ? it.handoffDate : undefined,
         dccReturnUrl: typeof it.dccReturnUrl === "string" ? it.dccReturnUrl : undefined,
-        embedDomain: typeof it.embedDomain === "string" ? it.embedDomain : undefined,
-        embedPath: typeof it.embedPath === "string" ? it.embedPath : undefined,
-        widgetPlacement: typeof it.widgetPlacement === "string" ? it.widgetPlacement : undefined,
-        widgetId: typeof it.widgetId === "string" ? it.widgetId : undefined,
+        embedDomain: sanitizeEmbedDomain(it.embedDomain),
+        embedPath:
+          it.handoffSource === "dcc" && typeof it.embedPath === "string"
+            ? it.embedPath.split(/[?#]/)[0]?.slice(0, 160)
+            : undefined,
+        widgetPlacement:
+          typeof it.widgetPlacement === "string"
+            ? sanitizePlacementLabel(it.widgetPlacement)
+            : undefined,
+        widgetId:
+          typeof it.widgetId === "string" && it.widgetId.trim()
+            ? it.widgetId.trim().slice(0, 80)
+            : undefined,
         partySize: Number.isFinite(Number(it.partySize)) ? Number(it.partySize) : undefined,
         adults: Number.isFinite(Number(it.adults)) ? Number(it.adults) : undefined,
         children: Number.isFinite(Number(it.children)) ? Number(it.children) : undefined,
@@ -227,31 +223,7 @@ export async function POST(req: NextRequest) {
     const order_id = `ord_${crypto.randomUUID()}`;
     const cart_id = `cart_${crypto.randomUUID()}`;
 
-    const attribution: OrderAttribution = {
-      handoffSource: pickFirstString(lines, "handoffSource"),
-      handoffId: pickFirstString(lines, "handoffId"),
-      sourceSlug: pickFirstString(lines, "sourceSlug"),
-      sourcePage: pickFirstString(lines, "sourcePage"),
-      topicSlug: pickFirstString(lines, "topicSlug"),
-      authorityTopic: pickFirstString(lines, "authorityTopic"),
-      referrerPath: pickFirstString(lines, "referrerPath"),
-      portSlug: pickFirstString(lines, "portSlug"),
-      productSlug: pickFirstString(lines, "productSlug"),
-      category: pickFirstString(lines, "handoffCategory"),
-      date: pickFirstString(lines, "handoffDate"),
-      dccReturnUrl: pickFirstString(lines, "dccReturnUrl"),
-      embedDomain: pickFirstString(lines, "embedDomain"),
-      embedPath: pickFirstString(lines, "embedPath"),
-      widgetPlacement: pickFirstString(lines, "widgetPlacement"),
-      widgetId: pickFirstString(lines, "widgetId"),
-      partySize: pickFirstNumber(lines, "partySize"),
-      adults: pickFirstNumber(lines, "adults"),
-      children: pickFirstNumber(lines, "children"),
-      cruiseShip: pickFirstString(lines, "cruiseShip"),
-      cruiseShipSlug: pickFirstString(lines, "cruiseShipSlug"),
-      timeOfDay: pickFirstString(lines, "timeOfDay"),
-      budgetTier: pickFirstString(lines, "budgetTier"),
-    };
+    const attribution: OrderAttribution = buildOrderAttributionFromLines(lines);
 
     const draft: OrderSnapshot = {
       order_id,
@@ -334,6 +306,10 @@ export async function POST(req: NextRequest) {
           contact_email: email,
           handoff_source: attribution.handoffSource || "",
           handoff_id: attribution.handoffId || "",
+          widget_placement: attribution.widgetPlacement || "",
+          widget_id: attribution.widgetId || "",
+          embed_domain: attribution.embedDomain || "",
+          embed_path: attribution.embedPath || "",
           authority_topic: attribution.authorityTopic || "",
           port_slug: attribution.portSlug || "",
           category: attribution.category || "",

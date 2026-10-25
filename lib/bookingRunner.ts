@@ -1,5 +1,6 @@
 import { createFareHarborBooking } from "@/lib/fareharbor";
 import type { OrderSnapshot } from "@/lib/orders";
+import { sanitizePlacementLabel } from "@/lib/tourWidget";
 
 export async function runFareHarborBookingsForOrder(order: OrderSnapshot, paymentIntentId: string) {
   const results: Array<Record<string, unknown>> = [];
@@ -7,14 +8,20 @@ export async function runFareHarborBookingsForOrder(order: OrderSnapshot, paymen
   for (const line of order.items) {
     try {
       const dccHandoffId = order.attribution?.handoffId?.trim();
-      const bookingNote = dccHandoffId
-        ? `WTA order ${order.order_id} / PI ${paymentIntentId} / DCC ${dccHandoffId}`
-        : `WTA order ${order.order_id} / PI ${paymentIntentId}`;
+      const placement =
+        sanitizePlacementLabel(line.widgetPlacement) ||
+        sanitizePlacementLabel(order.attribution?.widgetPlacements?.[0]) ||
+        sanitizePlacementLabel(order.attribution?.widgetPlacement);
+      const noteParts = [`WTA order ${order.order_id}`, `PI ${paymentIntentId}`];
+      if (dccHandoffId) noteParts.push(`DCC ${dccHandoffId}`);
+      if (placement) noteParts.push(`Placement ${placement}`);
+      const bookingNote = noteParts.join(" / ");
 
       console.log("[fareharbor-booking]", {
         orderId: order.order_id,
         paymentIntentId,
         handoffId: dccHandoffId ?? null,
+        widgetPlacement: placement ?? null,
         company: line.company,
         availabilityPk: line.availabilityPk,
         ratePk: line.ratePk,

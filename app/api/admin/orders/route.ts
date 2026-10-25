@@ -127,11 +127,16 @@ export async function GET(req: NextRequest) {
         name: order.contact?.name || "",
         email: order.contact?.email || "",
       },
+      attribution: order.attribution || null,
       items: (order.items || []).map((i) => ({
         title: i.title || "",
         company: i.company || "",
+        itemPk: i.itemPk || 0,
         startAt: i.startAt || "",
         qty: i.qty || 0,
+        widgetPlacement: i.widgetPlacement || null,
+        embedDomain: i.embedDomain || null,
+        widgetId: i.widgetId || null,
       })),
     }))
     .sort(

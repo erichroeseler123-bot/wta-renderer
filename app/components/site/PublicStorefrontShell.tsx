@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import CartDrawer from "@/app/components/cart/CartDrawer";
+import StickyCartBar from "@/app/components/cart/StickyCartBar";
+
+const CRUISE_PROMENADE =
+  "https://cruisepromenade.com/?utm_source=welcometoalaskatours&utm_medium=referral&utm_campaign=alaska_cruise_planning";
 
 const NAV_LINKS = [
   ["Ports", "/ports"],
@@ -10,13 +15,16 @@ const NAV_LINKS = [
   ["About", "/about"],
 ] as const;
 
-function shouldSkipChrome(pathname: string) {
+function isIsolatedRoute(pathname: string) {
   return (
-    pathname === "/" ||
     pathname.startsWith("/admin") ||
     pathname.startsWith("/widget") ||
     pathname.startsWith("/hud-demo")
   );
+}
+
+function shouldSkipHeaderFooter(pathname: string) {
+  return pathname === "/" || isIsolatedRoute(pathname);
 }
 
 function routeClass(pathname: string) {
@@ -37,10 +45,38 @@ function routeClass(pathname: string) {
   return "wta-route-standard";
 }
 
+function PublicCartAndPromoChrome() {
+  return (
+    <>
+      <section className="border-t border-[#123632]/10 bg-[#eaf2ee] px-5 py-8 text-[#123632] sm:px-7 lg:px-10">
+        <div className="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#46706a]">Already choosing Alaska excursions?</p>
+            <h2 className="mt-2 text-2xl font-black tracking-tight">Keep the whole cruise in one shared plan.</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-[#57706c]">Use Cruise Promenade to organize port days, booked activities and the plans your cruise group needs to see together.</p>
+          </div>
+          <a href={CRUISE_PROMENADE} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-[#123632] px-5 text-sm font-black text-white transition hover:bg-[#214b46]">Open Cruise Promenade →</a>
+        </div>
+      </section>
+      <StickyCartBar />
+      <CartDrawer />
+    </>
+  );
+}
+
 export default function PublicStorefrontShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  if (shouldSkipChrome(pathname)) return <>{children}</>;
+  if (isIsolatedRoute(pathname)) return <>{children}</>;
+
+  if (shouldSkipHeaderFooter(pathname)) {
+    return (
+      <>
+        {children}
+        <PublicCartAndPromoChrome />
+      </>
+    );
+  }
 
   return (
     <div className={`wta-storefront ${routeClass(pathname)} min-h-screen bg-[#f4ede4] text-[#2b211b]`}>
@@ -113,6 +149,7 @@ export default function PublicStorefrontShell({ children }: { children: React.Re
           </div>
         </div>
       </footer>
+      <PublicCartAndPromoChrome />
     </div>
   );
 }

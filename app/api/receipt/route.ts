@@ -122,6 +122,16 @@ export async function GET(req: NextRequest) {
     currency: order.currency,
     contact: order.contact,
     attribution: order.attribution || null,
+    items: (order.items || []).map((item) => ({
+      title: item.title || "",
+      company: item.company || "",
+      itemPk: item.itemPk || 0,
+      qty: item.qty || 1,
+      startAt: item.startAt || "",
+      widgetPlacement: item.widgetPlacement || null,
+      embedDomain: item.embedDomain || null,
+      widgetId: item.widgetId || null,
+    })),
     results: order.bookingResults || [],
     lastError: order.lastError || null,
     // Redact cancel_token unless authorized by client_secret or admin
