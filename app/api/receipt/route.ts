@@ -8,7 +8,7 @@ import {
   verifyClientSecret,
   saveOrder,
 } from "@/lib/orders";
-import { isAdminCookieValue } from "@/lib/admin";
+import { isAdminCookieValue, isAdminReq } from "@/lib/admin";
 
 export const runtime = "nodejs";
 
@@ -18,6 +18,8 @@ const INTERNAL_SECRET = String(process.env.WTA_INTERNAL_SECRET || "").trim();
 async function checkAdminAuth(req: NextRequest): Promise<boolean> {
   const adminSecret = String(process.env.WTA_ADMIN_SECRET || "").trim();
   const internalSecret = String(process.env.WTA_INTERNAL_SECRET || "").trim();
+
+  if (isAdminReq(req)) return true;
 
   try {
     const jar = await cookies();

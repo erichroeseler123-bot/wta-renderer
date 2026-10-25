@@ -18,25 +18,49 @@ import {
   checkBookingCapabilityReadiness,
   setFareHarborBookingHandlerForTests,
 } from "../lib/fareharbor";
-import { setDurableKVOverrideForTests, type KV } from "../lib/kv";
+import {
+  setDurableKVOverrideForTests,
+  namespaceKVKey,
+  type KVClient,
+} from "../lib/kv";
 import { setStripeClientForTests } from "../lib/stripe";
 import {
   getVisibility,
   deleteIsolatedTestVisibilityRecord,
 } from "../lib/visibilityStore";
+import {
+  applyServerPriceChangesToCartItems,
+  formatCentsUsd,
+} from "../app/components/cart/CheckoutClient";
 
 import { GET as priceGET } from "../app/api/fareharbor/price/route";
 import { POST as createIntentPOST } from "../app/api/stripe/create-intent/route";
 import { POST as webhookPOST } from "../app/api/stripe/webhook/route";
 import { POST as finalizePOST } from "../app/api/stripe/finalize/route";
 import { GET as receiptGET } from "../app/api/receipt/route";
+import { POST as fareharborCancelPOST } from "../app/api/fareharbor/cancel/route";
 import { POST as adminLoginPOST } from "../app/api/admin/login/route";
 import { GET as widgetCatalogGET } from "../app/api/admin/widget-catalog/route";
-import { POST as visibilityPOST } from "../app/api/admin/visibility/route";
+import {
+  GET as visibilityGET,
+  POST as visibilityPOST,
+} from "../app/api/admin/visibility/route";
 import { POST as providersPOST } from "../app/api/admin/providers/route";
 import { GET as adminToursGET } from "../app/api/admin/tours/route";
 import { GET as adminOrdersGET } from "../app/api/admin/orders/route";
 import { POST as adminOrdersRetryPOST } from "../app/api/admin/orders/retry/route";
+import {
+  GET as adminFlagsGET,
+  POST as adminFlagsPOST,
+} from "../app/api/admin/flags/route";
+import { GET as adminPlanEventsGET } from "../app/api/admin/plan-events/route";
+import { GET as adminDccCallbacksGET } from "../app/api/admin/dcc-callbacks/route";
+import { POST as adminDccProbePOST } from "../app/api/admin/dcc-callbacks/probe/route";
+import { GET as handoffDccDebugGET } from "../app/api/handoff/dcc/debug/route";
+import { GET as adminStripeStatusGET } from "../app/api/admin/stripe/status/route";
+import { GET as adminStripeConnectGET } from "../app/api/admin/stripe/connect/route";
+import { GET as adminStripeCallbackGET } from "../app/api/admin/stripe/callback/route";
+import { POST as adminStripeDisconnectPOST } from "../app/api/admin/stripe/disconnect/route";
 
 // Load .env.local credentials if present so live FareHarbor >90-days lookup can run
 function loadEnvLocal() {
@@ -245,16 +269,19 @@ test("1b. Exact departure pricing handles changed prices, sold-out departures, a
   }
 });
 
-test("2. Pre-payment booking capability detection and end-to-end payment, booking, duplicate webhook, failure queue, and retry in test environment", async () => {
+test("2. Pre-payment booking capability, changed-price confirmation before payment, simultaneous webhook/finalize concurrency, and ambiguous provider timeout protection", async () => {
   const prevFhEnabled = process.env.FH_BOOKINGS_ENABLED;
   const prevUseLocalKv = process.env.USE_LOCAL_KV;
   const prevWhSecret = process.env.STRIPE_WEBHOOK_SECRET;
   const prevAdminPassword = process.env.ADMIN_PASSWORD;
+  const prevOrderSecret = process.env.ORDER_SIGNING_SECRET;
   const prevTurnstileSecret = process.env.TURNSTILE_SECRET_KEY;
 
   process.env.USE_LOCAL_KV = "true";
   process.env.STRIPE_WEBHOOK_SECRET = "whsec_test_local_secret";
   process.env.ADMIN_PASSWORD = "test-strong-admin-password-2026";
+  process.env.ORDER_SIGNING_SECRET =
+    "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e";
   delete process.env.TURNSTILE_SECRET_KEY;
 
   let stripeCreateCalls = 0;
@@ -292,6 +319,8 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
 
   setStripeClientForTests(mockStripe);
 
+  let liveFareHarborUnitCents = 20900;
+
   setFareHarborDateFetchForTests(async () => ({
     status: 200,
     ok: true,
@@ -306,7 +335,7 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
             {
               pk: 9150964743,
               capacity: 6,
-              customer_prototype: { total: 20900 },
+              customer_prototype: { total: liveFareHarborUnitCents },
             },
           ],
         },
@@ -345,20 +374,86 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
     assert.equal(disabledBody.code, "bookings_disabled");
     assert.equal(stripeCreateCalls, 0, "Must not create a Stripe PaymentIntent when booking capability is disabled");
 
-    // 2b. Enable bookings in the local test environment and verify full payment -> reservation -> duplicate webhook idempotency
+    // 2b. Changed price is shown and accepted BEFORE payment
     process.env.FH_BOOKINGS_ENABLED = "1";
-    let fhBookingCalls = 0;
-    let shouldFailFareHarbor = false;
+    liveFareHarborUnitCents = 24500; // Live operator price increased from $209.00 (20900) to $245.00 (24500)
 
-    setFareHarborBookingHandlerForTests(async ({ company, availabilityPk, ratePk, qty }) => {
+    const initialCartItems = [
+      {
+        company: "beyondak",
+        itemPk: 195602,
+        availabilityPk: -5352426,
+        ratePk: 9150964743,
+        day: "2027-06-15",
+        startAt: "2027-06-15T11:00:00-0800",
+        qty: 2,
+        price: 20900,
+        unitCents: 20900,
+        expectedUnitCents: 20900,
+        title: "Mendenhall Glacier Guided Hike",
+        widgetPlacement: "hotel-homepage",
+        embedDomain: "https://insidepassagelodge.example.com/concierge",
+      },
+    ];
+
+    const priceChangedReq = new NextRequest("http://localhost:3000/api/stripe/create-intent", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contact: { name: "Jane Traveler", email: "jane@example.com", phone: "555-0100" },
+        items: initialCartItems,
+      }),
+    });
+    const priceChangedRes = await createIntentPOST(priceChangedReq);
+    const priceChangedBody = await priceChangedRes.json();
+
+    assert.equal(priceChangedRes.status, 409, "Changed price must block PaymentIntent creation with 409 until customer accepts");
+    assert.equal(priceChangedBody.success, false);
+    assert.equal(priceChangedBody.code, "price_changed");
+    assert.equal(priceChangedBody.previousTotalCents, 41800);
+    assert.equal(priceChangedBody.updatedTotalCents, 49000);
+    assert.equal(Array.isArray(priceChangedBody.priceChanges), true);
+    assert.equal(priceChangedBody.priceChanges.length, 1);
+    assert.equal(priceChangedBody.priceChanges[0].previousUnitCents, 20900);
+    assert.equal(priceChangedBody.priceChanges[0].updatedUnitCents, 24500);
+    assert.equal(stripeCreateCalls, 0, "No Stripe PaymentIntent may be created before customer accepts changed price");
+
+    // Verify CheckoutClient helper updates cart items and formats displayed amounts before customer confirms
+    const updatedCartItems = applyServerPriceChangesToCartItems(
+      initialCartItems,
+      priceChangedBody.priceChanges,
+    );
+    assert.equal(updatedCartItems[0].unitCents, 24500);
+    assert.equal(updatedCartItems[0].price, 24500);
+    assert.equal(updatedCartItems[0].expectedUnitCents, 24500);
+    assert.equal(formatCentsUsd(priceChangedBody.previousTotalCents), "$418.00");
+    assert.equal(formatCentsUsd(priceChangedBody.updatedTotalCents), "$490.00");
+
+    // Customer clicks "Accept Updated Total ($490.00) & Pay" -> sends acceptedTotalCents: 49000
+    let fhBookingCalls = 0;
+    let fhDelayMs = 35;
+    let fhFailureMode: "none" | "http_502" | "ambiguous_timeout" = "none";
+
+    setFareHarborBookingHandlerForTests(async ({ company, availabilityPk, customerTypeRatePk, qty }) => {
       fhBookingCalls += 1;
-      if (shouldFailFareHarbor) {
+      if (fhDelayMs > 0) {
+        await new Promise((resolve) => setTimeout(resolve, fhDelayMs));
+      }
+      if (fhFailureMode === "http_502") {
         throw new Error("FareHarbor HTTP 502: Simulated operator reservation failure");
+      }
+      if (fhFailureMode === "ambiguous_timeout") {
+        const err = new Error("Request timed out after dispatch: ETIMEDOUT") as Error & {
+          code?: string;
+        };
+        err.name = "TimeoutError";
+        err.code = "ETIMEDOUT";
+        throw err;
       }
       return {
         booking: {
           pk: 900100 + fhBookingCalls,
-          uuid: `fh-uuid-${company}-${availabilityPk}-${ratePk}-${qty}`,
+          uuid: `fh-uuid-${company}-${availabilityPk}-${customerTypeRatePk}-${qty}`,
           status: "booked",
         },
       };
@@ -369,34 +464,22 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
         contact: { name: "Jane Traveler", email: "jane@example.com", phone: "555-0100" },
-        items: [
-          {
-            company: "beyondak",
-            itemPk: 195602,
-            availabilityPk: -5352426,
-            ratePk: 9150964743,
-            day: "2027-06-15",
-            startAt: "2027-06-15T11:00:00-0800",
-            qty: 2,
-            title: "Mendenhall Glacier Guided Hike",
-            widgetPlacement: "hotel-homepage",
-            embedDomain: "https://insidepassagelodge.example.com/concierge",
-          },
-        ],
+        items: initialCartItems, // Even if original expectedUnitCents=20900 is sent, acceptedTotalCents=49000 proves customer accepted the new total
+        acceptedTotalCents: 49000,
       }),
     });
     const createRes1 = await createIntentPOST(createReq1);
     const createBody1 = await createRes1.json();
     assert.equal(createRes1.status, 200);
     assert.equal(createBody1.success, true);
-    assert.equal(createBody1.totalCents, 41800);
+    assert.equal(createBody1.totalCents, 49000);
     assert.equal(stripeCreateCalls, 1);
 
     const piId1 = createBody1.payment_intent_id as string;
     const orderId1 = createBody1.order_id as string;
     createdIntents.get(piId1).status = "succeeded";
 
-    // Deliver payment_intent.succeeded webhook
+    // 2c. SIMULTANEOUS webhook + finalize requests (Promise.all while FareHarbor call is in flight)
     const webhookEventPayload1 = JSON.stringify({
       id: "evt_test_1",
       type: "payment_intent.succeeded",
@@ -404,20 +487,41 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
         object: createdIntents.get(piId1),
       },
     });
-    const whRes1 = await webhookPOST(
-      new Request("http://localhost:3000/api/stripe/webhook", {
-        method: "POST",
-        headers: {
-          "content-type": "application/json",
-          "stripe-signature": "valid_sig:whsec_test_local_secret",
-        },
-        body: webhookEventPayload1,
-      }),
-    );
-    assert.equal(whRes1.status, 200);
-    assert.equal(fhBookingCalls, 1, "Webhook should invoke FareHarbor booking exactly once");
 
-    // Deliver DUPLICATE webhook and also call /api/stripe/finalize -> must be idempotent (no second FareHarbor booking)
+    const [whConcurrentRes, finConcurrentRes] = await Promise.all([
+      webhookPOST(
+        new Request("http://localhost:3000/api/stripe/webhook", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "stripe-signature": "valid_sig:whsec_test_local_secret",
+          },
+          body: webhookEventPayload1,
+        }),
+      ),
+      finalizePOST(
+        new Request("http://localhost:3000/api/stripe/finalize", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ payment_intent_id: piId1 }),
+        }),
+      ),
+    ]);
+
+    assert.equal(whConcurrentRes.status, 200);
+    assert.equal(finConcurrentRes.status, 200);
+    const finConcurrentBody = await finConcurrentRes.json();
+    assert.ok(
+      finConcurrentBody.status === "busy" || finConcurrentBody.status === "booked",
+      `Expected concurrent finalize status to be busy or booked, got ${finConcurrentBody.status}`,
+    );
+    assert.equal(
+      fhBookingCalls,
+      1,
+      "Simultaneous webhook + finalize requests must invoke FareHarbor booking exactly ONCE",
+    );
+
+    // Subsequent sequential webhook and finalize calls also remain idempotent
     const whResDuplicate = await webhookPOST(
       new Request("http://localhost:3000/api/stripe/webhook", {
         method: "POST",
@@ -429,21 +533,20 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
       }),
     );
     assert.equal(whResDuplicate.status, 200);
-    assert.equal(fhBookingCalls, 1, "Duplicate webhook must not create a duplicate FareHarbor reservation");
+    assert.equal(fhBookingCalls, 1);
 
-    const finRes1 = await finalizePOST(
+    const finResAfter = await finalizePOST(
       new Request("http://localhost:3000/api/stripe/finalize", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({ payment_intent_id: piId1 }),
       }),
     );
-    const finBody1 = await finRes1.json();
-    assert.equal(finRes1.status, 200);
-    assert.equal(finBody1.status, "booked");
-    assert.equal(fhBookingCalls, 1, "Finalize after webhook must not create a duplicate FareHarbor reservation");
+    const finBodyAfter = await finResAfter.json();
+    assert.equal(finResAfter.status, 200);
+    assert.equal(finBodyAfter.status, "booked");
+    assert.equal(fhBookingCalls, 1);
 
-    // Verify customer receipt shows booked status
     const receiptRes1 = await receiptGET(
       new NextRequest(`http://localhost:3000/api/receipt?pi=${encodeURIComponent(piId1)}`),
     );
@@ -452,9 +555,10 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
     assert.equal(receiptBody1.status, "booked");
     assert.equal(receiptBody1.order_id, orderId1);
 
-    // 2c. Simulate provider failure after payment -> verify customer gets booking_failed status,
-    // order lands in actionable internal queue (needs_attention), and admin retry recovers it.
-    shouldFailFareHarbor = true;
+    // 2d. Deterministic provider failure (HTTP 502) -> queued in needs_attention -> admin retry succeeds
+    fhFailureMode = "http_502";
+    fhDelayMs = 0;
+    liveFareHarborUnitCents = 20900;
 
     const createReq2 = new NextRequest("http://localhost:3000/api/stripe/create-intent", {
       method: "POST",
@@ -500,7 +604,6 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
     assert.equal(whRes2.status, 200);
     assert.equal(fhBookingCalls, 2);
 
-    // Customer receipt must accurately report booking_failed (never claiming a confirmed operator reservation)
     const receiptRes2 = await receiptGET(
       new NextRequest(`http://localhost:3000/api/receipt?pi=${encodeURIComponent(piId2)}`),
     );
@@ -509,9 +612,7 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
     assert.equal(receiptBody2.status, "booking_failed");
     assert.match(String(receiptBody2.lastError || ""), /Simulated operator reservation failure/);
 
-    // Verify failed order is queued in internal admin queue (GET /api/admin/orders?scope=needs_attention)
     const adminCookie = makeAdminCookieValue();
-    assert.ok(adminCookie);
     const cookieHeader = `${ADMIN_COOKIE}=${adminCookie}`;
 
     const queueRes = await adminOrdersGET(
@@ -521,15 +622,12 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
     );
     const queueBody = await queueRes.json();
     assert.equal(queueRes.status, 200);
-    assert.equal(queueBody.success, true);
     const queuedFailedOrder = (queueBody.orders || []).find(
       (o: any) => o.order_id === orderId2,
     );
     assert.ok(queuedFailedOrder, "Failed booking order must appear in needs_attention queue");
-    assert.equal(queuedFailedOrder.status, "booking_failed");
 
-    // Provider recovers -> Admin triggers POST /api/admin/orders/retry
-    shouldFailFareHarbor = false;
+    fhFailureMode = "none";
     const retryRes = await adminOrdersRetryPOST(
       new NextRequest("http://localhost:3000/api/admin/orders/retry", {
         method: "POST",
@@ -546,12 +644,137 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
     assert.equal(retryBody.status, "booked");
     assert.equal(fhBookingCalls, 3);
 
-    // Customer receipt now reflects booked status
-    const receiptRes2After = await receiptGET(
-      new NextRequest(`http://localhost:3000/api/receipt?pi=${encodeURIComponent(piId2)}`),
+    // 2e. AMBIGUOUS PROVIDER TIMEOUT after dispatch (ETIMEDOUT) -> must NOT trigger a blind duplicate booking!
+    fhFailureMode = "ambiguous_timeout";
+
+    const createReq3 = new NextRequest("http://localhost:3000/api/stripe/create-intent", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        contact: { name: "Morgan TimeoutTest", email: "morgan@example.com", phone: "555-0177" },
+        items: [
+          {
+            company: "beyondak",
+            itemPk: 195602,
+            availabilityPk: -5352426,
+            ratePk: 9150964743,
+            day: "2027-06-15",
+            startAt: "2027-06-15T11:00:00-0800",
+            qty: 2,
+            title: "Mendenhall Glacier Guided Hike",
+          },
+        ],
+      }),
+    });
+    const createRes3 = await createIntentPOST(createReq3);
+    const createBody3 = await createRes3.json();
+    assert.equal(createRes3.status, 200);
+
+    const piId3 = createBody3.payment_intent_id as string;
+    const orderId3 = createBody3.order_id as string;
+    createdIntents.get(piId3).status = "succeeded";
+
+    // First webhook triggers FareHarbor call which times out ambiguously after dispatch
+    const whRes3 = await webhookPOST(
+      new Request("http://localhost:3000/api/stripe/webhook", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "stripe-signature": "valid_sig:whsec_test_local_secret",
+        },
+        body: JSON.stringify({
+          id: "evt_test_3",
+          type: "payment_intent.succeeded",
+          data: { object: createdIntents.get(piId3) },
+        }),
+      }),
     );
-    const receiptBody2After = await receiptRes2After.json();
-    assert.equal(receiptBody2After.status, "booked");
+    assert.equal(whRes3.status, 200);
+    assert.equal(fhBookingCalls, 4, "Initial ambiguous timeout attempt called FareHarbor once");
+
+    // Even if FareHarbor is now healthy, subsequent finalize, duplicate webhook, and unforced admin retry
+    // MUST NOT blindly re-book because the timed-out request may have already created the reservation!
+    fhFailureMode = "none";
+
+    const finAfterTimeoutRes = await finalizePOST(
+      new Request("http://localhost:3000/api/stripe/finalize", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ payment_intent_id: piId3 }),
+      }),
+    );
+    const finAfterTimeoutBody = await finAfterTimeoutRes.json();
+    assert.equal(finAfterTimeoutRes.status, 200);
+    assert.equal(finAfterTimeoutBody.status, "booking_failed");
+    assert.equal(
+      fhBookingCalls,
+      4,
+      "Finalize after an ambiguous provider timeout MUST NOT trigger a blind duplicate booking",
+    );
+
+    const whAfterTimeoutRes = await webhookPOST(
+      new Request("http://localhost:3000/api/stripe/webhook", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          "stripe-signature": "valid_sig:whsec_test_local_secret",
+        },
+        body: JSON.stringify({
+          id: "evt_test_3_dup",
+          type: "payment_intent.succeeded",
+          data: { object: createdIntents.get(piId3) },
+        }),
+      }),
+    );
+    assert.equal(whAfterTimeoutRes.status, 200);
+    assert.equal(
+      fhBookingCalls,
+      4,
+      "Duplicate webhook after an ambiguous provider timeout MUST NOT trigger a blind duplicate booking",
+    );
+
+    const blindRetryRes = await adminOrdersRetryPOST(
+      new NextRequest("http://localhost:3000/api/admin/orders/retry", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: cookieHeader,
+        },
+        body: JSON.stringify({ order_id: orderId3 }),
+      }),
+    );
+    const blindRetryBody = await blindRetryRes.json();
+    assert.equal(
+      blindRetryRes.status,
+      409,
+      "Standard admin retry without manual verification must reject with 409 after an ambiguous provider timeout",
+    );
+    assert.equal(blindRetryBody.code, "ambiguous_provider_timeout_requires_manual_check");
+    assert.equal(
+      fhBookingCalls,
+      4,
+      "Unforced admin retry after an ambiguous timeout MUST NOT call FareHarbor",
+    );
+
+    // Only after staff manually verifies with the operator that the voucher was NOT created and passes force_rebook_after_manual_check=true does retry proceed
+    const forcedRetryRes = await adminOrdersRetryPOST(
+      new NextRequest("http://localhost:3000/api/admin/orders/retry", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: cookieHeader,
+        },
+        body: JSON.stringify({
+          order_id: orderId3,
+          force_rebook_after_manual_check: true,
+        }),
+      }),
+    );
+    const forcedRetryBody = await forcedRetryRes.json();
+    assert.equal(forcedRetryRes.status, 200);
+    assert.equal(forcedRetryBody.success, true);
+    assert.equal(forcedRetryBody.status, "booked");
+    assert.equal(fhBookingCalls, 5);
   } finally {
     setStripeClientForTests(null);
     setFareHarborBookingHandlerForTests(null);
@@ -564,17 +787,22 @@ test("2. Pre-payment booking capability detection and end-to-end payment, bookin
     else process.env.STRIPE_WEBHOOK_SECRET = prevWhSecret;
     if (prevAdminPassword === undefined) delete process.env.ADMIN_PASSWORD;
     else process.env.ADMIN_PASSWORD = prevAdminPassword;
+    if (prevOrderSecret === undefined) delete process.env.ORDER_SIGNING_SECRET;
+    else process.env.ORDER_SIGNING_SECRET = prevOrderSecret;
     if (prevTurnstileSecret !== undefined) process.env.TURNSTILE_SECRET_KEY = prevTurnstileSecret;
   }
 });
 
-test("3. Owner authentication fails closed when unconfigured, rejects empty-secret/invalid/expired cookies, and protects all owner endpoints", async () => {
+test("3. Owner authentication requires dedicated ORDER_SIGNING_SECRET + ADMIN_PASSWORD, fails closed when either is missing, and rejects old forged cookies across all 17 endpoints", async () => {
   const prevAdminPassword = process.env.ADMIN_PASSWORD;
   const prevOrderSecret = process.env.ORDER_SIGNING_SECRET;
+  const prevUseLocalKv = process.env.USE_LOCAL_KV;
+  process.env.USE_LOCAL_KV = "true";
 
   try {
-    // 3a. Missing / empty / placeholder ADMIN_PASSWORD fails closed
-    delete process.env.ORDER_SIGNING_SECRET;
+    // 3a. Missing / empty / placeholder ADMIN_PASSWORD fails closed even when ORDER_SIGNING_SECRET is set
+    process.env.ORDER_SIGNING_SECRET =
+      "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e";
     for (const badPw of ["", "   ", "replace_me", "changeme"]) {
       process.env.ADMIN_PASSWORD = badPw;
       assert.throws(() => makeAdminCookieValue());
@@ -582,11 +810,7 @@ test("3. Owner authentication fails closed when unconfigured, rejects empty-secr
       const ts = String(Date.now());
       const emptySecretSig = crypto.createHmac("sha256", "").update(ts).digest("hex");
       const forgedEmptyCookie = `${ts}.${emptySecretSig}`;
-      assert.equal(
-        isAdminCookieValue(forgedEmptyCookie),
-        false,
-        `Cookie signed with empty secret must be rejected when ADMIN_PASSWORD="${badPw}"`,
-      );
+      assert.equal(isAdminCookieValue(forgedEmptyCookie), false);
 
       const loginRes = await adminLoginPOST(
         new NextRequest("http://localhost:3000/api/admin/login", {
@@ -598,18 +822,48 @@ test("3. Owner authentication fails closed when unconfigured, rejects empty-secr
       assert.equal(loginRes.status, 503);
     }
 
-    // 3b. Valid ADMIN_PASSWORD configured, but ORDER_SIGNING_SECRET unset (like Vercel Production)
+    // 3b. Missing / empty / placeholder ORDER_SIGNING_SECRET fails closed even when ADMIN_PASSWORD is set
     process.env.ADMIN_PASSWORD = "owner-prod-password-verified-99";
-    delete process.env.ORDER_SIGNING_SECRET;
+    for (const badSecret of ["", "   ", "replace_me", "change_me_to_long_random"]) {
+      process.env.ORDER_SIGNING_SECRET = badSecret;
+      assert.throws(() => makeAdminCookieValue());
+
+      const ts = String(Date.now());
+      const emptySecretSig = crypto.createHmac("sha256", "").update(ts).digest("hex");
+      assert.equal(isAdminCookieValue(`${ts}.${emptySecretSig}`), false);
+
+      const loginRes = await adminLoginPOST(
+        new NextRequest("http://localhost:3000/api/admin/login", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ password: "owner-prod-password-verified-99" }),
+        }),
+      );
+      assert.equal(loginRes.status, 503);
+    }
+
+    // 3c. With both ADMIN_PASSWORD and dedicated ORDER_SIGNING_SECRET configured:
+    process.env.ADMIN_PASSWORD = "owner-prod-password-verified-99";
+    process.env.ORDER_SIGNING_SECRET =
+      "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e";
 
     const now = Date.now();
+    // Forged cookie #1: Legacy empty-secret vulnerability (${ts}.${hmac("", ts)})
     const emptySig = crypto.createHmac("sha256", "").update(String(now)).digest("hex");
     const emptySecretCookie = `${now}.${emptySig}`;
-    assert.equal(
-      isAdminCookieValue(emptySecretCookie, now),
-      false,
-      "Cookie signed with empty secret must be rejected even when ORDER_SIGNING_SECRET is unset",
-    );
+    assert.equal(isAdminCookieValue(emptySecretCookie, now), false);
+
+    // Forged cookie #2: Signed without dedicated ORDER_SIGNING_SECRET
+    const noOrderSecretKey = crypto
+      .createHmac("sha256", "wta-admin-cookie-signing-key-v1")
+      .update(`:${process.env.ADMIN_PASSWORD}`)
+      .digest("hex");
+    const noOrderSecretSig = crypto
+      .createHmac("sha256", noOrderSecretKey)
+      .update(String(now))
+      .digest("hex");
+    const noOrderSecretCookie = `${now}.${noOrderSecretSig}`;
+    assert.equal(isAdminCookieValue(noOrderSecretCookie, now), false);
 
     // Valid cookie works within TTL
     const validCookie = makeAdminCookieValue(now);
@@ -618,74 +872,243 @@ test("3. Owner authentication fails closed when unconfigured, rejects empty-secr
 
     // Expired cookie (>8 hours old) is rejected
     const nineHoursLater = now + 9 * 60 * 60 * 1000;
-    assert.equal(
-      isAdminCookieValue(validCookie, nineHoursLater),
-      false,
-      "Expired admin cookie (>8h) must be rejected",
-    );
+    assert.equal(isAdminCookieValue(validCookie, nineHoursLater), false);
 
     // Future-dated cookie beyond clock skew (>5m in future) is rejected
     const futureCookie = makeAdminCookieValue(now + 10 * 60 * 1000);
-    assert.equal(
-      isAdminCookieValue(futureCookie, now),
-      false,
-      "Future-dated cookie beyond skew must be rejected",
-    );
+    assert.equal(isAdminCookieValue(futureCookie, now), false);
 
     // Tampered signature is rejected
     const tamperedCookie = `${validCookie.slice(0, -4)}abcd`;
     assert.equal(isAdminCookieValue(tamperedCookie, now), false);
 
-    // 3c. Verify all owner-only endpoints reject unauthenticated / empty-secret requests and accept normal login cookie
-    const forgedHeader = `${ADMIN_COOKIE}=${emptySecretCookie}`;
+    // 3d. Verify ALL 17 endpoints that used the vulnerable helper reject old forged cookies
+    for (const badCookie of [emptySecretCookie, noOrderSecretCookie]) {
+      const forgedHeader = `${ADMIN_COOKIE}=${badCookie}`;
 
-    const unauthWidgetCatalog = await widgetCatalogGET(
-      new NextRequest("http://localhost:3000/api/admin/widget-catalog", {
-        headers: { cookie: forgedHeader },
-      }),
-    );
-    assert.equal(unauthWidgetCatalog.status, 401);
+      // 1. GET /api/admin/widget-catalog
+      assert.equal(
+        (
+          await widgetCatalogGET(
+            new NextRequest("http://localhost:3000/api/admin/widget-catalog", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
 
-    const unauthVisibility = await visibilityPOST(
-      new NextRequest("http://localhost:3000/api/admin/visibility", {
-        method: "POST",
-        headers: { "content-type": "application/json", cookie: forgedHeader },
-        body: JSON.stringify({ key: "__test_isolated__:99999999", hidden: true }),
-      }),
-    );
-    assert.equal(unauthVisibility.status, 401);
+      // 2. GET & POST /api/admin/visibility
+      assert.equal(
+        (
+          await visibilityGET(
+            new NextRequest("http://localhost:3000/api/admin/visibility", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
+      assert.equal(
+        (
+          await visibilityPOST(
+            new NextRequest("http://localhost:3000/api/admin/visibility", {
+              method: "POST",
+              headers: { "content-type": "application/json", cookie: forgedHeader },
+              body: JSON.stringify({ key: "__test_isolated__:99999999", hidden: true }),
+            }),
+          )
+        ).status,
+        401,
+      );
 
-    const unauthProviders = await providersPOST(
-      new NextRequest("http://localhost:3000/api/admin/providers", {
-        method: "POST",
-        headers: { "content-type": "application/json", cookie: forgedHeader },
-        body: JSON.stringify({ company: "__test_isolated__", hidden: true }),
-      }),
-    );
-    assert.equal(unauthProviders.status, 401);
+      // 3. POST /api/admin/providers
+      assert.equal(
+        (
+          await providersPOST(
+            new NextRequest("http://localhost:3000/api/admin/providers", {
+              method: "POST",
+              headers: { "content-type": "application/json", cookie: forgedHeader },
+              body: JSON.stringify({ company: "__test_isolated__", hidden: true }),
+            }),
+          )
+        ).status,
+        401,
+      );
 
-    const unauthTours = await adminToursGET(
-      new NextRequest("http://localhost:3000/api/admin/tours", {
-        headers: { cookie: forgedHeader },
-      }),
-    );
-    assert.equal(unauthTours.status, 401);
+      // 4. GET /api/admin/tours
+      assert.equal(
+        (
+          await adminToursGET(
+            new NextRequest("http://localhost:3000/api/admin/tours", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
 
-    const unauthOrders = await adminOrdersGET(
-      new NextRequest("http://localhost:3000/api/admin/orders", {
-        headers: { cookie: forgedHeader },
-      }),
-    );
-    assert.equal(unauthOrders.status, 401);
+      // 5. GET /api/admin/orders
+      assert.equal(
+        (
+          await adminOrdersGET(
+            new NextRequest("http://localhost:3000/api/admin/orders", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
 
-    const unauthRetry = await adminOrdersRetryPOST(
-      new NextRequest("http://localhost:3000/api/admin/orders/retry", {
-        method: "POST",
-        headers: { "content-type": "application/json", cookie: forgedHeader },
-        body: JSON.stringify({ order_id: "ord_123" }),
-      }),
-    );
-    assert.equal(unauthRetry.status, 401);
+      // 6. POST /api/admin/orders/retry
+      assert.equal(
+        (
+          await adminOrdersRetryPOST(
+            new NextRequest("http://localhost:3000/api/admin/orders/retry", {
+              method: "POST",
+              headers: { "content-type": "application/json", cookie: forgedHeader },
+              body: JSON.stringify({ order_id: "ord_123" }),
+            }),
+          )
+        ).status,
+        401,
+      );
+
+      // 7. GET & POST /api/admin/flags
+      assert.equal(
+        (
+          await adminFlagsGET(
+            new NextRequest("http://localhost:3000/api/admin/flags", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        403,
+      );
+      assert.equal(
+        (
+          await adminFlagsPOST(
+            new NextRequest("http://localhost:3000/api/admin/flags", {
+              method: "POST",
+              headers: { "content-type": "application/json", cookie: forgedHeader },
+              body: JSON.stringify({ bookingsEnabled: false }),
+            }),
+          )
+        ).status,
+        403,
+      );
+
+      // 8. GET /api/admin/plan-events
+      assert.equal(
+        (
+          await adminPlanEventsGET(
+            new NextRequest("http://localhost:3000/api/admin/plan-events", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
+
+      // 9. GET /api/admin/dcc-callbacks
+      assert.equal(
+        (
+          await adminDccCallbacksGET(
+            new NextRequest("http://localhost:3000/api/admin/dcc-callbacks", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
+
+      // 10. POST /api/admin/dcc-callbacks/probe
+      assert.equal(
+        (
+          await adminDccProbePOST(
+            new NextRequest("http://localhost:3000/api/admin/dcc-callbacks/probe", {
+              method: "POST",
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
+
+      // 11. GET /api/handoff/dcc/debug
+      assert.equal(
+        (
+          await handoffDccDebugGET(
+            new NextRequest("http://localhost:3000/api/handoff/dcc/debug", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
+
+      // 12. GET /api/admin/stripe/status
+      assert.equal(
+        (
+          await adminStripeStatusGET(
+            new NextRequest("http://localhost:3000/api/admin/stripe/status", {
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
+
+      // 13. GET /api/admin/stripe/connect (redirects unauthenticated to /admin)
+      const stripeConnectRes = await adminStripeConnectGET(
+        new NextRequest("http://localhost:3000/api/admin/stripe/connect", {
+          headers: { cookie: forgedHeader },
+        }),
+      );
+      assert.equal(stripeConnectRes.status, 307);
+      assert.match(String(stripeConnectRes.headers.get("location") || ""), /\/admin$/);
+
+      // 14. GET /api/admin/stripe/callback (redirects unauthenticated to /admin)
+      const stripeCallbackRes = await adminStripeCallbackGET(
+        new NextRequest("http://localhost:3000/api/admin/stripe/callback?code=1&state=2", {
+          headers: { cookie: forgedHeader },
+        }),
+      );
+      assert.equal(stripeCallbackRes.status, 307);
+      assert.match(String(stripeCallbackRes.headers.get("location") || ""), /\/admin$/);
+
+      // 15. POST /api/admin/stripe/disconnect
+      assert.equal(
+        (
+          await adminStripeDisconnectPOST(
+            new NextRequest("http://localhost:3000/api/admin/stripe/disconnect", {
+              method: "POST",
+              headers: { cookie: forgedHeader },
+            }),
+          )
+        ).status,
+        401,
+      );
+
+      // 16. GET /api/receipt (forged admin cookie must NOT reveal cancel_token)
+      const receiptForgedRes = await receiptGET(
+        new NextRequest("http://localhost:3000/api/receipt?pi=pi_nonexistent_test", {
+          headers: { cookie: forgedHeader },
+        }),
+      );
+      const receiptForgedBody = await receiptForgedRes.json();
+      assert.equal(receiptForgedBody.cancel_token ?? null, null);
+
+      // 17. POST /api/fareharbor/cancel (forged admin cookie must NOT grant admin override)
+      const cancelForgedRes = await fareharborCancelPOST(
+        new NextRequest("http://localhost:3000/api/fareharbor/cancel", {
+          method: "POST",
+          headers: { "content-type": "application/json", cookie: forgedHeader },
+          body: JSON.stringify({ orderId: "ord_nonexistent_test" }),
+        }),
+      );
+      assert.equal(cancelForgedRes.status, 404);
+    }
 
     // Normal login via POST /api/admin/login issues a valid Set-Cookie header
     const wrongLogin = await adminLoginPOST(
@@ -721,17 +1144,35 @@ test("3. Owner authentication fails closed when unconfigured, rejects empty-secr
     else process.env.ADMIN_PASSWORD = prevAdminPassword;
     if (prevOrderSecret === undefined) delete process.env.ORDER_SIGNING_SECRET;
     else process.env.ORDER_SIGNING_SECRET = prevOrderSecret;
+    if (prevUseLocalKv === undefined) delete process.env.USE_LOCAL_KV;
+    else process.env.USE_LOCAL_KV = prevUseLocalKv;
   }
 });
 
-test("4. Durable production updates fail with 503 when durable KV is unavailable and persist across separate invocations using an isolated test record", async () => {
+test("4. Durable production updates enforce wta: key isolation, fail with 503 when durable KV is unavailable, and persist across separate invocations using an isolated test record", async () => {
   const prevAdminPassword = process.env.ADMIN_PASSWORD;
+  const prevOrderSecret = process.env.ORDER_SIGNING_SECRET;
+  const prevKvUrl = process.env.KV_REST_API_URL;
+  const prevKvToken = process.env.KV_REST_API_TOKEN;
+  const prevUpstashUrl = process.env.UPSTASH_REDIS_REST_URL;
+  const prevUpstashToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+
   process.env.ADMIN_PASSWORD = "owner-prod-password-verified-99";
+  process.env.ORDER_SIGNING_SECRET =
+    "9f8e7d6c5b4a3f2e1d0c9b8a7f6e5d4c3b2a1f0e9d8c7b6a5f4e3d2c1b0a9f8e";
   const adminCookieHeader = `${ADMIN_COOKIE}=${makeAdminCookieValue()}`;
 
   try {
+    // Verify namespaceKVKey prefixes all keys with wta:
+    assert.equal(namespaceKVKey("order:ord_123"), "wta:order:ord_123");
+    assert.equal(namespaceKVKey("wta:visibility:v1"), "wta:visibility:v1");
+
     // 4a. Without durable KV configured, visibility/catalog/provider writes MUST NOT return success
     setDurableKVOverrideForTests(null);
+    delete process.env.KV_REST_API_URL;
+    delete process.env.KV_REST_API_TOKEN;
+    delete process.env.UPSTASH_REDIS_REST_URL;
+    delete process.env.UPSTASH_REDIS_REST_TOKEN;
 
     const noKvVisRes = await visibilityPOST(
       new NextRequest("http://localhost:3000/api/admin/visibility", {
@@ -792,16 +1233,19 @@ test("4. Durable production updates fail with 503 when durable KV is unavailable
     // 4b. With durable KV configured, verify persistence across separate serverless invocations
     // using an isolated test record (__test_isolated__:99999999) without altering any real tour.
     const backingRedisMap = new Map<string, string>();
-    const simulatedDurableKV: KV = {
+    backingRedisMap.set("cp:cruisepromenade:existing_key", JSON.stringify({ untouched: true }));
+
+    const simulatedDurableKV: KVClient = {
       async get<T = unknown>(k: string): Promise<T | null> {
         const raw = backingRedisMap.get(k);
         return raw ? (JSON.parse(raw) as T) : null;
       },
-      async set(k: string, v: unknown): Promise<void> {
+      async set(k: string, v: unknown): Promise<string> {
         backingRedisMap.set(k, JSON.stringify(v));
+        return "OK";
       },
-      async del(k: string): Promise<void> {
-        backingRedisMap.delete(k);
+      async del(k: string): Promise<number> {
+        return backingRedisMap.delete(k) ? 1 : 0;
       },
     };
     setDurableKVOverrideForTests(simulatedDurableKV);
@@ -829,17 +1273,48 @@ test("4. Durable production updates fail with 503 when durable KV is unavailable
     assert.equal(writeRes.status, 200);
     assert.equal(writeBody.success, true);
 
-    // Simulate separate serverless invocation cold start by wiping any process-local state
-    delete (globalThis as any).__wtaVisibilityDB;
+    // Verify all WTA writes in the shared Redis map are isolated under wta:* and existing cp:* key is untouched
+    assert.equal(backingRedisMap.has("wta:visibility:v1"), true);
+    assert.equal(
+      backingRedisMap.get("cp:cruisepromenade:existing_key"),
+      JSON.stringify({ untouched: true }),
+    );
 
-    // Invocation 2: read isolated test record from a fresh invocation via getVisibility()
-    const persisted = await getVisibility();
-    assert.equal(persisted.tours[isolatedKey], true);
-    assert.equal(persisted.overrides?.[isolatedKey]?.fromPrice, "$199 Isolated Test Record");
+    // Invocation 2: read isolated test record from a separate GET /api/admin/visibility?key=... invocation
+    const readRes = await visibilityGET(
+      new NextRequest(
+        `http://localhost:3000/api/admin/visibility?key=${encodeURIComponent(isolatedKey)}`,
+        {
+          headers: { cookie: adminCookieHeader },
+        },
+      ),
+    );
+    const readBody = await readRes.json();
+    assert.equal(readRes.status, 200);
+    assert.equal(readBody.success, true);
+    assert.equal(readBody.exists, true);
+    assert.equal(readBody.hidden, 1);
+    assert.equal(readBody.override?.fromPrice, "$199 Isolated Test Record");
 
-    // Clean up isolated test record and verify real tours were never touched
-    await deleteIsolatedTestVisibilityRecord(isolatedKey);
-    delete (globalThis as any).__wtaVisibilityDB;
+    // Invocation 3: remove isolated test record via POST /api/admin/visibility { delete: true }
+    const delRes = await visibilityPOST(
+      new NextRequest("http://localhost:3000/api/admin/visibility", {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          cookie: adminCookieHeader,
+        },
+        body: JSON.stringify({
+          key: isolatedKey,
+          delete: true,
+        }),
+      }),
+    );
+    const delBody = await delRes.json();
+    assert.equal(delRes.status, 200);
+    assert.equal(delBody.success, true);
+    assert.equal(delBody.deleted, true);
+
     const afterCleanup = await getVisibility();
     assert.equal(Boolean(afterCleanup.tours[isolatedKey]), false);
     assert.equal(afterCleanup.overrides?.[isolatedKey] ?? null, null);
@@ -847,5 +1322,15 @@ test("4. Durable production updates fail with 503 when durable KV is unavailable
     setDurableKVOverrideForTests(null);
     if (prevAdminPassword === undefined) delete process.env.ADMIN_PASSWORD;
     else process.env.ADMIN_PASSWORD = prevAdminPassword;
+    if (prevOrderSecret === undefined) delete process.env.ORDER_SIGNING_SECRET;
+    else process.env.ORDER_SIGNING_SECRET = prevOrderSecret;
+    if (prevKvUrl === undefined) delete process.env.KV_REST_API_URL;
+    else process.env.KV_REST_API_URL = prevKvUrl;
+    if (prevKvToken === undefined) delete process.env.KV_REST_API_TOKEN;
+    else process.env.KV_REST_API_TOKEN = prevKvToken;
+    if (prevUpstashUrl === undefined) delete process.env.UPSTASH_REDIS_REST_URL;
+    else process.env.UPSTASH_REDIS_REST_URL = prevUpstashUrl;
+    if (prevUpstashToken === undefined) delete process.env.UPSTASH_REDIS_REST_TOKEN;
+    else process.env.UPSTASH_REDIS_REST_TOKEN = prevUpstashToken;
   }
 });

@@ -18,7 +18,7 @@ function canUseSecretAuth(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const admin = await requireAdmin();
+  const admin = await requireAdmin(req);
   const secretOk = canUseSecretAuth(req);
   if (!admin.ok && !secretOk) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });

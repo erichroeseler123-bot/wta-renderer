@@ -354,9 +354,10 @@ export async function releaseOrderLock(orderId: string) {
 }
 
 import crypto from "crypto";
+import { getConfiguredOrderSigningSecret } from "@/lib/admin";
 
 export function makeOrderCancelToken(orderId: string, email?: string): string {
-  const secret = process.env.ORDER_SIGNING_SECRET || "";
+  const secret = getConfiguredOrderSigningSecret() || "";
   const randomSalt = crypto.randomBytes(16).toString("hex");
   if (secret) {
     const sig = crypto.createHmac("sha256", secret).update(`${orderId}:${(email || "").toLowerCase().trim()}:${randomSalt}`).digest("hex");
@@ -370,7 +371,7 @@ export function verifyOrderCancelToken(order: OrderSnapshot, providedToken: stri
   const token = providedToken.trim();
   if (order.cancel_token && order.cancel_token === token) return true;
 
-  const secret = process.env.ORDER_SIGNING_SECRET || "";
+  const secret = getConfiguredOrderSigningSecret() || "";
   if (secret && token.includes(".")) {
     const [salt, sig] = token.split(".");
     if (salt && sig) {

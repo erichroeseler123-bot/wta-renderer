@@ -27,6 +27,8 @@ export async function POST(req: Request) {
   const orderId = String(body?.order_id || "").trim();
   if (!orderId) return NextResponse.json({ success: false, error: "Missing order_id" }, { status: 400 });
 
+  const forceRebookAfterManualCheck = body?.force_rebook_after_manual_check === true;
+
   const order = await getOrder(orderId);
   if (!order) return NextResponse.json({ success: false, error: "Order not found" }, { status: 404 });
 
@@ -43,6 +45,23 @@ export async function POST(req: Request) {
     const latest = (await getOrder(order.order_id)) || order;
     if (latest.status === "booked") {
       return NextResponse.json({ success: true, status: "booked", order: latest });
+    }
+
+    const hasPriorAmbiguousTimeout =
+      Array.isArray(latest.bookingResults) &&
+      latest.bookingResults.some((r) => r?.ambiguousTimeout === true);
+
+    if (hasPriorAmbiguousTimeout && !forceRebookAfterManualCheck) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: "ambiguous_provider_timeout_requires_manual_check",
+          error:
+            "Prior booking attempt timed out after dispatch. Verify with the operator in FareHarbor whether the voucher was created before forcing a re-book.",
+          order: latest,
+        },
+        { status: 409 },
+      );
     }
 
     const pending: OrderSnapshot = {
@@ -68,7 +87,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: "Missing payment_intent_id", order: failed }, { status: 409 });
     }
 
-    const { results, allOk } = await runFareHarborBookingsForOrder(pending, paymentIntentId);
+    const { results, allOk } = await runFareHarborBookingsForOrder(pending, paymentIntentId, {
+      forceRebookAfterManualCheck,
+    });
 
     const firstError = results
       .map((x) => (typeof x.error === "string" ? x.error : ""))

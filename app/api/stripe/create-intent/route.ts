@@ -147,7 +147,23 @@ export async function POST(req: NextRequest) {
     if (!name || !email) return jsonError("Missing contact.name or contact.email.", 400);
 
     let totalCents = 0;
+    let previousTotalCents = 0;
     const computed: OrderLine[] = [];
+    const priceChanges: Array<{
+      company: string;
+      itemPk: number;
+      availabilityPk: number;
+      ratePk: number;
+      title?: string;
+      date: string;
+      startAt?: string;
+      qty: number;
+      previousUnitCents: number;
+      updatedUnitCents: number;
+      previousLineTotalCents: number;
+      updatedLineTotalCents: number;
+      currency: string;
+    }> = [];
 
     for (const it of lines) {
       const company = String(it.company || "").trim();
@@ -161,12 +177,12 @@ export async function POST(req: NextRequest) {
       }
 
       const expectedUnit =
-        typeof it.expectedUnitCents === "number"
-          ? it.expectedUnitCents
-          : typeof it.unitCents === "number"
-            ? it.unitCents
-            : typeof it.price === "number"
-              ? it.price
+        typeof it.expectedUnitCents === "number" && Number.isFinite(it.expectedUnitCents) && it.expectedUnitCents > 0
+          ? Math.floor(it.expectedUnitCents)
+          : typeof it.unitCents === "number" && Number.isFinite(it.unitCents) && it.unitCents > 0
+            ? Math.floor(it.unitCents)
+            : typeof it.price === "number" && Number.isFinite(it.price) && it.price > 0
+              ? Math.floor(it.price)
               : null;
 
       const pj = await resolveExactDeparturePrice({
@@ -198,7 +214,28 @@ export async function POST(req: NextRequest) {
         });
       }
 
-      totalCents += Math.floor(lineTotal);
+      const roundedLineTotal = Math.floor(lineTotal);
+      totalCents += roundedLineTotal;
+      previousTotalCents += expectedUnit !== null ? expectedUnit * qty : roundedLineTotal;
+
+      if (pj.priceChanged && expectedUnit !== null) {
+        priceChanges.push({
+          company: pj.company,
+          itemPk: pj.itemPk,
+          availabilityPk: pj.availabilityPk,
+          ratePk: pj.customerTypeRatePk,
+          title: it.title,
+          date: pj.date,
+          startAt: pj.startAt || it.startAt,
+          qty,
+          previousUnitCents: expectedUnit,
+          updatedUnitCents: pj.unitCents,
+          previousLineTotalCents: expectedUnit * qty,
+          updatedLineTotalCents: roundedLineTotal,
+          currency,
+        });
+      }
+
       computed.push({
         company: pj.company,
         itemPk: pj.itemPk,
@@ -207,7 +244,7 @@ export async function POST(req: NextRequest) {
         qty,
         title: it.title,
         startAt: pj.startAt || it.startAt,
-        lineTotalCents: Math.floor(lineTotal),
+        lineTotalCents: roundedLineTotal,
         currency,
         handoffSource: typeof it.handoffSource === "string" ? it.handoffSource : undefined,
         handoffId: typeof it.handoffId === "string" ? it.handoffId : undefined,
@@ -245,6 +282,28 @@ export async function POST(req: NextRequest) {
     }
 
     if (!Number.isFinite(totalCents) || totalCents <= 0) return jsonError("Total is invalid.", 409);
+
+    const acceptedTotalCents =
+      typeof body?.acceptedTotalCents === "number" && Number.isFinite(body.acceptedTotalCents)
+        ? Math.floor(body.acceptedTotalCents)
+        : null;
+
+    if (priceChanges.length > 0 && acceptedTotalCents !== totalCents) {
+      return NextResponse.json(
+        {
+          success: false,
+          code: "price_changed",
+          error:
+            "Live departure pricing has updated since this item was added to your cart. Please review and accept the updated price before payment.",
+          previousTotalCents,
+          updatedTotalCents: totalCents,
+          currency: "usd",
+          priceChanges,
+          request_id: rid,
+        },
+        { status: 409 },
+      );
+    }
 
     const order_id = `ord_${crypto.randomUUID()}`;
     const cart_id = `cart_${crypto.randomUUID()}`;

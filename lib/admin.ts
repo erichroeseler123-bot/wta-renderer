@@ -22,14 +22,20 @@ export function getConfiguredAdminPassword(): string | null {
   return raw;
 }
 
-export function getAdminSigningSecret(): string | null {
-  const adminPassword = getConfiguredAdminPassword();
-  if (!adminPassword) {
+export function getConfiguredOrderSigningSecret(): string | null {
+  const raw = String(process.env.ORDER_SIGNING_SECRET || "").trim();
+  if (!raw || isPlaceholderAdminSecret(raw)) {
     return null;
   }
+  return raw;
+}
 
-  const orderSecretRaw = String(process.env.ORDER_SIGNING_SECRET || "").trim();
-  const orderSecret = isPlaceholderAdminSecret(orderSecretRaw) ? "" : orderSecretRaw;
+export function getAdminSigningSecret(): string | null {
+  const adminPassword = getConfiguredAdminPassword();
+  const orderSecret = getConfiguredOrderSigningSecret();
+  if (!adminPassword || !orderSecret) {
+    return null;
+  }
 
   return crypto
     .createHmac("sha256", "wta-admin-cookie-signing-key-v1")
@@ -44,7 +50,9 @@ function hmacWithSecret(secret: string, payload: string): string {
 export function makeAdminCookieValue(issuedAtMs: number = Date.now()): string {
   const secret = getAdminSigningSecret();
   if (!secret) {
-    throw new Error("Admin authentication is not configured (missing ADMIN_PASSWORD).");
+    throw new Error(
+      "Admin authentication is not configured (missing ADMIN_PASSWORD or ORDER_SIGNING_SECRET).",
+    );
   }
   const ts = Math.floor(Number(issuedAtMs));
   if (!Number.isSafeInteger(ts) || ts <= 0) {

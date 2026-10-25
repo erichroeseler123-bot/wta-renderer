@@ -62,13 +62,66 @@ type PayloadItem = {
   portSlug?: string;
 };
 
+export type ServerPriceChangeNotice = {
+  company: string;
+  itemPk: number;
+  availabilityPk: number;
+  ratePk: number;
+  title?: string;
+  date: string;
+  startAt?: string;
+  qty: number;
+  previousUnitCents: number;
+  updatedUnitCents: number;
+  previousLineTotalCents: number;
+  updatedLineTotalCents: number;
+  currency: string;
+};
+
+export function applyServerPriceChangesToCartItems<T extends Record<string, unknown>>(
+  items: T[],
+  priceChanges: ServerPriceChangeNotice[],
+): T[] {
+  if (!Array.isArray(items) || !Array.isArray(priceChanges) || priceChanges.length === 0) {
+    return items;
+  }
+  return items.map((item) => {
+    const match = priceChanges.find(
+      (pc) =>
+        String(pc.company || "").toLowerCase() === String(item.company || "").toLowerCase() &&
+        Number(pc.itemPk) === Number(item.itemPk) &&
+        Number(pc.availabilityPk) === Number(item.availabilityPk) &&
+        Number(pc.ratePk) === Number(item.ratePk),
+    );
+    if (!match) return item;
+    return {
+      ...item,
+      price: match.updatedUnitCents,
+      unitCents: match.updatedUnitCents,
+      expectedUnitCents: match.updatedUnitCents,
+    };
+  });
+}
+
+export function formatCentsUsd(cents: number): string {
+  const n = Number(cents || 0);
+  if (!Number.isFinite(n)) return "$0.00";
+  return (n / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
+}
+
 export default function CheckoutClient() {
-  const { items } = useCart();
+  const { items, setSelection } = useCart();
   const stripe = useStripe();
   const elements = useElements();
 
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [pendingPriceApproval, setPendingPriceApproval] = useState<{
+    previousTotalCents: number;
+    updatedTotalCents: number;
+    priceChanges: ServerPriceChangeNotice[];
+  } | null>(null);
+  const [acceptedTotalCents, setAcceptedTotalCents] = useState<number | null>(null);
 
   // basic contact fields (you can replace with your own form)
   const [name, setName] = useState("");
@@ -126,14 +179,17 @@ export default function CheckoutClient() {
     return Array.from(new Set(payloadItems.map((it) => it.company).filter(Boolean)));
   }, [payloadItems]);
   const estimatedTotal = useMemo(() => {
+    if (pendingPriceApproval) {
+      return pendingPriceApproval.updatedTotalCents;
+    }
     const source = (items || []) as Array<Record<string, unknown>>;
     return source.reduce((sum, it) => {
-      const price = Number(it.price || 0);
+      const price = Number(it.price || it.unitCents || 0);
       const qty = Number(it.qty || 0);
       const line = price * qty;
       return sum + (Number.isFinite(line) ? line : 0);
     }, 0);
-  }, [items]);
+  }, [items, pendingPriceApproval]);
   const estimatedTotalLabel = estimatedTotal > 0
     ? (estimatedTotal / 100).toLocaleString(undefined, { style: "currency", currency: "USD" })
     : "Calculated live";
@@ -171,6 +227,9 @@ export default function CheckoutClient() {
     if (!name || !email) return setErr("Please enter name + email.");
     if (turnstileSiteKey && !turnstileToken) return setErr("Please complete human verification.");
 
+    const effectiveAcceptedTotalCents =
+      pendingPriceApproval?.updatedTotalCents ?? acceptedTotalCents ?? undefined;
+
     setLoading(true);
     try {
       // 1) Create PI from server-truth totals + snapshot
@@ -181,10 +240,52 @@ export default function CheckoutClient() {
           items: payloadItems,
           contact: { name, email, phone },
           turnstileToken,
+          ...(typeof effectiveAcceptedTotalCents === "number"
+            ? { acceptedTotalCents: effectiveAcceptedTotalCents }
+            : {}),
         }),
       });
       const j = await r.json();
-      if (!r.ok || !j?.success) throw new Error(j?.error || "Create intent failed");
+      if (!r.ok || !j?.success) {
+        if (r.status === 409 && j?.code === "price_changed" && Array.isArray(j?.priceChanges)) {
+          const updatedTotalCents = Number(j.updatedTotalCents || 0);
+          const previousTotalCents = Number(j.previousTotalCents || estimatedTotal || 0);
+          const changes = j.priceChanges as ServerPriceChangeNotice[];
+          setPendingPriceApproval({
+            previousTotalCents,
+            updatedTotalCents,
+            priceChanges: changes,
+          });
+          setAcceptedTotalCents(updatedTotalCents);
+          if (Array.isArray(items) && typeof setSelection === "function") {
+            const updatedCart = applyServerPriceChangesToCartItems(
+              items as unknown as Array<Record<string, unknown>>,
+              changes,
+            );
+            for (const updatedItem of updatedCart) {
+              const id = String(updatedItem.id || "");
+              const availabilityPk = Number(updatedItem.availabilityPk || 0);
+              const startAt = String(updatedItem.startAt || "");
+              if (id && availabilityPk && startAt) {
+                setSelection(id, {
+                  day: updatedItem.day ? String(updatedItem.day) : undefined,
+                  availabilityPk,
+                  startAt,
+                  ratePk: updatedItem.ratePk ? Number(updatedItem.ratePk) : undefined,
+                  price: typeof updatedItem.price === "number" ? updatedItem.price : undefined,
+                  unitCents:
+                    typeof updatedItem.unitCents === "number" ? updatedItem.unitCents : undefined,
+                });
+              }
+            }
+          }
+          setLoading(false);
+          return;
+        }
+        throw new Error(j?.error || "Create intent failed");
+      }
+
+      setPendingPriceApproval(null);
 
       const clientSecret = String(j.client_secret || "");
       if (!clientSecret) throw new Error("Missing client secret.");
@@ -314,6 +415,47 @@ export default function CheckoutClient() {
               )}
             </div>
 
+            {pendingPriceApproval ? (
+              <div
+                role="alert"
+                className="rounded-2xl border border-amber-300 bg-amber-50 p-4 text-xs text-amber-950 space-y-2"
+              >
+                <div className="font-bold text-sm text-amber-900">
+                  Live Departure Price Updated — Please Review Before Payment
+                </div>
+                <p className="text-amber-900 leading-relaxed">
+                  The operator’s live rate for your selected departure changed since it was added to your cart. Your card has <strong>not</strong> been charged.
+                </p>
+                <ul className="space-y-1 border-t border-amber-200 pt-2">
+                  {pendingPriceApproval.priceChanges.map((pc, idx) => (
+                    <li key={idx} className="flex flex-wrap items-center justify-between gap-2">
+                      <span className="font-semibold">
+                        {pc.title || `${pc.company} #${pc.itemPk}`} (Qty {pc.qty})
+                      </span>
+                      <span>
+                        <span className="line-through text-amber-700 mr-1.5">
+                          {formatCentsUsd(pc.previousLineTotalCents)}
+                        </span>
+                        <strong className="text-amber-950">
+                          {formatCentsUsd(pc.updatedLineTotalCents)}
+                        </strong>{" "}
+                        ({formatCentsUsd(pc.updatedUnitCents)} each)
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="flex items-center justify-between border-t border-amber-200 pt-2 font-bold text-sm">
+                  <span>Updated Order Total</span>
+                  <span>
+                    <span className="line-through text-amber-700 font-normal mr-2">
+                      {formatCentsUsd(pendingPriceApproval.previousTotalCents)}
+                    </span>
+                    {formatCentsUsd(pendingPriceApproval.updatedTotalCents)}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+
             {err ? <div className="rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">{err}</div> : null}
 
             <button
@@ -321,7 +463,11 @@ export default function CheckoutClient() {
               disabled={!stripe || !elements || loading}
               className="w-full rounded-2xl bg-slate-900 py-3 font-black text-white disabled:opacity-60"
             >
-              {loading ? "Processing…" : "Pay & Confirm Booking"}
+              {loading
+                ? "Processing…"
+                : pendingPriceApproval
+                  ? `Accept Updated Total (${formatCentsUsd(pendingPriceApproval.updatedTotalCents)}) & Pay`
+                  : "Pay & Confirm Booking"}
             </button>
           </form>
         </section>

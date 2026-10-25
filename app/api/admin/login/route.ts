@@ -1,6 +1,10 @@
 import crypto from "crypto";
 import { NextRequest, NextResponse } from "next/server";
-import { getConfiguredAdminPassword, setAdminCookie } from "@/lib/admin";
+import {
+  getAdminSigningSecret,
+  getConfiguredAdminPassword,
+  setAdminCookie,
+} from "@/lib/admin";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -13,7 +17,8 @@ function passwordsMatch(provided: string, expected: string): boolean {
 
 export async function POST(req: NextRequest) {
   const expected = getConfiguredAdminPassword();
-  if (!expected) {
+  const signingSecret = getAdminSigningSecret();
+  if (!expected || !signingSecret) {
     return NextResponse.json(
       { success: false, error: "Admin authentication is not configured" },
       { status: 503 },

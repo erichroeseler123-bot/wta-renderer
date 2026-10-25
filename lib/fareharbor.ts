@@ -62,6 +62,28 @@ export function setFareHarborBookingHandlerForTests(
   bookingHandlerOverrideForTests = handler;
 }
 
+export function isAmbiguousProviderTimeoutError(err: unknown): boolean {
+  if (!err) return false;
+  const e = err as Error & {
+    ambiguous?: boolean;
+    code?: string;
+    status?: number;
+    cause?: unknown;
+  };
+  if (e.ambiguous === true) return true;
+  if (e.status === 504) return true;
+  const name = String(e.name || "");
+  if (name === "AbortError" || name === "TimeoutError") return true;
+  const code = String(e.code || (e.cause as { code?: string } | undefined)?.code || "");
+  if (/^(ETIMEDOUT|ECONNRESET|UND_ERR_HEADERS_TIMEOUT|UND_ERR_BODY_TIMEOUT|ABORT_ERR)$/i.test(code)) {
+    return true;
+  }
+  const msg = String(e.message || err || "");
+  return /(timed?\s*out|etimedout|econnreset|socket hang up|504\s+gateway|ambiguous.*timeout)/i.test(
+    msg,
+  );
+}
+
 export async function createFareHarborBooking(input: FareHarborBookingInput) {
   if (bookingHandlerOverrideForTests) {
     return bookingHandlerOverrideForTests(input);
@@ -99,26 +121,51 @@ export async function createFareHarborBooking(input: FareHarborBookingInput) {
     fhPayload.amount_paid = Math.floor(amountPaid);
   }
 
-  const response = await fetch(
-    `https://fareharbor.com/api/external/v1/companies/${encodeURIComponent(company)}/bookings/`,
-    {
-      method: "POST",
-      headers: {
-        "X-FareHarbor-API-App": appKey,
-        "X-FareHarbor-API-User": userKey,
-        "Content-Type": "application/json",
+  let response: Response;
+  try {
+    response = await fetch(
+      `https://fareharbor.com/api/external/v1/companies/${encodeURIComponent(company)}/bookings/`,
+      {
+        method: "POST",
+        headers: {
+          "X-FareHarbor-API-App": appKey,
+          "X-FareHarbor-API-User": userKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(fhPayload),
+        signal: AbortSignal.timeout(25_000),
       },
-      body: JSON.stringify(fhPayload),
-    },
-  );
+    );
+  } catch (networkErr: unknown) {
+    if (isAmbiguousProviderTimeoutError(networkErr)) {
+      const err = new Error(
+        `FareHarbor booking request timed out after dispatch: ${
+          networkErr instanceof Error ? networkErr.message : String(networkErr)
+        }`,
+      ) as Error & { ambiguous?: boolean; code?: string };
+      err.ambiguous = true;
+      err.code = "ambiguous_provider_timeout";
+      throw err;
+    }
+    throw networkErr;
+  }
 
   const result = await response.json().catch(() => null);
 
   if (!response.ok) {
     const msg = (result as { error?: string } | null)?.error || "FareHarbor booking failed";
-    const err = new Error(msg);
-    (err as Error & { details?: unknown; status?: number }).details = result;
-    (err as Error & { details?: unknown; status?: number }).status = response.status;
+    const err = new Error(msg) as Error & {
+      details?: unknown;
+      status?: number;
+      ambiguous?: boolean;
+      code?: string;
+    };
+    err.details = result;
+    err.status = response.status;
+    if (response.status === 504) {
+      err.ambiguous = true;
+      err.code = "ambiguous_provider_timeout";
+    }
     throw err;
   }
 

@@ -31,6 +31,30 @@ function readEnv(name: string) {
   return v;
 }
 
+export const WTA_KV_NAMESPACE = "wta:";
+
+export function namespaceKVKey(key: string): string {
+  const trimmed = String(key || "").trim();
+  if (!trimmed) {
+    throw new Error("KV key cannot be empty.");
+  }
+  return trimmed.startsWith(WTA_KV_NAMESPACE) ? trimmed : `${WTA_KV_NAMESPACE}${trimmed}`;
+}
+
+function wrapNamespacedKV(rawClient: KVClient): KVClient {
+  return {
+    async get<T = unknown>(key: string) {
+      return rawClient.get<T>(namespaceKVKey(key));
+    },
+    async set(key: string, value: unknown, opts?: KVGetOptions) {
+      return rawClient.set(namespaceKVKey(key), value, opts);
+    },
+    async del(key: string) {
+      return rawClient.del(namespaceKVKey(key));
+    },
+  };
+}
+
 function cleanExpiredLocal(key: string) {
   const entry = localStore.get(key);
   if (!entry) return;
@@ -39,7 +63,7 @@ function cleanExpiredLocal(key: string) {
   }
 }
 
-const localKV: KVClient = {
+const rawLocalKV: KVClient = {
   async get<T = unknown>(key: string) {
     cleanExpiredLocal(key);
     const entry = localStore.get(key);
@@ -58,8 +82,10 @@ const localKV: KVClient = {
   },
 };
 
+const localKV: KVClient = wrapNamespacedKV(rawLocalKV);
+
 export function setDurableKVOverrideForTests(client: KVClient | null) {
-  durableKVOverrideForTests = client;
+  durableKVOverrideForTests = client ? wrapNamespacedKV(client) : null;
 }
 
 export function isDurableKVConfigured(): boolean {
@@ -84,14 +110,14 @@ export async function getDurableKV(): Promise<KVClient | null> {
   const vercelToken = readEnv("KV_REST_API_TOKEN");
   if (vercelUrl && vercelToken) {
     const mod = await import("@vercel/kv");
-    return mod.kv as unknown as KVClient;
+    return wrapNamespacedKV(mod.kv as unknown as KVClient);
   }
 
   const upstashUrl = readEnv("UPSTASH_REDIS_REST_URL");
   const upstashToken = readEnv("UPSTASH_REDIS_REST_TOKEN");
   if (upstashUrl && upstashToken) {
     const mod = await import("@upstash/redis");
-    return mod.Redis.fromEnv() as unknown as KVClient;
+    return wrapNamespacedKV(mod.Redis.fromEnv() as unknown as KVClient);
   }
 
   return null;
@@ -113,3 +139,4 @@ export async function getKV(): Promise<KVClient | null> {
 
   return null;
 }
+

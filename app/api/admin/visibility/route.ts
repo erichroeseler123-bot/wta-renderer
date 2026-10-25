@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "../_lib/auth";
+import { isDurableKVConfigured } from "@/lib/kv";
 import {
   DurableStorageUnavailableError,
+  deleteIsolatedTestVisibilityRecord,
+  getVisibility,
   setTourCatalogOverride,
   setTourHidden,
   type TourCatalogOverride,
@@ -9,6 +12,35 @@ import {
 
 function jsonError(message: string, status = 400, extra?: Record<string, unknown>) {
   return NextResponse.json({ success: false, error: message, ...(extra || {}) }, { status });
+}
+
+export async function GET(req: Request) {
+  const a = await requireAdmin(req);
+  if (!a.ok) return jsonError("Unauthorized", 401);
+
+  const url = new URL(req.url);
+  const key = String(url.searchParams.get("key") || "").trim().toLowerCase();
+  const db = await getVisibility();
+
+  if (key) {
+    const existsInTours = Object.prototype.hasOwnProperty.call(db.tours || {}, key);
+    const existsInOverrides = Object.prototype.hasOwnProperty.call(db.overrides || {}, key);
+    return NextResponse.json({
+      success: true,
+      key,
+      exists: existsInTours || existsInOverrides,
+      hidden: existsInTours ? (db.tours[key] ? 1 : 0) : null,
+      override: existsInOverrides ? db.overrides?.[key] || null : null,
+      updatedAt: db.updatedAt,
+      durableStorageConfigured: isDurableKVConfigured(),
+    });
+  }
+
+  return NextResponse.json({
+    success: true,
+    visibility: db,
+    durableStorageConfigured: isDurableKVConfigured(),
+  });
 }
 
 export async function POST(req: Request) {
@@ -21,6 +53,19 @@ export async function POST(req: Request) {
   if (!key || !key.includes(":")) return jsonError("Missing/invalid key", 400);
 
   try {
+    if (body?.delete === true) {
+      if (!key.startsWith("__test_isolated__:")) {
+        return jsonError("Only __test_isolated__:* keys can be deleted via delete=true", 400);
+      }
+      const saved = await deleteIsolatedTestVisibilityRecord(key);
+      return NextResponse.json({
+        success: true,
+        key,
+        deleted: true,
+        updatedAt: saved.updatedAt,
+      });
+    }
+
     let hiddenResult: { key: string; hidden: boolean; updatedAt: string } | null = null;
     if (typeof body?.hidden !== "undefined") {
       hiddenResult = await setTourHidden(key, !!body.hidden);
