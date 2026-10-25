@@ -2,17 +2,6 @@
 
 import { useMemo, useState } from "react";
 
-type AdminOrderItem = {
-  title: string;
-  company: string;
-  itemPk?: number;
-  startAt?: string;
-  qty: number;
-  widgetPlacement?: string | null;
-  embedDomain?: string | null;
-  widgetId?: string | null;
-};
-
 type AdminOrder = {
   order_id: string;
   status: string;
@@ -25,14 +14,6 @@ type AdminOrder = {
   confirmationEmailSentAt?: string;
   confirmationEmailError?: string;
   lastError?: string;
-  attribution?: {
-    handoffSource?: string;
-    widgetPlacement?: string;
-    widgetPlacements?: string[];
-    embedDomain?: string;
-    widgetId?: string;
-  } | null;
-  items?: AdminOrderItem[];
   stripeData?: {
     status: string;
     amount: number;
@@ -96,7 +77,7 @@ export default function AdminOrdersPage() {
     <main className="mx-auto max-w-7xl px-6 py-10 text-slate-900">
       <h1 className="text-3xl font-black tracking-tight">Recent Orders</h1>
       <p className="mt-2 text-sm text-slate-600">
-        Read-only operations view for booking status, payment intent, per-item widget placement attribution, and confirmation outcomes.
+        Read-only operations view for booking status, payment intent, and confirmation outcomes.
       </p>
 
       <div className="mt-5 rounded-2xl border border-slate-200 bg-white p-4">
@@ -138,7 +119,6 @@ export default function AdminOrdersPage() {
               <th className="px-3 py-3 text-left">Status</th>
               <th className="px-3 py-3 text-left">Created</th>
               <th className="px-3 py-3 text-left">Total</th>
-              <th className="px-3 py-3 text-left">Items &amp; Placement Attribution</th>
               <th className="px-3 py-3 text-left">Payment Intent</th>
               <th className="px-3 py-3 text-left">Stripe</th>
               <th className="px-3 py-3 text-left">Email Sent</th>
@@ -160,34 +140,6 @@ export default function AdminOrdersPage() {
                   {typeof order.totalCents === "number"
                     ? `$${(order.totalCents / 100).toFixed(2)}`
                     : "—"}
-                </td>
-                <td className="px-3 py-3">
-                  {order.attribution?.widgetPlacement ? (
-                    <div className="mb-1.5 text-xs text-slate-700">
-                      <span className="font-semibold">Order placements:</span>{" "}
-                      <span className="font-mono">{order.attribution.widgetPlacement}</span>
-                      {order.attribution.embedDomain ? (
-                        <span className="text-slate-500"> ({order.attribution.embedDomain})</span>
-                      ) : null}
-                    </div>
-                  ) : null}
-                  {order.items?.length ? (
-                    <div className="space-y-1 text-xs">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="rounded bg-slate-50 px-2 py-1 text-slate-700">
-                          <span className="font-semibold">{item.title || item.company}</span>{" "}
-                          <span className="text-slate-500">({item.company} × {item.qty})</span>
-                          {item.widgetPlacement ? (
-                            <span className="ml-1.5 inline-block rounded bg-blue-50 px-1.5 py-0.5 font-mono text-[11px] font-semibold text-blue-800">
-                              placement: {item.widgetPlacement}
-                            </span>
-                          ) : null}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <span className="text-xs text-slate-400">—</span>
-                  )}
                 </td>
                 <td className="px-3 py-3 font-mono text-xs">{order.payment_intent_id || "—"}</td>
                 <td className="px-3 py-3">
@@ -241,7 +193,7 @@ export default function AdminOrdersPage() {
             ))}
             {loaded && orders.length < 1 ? (
               <tr>
-                <td className="px-3 py-6 text-slate-500" colSpan={10}>
+                <td className="px-3 py-6 text-slate-500" colSpan={9}>
                   No recent orders found.
                 </td>
               </tr>

@@ -11,7 +11,6 @@ import { CRUISE_ITINERARY_HINTS, type CruiseShipName } from "@/lib/cruiseShips";
 import { evaluatePortDayFit } from "@/lib/timing";
 import { trackDepartureSelect } from "@/lib/analytics/ga";
 import { getOperatorCancellationPolicy } from "@/lib/operatorCancellationPolicies";
-import { getOperatorDisplayName, sanitizePlacementLabel } from "@/lib/tourWidget";
 
 export type SlotRate = {
   pk: number;
@@ -49,16 +48,12 @@ export default function DayBookingClient({
   company,
   item,
   day,
-  tourTitle,
-  upstreamError,
   initialSlots,
   tourDurationMinutes,
 }: {
   company: string;
   item: string;
   day: string;
-  tourTitle?: string;
-  upstreamError?: string | null;
   initialSlots: Slot[];
   tourDurationMinutes: number | null;
 }) {
@@ -70,20 +65,6 @@ export default function DayBookingClient({
   const [qty, setQty] = useState<number>(1);
   const widgetContext = useMemo(() => parseWidgetInitContext(sp), [sp]);
   const policy = useMemo(() => getOperatorCancellationPolicy(company, item), [company, item]);
-  const safePlacement = useMemo(
-    () => sanitizePlacementLabel(widgetContext.widgetPlacement),
-    [widgetContext.widgetPlacement],
-  );
-
-  const backHref = useMemo(() => {
-    const params = new URLSearchParams(sp.toString());
-    params.delete("date");
-    if (/^\d{4}-\d{2}/.test(day)) {
-      params.set("month", day.slice(0, 7));
-    }
-    const qs = params.toString();
-    return qs ? `/tours/${company}/${item}/calendar?${qs}` : `/tours/${company}/${item}/calendar`;
-  }, [company, day, item, sp]);
 
   const rates = useMemo<PickerRate[]>(() => {
     if (!selected?.customer_type_rates) return [];
@@ -124,18 +105,15 @@ export default function DayBookingClient({
       {
         company,
         itemPk: Number(item),
-        title: tourTitle || `Tour ${item}`,
-        supplierLabel: getOperatorDisplayName(company),
+        title: `Tour ${item}`,
+        supplierLabel: company,
         day,
         availabilityPk: Number(selected.pk),
         startAt: String(selected.start_at || selected.startAt || ""),
         ratePk: Number(ratePk),
         rateLabel: chosenRate?.name ? String(chosenRate.name) : undefined,
         price: unitCents,
-        handoffSource:
-          sp.get("source") ||
-          sp.get("handoffSource") ||
-          (safePlacement || widgetContext.widgetId ? "widget" : undefined),
+        handoffSource: sp.get("source") || sp.get("handoffSource") || undefined,
         handoffId: widgetContext.handoffId,
         sourceSlug: widgetContext.sourceSlug,
         sourcePage: sp.get("sourcePage") || widgetContext.sourcePage || undefined,
@@ -159,7 +137,7 @@ export default function DayBookingClient({
         degradedFallback: sp.get("degradedFallback") === "true" ? true : sp.get("degradedFallback") === "false" ? false : undefined,
         embedDomain: widgetContext.embedDomain,
         embedPath: widgetContext.embedPath,
-        widgetPlacement: safePlacement,
+        widgetPlacement: widgetContext.widgetPlacement,
         widgetId: widgetContext.widgetId,
       },
       safeQty,
@@ -193,26 +171,13 @@ export default function DayBookingClient({
     <main className="min-h-screen bg-stone-50 text-slate-900">
       <div className="mx-auto max-w-3xl px-4 py-10">
         <Link
-          href={backHref}
+          href={`/tours/${company}/${item}/calendar`}
           className="inline-flex rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-100"
         >
-          &larr; Back to calendar
+          Back to calendar
         </Link>
 
-        {tourTitle ? (
-          <div className="mt-6 text-xs font-bold uppercase tracking-wider text-slate-500">
-            {getOperatorDisplayName(company)} · {tourTitle}
-          </div>
-        ) : null}
-        <h1 className="mt-2 text-3xl font-black tracking-tight">{day}</h1>
-        {upstreamError ? (
-          <div
-            role="alert"
-            className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-900"
-          >
-            <strong>Schedule connection notice:</strong> {upstreamError}
-          </div>
-        ) : null}
+        <h1 className="mt-6 text-3xl font-black tracking-tight">{day}</h1>
         <p className="mt-2 text-sm text-slate-600">
           Choose a departure and passenger type, then add it to the cart.
         </p>

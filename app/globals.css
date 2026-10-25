@@ -301,14 +301,3 @@ main[class*="bg-[#f4f0e7]"] a[href="#popular-searches"].group [class*="text-[10p
 #popular-searches > div {
   background: linear-gradient(135deg, #efb98f 0%, #f6d5be 56%, #f8e5d8 100%) !important;
 }
-
-/* Isolated embeddable widget route styling */
-html:has([data-wta-widget-root]),
-body:has([data-wta-widget-root]) {
-  background: transparent !important;
-  color: #0f172a;
-  height: auto !important;
-  min-height: 0 !important;
-  margin: 0;
-  padding: 0;
-}

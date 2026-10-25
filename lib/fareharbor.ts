@@ -50,45 +50,7 @@ export type FareHarborBookingInput = {
   voucherNumber?: string;
 };
 
-export type FareHarborBookingHandler = (
-  input: FareHarborBookingInput,
-) => Promise<Record<string, unknown>>;
-
-let bookingHandlerOverrideForTests: FareHarborBookingHandler | null = null;
-
-export function setFareHarborBookingHandlerForTests(
-  handler: FareHarborBookingHandler | null,
-) {
-  bookingHandlerOverrideForTests = handler;
-}
-
-export function isAmbiguousProviderTimeoutError(err: unknown): boolean {
-  if (!err) return false;
-  const e = err as Error & {
-    ambiguous?: boolean;
-    code?: string;
-    status?: number;
-    cause?: unknown;
-  };
-  if (e.ambiguous === true) return true;
-  if (e.status === 504) return true;
-  const name = String(e.name || "");
-  if (name === "AbortError" || name === "TimeoutError") return true;
-  const code = String(e.code || (e.cause as { code?: string } | undefined)?.code || "");
-  if (/^(ETIMEDOUT|ECONNRESET|UND_ERR_HEADERS_TIMEOUT|UND_ERR_BODY_TIMEOUT|ABORT_ERR)$/i.test(code)) {
-    return true;
-  }
-  const msg = String(e.message || err || "");
-  return /(timed?\s*out|etimedout|econnreset|socket hang up|504\s+gateway|ambiguous.*timeout)/i.test(
-    msg,
-  );
-}
-
 export async function createFareHarborBooking(input: FareHarborBookingInput) {
-  if (bookingHandlerOverrideForTests) {
-    return bookingHandlerOverrideForTests(input);
-  }
-
   const { appKey, userKey } = getFareHarborCredentials();
 
   const company = String(input.company || "").trim();
@@ -121,93 +83,37 @@ export async function createFareHarborBooking(input: FareHarborBookingInput) {
     fhPayload.amount_paid = Math.floor(amountPaid);
   }
 
-  let response: Response;
-  try {
-    response = await fetch(
-      `https://fareharbor.com/api/external/v1/companies/${encodeURIComponent(company)}/bookings/`,
-      {
-        method: "POST",
-        headers: {
-          "X-FareHarbor-API-App": appKey,
-          "X-FareHarbor-API-User": userKey,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(fhPayload),
-        signal: AbortSignal.timeout(25_000),
+  const response = await fetch(
+    `https://fareharbor.com/api/external/v1/companies/${encodeURIComponent(company)}/bookings/`,
+    {
+      method: "POST",
+      headers: {
+        "X-FareHarbor-API-App": appKey,
+        "X-FareHarbor-API-User": userKey,
+        "Content-Type": "application/json",
       },
-    );
-  } catch (networkErr: unknown) {
-    if (isAmbiguousProviderTimeoutError(networkErr)) {
-      const err = new Error(
-        `FareHarbor booking request timed out after dispatch: ${
-          networkErr instanceof Error ? networkErr.message : String(networkErr)
-        }`,
-      ) as Error & { ambiguous?: boolean; code?: string };
-      err.ambiguous = true;
-      err.code = "ambiguous_provider_timeout";
-      throw err;
-    }
-    throw networkErr;
-  }
+      body: JSON.stringify(fhPayload),
+    },
+  );
 
   const result = await response.json().catch(() => null);
 
   if (!response.ok) {
     const msg = (result as { error?: string } | null)?.error || "FareHarbor booking failed";
-    const err = new Error(msg) as Error & {
-      details?: unknown;
-      status?: number;
-      ambiguous?: boolean;
-      code?: string;
-    };
-    err.details = result;
-    err.status = response.status;
-    if (response.status === 504) {
-      err.ambiguous = true;
-      err.code = "ambiguous_provider_timeout";
-    }
+    const err = new Error(msg);
+    (err as Error & { details?: unknown; status?: number }).details = result;
+    (err as Error & { details?: unknown; status?: number }).status = response.status;
     throw err;
   }
 
   return result;
 }
 
-export function isBookingsEnabled(): boolean {
-  return String(process.env.FH_BOOKINGS_ENABLED || "0").trim() === "1";
-}
-
 export function assertBookingsEnabled() {
-  if (!isBookingsEnabled()) {
+  const enabled = String(process.env.FH_BOOKINGS_ENABLED || "0") === "1";
+  if (!enabled) {
     throw new Error("Bookings are disabled (FH_BOOKINGS_ENABLED=0). This is a safety lock.");
   }
-}
-
-export function checkBookingCapabilityReadiness():
-  | { ok: true }
-  | { ok: false; code: string; error: string; status: number } {
-  if (!isBookingsEnabled()) {
-    return {
-      ok: false,
-      code: "bookings_disabled",
-      status: 503,
-      error:
-        "Online booking is currently disabled while operator reservation fulfillment is turned off. Your card has not been charged.",
-    };
-  }
-
-  try {
-    getFareHarborCredentials();
-  } catch {
-    return {
-      ok: false,
-      code: "provider_credentials_missing",
-      status: 503,
-      error:
-        "Operator reservation service credentials are not configured. Your card has not been charged.",
-    };
-  }
-
-  return { ok: true };
 }
 
 export function assertInternalSecret(req: Request) {

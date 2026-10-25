@@ -9,19 +9,12 @@ import {
   requestId,
 } from "@/lib/security";
 
-import crypto from "crypto";
-import { isPlaceholderAdminSecret } from "@/lib/admin";
+const ADMIN_SECRET = String(process.env.WTA_ADMIN_SECRET || "").trim();
 
 function canUseSecretAuth(req: NextRequest) {
-  const adminSecret = String(process.env.WTA_ADMIN_SECRET || "").trim();
-  if (!adminSecret || adminSecret.length < 40 || isPlaceholderAdminSecret(adminSecret)) {
-    return false;
-  }
-  const provided = String(new URL(req.url).searchParams.get("secret") || "").trim();
-  if (!provided) return false;
-  const a = crypto.createHash("sha256").update(provided).digest();
-  const b = crypto.createHash("sha256").update(adminSecret).digest();
-  return crypto.timingSafeEqual(a, b);
+  if (!ADMIN_SECRET || ADMIN_SECRET.length < 40) return false;
+  const provided = new URL(req.url).searchParams.get("secret");
+  return Boolean(provided && provided === ADMIN_SECRET);
 }
 
 type StripePaymentSummary = {
@@ -93,7 +86,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: "Too many requests" }, { status: 429 });
   }
 
-  const a = await requireAdmin(req);
+  const a = await requireAdmin();
   const secretOk = canUseSecretAuth(req);
   if (!a.ok && !secretOk) {
     logSecurityEvent("admin_access_denied", { rid, ip, route: "/api/admin/orders" });
@@ -134,16 +127,11 @@ export async function GET(req: NextRequest) {
         name: order.contact?.name || "",
         email: order.contact?.email || "",
       },
-      attribution: order.attribution || null,
       items: (order.items || []).map((i) => ({
         title: i.title || "",
         company: i.company || "",
-        itemPk: i.itemPk || 0,
         startAt: i.startAt || "",
         qty: i.qty || 0,
-        widgetPlacement: i.widgetPlacement || null,
-        embedDomain: i.embedDomain || null,
-        widgetId: i.widgetId || null,
       })),
     }))
     .sort(

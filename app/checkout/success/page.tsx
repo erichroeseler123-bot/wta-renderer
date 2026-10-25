@@ -23,22 +23,9 @@ type ReceiptResult = {
   };
 };
 
-type ReceiptItem = {
-  title?: string;
-  company?: string;
-  itemPk?: number;
-  qty?: number;
-  startAt?: string;
-  widgetPlacement?: string | null;
-  embedDomain?: string | null;
-  widgetId?: string | null;
-};
-
 type ReceiptPayload = {
   status?: string;
   results?: ReceiptResult[];
-  items?: ReceiptItem[];
-  lastError?: string | null;
   order_id?: string;
   totalCents?: number;
   currency?: string;
@@ -57,7 +44,6 @@ type ReceiptPayload = {
     embedDomain?: string;
     embedPath?: string;
     widgetPlacement?: string;
-    widgetPlacements?: string[];
     widgetId?: string;
   } | null;
 };
@@ -114,7 +100,6 @@ export default function SuccessPage() {
 
   const status = data?.status || "pending";
   const isDone = status === "booked" || status === "completed";
-  const isFailed = status === "booking_failed" || status === "failed";
 
   useEffect(() => {
     if (!isDone || !data) return;
@@ -134,50 +119,16 @@ export default function SuccessPage() {
     });
   }, [isDone, data, pi]);
 
-  const headingText = isDone
-    ? "Booking Confirmed"
-    : isFailed
-      ? "Payment Received — Operator Reservation Not Yet Confirmed"
-      : "Processing Your Reservation…";
-
-  const subheadingText = isDone
-    ? "Your payment and operator reservation have been confirmed."
-    : isFailed
-      ? "Your payment was recorded, but the operator reservation was not confirmed automatically."
-      : "We are verifying your payment and finalizing operator reservation details.";
-
   return (
     <main className="min-h-screen bg-slate-50 px-4 py-10">
       <div className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1
-          data-testid="checkout-status-heading"
-          className="text-3xl font-black tracking-tight text-slate-900"
-        >
-          {headingText}
-        </h1>
-        <p className="mt-2 text-slate-600">{subheadingText}</p>
-        <p className="mt-2 text-sm text-slate-500">
-          {isDone
-            ? "Your confirmation details are shown below and a receipt email has been sent."
-            : isFailed
-              ? "Please note: this page is NOT a confirmed operator ticket. Our team reviews unconfirmed orders to complete the operator booking or issue a prompt refund."
-              : "This page updates automatically as operator confirmation completes."}
+        <h1 className="text-3xl font-black tracking-tight text-slate-900">Booking Confirmation</h1>
+        <p className="mt-2 text-slate-600">
+          Payment was received. We are finalizing your booking details and operator confirmations.
         </p>
-
-        {isFailed ? (
-          <div
-            data-testid="booking-unconfirmed-banner"
-            role="alert"
-            className="mt-4 rounded-2xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"
-          >
-            <div className="font-bold">
-              Operator Reservation Unconfirmed ({data?.lastError || "Automated booking disabled or unavailable"})
-            </div>
-            <p className="mt-1 text-xs leading-relaxed text-amber-900">
-              Your excursion reservation with the tour operator has not been finalized yet. Do not treat this screen as a boarding voucher until you receive an official operator confirmation number.
-            </p>
-          </div>
-        ) : null}
+        <p className="mt-2 text-sm text-slate-500">
+          You should receive a payment receipt email, and tour confirmation details are shown below as processing completes.
+        </p>
 
         {!pi ? (
           <div className="mt-4 rounded-xl bg-rose-50 px-3 py-2 text-sm font-semibold text-rose-700">
@@ -198,12 +149,7 @@ export default function SuccessPage() {
           </div>
           <div className="text-right">
             <div className="text-xs font-semibold uppercase tracking-wide text-slate-500">Status</div>
-            <div
-              data-testid="checkout-status-badge"
-              className={`text-lg font-black uppercase ${
-                isDone ? "text-emerald-700" : isFailed ? "text-rose-700" : "text-slate-900"
-              }`}
-            >
+            <div className={`text-lg font-black uppercase ${isDone ? "text-emerald-700" : "text-slate-900"}`}>
               {status}
             </div>
           </div>
@@ -253,32 +199,9 @@ export default function SuccessPage() {
                   </div>
                 ) : (
                   <div className="mt-2 text-sm font-semibold text-rose-700">
-                    Operator Reservation Unconfirmed ✕ {r?.error || "Booking still processing"}
+                    Pending/Failed ✕ {r?.error || "Booking still processing"}
                   </div>
                 )}
-              </div>
-            ))}
-          </div>
-        ) : data?.items?.length ? (
-          <div className="mt-6 space-y-3">
-            {data.items.map((item, idx) => (
-              <div key={idx} className="rounded-2xl border border-slate-200 bg-white p-4">
-                <div className="font-bold text-slate-900">
-                  {item.title || "Tour"} — qty {item.qty || 1}
-                </div>
-                <div className="text-sm text-slate-600">
-                  {item.company} • {item.startAt || "Time pending"}
-                  {item.widgetPlacement ? ` • Placement: ${item.widgetPlacement}` : ""}
-                </div>
-                <div
-                  className={`mt-2 text-sm font-semibold ${
-                    isFailed ? "text-rose-700" : "text-amber-700"
-                  }`}
-                >
-                  {isFailed
-                    ? `Operator Reservation Unconfirmed ✕ (${data?.lastError || "Awaiting manual confirmation"})`
-                    : "Finalizing operator reservation…"}
-                </div>
               </div>
             ))}
           </div>

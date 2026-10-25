@@ -5,30 +5,21 @@ import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { getToursFromFareHarbor, type Tour as FareHarborTour } from "@/lib/data/tours";
 import { getFareHarborAvailabilities } from "@/lib/fareharborAvailability";
 import { cleanTourDescription } from "@/lib/tourSeo";
-import { getVisibility } from "@/lib/visibilityStore";
 
 export type HelicopterTour = {
   pk: number;
   slug: string;
   title: string;
   description?: string;
-  duration?: string;
   image?: string;
   imageGallery?: string[];
   company: string;
   port: string;
   fromPrice?: string;
-  priceUpdatedAt?: string | number | null;
   category?: string;
   nextAvailableDate?: string;
   hasInventory?: boolean | null;
   cancellationPolicy?: string;
-};
-
-export type WidgetTourState = {
-  status: "active" | "retired" | "not_found";
-  tour: HelicopterTour | null;
-  reason?: string;
 };
 
 export type HelicopterTourDeparture = {
@@ -53,15 +44,10 @@ type SnapshotTour = {
   headline?: string;
   shortDescription?: string;
   description?: string;
-  duration?: string;
   image?: string;
   company?: string;
   fromPrice?: string;
-  priceUpdatedAt?: string | number | null;
-  updatedAt?: string;
   category?: string;
-  retired?: boolean;
-  status?: string;
   fareharbor?: {
     itemPk?: number | string;
     company?: string;
@@ -224,7 +210,6 @@ function getLiveItemDetails(company: string, item: number) {
 function normalizeTour(
   tour: SnapshotTour | FareHarborTour,
   fallbackCompany?: string,
-  options?: { allowBlockedOrRetired?: boolean; defaultPriceUpdatedAt?: string },
 ): HelicopterTour | null {
   const snapshotTour = tour as SnapshotTour;
   const fareHarborTour = tour as FareHarborTour;
@@ -272,14 +257,7 @@ function normalizeTour(
   const slug = slugSource ? slugify(slugSource) : "";
   const port = inferPortFromCompany(company, pk) || "";
 
-  if (!options?.allowBlockedOrRetired) {
-    if (snapshotTour.retired === true || String(snapshotTour.status || "").toLowerCase() === "retired") {
-      return null;
-    }
-    if (!isPublicExcursion(pk, title, company, port)) return null;
-  } else if (!pk || !title || !company) {
-    return null;
-  }
+  if (!isPublicExcursion(pk, title, company, port)) return null;
 
   let resolvedFromPrice =
     company === "temscoair-juneau" && pk === 285755
@@ -302,39 +280,22 @@ function normalizeTour(
     if (d) resolvedFromPrice = `$${d.toLocaleString()} Per Person (Flat Rate)`;
   }
 
-  const resolvedPriceUpdatedAt =
-    snapshotTour.priceUpdatedAt !== undefined
-      ? snapshotTour.priceUpdatedAt
-      : snapshotTour.updatedAt || options?.defaultPriceUpdatedAt || undefined;
-
   return {
     pk,
     slug,
     title,
     description: cleanTourDescription(description) || undefined,
-    duration: snapshotTour.duration ? String(snapshotTour.duration).trim() : undefined,
     image: tour.image || undefined,
     imageGallery: tour.image ? [tour.image] : [],
     company,
-    port: port || "juneau",
+    port,
     fromPrice: resolvedFromPrice,
-    priceUpdatedAt: resolvedPriceUpdatedAt,
     category: inferCategory(title, description, snapshotTour.category, port),
     hasInventory: null,
   };
 }
 
-let rawSnapshotCache: {
-  file: string;
-  mtimeMs: number;
-  mtimeIso: string;
-  records: SnapshotTour[];
-} | null = null;
-
-async function loadRawSnapshotWithMeta(): Promise<{
-  records: SnapshotTour[];
-  mtimeIso: string;
-}> {
+async function loadSnapshotTours(): Promise<HelicopterTour[]> {
   const candidateFiles = [
     path.join(process.cwd(), "public", "data", "tours.json"),
     path.join(process.cwd(), "public", "data", "widget-tours.json"),
@@ -342,36 +303,17 @@ async function loadRawSnapshotWithMeta(): Promise<{
 
   for (const file of candidateFiles) {
     try {
-      const stat = await fs.stat(file);
-      if (
-        rawSnapshotCache &&
-        rawSnapshotCache.file === file &&
-        rawSnapshotCache.mtimeMs === stat.mtimeMs
-      ) {
-        return {
-          records: rawSnapshotCache.records,
-          mtimeIso: rawSnapshotCache.mtimeIso,
-        };
-      }
       const raw = await fs.readFile(file, "utf8");
-      const records = JSON.parse(raw) as SnapshotTour[];
-      if (Array.isArray(records) && records.length) {
-        const mtimeIso = new Date(stat.mtimeMs).toISOString();
-        rawSnapshotCache = { file, mtimeMs: stat.mtimeMs, mtimeIso, records };
-        return { records, mtimeIso };
-      }
+      const tours = JSON.parse(raw) as SnapshotTour[];
+      const normalized = tours
+        .map((tour) => normalizeTour(tour))
+        .filter((tour): tour is HelicopterTour => Boolean(tour));
+      if (normalized.length) return normalized;
     } catch {
       continue;
     }
   }
-  return { records: [], mtimeIso: new Date().toISOString() };
-}
-
-async function loadSnapshotTours(): Promise<HelicopterTour[]> {
-  const { records, mtimeIso } = await loadRawSnapshotWithMeta();
-  return records
-    .map((tour) => normalizeTour(tour, undefined, { defaultPriceUpdatedAt: mtimeIso }))
-    .filter((tour): tour is HelicopterTour => Boolean(tour));
+  return [];
 }
 
 function dedupeTours(tours: HelicopterTour[]) {
@@ -384,286 +326,101 @@ function dedupeTours(tours: HelicopterTour[]) {
   return Array.from(byKey.values());
 }
 
-function applyRuntimeCatalogOverride(
-  tour: HelicopterTour,
-  override?: {
-    title?: string;
-    fromPrice?: string;
-    priceUpdatedAt?: string | null;
-    description?: string;
-    duration?: string;
-    retired?: boolean;
+export const getHelicopterToursSnapshot = unstable_cache(
+  async (): Promise<HelicopterTour[]> => {
+    const tours = await loadSnapshotTours();
+    return dedupeTours(tours).sort((a, b) => {
+      const portCompare = a.port.localeCompare(b.port);
+      return portCompare || a.title.localeCompare(b.title);
+    });
   },
-): HelicopterTour {
-  if (!override) return tour;
-  return {
-    ...tour,
-    title: typeof override.title === "string" && override.title ? override.title : tour.title,
-    fromPrice:
-      typeof override.fromPrice === "string" ? override.fromPrice : tour.fromPrice,
-    priceUpdatedAt:
-      override.priceUpdatedAt !== undefined ? override.priceUpdatedAt : tour.priceUpdatedAt,
-    description:
-      typeof override.description === "string" ? override.description : tour.description,
-    duration:
-      typeof override.duration === "string" ? override.duration : tour.duration,
-  };
-}
-
-async function filterVisibleTours(tours: HelicopterTour[]): Promise<HelicopterTour[]> {
-  const visibility = await getVisibility();
-  const visible: HelicopterTour[] = [];
-  for (const tour of tours) {
-    const key = `${tour.company}:${tour.pk}`;
-    if (visibility.providers[tour.company]) continue;
-    if (visibility.tours[key]) continue;
-    const override = visibility.overrides?.[key];
-    if (override?.retired === true) continue;
-    visible.push(applyRuntimeCatalogOverride(tour, override));
-  }
-  return visible;
-}
-
-async function computeToursSnapshot(): Promise<HelicopterTour[]> {
-  const tours = await loadSnapshotTours();
-  return dedupeTours(tours).sort((a, b) => {
-    const portCompare = a.port.localeCompare(b.port);
-    return portCompare || a.title.localeCompare(b.title);
-  });
-}
-
-const cachedToursSnapshot = unstable_cache(
-  computeToursSnapshot,
-  ["alaska-tours-snapshot-v6"],
+  ["alaska-tours-snapshot-v5"],
   { revalidate: 1800 },
 );
 
-export async function getHelicopterToursSnapshot(): Promise<HelicopterTour[]> {
-  let tours: HelicopterTour[];
-  try {
-    tours = await cachedToursSnapshot();
-  } catch {
-    tours = await computeToursSnapshot();
-  }
-  return filterVisibleTours(tours);
-}
+export const getHelicopterTours = unstable_cache(
+  async (): Promise<HelicopterTour[]> => {
+    // Snapshot is intentionally primary: it contains category, image and pricing data
+    // without requiring dozens of item-level FareHarbor calls on each storefront request.
+    const snapshotTours = await loadSnapshotTours();
+    const liveTours = await getToursFromFareHarbor().catch(() => []);
+    const normalizedLiveTours = liveTours
+      .map((tour) => normalizeTour(tour))
+      .filter((tour): tour is HelicopterTour => Boolean(tour));
 
-async function computeAllTours(): Promise<HelicopterTour[]> {
-  // Snapshot is intentionally primary: it contains category, image and pricing data
-  // without requiring dozens of item-level FareHarbor calls on each storefront request.
-  const snapshotTours = await loadSnapshotTours();
-  const liveTours = await getToursFromFareHarbor().catch(() => []);
-  const normalizedLiveTours = liveTours
-    .map((tour) => normalizeTour(tour))
-    .filter((tour): tour is HelicopterTour => Boolean(tour));
-
-  const snapshotByKey = new Map(snapshotTours.map((tour) => [`${tour.company}:${tour.pk}`, tour]));
-  const merged = normalizedLiveTours.map((tour) => {
-    const snapshot = snapshotByKey.get(`${tour.company}:${tour.pk}`);
-    return {
-      ...tour,
-      description: snapshot?.description || tour.description,
-      duration: snapshot?.duration || tour.duration,
-      image: snapshot?.image || tour.image,
-      imageGallery: snapshot?.imageGallery || tour.imageGallery,
-      fromPrice: getNorthstarDisplayPrice(snapshot || tour) || snapshot?.fromPrice || tour.fromPrice,
-      priceUpdatedAt: snapshot?.priceUpdatedAt || tour.priceUpdatedAt,
-      category: snapshot?.category || tour.category,
-    };
-  });
-
-  const tours = merged.length ? [...merged, ...snapshotTours] : snapshotTours;
-  return dedupeTours(tours).sort((a, b) => {
-    const portCompare = a.port.localeCompare(b.port);
-    return portCompare || a.title.localeCompare(b.title);
-  });
-}
-
-const cachedAllTours = unstable_cache(
-  computeAllTours,
-  ["alaska-tours-v6"],
-  { revalidate: 1800 },
-);
-
-export async function getHelicopterTours(): Promise<HelicopterTour[]> {
-  // Always read fresh mtime-checked snapshot + visibility so local catalog updates
-  // and admin visibility changes flow through immediately.
-  const snapshotTours = await loadSnapshotTours();
-  let cached: HelicopterTour[] = [];
-  try {
-    cached = await cachedAllTours();
-  } catch {
-    cached = snapshotTours;
-  }
-
-  const snapshotByKey = new Map(snapshotTours.map((tour) => [`${tour.company}:${tour.pk}`, tour]));
-  const merged = cached.map((tour) => {
-    const latestSnapshot = snapshotByKey.get(`${tour.company}:${tour.pk}`);
-    return latestSnapshot ? { ...tour, ...latestSnapshot } : tour;
-  });
-
-  const combined = dedupeTours([...snapshotTours, ...merged]).sort((a, b) => {
-    const portCompare = a.port.localeCompare(b.port);
-    return portCompare || a.title.localeCompare(b.title);
-  });
-
-  return filterVisibleTours(combined);
-}
-
-function applyTourSpecificOverrides(found: HelicopterTour): HelicopterTour {
-  const copy = { ...found };
-  if (copy.company === "northstartrekking" && (Number(copy.pk) === 405050 || String(copy.pk) === "405050")) {
-    copy.fromPrice = "$419 Per Person (Flat Rate)";
-    copy.description = (copy.description || "")
-      .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
-      .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
-  } else if (copy.company === "temscoair-skagway" && (Number(copy.pk) === 213556 || String(copy.pk) === "213556")) {
-    copy.fromPrice = "$439 Per Person (Flat Rate)";
-    copy.description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
-  } else if (copy.company === "temscoair-skagway" && (Number(copy.pk) === 213561 || String(copy.pk) === "213561")) {
-    copy.fromPrice = "$599 Per Person (Flat Rate)";
-    copy.description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
-  } else if (copy.company === "akduck" && (Number(copy.pk) === 4161 || String(copy.pk) === "4161")) {
-    copy.fromPrice = "$79 Adult / $47 Child (Flat Rate)";
-    copy.description = "90 Minutes • All Ages • Historic downtown Ketchikan & scenic harbor splash";
-    copy.category = "Adventures";
-  } else if (copy.company === "alaskarainforest" && (Number(copy.pk) === 563489 || String(copy.pk) === "563489")) {
-    copy.description = "3.5 Hours • All Ages (Brewery 21+) • Rainforest boardwalk bear viewing & craft brewery tasting";
-    copy.category = "Adventures";
-  } else if (copy.company === "taquanair" && (Number(copy.pk) === 392949 || String(copy.pk) === "392949")) {
-    copy.fromPrice = "$369 Per Person (Flat Rate)";
-    copy.description = "Floatplane Flightseeing • 2 Hours • All Ages • Remote fjord water landing";
-    copy.category = "Air Tours";
-  } else if (copy.company === "taquanair" && (Number(copy.pk) === 392950 || String(copy.pk) === "392950")) {
-    copy.fromPrice = "$399 Per Person (Flat Rate)";
-    copy.description = "Floatplane Bear Viewing • 3 Hours 15 Minutes • All Ages • Traitors Cove / Neets Bay";
-    copy.category = "Air Tours";
-  }
-  return copy;
-}
-
-/**
- * Resolves a tour for the embeddable widget renderer using cached catalog data only.
- * Never triggers a per-impression upstream FareHarbor API call, and clearly distinguishes
- * active tours from retired/hidden tours and non-existent tours.
- */
-export async function getWidgetTourState(company: string, item: string): Promise<WidgetTourState> {
-  const normalizedCompany = String(company || "").trim().toLowerCase();
-  const normalizedItem = String(item || "").trim().toLowerCase();
-
-  if (!normalizedCompany || !normalizedItem) {
-    return {
-      status: "not_found",
-      tour: null,
-      reason: "No tour identifier was provided for this widget.",
-    };
-  }
-
-  const [{ records: rawRecords, mtimeIso }, visibility] = await Promise.all([
-    loadRawSnapshotWithMeta(),
-    getVisibility(),
-  ]);
-
-  const matchedRaw = rawRecords.find((record) => {
-    const recCompany = String(record.fareharbor?.company || record.company || "").trim().toLowerCase();
-    if (recCompany !== normalizedCompany) return false;
-    const recPk = String(record.fareharbor?.itemPk || record.pk || "").trim().toLowerCase();
-    const recSlug = slugify(String(record.slug || record.title || ""));
-    return recPk === normalizedItem || (recSlug && recSlug === normalizedItem);
-  });
-
-  if (matchedRaw) {
-    const permissiveTour = normalizeTour(matchedRaw, normalizedCompany, {
-      allowBlockedOrRetired: true,
-      defaultPriceUpdatedAt: mtimeIso,
-    });
-    const strictTour = normalizeTour(matchedRaw, normalizedCompany, {
-      allowBlockedOrRetired: false,
-      defaultPriceUpdatedAt: mtimeIso,
-    });
-    const resolvedPk = permissiveTour?.pk || Number(matchedRaw.pk || 0);
-    const key = `${normalizedCompany}:${resolvedPk}`;
-    const runtimeOverride = visibility.overrides?.[key];
-    const isHidden =
-      Boolean(visibility.providers[normalizedCompany]) ||
-      Boolean(visibility.tours[key]);
-    const isExplicitlyRetired =
-      matchedRaw.retired === true ||
-      String(matchedRaw.status || "").toLowerCase() === "retired" ||
-      runtimeOverride?.retired === true;
-
-    if (!strictTour || isHidden || isExplicitlyRetired) {
-      const baseRetiredTour = permissiveTour ? applyTourSpecificOverrides(permissiveTour) : null;
+    const snapshotByKey = new Map(snapshotTours.map((tour) => [`${tour.company}:${tour.pk}`, tour]));
+    const merged = normalizedLiveTours.map((tour) => {
+      const snapshot = snapshotByKey.get(`${tour.company}:${tour.pk}`);
       return {
-        status: "retired",
-        tour: baseRetiredTour ? applyRuntimeCatalogOverride(baseRetiredTour, runtimeOverride) : null,
-        reason: "This excursion is currently retired or unavailable for online booking.",
+        ...tour,
+        description: snapshot?.description || tour.description,
+        image: snapshot?.image || tour.image,
+        imageGallery: snapshot?.imageGallery || tour.imageGallery,
+        fromPrice: getNorthstarDisplayPrice(snapshot || tour) || snapshot?.fromPrice || tour.fromPrice,
+        category: snapshot?.category || tour.category,
       };
-    }
+    });
 
-    const activeTour = applyRuntimeCatalogOverride(
-      applyTourSpecificOverrides(strictTour),
-      runtimeOverride,
-    );
-
-    return {
-      status: "active",
-      tour: activeTour,
-    };
-  }
-
-  // Check if this company/item is marked hidden/retired in visibility.json even if removed from tours.json
-  const numericItem = Number(normalizedItem);
-  if (
-    visibility.providers[normalizedCompany] ||
-    visibility.tours[`${normalizedCompany}:${normalizedItem}`] ||
-    visibility.overrides?.[`${normalizedCompany}:${normalizedItem}`]?.retired === true ||
-    (Number.isFinite(numericItem) && BLOCKED_ITEM_IDS.has(numericItem)) ||
-    normalizedItem.includes("retired")
-  ) {
-    return {
-      status: "retired",
-      tour: null,
-      reason: "This excursion has been retired and is no longer available for booking.",
-    };
-  }
-
-  return {
-    status: "not_found",
-    tour: null,
-    reason: "This tour is not available in the Welcome to Alaska Tours catalog.",
-  };
-}
+    const tours = merged.length ? [...merged, ...snapshotTours] : snapshotTours;
+    return dedupeTours(tours).sort((a, b) => {
+      const portCompare = a.port.localeCompare(b.port);
+      return portCompare || a.title.localeCompare(b.title);
+    });
+  },
+  ["alaska-tours-v5"],
+  { revalidate: 1800 },
+);
 
 export async function getHelicopterTour(company: string, item: string): Promise<HelicopterTour | null> {
   const tours = await getHelicopterTours();
   const normalizedCompany = String(company || "").trim().toLowerCase();
   const normalizedItem = String(item || "").trim().toLowerCase();
-  const found =
-    tours.find(
-      (tour) =>
-        tour.company === normalizedCompany &&
-        (String(tour.pk) === normalizedItem || tour.slug === normalizedItem),
-    ) || null;
+  const found = tours.find(
+    (tour) =>
+      tour.company === normalizedCompany &&
+      (String(tour.pk) === normalizedItem || tour.slug === normalizedItem),
+  ) || null;
   if (!found) return null;
 
-  const overridden = applyTourSpecificOverrides(found);
-  let details: { imageGallery: string[]; cancellationPolicy?: string } = { imageGallery: [] };
-  try {
-    details = await getLiveItemDetails(overridden.company, overridden.pk);
-  } catch {
-    details = { imageGallery: [] };
+  if (found.company === "northstartrekking" && (Number(found.pk) === 405050 || String(found.pk) === "405050")) {
+    found.fromPrice = "$419 Per Person (Flat Rate)";
+    found.description = (found.description || "")
+      .replace(/\$388\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)")
+      .replace(/\$405\s*(?:Per\s*Person)?/gi, "$419 Per Person (Flat Rate)");
+  } else if (found.company === "temscoair-skagway" && (Number(found.pk) === 213556 || String(found.pk) === "213556")) {
+    found.fromPrice = "$439 Per Person (Flat Rate)";
+    found.description = "$439 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Landing & Guided Walk";
+  } else if (found.company === "temscoair-skagway" && (Number(found.pk) === 213561 || String(found.pk) === "213561")) {
+    found.fromPrice = "$599 Per Person (Flat Rate)";
+    found.description = "$599 Per Person (Flat Rate) | 2 Hours | All Ages | Glacier Dog Sledding Demonstration (No Sled Riding)";
+  } else if (found.company === "akduck" && (Number(found.pk) === 4161 || String(found.pk) === "4161")) {
+    found.fromPrice = "$79 Adult / $47 Child (Flat Rate)";
+    found.description = "90 Minutes • All Ages • Historic downtown Ketchikan & scenic harbor splash";
+    found.category = "Adventures";
+  } else if (found.company === "alaskarainforest" && (Number(found.pk) === 563489 || String(found.pk) === "563489")) {
+    found.description = "3.5 Hours • All Ages (Brewery 21+) • Rainforest boardwalk bear viewing & craft brewery tasting";
+    found.category = "Adventures";
+  } else if (found.company === "taquanair" && (Number(found.pk) === 392949 || String(found.pk) === "392949")) {
+    found.fromPrice = "$369 Per Person (Flat Rate)";
+    found.description = "Floatplane Flightseeing • 2 Hours • All Ages • Remote fjord water landing";
+    found.category = "Air Tours";
+  } else if (found.company === "taquanair" && (Number(found.pk) === 392950 || String(found.pk) === "392950")) {
+    found.fromPrice = "$399 Per Person (Flat Rate)";
+    found.description = "Floatplane Bear Viewing • 3 Hours 15 Minutes • All Ages • Traitors Cove / Neets Bay";
+    found.category = "Air Tours";
   }
+
+  const details = await getLiveItemDetails(found.company, found.pk);
   const imageGallery = details.imageGallery.length
     ? details.imageGallery
-    : overridden.image
-      ? [overridden.image]
+    : found.image
+      ? [found.image]
       : [];
 
   return {
-    ...overridden,
+    ...found,
     imageGallery,
-    image: imageGallery[0] || overridden.image,
+    image: imageGallery[0] || found.image,
     cancellationPolicy: details.cancellationPolicy,
   };
 }

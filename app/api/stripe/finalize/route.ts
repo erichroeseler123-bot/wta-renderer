@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import Stripe from "stripe";
 import {
   acquireOrderLock,
   getOrder,
@@ -9,7 +10,6 @@ import {
 } from "@/lib/orders";
 import { runFareHarborBookingsForOrder } from "@/lib/bookingRunner";
 import { assertBookingsEnabled } from "@/lib/fareharbor";
-import { getStripeClient } from "@/lib/stripe";
 import { maybeSendBookingConfirmationEmail } from "@/lib/bookingEmail";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
 import {
@@ -24,6 +24,12 @@ export const runtime = "nodejs";
 
 function jsonError(message: string, status = 400, extra?: Record<string, unknown>) {
   return NextResponse.json({ success: false, error: message, ...(extra || {}) }, { status });
+}
+
+function getStripeClient() {
+  const secret = String(process.env.STRIPE_SECRET_KEY || "");
+  if (!secret) throw new Error("Missing STRIPE_SECRET_KEY");
+  return new Stripe(secret, {});
 }
 
 async function markOrderFailed(order: OrderSnapshot, reason: string) {
@@ -58,7 +64,6 @@ export async function POST(req: Request) {
     if (!piId) return jsonError("Missing payment_intent_id", 400);
 
     const stripe = getStripeClient();
-    if (!stripe) return jsonError("Missing STRIPE_SECRET_KEY", 500);
     const pi = await stripe.paymentIntents.retrieve(piId);
     if (!pi?.id) return jsonError("Payment intent not found", 404);
 

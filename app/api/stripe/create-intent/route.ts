@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
 import { getKV } from "@/lib/kv";
 import {
-  buildOrderAttributionFromLines,
   saveOrder,
   makeOrderCancelToken,
   hashClientSecret,
@@ -9,12 +9,7 @@ import {
   type OrderLine,
   type OrderSnapshot,
 } from "@/lib/orders";
-import { checkBookingCapabilityReadiness } from "@/lib/fareharbor";
-import { resolveExactDeparturePrice } from "@/lib/fareharborAvailability";
-import { getStripeClient } from "@/lib/stripe";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
-import { sanitizePlacementLabel } from "@/lib/tourWidget";
-import { sanitizeEmbedDomain } from "@/lib/widgetContext";
 import {
   clientIpFromHeaders,
   enforceRateLimit,
@@ -34,12 +29,7 @@ type CartLine = {
   ratePk: number;
   qty: number;
   title?: string;
-  day?: string;
-  date?: string;
   startAt?: string;
-  expectedUnitCents?: number;
-  unitCents?: number;
-  price?: number;
   handoffSource?: string;
   handoffId?: string;
   sourceSlug?: string;
@@ -67,19 +57,45 @@ type CartLine = {
 
 function jsonError(message: string, status = 400, extra?: Record<string, unknown>) {
   return NextResponse.json(
-    {
-      success: false,
-      error: message,
-      ...(extra?.code ? { code: extra.code } : {}),
-      ...(extra ? { extra } : {}),
-    },
+    { success: false, error: message, ...(extra ? { extra } : {}) },
     { status },
   );
+}
+
+function getBaseUrl(req: NextRequest) {
+  const siteUrl = process.env.SITE_URL;
+  if (siteUrl) return siteUrl.replace(/\/+$/, "");
+
+  const origin = req.headers.get("origin") || req.headers.get("x-forwarded-host");
+  const proto = req.headers.get("x-forwarded-proto") || "https";
+
+  if (origin) {
+    if (origin.startsWith("http://") || origin.startsWith("https://")) return origin.replace(/\/+$/, "");
+    return `${proto}://${origin}`.replace(/\/+$/, "");
+  }
+
+  return "http://localhost:3000";
 }
 
 function clampQty(n: unknown) {
   const x = Math.floor(Number(n || 1));
   return Math.max(1, Math.min(99, x));
+}
+
+function pickFirstString(lines: CartLine[], key: keyof CartLine) {
+  for (const line of lines) {
+    const v = line[key];
+    if (typeof v === "string" && v.trim()) return v.trim();
+  }
+  return undefined;
+}
+
+function pickFirstNumber(lines: CartLine[], key: keyof CartLine) {
+  for (const line of lines) {
+    const n = Number(line[key]);
+    if (Number.isFinite(n) && n > 0) return Math.floor(n);
+  }
+  return undefined;
 }
 
 export async function POST(req: NextRequest) {
@@ -100,29 +116,13 @@ export async function POST(req: NextRequest) {
       return r;
     }
 
-    const bookingReady = checkBookingCapabilityReadiness();
-    if (!bookingReady.ok) {
-      logSecurityEvent("create_intent_booking_unavailable", {
-        rid,
-        ip,
-        code: bookingReady.code,
-      });
-      return jsonError(bookingReady.error, bookingReady.status, {
-        code: bookingReady.code,
-        request_id: rid,
-      });
-    }
-
-    const stripe = getStripeClient();
-    if (!stripe) return jsonError("Payment service is not configured.", 500, { request_id: rid });
+    const stripeKey = process.env.STRIPE_SECRET_KEY;
+    if (!stripeKey) return jsonError("Payment service is not configured.", 500, { request_id: rid });
 
     const kv = await getKV();
-    if (!kv) {
-      return jsonError("Booking storage is currently unavailable.", 503, {
-        code: "storage_unavailable",
-        request_id: rid,
-      });
-    }
+    if (!kv) return jsonError("Booking storage is currently unavailable.", 500, { request_id: rid });
+
+    const stripe = new Stripe(stripeKey, {});
 
     const body = await req.json().catch(() => null);
     if (!body) return jsonError("Invalid JSON body.", 400);
@@ -146,24 +146,10 @@ export async function POST(req: NextRequest) {
     if (!Array.isArray(lines) || lines.length < 1) return jsonError("Cart is empty.", 400);
     if (!name || !email) return jsonError("Missing contact.name or contact.email.", 400);
 
+    const baseUrl = getBaseUrl(req);
+
     let totalCents = 0;
-    let previousTotalCents = 0;
     const computed: OrderLine[] = [];
-    const priceChanges: Array<{
-      company: string;
-      itemPk: number;
-      availabilityPk: number;
-      ratePk: number;
-      title?: string;
-      date: string;
-      startAt?: string;
-      qty: number;
-      previousUnitCents: number;
-      updatedUnitCents: number;
-      previousLineTotalCents: number;
-      updatedLineTotalCents: number;
-      currency: string;
-    }> = [];
 
     for (const it of lines) {
       const company = String(it.company || "").trim();
@@ -176,75 +162,39 @@ export async function POST(req: NextRequest) {
         return jsonError("Bad cart line (missing company/itemPk/availabilityPk/ratePk).", 400, { it });
       }
 
-      const expectedUnit =
-        typeof it.expectedUnitCents === "number" && Number.isFinite(it.expectedUnitCents) && it.expectedUnitCents > 0
-          ? Math.floor(it.expectedUnitCents)
-          : typeof it.unitCents === "number" && Number.isFinite(it.unitCents) && it.unitCents > 0
-            ? Math.floor(it.unitCents)
-            : typeof it.price === "number" && Number.isFinite(it.price) && it.price > 0
-              ? Math.floor(it.price)
-              : null;
+      const qs = new URLSearchParams({
+        company,
+        item_pk: String(itemPk),
+        availability_pk: String(availabilityPk),
+        customer_type_rate_pk: String(ratePk),
+        qty: String(qty),
+      });
 
-      const pj = await resolveExactDeparturePrice({
+      const priceUrl = new URL(`/api/fareharbor/price?${qs.toString()}`, baseUrl).toString();
+      const pr = await fetch(priceUrl, { cache: "no-store" });
+      const pj = await pr.json().catch(() => null);
+
+      if (!pr.ok || (!pj?.success && !pj?.ok)) {
+        return jsonError("Pricing failed for a cart line.", 409, { line: it, details: pj });
+      }
+
+      const currency = String(pj?.currency || "usd").toLowerCase();
+      const lineTotal = Number(pj?.lineTotalCents ?? pj?.totalCents ?? 0);
+
+      if (!Number.isFinite(lineTotal) || lineTotal <= 0) {
+        return jsonError("Invalid line total returned from price endpoint.", 409, { line: it, details: pj });
+      }
+
+      totalCents += Math.floor(lineTotal);
+      computed.push({
         company,
         itemPk,
         availabilityPk,
-        customerTypeRatePk: ratePk,
-        date: it.day || it.date,
-        startAt: it.startAt,
-        qty,
-        expectedUnitCents: expectedUnit,
-      });
-
-      if (!pj.ok) {
-        return jsonError(pj.error || "Pricing failed for a cart line.", pj.status, {
-          code: pj.code,
-          line: it,
-          details: pj,
-        });
-      }
-
-      const currency = String(pj.currency || "usd").toLowerCase();
-      const lineTotal = Number(pj.lineTotalCents);
-
-      if (!Number.isFinite(lineTotal) || lineTotal <= 0) {
-        return jsonError("Invalid line total returned from price resolution.", 409, {
-          line: it,
-          details: pj,
-        });
-      }
-
-      const roundedLineTotal = Math.floor(lineTotal);
-      totalCents += roundedLineTotal;
-      previousTotalCents += expectedUnit !== null ? expectedUnit * qty : roundedLineTotal;
-
-      if (pj.priceChanged && expectedUnit !== null) {
-        priceChanges.push({
-          company: pj.company,
-          itemPk: pj.itemPk,
-          availabilityPk: pj.availabilityPk,
-          ratePk: pj.customerTypeRatePk,
-          title: it.title,
-          date: pj.date,
-          startAt: pj.startAt || it.startAt,
-          qty,
-          previousUnitCents: expectedUnit,
-          updatedUnitCents: pj.unitCents,
-          previousLineTotalCents: expectedUnit * qty,
-          updatedLineTotalCents: roundedLineTotal,
-          currency,
-        });
-      }
-
-      computed.push({
-        company: pj.company,
-        itemPk: pj.itemPk,
-        availabilityPk: pj.availabilityPk,
-        ratePk: pj.customerTypeRatePk,
+        ratePk,
         qty,
         title: it.title,
-        startAt: pj.startAt || it.startAt,
-        lineTotalCents: roundedLineTotal,
+        startAt: it.startAt,
+        lineTotalCents: Math.floor(lineTotal),
         currency,
         handoffSource: typeof it.handoffSource === "string" ? it.handoffSource : undefined,
         handoffId: typeof it.handoffId === "string" ? it.handoffId : undefined,
@@ -258,19 +208,10 @@ export async function POST(req: NextRequest) {
         category: typeof it.handoffCategory === "string" ? it.handoffCategory : undefined,
         handoffDate: typeof it.handoffDate === "string" ? it.handoffDate : undefined,
         dccReturnUrl: typeof it.dccReturnUrl === "string" ? it.dccReturnUrl : undefined,
-        embedDomain: sanitizeEmbedDomain(it.embedDomain),
-        embedPath:
-          it.handoffSource === "dcc" && typeof it.embedPath === "string"
-            ? it.embedPath.split(/[?#]/)[0]?.slice(0, 160)
-            : undefined,
-        widgetPlacement:
-          typeof it.widgetPlacement === "string"
-            ? sanitizePlacementLabel(it.widgetPlacement)
-            : undefined,
-        widgetId:
-          typeof it.widgetId === "string" && it.widgetId.trim()
-            ? it.widgetId.trim().slice(0, 80)
-            : undefined,
+        embedDomain: typeof it.embedDomain === "string" ? it.embedDomain : undefined,
+        embedPath: typeof it.embedPath === "string" ? it.embedPath : undefined,
+        widgetPlacement: typeof it.widgetPlacement === "string" ? it.widgetPlacement : undefined,
+        widgetId: typeof it.widgetId === "string" ? it.widgetId : undefined,
         partySize: Number.isFinite(Number(it.partySize)) ? Number(it.partySize) : undefined,
         adults: Number.isFinite(Number(it.adults)) ? Number(it.adults) : undefined,
         children: Number.isFinite(Number(it.children)) ? Number(it.children) : undefined,
@@ -283,32 +224,34 @@ export async function POST(req: NextRequest) {
 
     if (!Number.isFinite(totalCents) || totalCents <= 0) return jsonError("Total is invalid.", 409);
 
-    const acceptedTotalCents =
-      typeof body?.acceptedTotalCents === "number" && Number.isFinite(body.acceptedTotalCents)
-        ? Math.floor(body.acceptedTotalCents)
-        : null;
-
-    if (priceChanges.length > 0 && acceptedTotalCents !== totalCents) {
-      return NextResponse.json(
-        {
-          success: false,
-          code: "price_changed",
-          error:
-            "Live departure pricing has updated since this item was added to your cart. Please review and accept the updated price before payment.",
-          previousTotalCents,
-          updatedTotalCents: totalCents,
-          currency: "usd",
-          priceChanges,
-          request_id: rid,
-        },
-        { status: 409 },
-      );
-    }
-
     const order_id = `ord_${crypto.randomUUID()}`;
     const cart_id = `cart_${crypto.randomUUID()}`;
 
-    const attribution: OrderAttribution = buildOrderAttributionFromLines(lines);
+    const attribution: OrderAttribution = {
+      handoffSource: pickFirstString(lines, "handoffSource"),
+      handoffId: pickFirstString(lines, "handoffId"),
+      sourceSlug: pickFirstString(lines, "sourceSlug"),
+      sourcePage: pickFirstString(lines, "sourcePage"),
+      topicSlug: pickFirstString(lines, "topicSlug"),
+      authorityTopic: pickFirstString(lines, "authorityTopic"),
+      referrerPath: pickFirstString(lines, "referrerPath"),
+      portSlug: pickFirstString(lines, "portSlug"),
+      productSlug: pickFirstString(lines, "productSlug"),
+      category: pickFirstString(lines, "handoffCategory"),
+      date: pickFirstString(lines, "handoffDate"),
+      dccReturnUrl: pickFirstString(lines, "dccReturnUrl"),
+      embedDomain: pickFirstString(lines, "embedDomain"),
+      embedPath: pickFirstString(lines, "embedPath"),
+      widgetPlacement: pickFirstString(lines, "widgetPlacement"),
+      widgetId: pickFirstString(lines, "widgetId"),
+      partySize: pickFirstNumber(lines, "partySize"),
+      adults: pickFirstNumber(lines, "adults"),
+      children: pickFirstNumber(lines, "children"),
+      cruiseShip: pickFirstString(lines, "cruiseShip"),
+      cruiseShipSlug: pickFirstString(lines, "cruiseShipSlug"),
+      timeOfDay: pickFirstString(lines, "timeOfDay"),
+      budgetTier: pickFirstString(lines, "budgetTier"),
+    };
 
     const draft: OrderSnapshot = {
       order_id,
@@ -391,10 +334,6 @@ export async function POST(req: NextRequest) {
           contact_email: email,
           handoff_source: attribution.handoffSource || "",
           handoff_id: attribution.handoffId || "",
-          widget_placement: attribution.widgetPlacement || "",
-          widget_id: attribution.widgetId || "",
-          embed_domain: attribution.embedDomain || "",
-          embed_path: attribution.embedPath || "",
           authority_topic: attribution.authorityTopic || "",
           port_slug: attribution.portSlug || "",
           category: attribution.category || "",

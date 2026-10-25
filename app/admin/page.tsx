@@ -1,7 +1,6 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import Link from "next/link";
 import { useState } from "react";
 import { useAdminData } from "./useAdminData";
 
@@ -40,22 +39,8 @@ export default function AdminPage() {
 
   return (
     <div className="mx-auto max-w-5xl p-6 text-white">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-4">
-          <h1 className="text-2xl font-semibold">WTA Admin</h1>
-          <Link
-            href="/admin/widgets"
-            className="rounded-xl bg-sky-500/20 border border-sky-400/40 hover:bg-sky-500/30 px-3.5 py-1.5 text-xs font-semibold text-sky-200"
-          >
-            Tour Widget Builder &rarr;
-          </Link>
-          <Link
-            href="/admin/orders"
-            className="rounded-xl bg-white/10 hover:bg-white/15 px-3.5 py-1.5 text-xs font-medium text-white/80"
-          >
-            Orders
-          </Link>
-        </div>
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold">WTA Admin</h1>
         {authed ? (
           <button
             onClick={logout}

@@ -52,42 +52,6 @@ function readAny(input: SearchLike, keys: string[]) {
   return undefined;
 }
 
-export function sanitizeEmbedDomain(value: unknown): string | undefined {
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-
-  let candidate = trimmed;
-  if (/^[a-z][a-z0-9+.-]*:\/\//i.test(candidate)) {
-    try {
-      const parsed = new URL(candidate);
-      candidate = parsed.host || parsed.hostname;
-    } catch {
-      return undefined;
-    }
-  } else {
-    candidate = candidate.split(/[/?#]/)[0] || "";
-  }
-
-  const normalized = candidate.trim().toLowerCase();
-  if (!normalized || normalized.length > 128) return undefined;
-  if (!/^[a-z0-9.-]+(?::\d{1,5})?$/.test(normalized)) return undefined;
-  if (normalized.startsWith(".") || normalized.endsWith(".") || normalized.includes("..")) {
-    return undefined;
-  }
-  return normalized;
-}
-
-function sanitizeEmbedPath(value: unknown): string | undefined {
-  if (typeof value !== "string") return undefined;
-  const trimmed = value.trim();
-  if (!trimmed) return undefined;
-  // Strip any query string or hash fragment so sensitive query params are never retained
-  const withoutQuery = trimmed.split(/[?#]/)[0]?.trim() || "";
-  if (!withoutQuery || !withoutQuery.startsWith("/")) return undefined;
-  return withoutQuery.slice(0, 160);
-}
-
 export function parseWidgetInitContext(input: SearchLike): WidgetInitContext {
   return {
     handoffId: readAny(input, ["handoffId", "handoff_id", "dcc_handoff_id"]),
@@ -99,9 +63,9 @@ export function parseWidgetInitContext(input: SearchLike): WidgetInitContext {
     portSlug: readAny(input, ["portSlug", "port_slug"]),
     productSlug: readAny(input, ["productSlug", "product_slug"]),
     eventDate: readAny(input, ["eventDate", "event_date", "date"]),
-    embedDomain: sanitizeEmbedDomain(readAny(input, ["embedDomain", "embed_domain"])),
-    embedPath: sanitizeEmbedPath(readAny(input, ["embedPath", "embed_path"])),
-    widgetPlacement: readAny(input, ["widgetPlacement", "widget_placement", "placement"]),
+    embedDomain: readAny(input, ["embedDomain", "embed_domain"]),
+    embedPath: readAny(input, ["embedPath", "embed_path"]),
+    widgetPlacement: readAny(input, ["widgetPlacement", "widget_placement"]),
     widgetId: readAny(input, ["widgetId", "widget_id"]),
   };
 }
@@ -111,7 +75,8 @@ export function inferEmbedContextFromLocation(locationLike?: {
   pathname?: string;
 }): WidgetEmbedContext {
   return {
-    embedDomain: sanitizeEmbedDomain(locationLike?.hostname),
+    embedDomain: cleanString(locationLike?.hostname),
+    embedPath: cleanString(locationLike?.pathname),
   };
 }
 
@@ -119,30 +84,20 @@ export function inferEmbedContextFromWindow(): WidgetEmbedContext {
   if (typeof window === "undefined") return {};
 
   try {
-    if (window.top?.location?.host || window.top?.location?.hostname) {
-      return {
-        embedDomain: sanitizeEmbedDomain(
-          window.top.location.host || window.top.location.hostname,
-        ),
-      };
+    if (window.top?.location) {
+      return inferEmbedContextFromLocation({
+        hostname: window.top.location.hostname,
+        pathname: window.top.location.pathname,
+      });
     }
   } catch {
-    // Cross-origin top access is expected for iframe embeds; fall back to document.referrer origin/host only.
-    try {
-      if (typeof document !== "undefined" && document.referrer) {
-        const refUrl = new URL(document.referrer);
-        return {
-          embedDomain: sanitizeEmbedDomain(refUrl.host || refUrl.hostname),
-        };
-      }
-    } catch {
-      // Ignore invalid referrer URLs.
-    }
+    // Cross-origin top access is expected for iframe embeds.
   }
 
-  return {
-    embedDomain: sanitizeEmbedDomain(window.location.host || window.location.hostname),
-  };
+  return inferEmbedContextFromLocation({
+    hostname: window.location.hostname,
+    pathname: window.location.pathname,
+  });
 }
 
 export function resolveWidgetInitContext(input: SearchLike): WidgetInitContext {
@@ -152,6 +107,7 @@ export function resolveWidgetInitContext(input: SearchLike): WidgetInitContext {
   return {
     ...parsed,
     embedDomain: parsed.embedDomain || inferred.embedDomain,
+    embedPath: parsed.embedPath || inferred.embedPath,
   };
 }
 

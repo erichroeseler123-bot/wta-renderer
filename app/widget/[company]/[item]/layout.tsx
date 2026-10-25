@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getWidgetTourState } from "@/lib/helicopterTours";
+import { getHelicopterTour } from "@/lib/helicopterTours";
 import { buildTourUrl, cleanTourDescription, sanitizeTour } from "@/lib/tourSeo";
 
 export async function generateMetadata({
@@ -8,13 +8,12 @@ export async function generateMetadata({
   params: Promise<{ company: string; item: string }>;
 }): Promise<Metadata> {
   const { company, item } = await params;
-  const state = await getWidgetTourState(company, item);
-  const tour = state.tour;
+  const tour = await getHelicopterTour(company, item);
 
-  if (!tour || state.status !== "active") {
+  if (!tour) {
     return {
       title: "Tour Widget | Welcome To Alaska Tours",
-      description: "Embedded Alaska shore excursion widget.",
+      description: "Embedded Juneau helicopter tour information.",
       robots: {
         index: false,
         follow: true,
@@ -29,7 +28,7 @@ export async function generateMetadata({
   const canonical = buildTourUrl(safeTour);
   const description = cleanTourDescription(
     safeTour.description,
-    "Embedded Alaska shore excursion information.",
+    "Embedded Juneau helicopter tour information."
   );
 
   return {

@@ -1,13 +1,7 @@
-import { getWidgetTourState } from "@/lib/helicopterTours";
+import { redirect } from "next/navigation";
+import { getHelicopterTour } from "@/lib/helicopterTours";
 import { WidgetProduct } from "@/components/widget/WidgetProduct";
 import { sanitizeTour } from "@/lib/tourSeo";
-import { sanitizePlacementLabel, sanitizeWidgetLayout } from "@/lib/tourWidget";
-
-function firstString(value: string | string[] | undefined): string | undefined {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value[0];
-  return undefined;
-}
 
 export default async function WidgetProductPage({
   params,
@@ -17,26 +11,15 @@ export default async function WidgetProductPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [{ company, item }, resolvedSearch] = await Promise.all([params, searchParams]);
-  const state = await getWidgetTourState(company, item);
+  const tour = await getHelicopterTour(company, item);
 
-  const initialLayout = sanitizeWidgetLayout(firstString(resolvedSearch.layout));
-  const initialAccent = firstString(resolvedSearch.accent);
-  const initialPlacement = sanitizePlacementLabel(
-    firstString(resolvedSearch.placement) ||
-      firstString(resolvedSearch.widgetPlacement) ||
-      firstString(resolvedSearch.widget_placement),
-  );
+  if (!tour) {
+    const qs = new URLSearchParams();
+    for (const [key, value] of Object.entries(resolvedSearch)) {
+      if (typeof value === "string" && value) qs.set(key, value);
+    }
+    redirect(qs.toString() ? `/widget?${qs.toString()}` : "/widget");
+  }
 
-  return (
-    <WidgetProduct
-      tour={state.tour ? sanitizeTour(state.tour) : null}
-      status={state.status}
-      reason={state.reason}
-      requestedCompany={company}
-      requestedItem={item}
-      initialLayout={initialLayout}
-      initialAccent={initialAccent}
-      initialPlacement={initialPlacement}
-    />
-  );
+  return <WidgetProduct tour={sanitizeTour(tour)} />;
 }

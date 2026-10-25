@@ -1,9 +1,9 @@
-export type KVGetOptions = {
+type KVGetOptions = {
   ex?: number;
   nx?: boolean;
 };
 
-export type KVClient = {
+type KVClient = {
   get<T = unknown>(key: string): Promise<T | null>;
   set(key: string, value: unknown, opts?: KVGetOptions): Promise<unknown>;
   del(key: string): Promise<number>;
@@ -15,7 +15,6 @@ type LocalEntry = {
 };
 
 const localStore = new Map<string, LocalEntry>();
-let durableKVOverrideForTests: KVClient | null = null;
 
 function nowMs() {
   return Date.now();
@@ -31,30 +30,6 @@ function readEnv(name: string) {
   return v;
 }
 
-export const WTA_KV_NAMESPACE = "wta:";
-
-export function namespaceKVKey(key: string): string {
-  const trimmed = String(key || "").trim();
-  if (!trimmed) {
-    throw new Error("KV key cannot be empty.");
-  }
-  return trimmed.startsWith(WTA_KV_NAMESPACE) ? trimmed : `${WTA_KV_NAMESPACE}${trimmed}`;
-}
-
-function wrapNamespacedKV(rawClient: KVClient): KVClient {
-  return {
-    async get<T = unknown>(key: string) {
-      return rawClient.get<T>(namespaceKVKey(key));
-    },
-    async set(key: string, value: unknown, opts?: KVGetOptions) {
-      return rawClient.set(namespaceKVKey(key), value, opts);
-    },
-    async del(key: string) {
-      return rawClient.del(namespaceKVKey(key));
-    },
-  };
-}
-
 function cleanExpiredLocal(key: string) {
   const entry = localStore.get(key);
   if (!entry) return;
@@ -63,11 +38,11 @@ function cleanExpiredLocal(key: string) {
   }
 }
 
-const rawLocalKV: KVClient = {
+const localKV: KVClient = {
   async get<T = unknown>(key: string) {
     cleanExpiredLocal(key);
     const entry = localStore.get(key);
-    return entry ? (entry.value as T) : null;
+    return (entry ? (entry.value as T) : null);
   },
   async set(key: string, value: unknown, opts?: KVGetOptions) {
     cleanExpiredLocal(key);
@@ -82,55 +57,23 @@ const rawLocalKV: KVClient = {
   },
 };
 
-const localKV: KVClient = wrapNamespacedKV(rawLocalKV);
-
-export function setDurableKVOverrideForTests(client: KVClient | null) {
-  durableKVOverrideForTests = client ? wrapNamespacedKV(client) : null;
-}
-
-export function isDurableKVConfigured(): boolean {
-  if (durableKVOverrideForTests) return true;
-  const vercelUrl = readEnv("KV_REST_API_URL");
-  const vercelToken = readEnv("KV_REST_API_TOKEN");
-  if (vercelUrl && vercelToken) return true;
-
-  const upstashUrl = readEnv("UPSTASH_REDIS_REST_URL");
-  const upstashToken = readEnv("UPSTASH_REDIS_REST_TOKEN");
-  if (upstashUrl && upstashToken) return true;
-
-  return false;
-}
-
-export async function getDurableKV(): Promise<KVClient | null> {
-  if (durableKVOverrideForTests) {
-    return durableKVOverrideForTests;
+export async function getKV(): Promise<KVClient | null> {
+  if (process.env.USE_LOCAL_KV === "true" || process.env.NEXT_PUBLIC_USE_LOCAL_KV === "true") {
+    return localKV;
   }
 
   const vercelUrl = readEnv("KV_REST_API_URL");
   const vercelToken = readEnv("KV_REST_API_TOKEN");
   if (vercelUrl && vercelToken) {
     const mod = await import("@vercel/kv");
-    return wrapNamespacedKV(mod.kv as unknown as KVClient);
+    return mod.kv as unknown as KVClient;
   }
 
   const upstashUrl = readEnv("UPSTASH_REDIS_REST_URL");
   const upstashToken = readEnv("UPSTASH_REDIS_REST_TOKEN");
   if (upstashUrl && upstashToken) {
     const mod = await import("@upstash/redis");
-    return wrapNamespacedKV(mod.Redis.fromEnv() as unknown as KVClient);
-  }
-
-  return null;
-}
-
-export async function getKV(): Promise<KVClient | null> {
-  if (process.env.USE_LOCAL_KV === "true" || process.env.NEXT_PUBLIC_USE_LOCAL_KV === "true") {
-    return localKV;
-  }
-
-  const durable = await getDurableKV();
-  if (durable) {
-    return durable;
+    return mod.Redis.fromEnv() as unknown as KVClient;
   }
 
   if (process.env.NODE_ENV !== "production") {
@@ -139,4 +82,3 @@ export async function getKV(): Promise<KVClient | null> {
 
   return null;
 }
-

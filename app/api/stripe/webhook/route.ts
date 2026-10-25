@@ -11,11 +11,18 @@ import {
 } from "@/lib/orders";
 import { runFareHarborBookingsForOrder } from "@/lib/bookingRunner";
 import { assertBookingsEnabled } from "@/lib/fareharbor";
-import { getStripeClient } from "@/lib/stripe";
 import { maybeSendBookingConfirmationEmail } from "@/lib/bookingEmail";
 import { logServerError, requestId } from "@/lib/security";
 
 export const runtime = "nodejs";
+
+function getStripeClient() {
+  const secret = String(process.env.STRIPE_SECRET_KEY || "");
+  if (!secret) {
+    throw new Error("Missing STRIPE_SECRET_KEY");
+  }
+  return new Stripe(secret, {});
+}
 
 function ok() {
   return NextResponse.json({ received: true });
@@ -34,9 +41,6 @@ export async function POST(req: Request) {
   const rid = requestId();
   try {
     const stripe = getStripeClient();
-    if (!stripe) {
-      return NextResponse.json({ error: "Missing STRIPE_SECRET_KEY" }, { status: 500 });
-    }
     const kv = await getKV();
     if (!kv) {
       return NextResponse.json({ error: "KV not configured" }, { status: 500 });

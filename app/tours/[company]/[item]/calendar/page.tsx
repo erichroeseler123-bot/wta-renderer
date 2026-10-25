@@ -4,12 +4,6 @@ import {
   getFareHarborAvailabilities,
   getFareHarborNextAvailability,
 } from "@/lib/fareharborAvailability";
-import { getWidgetTourState } from "@/lib/helicopterTours";
-import {
-  getOperatorDisplayName,
-  getPortDisplayName,
-  sanitizePlacementLabel,
-} from "@/lib/tourWidget";
 import StageTelemetry from "@/app/components/plan/StageTelemetry";
 import CalendarOpenTracker from "@/app/components/analytics/CalendarOpenTracker";
 
@@ -95,56 +89,11 @@ export default async function Page({
   const sp = await searchParams;
   const getParam = (value: string | undefined) => String(value || "");
   const canonicalProductKey = `${company}/${item}`;
-
-  const tourState = await getWidgetTourState(company, item);
-  const tour = tourState.tour;
-
-  if (tourState.status !== "active") {
-    return (
-      <main className="min-h-screen bg-stone-50 px-4 py-12 text-slate-900">
-        <div className="mx-auto max-w-2xl rounded-3xl border border-amber-300 bg-white p-8 shadow-sm">
-          <div className="inline-flex rounded-full bg-amber-100 px-3 py-1 text-xs font-bold uppercase tracking-wider text-amber-900">
-            {tourState.status === "retired" ? "Retired Tour" : "Tour Unavailable"}
-          </div>
-          <h1 className="mt-4 text-2xl font-black tracking-tight text-slate-900">
-            {tour?.title || "Excursion Not Available for Online Booking"}
-          </h1>
-          <p className="mt-2 text-sm leading-relaxed text-slate-600">
-            {tourState.reason ||
-              "This excursion is no longer available for online booking. We do not redirect retired excursions to unrelated products."}
-          </p>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/tours"
-              className="inline-flex rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-bold text-white hover:bg-slate-800"
-            >
-              Browse active Alaska tours
-            </Link>
-            <Link
-              href="/"
-              className="inline-flex rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-800 hover:bg-slate-50"
-            >
-              Back to homepage
-            </Link>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  const isNorthStar405050 =
-    company === "northstartrekking" && (item === "405050" || String(item) === "405050");
+  const isNorthStar405050 = company === "northstartrekking" && (item === "405050" || String(item) === "405050");
 
   const requestedDate = sp.date && /^\d{4}-\d{2}-\d{2}$/.test(sp.date) ? sp.date : "";
-  let month = sp.month && /^\d{4}-\d{2}$/.test(sp.month) ? sp.month : "";
-
-  let upstreamError: string | null = null;
-  const nextAvailabilityStartAt = await getFareHarborNextAvailability(company, item).catch(
-    (err: unknown) => {
-      upstreamError = err instanceof Error ? err.message : "Unable to reach live schedule service.";
-      return null;
-    },
-  );
+  let month = sp.month ?? "";
+  const nextAvailabilityStartAt = await getFareHarborNextAvailability(company, item);
   const nextAvailabilityMonth =
     typeof nextAvailabilityStartAt === "string" && nextAvailabilityStartAt.length >= 7
       ? nextAvailabilityStartAt.slice(0, 7)
@@ -163,12 +112,7 @@ export default async function Page({
   const nextMonth = shiftMonth(month, 1);
   const monthLabel = formatMonthLabel(month);
 
-  const availabilities = await getFareHarborAvailabilities(company, item, start, end).catch(
-    (err: unknown) => {
-      upstreamError = err instanceof Error ? err.message : "Unable to load live departure dates.";
-      return [];
-    },
-  );
+  const availabilities = await getFareHarborAvailabilities(company, item, start, end);
   const days: Array<{ day: string; slots: unknown[] }> = groupByDay(availabilities);
   const byDay = new Map(days.map((d) => [d.day, d.slots]));
   const hasAnyAvailabilityThisMonth = days.some((d) => Array.isArray(d.slots) && d.slots.length > 0);
@@ -185,13 +129,7 @@ export default async function Page({
   Object.entries(sp).forEach(([key, value]) => {
     if (value && key !== "month") carriedContext.set(key, value);
   });
-  const placement = sanitizePlacementLabel(sp.widgetPlacement || sp.widget_placement || sp.placement);
-  if (placement) {
-    carriedContext.set("widgetPlacement", placement);
-  }
-  if (!carriedContext.get("productSlug")) {
-    carriedContext.set("productSlug", tour?.slug || canonicalProductKey);
-  }
+  if (!carriedContext.get("productSlug")) carriedContext.set("productSlug", canonicalProductKey);
 
   const monthHref = (targetMonth: string) => {
     const query = new URLSearchParams(carriedContext);
@@ -204,10 +142,6 @@ export default async function Page({
     query.set("date", day);
     return `/tours/${company}/${item}/calendar/${day}?${query.toString()}`;
   };
-
-  const detailHref = carriedContext.toString()
-    ? `/tours/${company}/${item}?${carriedContext.toString()}`
-    : `/tours/${company}/${item}`;
 
   const telemetryPayload = {
     event: "calendar_start" as const,
@@ -229,49 +163,21 @@ export default async function Page({
       <StageTelemetry payload={telemetryPayload} enabled={Boolean(getParam((sp as any).from) === "plan" || getParam(sp.requestedLane))} />
     <main className="min-h-screen bg-[linear-gradient(180deg,#f5f7fb_0%,#eef6f6_45%,#f8fafc_100%)]">
       <div className="mx-auto max-w-5xl px-4 py-10">
-        <div className="flex flex-wrap items-center gap-3">
-          <Link
-            href={detailHref}
-            className="inline-flex rounded-xl border border-sky-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-white"
-          >
-            &larr; Tour details
-          </Link>
-          <Link
-            href="/tours"
-            className="inline-flex rounded-xl border border-slate-200 bg-white/80 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-white"
-          >
-            All Alaska tours
-          </Link>
-        </div>
+        <Link
+          href="/"
+          className="inline-flex rounded-xl border border-sky-200 bg-white/90 px-4 py-2 text-sm font-semibold text-slate-900 shadow-sm hover:bg-white"
+        >
+          Back to homepage
+        </Link>
 
         <div className="mt-6 rounded-[2rem] border border-sky-100 bg-[linear-gradient(135deg,#ffffff_0%,#ecfeff_55%,#eff6ff_100%)] p-6 shadow-sm">
-          <div className="flex flex-wrap items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-700">
-            <span>{tour ? getPortDisplayName(tour.port) : "Alaska Port"}</span>
-            <span>·</span>
-            <span>{getOperatorDisplayName(company)}</span>
-            {sp.source === "widget" || placement ? (
-              <span
-                data-testid="calendar-attribution-badge"
-                className="rounded-full bg-sky-100 px-2.5 py-0.5 text-[10px] font-bold tracking-wider text-sky-900"
-              >
-                Direct Reseller Booking{placement ? ` · ${placement}` : ""}
-              </span>
-            ) : null}
+          <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-sky-600">
+            Live FareHarbor Availability
           </div>
-          <h1 className="mt-2 text-2xl font-black tracking-tight text-slate-900 sm:text-3xl">
-            {tour?.title ? `${tour.title} — Choose a Date` : "Choose a date"}
-          </h1>
+          <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-900">Choose a date</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Select an available departure date below to view live departure times, verify rates, and complete checkout with Welcome to Alaska Tours.
+            Select a day with availability to see departure times and add the tour to the cart.
           </p>
-          {upstreamError ? (
-            <div
-              role="alert"
-              className="mt-4 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-xs text-rose-900"
-            >
-              <strong>Live schedule connection notice:</strong> {upstreamError}. You can try another month or refresh in a moment.
-            </div>
-          ) : null}
           {isNorthStar405050 ? (
             <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-950 space-y-3">
               <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-xs text-amber-800">

@@ -5,8 +5,8 @@ import { emitDccSatelliteEvent } from "@/lib/dccSatellite";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-export async function POST(req?: Request) {
-  const auth = await requireAdmin(req);
+export async function POST() {
+  const auth = await requireAdmin();
   if (!auth.ok) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });
   }

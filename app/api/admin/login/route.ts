@@ -29,7 +29,10 @@ export async function POST(req: NextRequest) {
   const rawPassword = typeof body?.password === "string" ? body.password : "";
   const trimmedPassword = rawPassword.trim();
 
-  if (!trimmedPassword || (!passwordsMatch(rawPassword, expected) && !passwordsMatch(trimmedPassword, expected))) {
+  if (
+    !trimmedPassword ||
+    (!passwordsMatch(rawPassword, expected) && !passwordsMatch(trimmedPassword, expected))
+  ) {
     return NextResponse.json(
       { success: false, error: "Invalid password" },
       { status: 401 },
@@ -40,3 +43,4 @@ export async function POST(req: NextRequest) {
   setAdminCookie(res);
   return res;
 }
+

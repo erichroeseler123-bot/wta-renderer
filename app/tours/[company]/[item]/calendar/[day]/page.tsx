@@ -1,5 +1,7 @@
-import { getFareHarborAvailabilities } from "@/lib/fareharborAvailability";
-import { getWidgetTourState } from "@/lib/helicopterTours";
+import {
+  getFareHarborAvailabilities,
+} from "@/lib/fareharborAvailability";
+import { getHelicopterTour } from "@/lib/helicopterTours";
 import DayBookingClient, { type Slot } from "./DayBookingClient";
 import type { Metadata } from "next";
 
@@ -36,17 +38,10 @@ export default async function Page({
   params: Promise<{ company: string; item: string; day: string }>;
 }) {
   const { company, item, day } = await params;
-  let upstreamError: string | null = null;
-
-  const [availabilities, tourState] = await Promise.all([
-    getFareHarborAvailabilities(company, item, day, day).catch((err: unknown) => {
-      upstreamError = err instanceof Error ? err.message : "Unable to load departure times.";
-      return [];
-    }),
-    getWidgetTourState(company, item),
+  const [availabilities, tour] = await Promise.all([
+    getFareHarborAvailabilities(company, item, day, day),
+    getHelicopterTour(company, item),
   ]);
-
-  const tour = tourState.tour;
   const initialSlots = normalizeSlotsForDay(availabilities, day);
 
   let durationMinutes: number | null = null;
@@ -63,8 +58,6 @@ export default async function Page({
       company={company}
       item={item}
       day={day}
-      tourTitle={tour?.title}
-      upstreamError={upstreamError}
       initialSlots={initialSlots}
       tourDurationMinutes={durationMinutes}
     />

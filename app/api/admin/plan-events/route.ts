@@ -2,23 +2,16 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAdmin } from "../_lib/auth";
 import { listRecentPlanEvents } from "@/lib/planTelemetry";
 
-import crypto from "crypto";
-import { isPlaceholderAdminSecret } from "@/lib/admin";
+const ADMIN_SECRET = String(process.env.WTA_ADMIN_SECRET || "").trim();
 
 function canUseSecretAuth(req: NextRequest) {
-  const adminSecret = String(process.env.WTA_ADMIN_SECRET || "").trim();
-  if (!adminSecret || adminSecret.length < 40 || isPlaceholderAdminSecret(adminSecret)) {
-    return false;
-  }
-  const provided = String(new URL(req.url).searchParams.get("secret") || "").trim();
-  if (!provided) return false;
-  const a = crypto.createHash("sha256").update(provided).digest();
-  const b = crypto.createHash("sha256").update(adminSecret).digest();
-  return crypto.timingSafeEqual(a, b);
+  if (!ADMIN_SECRET || ADMIN_SECRET.length < 40) return false;
+  const provided = new URL(req.url).searchParams.get("secret");
+  return Boolean(provided && provided === ADMIN_SECRET);
 }
 
 export async function GET(req: NextRequest) {
-  const admin = await requireAdmin(req);
+  const admin = await requireAdmin();
   const secretOk = canUseSecretAuth(req);
   if (!admin.ok && !secretOk) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 401 });

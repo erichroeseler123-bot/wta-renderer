@@ -51,7 +51,7 @@
     "image": "https://cdn.filestackcontent.com/hjXfJpHQs6m1Oa3HdJrg",
     "company": "beyondak",
     "fromPrice": "$989 Per Person (Flat Rate)",
-    "rateSummary": "989 • 4945",
+    "rateSummary": "989 • 4995 • 5445",
     "category": "Adventures"
   },
   {
@@ -62,7 +62,7 @@
     "image": "https://cdn.filestackcontent.com/1LvXaHH5RQmIzTnR2s7e",
     "company": "beyondak",
     "fromPrice": "$989 Per Person (Flat Rate)",
-    "rateSummary": "989 • 4945",
+    "rateSummary": "989 • 4945 • 4995",
     "category": "Adventures"
   },
   {
@@ -454,11 +454,11 @@
     "pk": 435981,
     "title": "Alaska Fishing Combo",
     "slug": "alaska-fishing-combo",
-    "description": "Ages 2+ • 5 or 6 Hours • No experience necessary! • Includes Cod, Rockfish & Salmon Fishing",
+    "description": "Ages 2+ • 5 or 6 Hours • No experience necessary! • Includes Halibut, Cod, Rockfish & Salmon Fishing",
     "image": "https://cdn.filestackcontent.com/nwOHBGMT76RegORiI78V",
     "company": "exclusivealaska",
-    "fromPrice": "$359 Per Person (Flat Rate)",
-    "rateSummary": "359 • 389 • 429",
+    "fromPrice": "$419 Per Person (Flat Rate)",
+    "rateSummary": "419 • 439",
     "category": "Fishing"
   },
   {
@@ -468,19 +468,19 @@
     "description": "Ages 2+ • 5 or 6 Hours • No experience necessary!",
     "image": "https://cdn.filestackcontent.com/JSRhAkxgTdqxgQX1eJmw",
     "company": "exclusivealaska",
-    "fromPrice": "$359 Per Person (Flat Rate)",
-    "rateSummary": "359 • 379",
+    "fromPrice": "$389 Per Person (Flat Rate)",
+    "rateSummary": "389",
     "category": "Adventures"
   },
   {
     "pk": 436106,
-    "title": "Salmon Fishing",
-    "slug": "salmon-fishing",
-    "description": "Ages 2+ • 5 or 6 Hours • No experience necessary!",
+    "title": "Salmon Fishing Charter",
+    "slug": "salmon-fishing-charter",
+    "description": "Ages 2+ • 5 Hours • No experience necessary!",
     "image": "https://cdn.filestackcontent.com/8nwX1jaCRHWUa1ou3MpP",
     "company": "exclusivealaska",
-    "fromPrice": "$379 Per Person (Flat Rate)",
-    "rateSummary": "379 • 389",
+    "fromPrice": "$1,700 Per Person (Flat Rate)",
+    "rateSummary": "1700",
     "category": "Fishing"
   },
   {
@@ -491,7 +491,7 @@
     "image": "https://cdn.filestackcontent.com/iD6MqfCHSkewF6AWw3QX",
     "company": "exclusivealaska",
     "fromPrice": "$100 Per Person (Flat Rate)",
-    "rateSummary": "100 • 389 • 409 +2 more",
+    "rateSummary": "100 • 419 • 439 +1 more",
     "category": "Fishing"
   },
   {
@@ -512,8 +512,8 @@
     "description": "Starting at $1,700 • Ages 2+ • 5, 6, and 8 Hour Charter Options",
     "image": "https://cdn.filestackcontent.com/Xa5OOW6LRsaiPDHrKU2f",
     "company": "exclusivealaska",
-    "fromPrice": "$1,700 Private Charter (Flat Rate)",
-    "rateSummary": "1700 • 1800 • 2100",
+    "fromPrice": "$1,800 Private Charter (Flat Rate)",
+    "rateSummary": "1800 • 1900 • 2100",
     "category": "Adventures"
   },
   {
@@ -523,52 +523,52 @@
     "description": "Starting at $1,900 • Ages 2+ • 5, 6, or 8 Hour Charter • Includes Wilderness Dining Experience!",
     "image": "https://cdn.filestackcontent.com/X5PlPGtZRK6tVgWfbA3J",
     "company": "exclusivealaska",
-    "fromPrice": "$2,100 Private Charter (Flat Rate)",
-    "rateSummary": "2100 • 2200 • 2500",
+    "fromPrice": "$2,200 Private Charter (Flat Rate)",
+    "rateSummary": "2200 • 2300 • 2500",
     "category": "Adventures"
   },
   {
     "pk": 413056,
     "title": "Icefield Excursion",
     "slug": "icefield-excursion",
-    "description": "2.5 Hours • All Ages",
-    "image": "https://cdn.filestackcontent.com/NPg1gKoCQu6ewj2mnmsQ",
+    "description": "2 Hours, 35 minutes • All Ages",
+    "image": "https://cdn.filestackcontent.com/rnNa9XKXSPK10KjMi6pU",
     "company": "coastalhelicopters",
-    "fromPrice": "$429 Per Person (Flat Rate)",
-    "rateSummary": "429 • 456 • 579 +3 more",
+    "fromPrice": "$456 Per Person (Flat Rate)",
+    "rateSummary": "456 • 459 • 606 +3 more",
     "category": "Adventures"
   },
   {
     "pk": 673459,
     "title": "Private Icefield Excursion",
     "slug": "private-icefield-excursion",
-    "description": "2.5 Hours • All Ages",
+    "description": "2 Hours, 35 minutes • All Ages",
     "image": "https://cdn.filestackcontent.com/68F1Nx8Seu44ZyTG3Ejl",
     "company": "coastalhelicopters",
-    "fromPrice": "$2,512 Private Charter (Flat Rate)",
-    "rateSummary": "2512",
+    "fromPrice": "$3,365 Private Charter (Flat Rate)",
+    "rateSummary": "3365",
     "category": "Adventures"
   },
   {
     "pk": 413073,
     "title": "Dog Sled Tour",
     "slug": "dog-sled-tour",
-    "description": "3 Hours • All Ages",
+    "description": "3 Hours, 15 minutes • All Ages",
     "image": "https://cdn.filestackcontent.com/MY7gLjORnauQs7dB2dOm",
     "company": "coastalhelicopters",
-    "fromPrice": "$709 Per Person (Flat Rate)",
-    "rateSummary": "709 • 756 • 859 +3 more",
+    "fromPrice": "$756 Per Person (Flat Rate)",
+    "rateSummary": "756 • 769 • 906 +3 more",
     "category": "Dog Sledding"
   },
   {
     "pk": 413093,
     "title": "Dog Sled Tour with Glacier Landing",
     "slug": "dog-sled-tour-with-glacier-landing",
-    "description": "3.5 Hours • All Ages",
+    "description": "3 Hours, 55 minutes • All Ages",
     "image": "https://cdn.filestackcontent.com/qpue1ZqTp62Bj5LGdhC0",
     "company": "coastalhelicopters",
-    "fromPrice": "$839 Per Person (Flat Rate)",
-    "rateSummary": "839 • 895 • 989 +3 more",
+    "fromPrice": "$895 Per Person (Flat Rate)",
+    "rateSummary": "895 • 899 • 1045 +3 more",
     "category": "Dog Sledding"
   },
   {

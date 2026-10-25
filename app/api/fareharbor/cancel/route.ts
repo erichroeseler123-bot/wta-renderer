@@ -13,7 +13,7 @@ import {
   type OrderSnapshot,
   type OrderStatus,
 } from "@/lib/orders";
-import { isAdminCookieValue, isAdminReq } from "@/lib/admin";
+import { isAdminCookieValue } from "@/lib/admin";
 import {
   evaluateOrderCancellationPolicy,
   type CancellationReason,
@@ -29,7 +29,6 @@ async function checkAdminAuth(req: NextRequest): Promise<boolean> {
   const internalSecret = String(process.env.WTA_INTERNAL_SECRET || "").trim();
 
   // 1. Admin cookie
-  if (isAdminReq(req)) return true;
   try {
     const jar = await cookies();
     const raw = jar.get("wta_admin")?.value || "";

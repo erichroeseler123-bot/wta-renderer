@@ -49,9 +49,6 @@ export type OrderLine = {
   budgetTier?: string;
 };
 
-import { sanitizePlacementLabel } from "@/lib/tourWidget";
-import { sanitizeEmbedDomain } from "@/lib/widgetContext";
-
 export type OrderAttribution = {
   handoffSource?: string;
   handoffId?: string;
@@ -68,7 +65,6 @@ export type OrderAttribution = {
   embedDomain?: string;
   embedPath?: string;
   widgetPlacement?: string;
-  widgetPlacements?: string[];
   widgetId?: string;
   partySize?: number;
   adults?: number;
@@ -78,116 +74,6 @@ export type OrderAttribution = {
   timeOfDay?: string;
   budgetTier?: string;
 };
-
-type AttributionLineInput = {
-  handoffSource?: string;
-  handoffId?: string;
-  sourceSlug?: string;
-  sourcePage?: string;
-  topicSlug?: string;
-  authorityTopic?: string;
-  referrerPath?: string;
-  portSlug?: string;
-  productSlug?: string;
-  category?: string;
-  handoffCategory?: string;
-  handoffDate?: string;
-  dccReturnUrl?: string;
-  embedDomain?: string;
-  embedPath?: string;
-  widgetPlacement?: string;
-  widgetId?: string;
-  partySize?: number;
-  adults?: number;
-  children?: number;
-  cruiseShip?: string;
-  cruiseShipSlug?: string;
-  timeOfDay?: string;
-  budgetTier?: string;
-};
-
-function pickFirstLineString(lines: AttributionLineInput[], key: keyof AttributionLineInput) {
-  for (const line of lines) {
-    const v = line[key];
-    if (typeof v === "string" && v.trim()) return v.trim();
-  }
-  return undefined;
-}
-
-function pickFirstLineNumber(lines: AttributionLineInput[], key: keyof AttributionLineInput) {
-  for (const line of lines) {
-    const n = Number(line[key]);
-    if (Number.isFinite(n) && n > 0) return Math.floor(n);
-  }
-  return undefined;
-}
-
-/**
- * Summarizes order-level attribution across one or more cart/order lines while preserving
- * all distinct widget placements and host domains when a cart contains multiple tours.
- */
-export function buildOrderAttributionFromLines(lines: AttributionLineInput[]): OrderAttribution {
-  const uniquePlacements = Array.from(
-    new Set(
-      lines
-        .map((line) => sanitizePlacementLabel(line.widgetPlacement))
-        .filter((val): val is string => Boolean(val)),
-    ),
-  );
-
-  const uniqueDomains = Array.from(
-    new Set(
-      lines
-        .map((line) => sanitizeEmbedDomain(line.embedDomain))
-        .filter((val): val is string => Boolean(val)),
-    ),
-  );
-
-  const uniqueWidgetIds = Array.from(
-    new Set(
-      lines
-        .map((line) =>
-          typeof line.widgetId === "string" && line.widgetId.trim()
-            ? line.widgetId.trim().slice(0, 80)
-            : undefined,
-        )
-        .filter((val): val is string => Boolean(val)),
-    ),
-  );
-
-  const handoffSource =
-    pickFirstLineString(lines, "handoffSource") ||
-    (uniquePlacements.length > 0 || uniqueWidgetIds.length > 0 ? "widget" : undefined);
-
-  return {
-    handoffSource,
-    handoffId: pickFirstLineString(lines, "handoffId"),
-    sourceSlug: pickFirstLineString(lines, "sourceSlug"),
-    sourcePage: pickFirstLineString(lines, "sourcePage"),
-    topicSlug: pickFirstLineString(lines, "topicSlug"),
-    authorityTopic: pickFirstLineString(lines, "authorityTopic"),
-    referrerPath: pickFirstLineString(lines, "referrerPath"),
-    portSlug: pickFirstLineString(lines, "portSlug"),
-    productSlug: pickFirstLineString(lines, "productSlug"),
-    category:
-      pickFirstLineString(lines, "handoffCategory") || pickFirstLineString(lines, "category"),
-    date: pickFirstLineString(lines, "handoffDate"),
-    dccReturnUrl: pickFirstLineString(lines, "dccReturnUrl"),
-    embedDomain: uniqueDomains.length ? uniqueDomains.join(", ") : undefined,
-    embedPath:
-      handoffSource === "dcc" ? pickFirstLineString(lines, "embedPath") : undefined,
-    widgetPlacement: uniquePlacements.length ? uniquePlacements.join(", ") : undefined,
-    widgetPlacements: uniquePlacements.length ? uniquePlacements : undefined,
-    widgetId: uniqueWidgetIds.length ? uniqueWidgetIds.join(", ") : undefined,
-    partySize: pickFirstLineNumber(lines, "partySize"),
-    adults: pickFirstLineNumber(lines, "adults"),
-    children: pickFirstLineNumber(lines, "children"),
-    cruiseShip: pickFirstLineString(lines, "cruiseShip"),
-    cruiseShipSlug: pickFirstLineString(lines, "cruiseShipSlug"),
-    timeOfDay: pickFirstLineString(lines, "timeOfDay"),
-    budgetTier: pickFirstLineString(lines, "budgetTier"),
-  };
-}
 
 export type OrderSnapshot = {
   order_id: string;
@@ -354,10 +240,9 @@ export async function releaseOrderLock(orderId: string) {
 }
 
 import crypto from "crypto";
-import { getConfiguredOrderSigningSecret } from "@/lib/admin";
 
 export function makeOrderCancelToken(orderId: string, email?: string): string {
-  const secret = getConfiguredOrderSigningSecret() || "";
+  const secret = process.env.ORDER_SIGNING_SECRET || "";
   const randomSalt = crypto.randomBytes(16).toString("hex");
   if (secret) {
     const sig = crypto.createHmac("sha256", secret).update(`${orderId}:${(email || "").toLowerCase().trim()}:${randomSalt}`).digest("hex");
@@ -371,7 +256,7 @@ export function verifyOrderCancelToken(order: OrderSnapshot, providedToken: stri
   const token = providedToken.trim();
   if (order.cancel_token && order.cancel_token === token) return true;
 
-  const secret = getConfiguredOrderSigningSecret() || "";
+  const secret = process.env.ORDER_SIGNING_SECRET || "";
   if (secret && token.includes(".")) {
     const [salt, sig] = token.split(".");
     if (salt && sig) {

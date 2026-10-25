@@ -22,20 +22,13 @@ export function getConfiguredAdminPassword(): string | null {
   return raw;
 }
 
-export function getConfiguredOrderSigningSecret(): string | null {
-  const raw = String(process.env.ORDER_SIGNING_SECRET || "").trim();
-  if (!raw || isPlaceholderAdminSecret(raw)) {
-    return null;
-  }
-  return raw;
-}
-
 export function getAdminSigningSecret(): string | null {
   const adminPassword = getConfiguredAdminPassword();
-  const orderSecret = getConfiguredOrderSigningSecret();
-  if (!adminPassword || !orderSecret) {
+  if (!adminPassword) {
     return null;
   }
+  const orderSecretRaw = String(process.env.ORDER_SIGNING_SECRET || "").trim();
+  const orderSecret = isPlaceholderAdminSecret(orderSecretRaw) ? "" : orderSecretRaw;
 
   return crypto
     .createHmac("sha256", "wta-admin-cookie-signing-key-v1")
@@ -50,9 +43,7 @@ function hmacWithSecret(secret: string, payload: string): string {
 export function makeAdminCookieValue(issuedAtMs: number = Date.now()): string {
   const secret = getAdminSigningSecret();
   if (!secret) {
-    throw new Error(
-      "Admin authentication is not configured (missing ADMIN_PASSWORD or ORDER_SIGNING_SECRET).",
-    );
+    throw new Error("Admin authentication is not configured.");
   }
   const ts = Math.floor(Number(issuedAtMs));
   if (!Number.isSafeInteger(ts) || ts <= 0) {
@@ -110,3 +101,4 @@ export function setAdminCookie(res: NextResponse) {
 export function clearAdminCookie(res: NextResponse) {
   res.cookies.set(ADMIN_COOKIE, "", { path: "/", maxAge: 0 });
 }
+

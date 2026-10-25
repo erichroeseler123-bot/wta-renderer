@@ -18,8 +18,8 @@ function writeLocalFlags(next: { bookingsEnabled?: number }) {
   fs.writeFileSync(FLAGS_PATH, JSON.stringify(next, null, 2));
 }
 
-export async function GET(req?: Request) {
-  const a = await requireAdmin(req);
+export async function GET() {
+  const a = await requireAdmin();
   if (!a.ok) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 });
   }
@@ -39,7 +39,7 @@ export async function GET(req?: Request) {
 }
 
 export async function POST(req: Request) {
-  const a = await requireAdmin(req);
+  const a = await requireAdmin();
   if (!a.ok) {
     return NextResponse.json({ success: false, error: "Unauthorized" }, { status: 403 });
   }
