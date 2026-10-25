@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
 const BASE_CSP =
-  "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://m.stripe.network https://challenges.cloudflare.com https://vercel.live https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; font-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://r.stripe.com https://m.stripe.network https://q.stripe.com https://challenges.cloudflare.com https://vercel.live https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com https://vercel.live; worker-src 'self' blob:";
+  "default-src 'self'; base-uri 'self'; object-src 'none'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://m.stripe.network https://challenges.cloudflare.com https://vercel.live https://www.googletagmanager.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https: http:; font-src 'self' data: https:; connect-src 'self' https://api.stripe.com https://r.stripe.com https://m.stripe.network https://q.stripe.com https://challenges.cloudflare.com https://vercel.live https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com; frame-src 'self' https://www.welcometoalaskatours.com https://welcometoalaskatours.com https://wta-ui.vercel.app https://wta-renderer.vercel.app https://js.stripe.com https://hooks.stripe.com https://challenges.cloudflare.com https://vercel.live; worker-src 'self' blob:";
 
 const nextConfig: NextConfig = {
   images: {
