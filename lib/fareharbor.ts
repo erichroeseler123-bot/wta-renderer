@@ -1,5 +1,3 @@
-import { getKV } from "@/lib/kv";
-
 function requiredEnv(name: string) {
   const v = String(process.env[name] || "").trim();
   if (!v) throw new Error(`Missing ${name}`);
@@ -293,20 +291,38 @@ export async function createFareHarborBooking(input: FareHarborBookingInput) {
   return result;
 }
 
-export async function validateAndStoreAuthorizedFareHarborBooking(
+export type FareHarborBookingValidationResult = {
+  is_bookable: boolean;
+  verificationStatus: "checkout referral verified in preview";
+  company: string;
+  availabilityPk: number;
+  customerTypeRatePk: number;
+  qty: number;
+  voucher_number: string;
+  note: string;
+  handoffId: string | null;
+  orderId: string | null;
+  receipt_subtotal: number;
+  receipt_taxes: number;
+  receipt_total: number;
+  invoice_price: number;
+  validated_via: string;
+  validated_at: string;
+  live_bookings_enabled: boolean;
+};
+
+export async function validateFareHarborBooking(
   input: FareHarborBookingInput,
-): Promise<{ booking: FareHarborExternalBookingRecord }> {
+): Promise<{
+  validation: FareHarborBookingValidationResult;
+  booking: null;
+}> {
   const { appKey, userKey } = getFareHarborCredentials();
   const {
     company,
     availabilityPk,
     customerTypeRatePk,
     qty,
-    name,
-    email,
-    phone,
-    normalizedCustomers,
-    bookingFields,
     fhPayload,
   } = buildFareHarborExternalBookingPayload(input);
 
@@ -343,143 +359,62 @@ export async function validateAndStoreAuthorizedFareHarborBooking(
     throw err;
   }
 
-  const pk = input.preservePk || Math.floor(200000000 + Math.random() * 700000000);
-  const safeHandoff = (input.handoffId || "nohand").replace(/[^a-zA-Z0-9_-]/g, "");
-  const safeOrder = (input.orderId || "ord").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 24);
-  const uuid = input.preserveUuid || `fhv1-${pk}--${safeHandoff}--${safeOrder}`;
-  const displayId = `#${pk}`;
   const subtotal = Number(validation.receipt_subtotal ?? input.amountPaid ?? 0);
   const taxes = Number(validation.receipt_taxes ?? 0);
   const total = Number(validation.receipt_total ?? subtotal + taxes);
   const invoicePrice = Number(validation.invoice_price ?? Math.round(subtotal * 0.8));
-  const unitPrice = qty > 0 ? Math.round(subtotal / qty) : subtotal;
-  const itemPk = Number(input.itemPk || 413056);
-  const itemName =
-    input.itemName ||
-    (itemPk === 413056 ? "Icefield Excursion" : `Tour ${itemPk}`);
-  const startAt = input.startAt || "2027-07-15T07:40:00-0800";
-  const endAt = input.endAt || "2027-07-15T10:15:24-0800";
 
-  const bookingRecord: FareHarborExternalBookingRecord = {
-    pk,
-    uuid,
-    display_id: displayId,
-    status: "booked",
-    rebooked_to: null,
-    rebooked_from: null,
-    external_id: input.orderId || "",
-    voucher_number: String(fhPayload.voucher_number),
-    note: String(fhPayload.note),
-    confirmation_url: `https://fareharbor.com/embeds/book/${company}/items/${itemPk}/booking/${uuid}/`,
-    dashboard_url: `https://fareharbor.com/${company}/dashboard/bookings/${pk}/`,
-    is_eligible_for_cancellation: true,
-    arrival: null,
-    company: {
-      name:
-        company.toLowerCase() === "coastalhelicopters"
-          ? "Coastal Helicopters"
-          : company,
-      shortname: company,
-      currency: "usd",
-    },
-    affiliate_company: {
-      name: "Welcome to Alaska Tours",
-      shortname: "welcometoalaskatours",
-      currency: "usd",
-      ...(input.handoffId ? { asn_parameter: input.handoffId } : {}),
-    },
-    contact: {
-      name,
-      phone,
-      email,
-      normalized_phone: phone.replace(/[^0-9+]/g, ""),
-      language: "en-us",
-    },
-    availability: {
-      pk: availabilityPk,
-      start_at: startAt,
-      end_at: endAt,
-      capacity: 12,
-      item: {
-        pk: itemPk,
-        name: itemName,
-      },
-    },
-    customers: normalizedCustomers.map((c, idx) => ({
-      pk: pk * 10 + idx + 1,
-      checkin_url: null,
-      checkin_status: null,
-      customer_type_rate: {
-        pk: customerTypeRatePk,
-        total: unitPrice,
-        capacity: 12,
-        customer_prototype: {
-          pk: 2259156,
-          display_name: "Standard Passenger",
-          total: unitPrice,
-        },
-        customer_type: {
-          pk: 645950,
-          note: "Up to 250 lbs with gear",
-          singular: "Standard Passenger",
-          plural: "Standard Passengers",
-        },
-      },
-      custom_field_values: (c.custom_field_values || []).map((cf, cfIdx) => ({
-        pk: pk * 100 + idx * 10 + cfIdx + 1,
-        custom_field: cf.custom_field,
-        value: cf.value,
-        display_value: String(cf.value),
-      })),
-    })),
-    custom_field_values: bookingFields.map((bf, bfIdx) => ({
-      pk: pk * 100 + 90 + bfIdx + 1,
-      custom_field: bf.custom_field,
-      value: bf.value,
-      display_value: String(bf.value),
-    })),
-    order: null,
-    effective_cancellation_policy: {
-      type: "hours-before-start",
-      cutoff: 24,
-    },
-    receipt_subtotal: subtotal,
-    receipt_taxes: taxes,
-    receipt_total: total,
-    amount_paid: total,
-    invoice_price: invoicePrice,
+  return {
     validation: {
-      validated_via: validateUrl,
       is_bookable: true,
+      verificationStatus: "checkout referral verified in preview",
+      company,
+      availabilityPk,
+      customerTypeRatePk,
+      qty,
+      voucher_number: String(fhPayload.voucher_number),
+      note: String(fhPayload.note),
+      handoffId: input.handoffId || null,
+      orderId: input.orderId || null,
+      receipt_subtotal: subtotal,
+      receipt_taxes: taxes,
+      receipt_total: total,
+      invoice_price: invoicePrice,
+      validated_via: validateUrl,
       validated_at: new Date().toISOString(),
       live_bookings_enabled: String(process.env.FH_BOOKINGS_ENABLED || "0") === "1",
     },
+    booking: null,
   };
-
-  const kv = await getKV();
-  if (kv) {
-    await kv.set(`fh_booking:${uuid}`, bookingRecord, { ex: 60 * 60 * 24 * 30 });
-  }
-
-  return { booking: bookingRecord };
 }
 
 export async function getAuthorizedFareHarborBooking(params: {
   company: string;
   bookingUuid: string;
+  environment?: "live" | "demo";
 }): Promise<{
-  source: "fareharbor_external_api" | "fareharbor_validated_kv";
+  source: "fareharbor_external_api" | "fareharbor_demo_external_api";
   booking: FareHarborExternalBookingRecord | Record<string, unknown>;
 }> {
   const { appKey, userKey } = getFareHarborCredentials();
   const company = String(params.company || "").trim();
   const bookingUuid = String(params.bookingUuid || "").trim();
+  const isDemo = params.environment === "demo";
 
   if (!company || !bookingUuid) {
     throw new Error("Missing company or bookingUuid.");
   }
 
-  const fhUrl = `https://fareharbor.com/api/external/v1/companies/${encodeURIComponent(company)}/bookings/${encodeURIComponent(bookingUuid)}/`;
+  if (bookingUuid.toLowerCase().startsWith("fhv1-")) {
+    const err = new Error(
+      `Simulated booking reference ${bookingUuid} is forbidden in confirmed-sale reporting.`,
+    );
+    (err as Error & { status?: number }).status = 422;
+    throw err;
+  }
+
+  const fhHost = isDemo ? "https://demo.fareharbor.com" : "https://fareharbor.com";
+  const fhUrl = `${fhHost}/api/external/v1/companies/${encodeURIComponent(company)}/bookings/${encodeURIComponent(bookingUuid)}/`;
   const response = await fetch(fhUrl, {
     method: "GET",
     headers: {
@@ -496,67 +431,16 @@ export async function getAuthorizedFareHarborBooking(params: {
       | null;
     if (data?.booking) {
       return {
-        source: "fareharbor_external_api",
+        source: isDemo ? "fareharbor_demo_external_api" : "fareharbor_external_api",
         booking: data.booking,
       };
     }
   }
 
-  const kv = await getKV();
-  if (kv) {
-    const stored = await kv.get<FareHarborExternalBookingRecord>(
-      `fh_booking:${bookingUuid}`,
-    );
-    if (stored && typeof stored === "object") {
-      return {
-        source: "fareharbor_validated_kv",
-        booking: stored,
-      };
-    }
-  }
-
-  if (bookingUuid.startsWith("fhv1-")) {
-    const parts = bookingUuid.slice("fhv1-".length).split("--");
-    const parsedPk = Number(parts[0] || 0) || 250000001;
-    const parsedHandoff =
-      parts[1] && parts[1] !== "nohand" ? parts[1] : undefined;
-    const parsedOrder = parts[2] || "ord_wta";
-
-    const reconstructed = await validateAndStoreAuthorizedFareHarborBooking({
-      company,
-      itemPk: 413056,
-      itemName: "Icefield Excursion",
-      startAt: "2027-07-15T07:40:00-0800",
-      endAt: "2027-07-15T10:15:24-0800",
-      availabilityPk: -29637421,
-      customerTypeRatePk: 9260635433,
-      qty: 2,
-      contact: {
-        name: "Alaska Cruise Guest",
-        email: "alaska.guest@example.com",
-        phone: "+1-907-555-0142",
-      },
-      voucherNumber: parsedHandoff
-        ? `WTA-${parsedHandoff}-${parsedOrder.slice(0, 16)}`.slice(0, 64)
-        : `WTA-${parsedOrder}`.slice(0, 64),
-      note: `WTA order ${parsedOrder}${parsedHandoff ? ` / DCC ${parsedHandoff}` : ""}`,
-      amountPaid: 91800,
-      orderId: parsedOrder,
-      handoffId: parsedHandoff,
-      preserveUuid: bookingUuid,
-      preservePk: parsedPk,
-    });
-
-    return {
-      source: "fareharbor_validated_kv",
-      booking: reconstructed.booking,
-    };
-  }
-
   const err = new Error(
-    `FareHarbor booking ${bookingUuid} not found for company ${company}.`,
+    `FareHarbor booking ${bookingUuid} not found on ${fhHost} for company ${company} (HTTP ${response.status}).`,
   );
-  (err as Error & { status?: number }).status = 404;
+  (err as Error & { status?: number }).status = response.status === 404 ? 404 : response.status || 404;
   throw err;
 }
 

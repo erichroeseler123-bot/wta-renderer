@@ -85,7 +85,26 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const result = await getAuthorizedFareHarborBooking({ company, bookingUuid });
+    if (bookingUuid.toLowerCase().startsWith("fhv1-")) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: {
+            code: "SIMULATED_BOOKING_RECORD_REJECTED",
+            message: `Simulated booking reference "${bookingUuid}" is forbidden in confirmed-sale reporting.`,
+          },
+        },
+        { status: 422 },
+      );
+    }
+
+    const environment =
+      searchParams.get("environment") === "demo" ? ("demo" as const) : ("live" as const);
+    const result = await getAuthorizedFareHarborBooking({
+      company,
+      bookingUuid,
+      environment,
+    });
     const bookingObj = result.booking as Record<string, unknown>;
     const extractedDccHandoffId = extractDccHandoffIdFromFareHarborRecord(bookingObj);
 
@@ -109,7 +128,12 @@ export async function GET(req: NextRequest) {
       {
         ok: false,
         error: {
-          code: status === 404 ? "BOOKING_NOT_FOUND" : "FAREHARBOR_LOOKUP_FAILED",
+          code:
+            status === 422
+              ? "SIMULATED_BOOKING_RECORD_REJECTED"
+              : status === 404
+                ? "BOOKING_NOT_FOUND"
+                : "FAREHARBOR_LOOKUP_FAILED",
           message: error instanceof Error ? error.message : String(error),
         },
       },
@@ -129,7 +153,7 @@ export async function POST(req: NextRequest) {
           error: {
             code: "PREVIEW_ONLY_ENDPOINT",
             message:
-              "Direct order-to-FareHarbor validated booking execution is restricted to non-production while WTA terms are unsigned.",
+              "Direct order-to-FareHarbor preview validation execution is restricted to non-production while WTA terms are unsigned.",
           },
         },
         { status: 403 },
@@ -189,35 +213,49 @@ export async function POST(req: NextRequest) {
         `pi_validated_${orderId}`,
     ).trim();
 
+    const liveBookingsEnabled = String(process.env.FH_BOOKINGS_ENABLED || "0") === "1";
     const runResult = await runFareHarborBookingsForOrder(order, paymentIntentId, {
       useValidatedBookingWhenDisabled: true,
     });
 
     const updatedOrder = {
       ...order,
-      status: runResult.allOk ? ("booked" as const) : ("booking_failed" as const),
+      status: liveBookingsEnabled && runResult.allOk ? ("booked" as const) : order.status,
       fareharbor: {
         results: runResult.results,
-        bookedAt: runResult.allOk ? new Date().toISOString() : undefined,
+        bookedAt:
+          liveBookingsEnabled && runResult.allOk ? new Date().toISOString() : undefined,
         lastError: runResult.allOk ? undefined : "One or more bookings failed",
       },
     };
     await saveOrder(updatedOrder);
 
     const firstBookingResult = runResult.results[0] as
-      | { rawBooking?: Record<string, unknown>; booking?: Record<string, unknown> }
+      | {
+          rawBooking?: Record<string, unknown> | null;
+          booking?: Record<string, unknown> | null;
+          validation?: Record<string, unknown> | null;
+        }
       | undefined;
-    const bookingRecord = firstBookingResult?.rawBooking || firstBookingResult?.booking || null;
+    const bookingRecord =
+      firstBookingResult?.rawBooking || firstBookingResult?.booking || null;
 
     return NextResponse.json(
       {
         ok: runResult.allOk,
+        verificationStatus: bookingRecord
+          ? "live_fareharbor_booking_created"
+          : "checkout referral verified in preview",
+        confirmedSaleReported: Boolean(bookingRecord),
         orderId: order.order_id,
         paymentIntentId,
         handoffId: order.attribution?.handoffId ?? null,
         attribution: order.attribution ?? null,
+        validation: firstBookingResult?.validation ?? null,
         booking: bookingRecord,
-        extractedDccHandoffId: extractDccHandoffIdFromFareHarborRecord(bookingRecord),
+        extractedDccHandoffId: bookingRecord
+          ? extractDccHandoffIdFromFareHarborRecord(bookingRecord)
+          : (order.attribution?.handoffId ?? null),
         results: runResult.results,
       },
       { status: runResult.allOk ? 200 : 409 },

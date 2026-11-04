@@ -1,6 +1,6 @@
 import {
   createFareHarborBooking,
-  validateAndStoreAuthorizedFareHarborBooking,
+  validateFareHarborBooking,
 } from "@/lib/fareharbor";
 import type { OrderSnapshot } from "@/lib/orders";
 
@@ -50,10 +50,21 @@ export async function runFareHarborBookingsForOrder(
         handoffId: dccHandoffId || undefined,
       };
 
-      const booking =
-        !liveBookingsEnabled && options?.useValidatedBookingWhenDisabled
-          ? await validateAndStoreAuthorizedFareHarborBooking(bookingInput)
-          : await createFareHarborBooking(bookingInput);
+      if (!liveBookingsEnabled && options?.useValidatedBookingWhenDisabled) {
+        const validated = await validateFareHarborBooking(bookingInput);
+        results.push({
+          ok: true,
+          verificationStatus: "checkout referral verified in preview",
+          confirmedSaleReported: false,
+          line,
+          validation: validated.validation,
+          booking: null,
+          rawBooking: null,
+        });
+        continue;
+      }
+
+      const booking = await createFareHarborBooking(bookingInput);
 
       const maybeBooking =
         typeof booking === "object" && booking !== null
