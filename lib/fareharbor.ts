@@ -319,12 +319,7 @@ export async function validateAndStoreAuthorizedFareHarborBooking(
       "X-FareHarbor-API-User": userKey,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({
-      customers: fhPayload.customers,
-      ...(fhPayload.custom_field_values
-        ? { custom_field_values: fhPayload.custom_field_values }
-        : {}),
-    }),
+    body: JSON.stringify(fhPayload),
   });
 
   const validation = (await response.json().catch(() => null)) as

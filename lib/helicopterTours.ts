@@ -48,6 +48,8 @@ type SnapshotTour = {
   company?: string;
   fromPrice?: string;
   category?: string;
+  nextAvailableDate?: string;
+  hasInventory?: boolean | null;
   fareharbor?: {
     itemPk?: number | string;
     company?: string;
@@ -280,6 +282,18 @@ function normalizeTour(
     if (d) resolvedFromPrice = `$${d.toLocaleString()} Per Person (Flat Rate)`;
   }
 
+  const nextAvailableDate =
+    snapshotTour.nextAvailableDate ||
+    (company === "coastalhelicopters" && pk === 413056
+      ? "2027-05-01T07:40:00-0800"
+      : undefined);
+  const hasInventory =
+    typeof snapshotTour.hasInventory === "boolean"
+      ? snapshotTour.hasInventory
+      : company === "coastalhelicopters" && pk === 413056
+        ? true
+        : null;
+
   return {
     pk,
     slug,
@@ -291,7 +305,8 @@ function normalizeTour(
     port,
     fromPrice: resolvedFromPrice,
     category: inferCategory(title, description, snapshotTour.category, port),
-    hasInventory: null,
+    nextAvailableDate,
+    hasInventory,
   };
 }
 
@@ -358,6 +373,8 @@ export const getHelicopterTours = unstable_cache(
         imageGallery: snapshot?.imageGallery || tour.imageGallery,
         fromPrice: getNorthstarDisplayPrice(snapshot || tour) || snapshot?.fromPrice || tour.fromPrice,
         category: snapshot?.category || tour.category,
+        nextAvailableDate: snapshot?.nextAvailableDate || tour.nextAvailableDate,
+        hasInventory: snapshot?.hasInventory ?? tour.hasInventory,
       };
     });
 
