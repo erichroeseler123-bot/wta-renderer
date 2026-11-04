@@ -92,6 +92,14 @@ type CartAPI = {
     },
   ) => void;
 
+  setHandoffAttribution: (
+    id: string,
+    patch: {
+      handoffId: string;
+      handoffSource?: string;
+    },
+  ) => void;
+
   clear: () => void;
 };
 
@@ -242,6 +250,20 @@ export default function CartProvider({ children }: { children: React.ReactNode }
             // If it becomes a "real selection", its id should be selection-unique.
             const nextId = makeId(next);
             return { ...next, id: nextId };
+          }),
+        }));
+      },
+
+      setHandoffAttribution: (id, patch) => {
+        setState((s) => ({
+          ...s,
+          items: s.items.map((x) => {
+            if (x.id !== id) return x;
+            return {
+              ...x,
+              handoffId: patch.handoffId || x.handoffId,
+              handoffSource: patch.handoffSource || x.handoffSource || "dcc",
+            };
           }),
         }));
       },

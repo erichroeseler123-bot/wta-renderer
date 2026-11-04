@@ -58,7 +58,7 @@ export default function DayBookingClient({
   tourDurationMinutes: number | null;
 }) {
   const sp = useSearchParams();
-  const { addItem, open } = useCart();
+  const { addItem, setHandoffAttribution, open } = useCart();
   const [slots] = useState<Slot[]>(initialSlots);
   const [selected, setSelected] = useState<Slot | null>(null);
   const [ratePk, setRatePk] = useState<number | null>(null);
@@ -100,6 +100,8 @@ export default function DayBookingClient({
     const chosenRate = rates.find((r) => Number(r.ratePk) === Number(ratePk));
     const safeQty = Math.max(1, Math.min(99, Math.floor(Number(qty) || 1)));
     const unitCents = Number(chosenRate?.price || 0) || undefined;
+    const itemId = [company, Number(item), Number(selected.pk), Number(ratePk)].join(":");
+    const existingHandoffId = widgetContext.handoffId;
 
     addItem(
       {
@@ -113,17 +115,17 @@ export default function DayBookingClient({
         ratePk: Number(ratePk),
         rateLabel: chosenRate?.name ? String(chosenRate.name) : undefined,
         price: unitCents,
-        handoffSource: sp.get("source") || sp.get("handoffSource") || undefined,
-        handoffId: widgetContext.handoffId,
+        handoffSource: sp.get("source") || sp.get("handoffSource") || (existingHandoffId ? "dcc" : undefined),
+        handoffId: existingHandoffId,
         sourceSlug: widgetContext.sourceSlug,
-        sourcePage: sp.get("sourcePage") || widgetContext.sourcePage || undefined,
+        sourcePage: sp.get("sourcePage") || widgetContext.sourcePage || `/tours/${company}/${item}/calendar/${day}`,
         topicSlug: widgetContext.topicSlug,
         authorityTopic: sp.get("authority_topic") || sp.get("topic") || undefined,
-        referrerPath: sp.get("referrer_path") || sp.get("referrerPath") || undefined,
+        referrerPath: sp.get("referrer_path") || sp.get("referrerPath") || `/tours/${company}/${item}`,
         handoffCategory: sp.get("category") || undefined,
         handoffDate: widgetContext.eventDate || sp.get("date") || day || undefined,
         dccReturnUrl: widgetContext.dccReturnUrl,
-        partySize: Number(sp.get("partySize") || 0) || undefined,
+        partySize: Number(sp.get("partySize") || 0) || safeQty,
         adults: Number(sp.get("adults") || 0) || undefined,
         children: Number(sp.get("children") || 0) || undefined,
         cruiseShip: sp.get("cruiseShip") || undefined,
@@ -142,6 +144,35 @@ export default function DayBookingClient({
       },
       safeQty,
     );
+
+    if (!existingHandoffId) {
+      void fetch("/api/affiliate/dcc-referral", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sourcePagePath: `/tours/${company}/${item}/calendar/${day}`,
+          fareharborShortname: company,
+          fareharborItemId: String(item),
+          intendedDate: day,
+          partySize: safeQty,
+          quotedPriceAmount: unitCents ? (unitCents * safeQty) / 100 : undefined,
+        }),
+      })
+        .then((res) => res.json().catch(() => null))
+        .then((data) => {
+          const mintedHandoffId =
+            typeof data?.dccResponse?.referral?.handoffId === "string"
+              ? data.dccResponse.referral.handoffId.trim()
+              : "";
+          if (mintedHandoffId) {
+            setHandoffAttribution(itemId, {
+              handoffId: mintedHandoffId,
+              handoffSource: "dcc",
+            });
+          }
+        })
+        .catch(() => null);
+    }
 
     trackDepartureSelect({
       company,

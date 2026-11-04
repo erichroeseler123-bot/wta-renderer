@@ -176,12 +176,28 @@ export async function getFareHarborNextAvailability(
   const end = new Date();
   end.setDate(end.getDate() + 90);
 
-  const availabilities = await getFareHarborAvailabilities(
+  let availabilities = await getFareHarborAvailabilities(
     company,
     item,
     ymdUTC(start),
     ymdUTC(end),
   );
+
+  if (!Array.isArray(availabilities) || availabilities.length === 0) {
+    const currentMonth = start.getUTCMonth() + 1;
+    const nextSeasonYear =
+      currentMonth >= 9 ? start.getUTCFullYear() + 1 : start.getUTCFullYear();
+    const mayStart = `${nextSeasonYear}-05-01`;
+    const mayEnd = `${nextSeasonYear}-05-31`;
+    if (mayEnd > ymdUTC(end)) {
+      availabilities = await getFareHarborAvailabilities(
+        company,
+        item,
+        mayStart,
+        mayEnd,
+      );
+    }
+  }
 
   let best: string | null = null;
   for (const availability of availabilities) {
@@ -199,3 +215,4 @@ export async function getFareHarborNextAvailability(
 
   return best;
 }
+

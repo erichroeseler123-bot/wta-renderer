@@ -10,6 +10,7 @@ import {
   type OrderSnapshot,
 } from "@/lib/orders";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
+import { createWtaTaggedReferralOnDcc } from "@/lib/dccAffiliateReferral";
 import {
   clientIpFromHeaders,
   enforceRateLimit,
@@ -162,12 +163,21 @@ export async function POST(req: NextRequest) {
         return jsonError("Bad cart line (missing company/itemPk/availabilityPk/ratePk).", 400, { it });
       }
 
+      const lineDate =
+        (typeof it.handoffDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(it.handoffDate.trim())
+          ? it.handoffDate.trim()
+          : "") ||
+        (typeof it.startAt === "string" && /^\d{4}-\d{2}-\d{2}/.test(it.startAt.trim())
+          ? it.startAt.trim().slice(0, 10)
+          : "");
+
       const qs = new URLSearchParams({
         company,
         item_pk: String(itemPk),
         availability_pk: String(availabilityPk),
         customer_type_rate_pk: String(ratePk),
         qty: String(qty),
+        ...(lineDate ? { date: lineDate } : {}),
       });
 
       const priceUrl = new URL(`/api/fareharbor/price?${qs.toString()}`, baseUrl).toString();
@@ -206,7 +216,7 @@ export async function POST(req: NextRequest) {
         portSlug: typeof it.portSlug === "string" ? it.portSlug : undefined,
         productSlug: typeof it.productSlug === "string" ? it.productSlug : undefined,
         category: typeof it.handoffCategory === "string" ? it.handoffCategory : undefined,
-        handoffDate: typeof it.handoffDate === "string" ? it.handoffDate : undefined,
+        handoffDate: typeof it.handoffDate === "string" ? it.handoffDate : lineDate || undefined,
         dccReturnUrl: typeof it.dccReturnUrl === "string" ? it.dccReturnUrl : undefined,
         embedDomain: typeof it.embedDomain === "string" ? it.embedDomain : undefined,
         embedPath: typeof it.embedPath === "string" ? it.embedPath : undefined,
@@ -238,13 +248,15 @@ export async function POST(req: NextRequest) {
       portSlug: pickFirstString(lines, "portSlug"),
       productSlug: pickFirstString(lines, "productSlug"),
       category: pickFirstString(lines, "handoffCategory"),
-      date: pickFirstString(lines, "handoffDate"),
+      date:
+        pickFirstString(lines, "handoffDate") ||
+        (typeof computed[0]?.startAt === "string" ? computed[0].startAt.slice(0, 10) : undefined),
       dccReturnUrl: pickFirstString(lines, "dccReturnUrl"),
       embedDomain: pickFirstString(lines, "embedDomain"),
       embedPath: pickFirstString(lines, "embedPath"),
       widgetPlacement: pickFirstString(lines, "widgetPlacement"),
       widgetId: pickFirstString(lines, "widgetId"),
-      partySize: pickFirstNumber(lines, "partySize"),
+      partySize: pickFirstNumber(lines, "partySize") || computed.reduce((sum, line) => sum + line.qty, 0),
       adults: pickFirstNumber(lines, "adults"),
       children: pickFirstNumber(lines, "children"),
       cruiseShip: pickFirstString(lines, "cruiseShip"),
@@ -252,6 +264,49 @@ export async function POST(req: NextRequest) {
       timeOfDay: pickFirstString(lines, "timeOfDay"),
       budgetTier: pickFirstString(lines, "budgetTier"),
     };
+
+    const firstComputed = computed[0];
+    if (!attribution.handoffId && firstComputed) {
+      const referralResult = await createWtaTaggedReferralOnDcc({
+        sourcePagePath:
+          attribution.sourcePage ||
+          attribution.referrerPath ||
+          `/tours/${firstComputed.company}/${firstComputed.itemPk}`,
+        fareharborShortname: firstComputed.company,
+        fareharborItemId: String(firstComputed.itemPk),
+        intendedDate:
+          attribution.date ||
+          (typeof firstComputed.startAt === "string"
+            ? firstComputed.startAt.slice(0, 10)
+            : undefined),
+        partySize:
+          attribution.partySize ||
+          computed.reduce((sum, line) => sum + line.qty, 0),
+        quotedPriceAmount: totalCents / 100,
+        dccBaseUrlOverride:
+          typeof body?.dccBaseUrl === "string" ? body.dccBaseUrl : undefined,
+      }).catch(() => null);
+
+      const mintedHandoffId =
+        referralResult &&
+        referralResult.ok &&
+        typeof (referralResult.dccResponse as { referral?: { handoffId?: unknown } })?.referral
+          ?.handoffId === "string"
+          ? String(
+              (referralResult.dccResponse as { referral: { handoffId: string } }).referral
+                .handoffId,
+            ).trim()
+          : "";
+
+      if (mintedHandoffId) {
+        attribution.handoffId = mintedHandoffId;
+        attribution.handoffSource = attribution.handoffSource || "dcc";
+        for (const line of computed) {
+          if (!line.handoffId) line.handoffId = mintedHandoffId;
+          if (!line.handoffSource) line.handoffSource = "dcc";
+        }
+      }
+    }
 
     const draft: OrderSnapshot = {
       order_id,
@@ -361,6 +416,8 @@ export async function POST(req: NextRequest) {
       cart_id,
       client_secret: pi.client_secret,
       payment_intent_id: pi.id,
+      handoff_id: attribution.handoffId ?? null,
+      handoff_source: attribution.handoffSource ?? null,
       totalCents,
       currency: "usd",
       kvEnabled: true,

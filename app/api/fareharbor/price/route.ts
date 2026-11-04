@@ -41,6 +41,15 @@ export async function GET(req: Request) {
     const availabilityPk = Number(url.searchParams.get("availability_pk") || 0);
     const customerTypeRatePk = Number(url.searchParams.get("customer_type_rate_pk") || 0);
     const qty = Math.max(1, Math.floor(Number(url.searchParams.get("qty") || 1)));
+    const rawDate = (
+      url.searchParams.get("date") ||
+      url.searchParams.get("day") ||
+      url.searchParams.get("start_at") ||
+      ""
+    )
+      .trim()
+      .slice(0, 10);
+    const requestedDate = /^\d{4}-\d{2}-\d{2}$/.test(rawDate) ? rawDate : "";
 
     if (!company || !item) {
       return NextResponse.json({ success: false, error: "Missing company or item" }, { status: 400 });
@@ -54,8 +63,8 @@ export async function GET(req: Request) {
     const qs = new URLSearchParams({
       company,
       item,
-      start: fmt(start),
-      end: fmt(end),
+      start: requestedDate || fmt(start),
+      end: requestedDate || fmt(end),
     });
 
     const res = await fetch(`${url.origin}/api/fareharbor/availabilities?${qs.toString()}`, {
@@ -68,7 +77,7 @@ export async function GET(req: Request) {
     }
 
     const exactCents =
-      availabilityPk > 0 && customerTypeRatePk > 0
+      availabilityPk !== 0 && !Number.isNaN(availabilityPk) && customerTypeRatePk > 0
         ? pickExactRateCents(json, availabilityPk, customerTypeRatePk)
         : null;
 
@@ -96,3 +105,4 @@ export async function GET(req: Request) {
     return NextResponse.json({ success: false, error: err?.message || "Unknown error" }, { status: 500 });
   }
 }
+
