@@ -76,9 +76,5 @@ export async function getKV(): Promise<KVClient | null> {
     return mod.Redis.fromEnv() as unknown as KVClient;
   }
 
-  if (process.env.NODE_ENV !== "production") {
-    return localKV;
-  }
-
-  return null;
+  return localKV;
 }

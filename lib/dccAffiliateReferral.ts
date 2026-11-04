@@ -149,6 +149,14 @@ export async function createWtaTaggedReferralOnDcc(
     string,
     unknown
   >;
+  const handoffObj =
+    (payload.handoff as Record<string, unknown> | undefined) ||
+    (payload.referral as Record<string, unknown> | undefined) ||
+    null;
+  const handoffId =
+    typeof handoffObj?.handoffId === "string" ? handoffObj.handoffId : null;
+  const clickId =
+    typeof handoffObj?.clickId === "string" ? handoffObj.clickId : null;
 
   return {
     ok: response.ok && Boolean(payload.ok),
@@ -158,6 +166,11 @@ export async function createWtaTaggedReferralOnDcc(
     environment: config.environment,
     credentialTier: config.credentialTier,
     dccBaseUrl: config.dccBaseUrl,
-    dccResponse: payload,
+    handoffId,
+    clickId,
+    dccResponse: {
+      ...payload,
+      referral: handoffObj,
+    },
   };
 }

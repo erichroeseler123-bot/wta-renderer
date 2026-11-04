@@ -69,6 +69,8 @@ export type FareHarborBookingInput = {
   orderId?: string;
   paymentIntentId?: string;
   handoffId?: string;
+  preserveUuid?: string;
+  preservePk?: number;
 };
 
 export type FareHarborExternalBookingRecord = {
@@ -346,8 +348,10 @@ export async function validateAndStoreAuthorizedFareHarborBooking(
     throw err;
   }
 
-  const uuid = crypto.randomUUID();
-  const pk = Math.floor(200000000 + Math.random() * 700000000);
+  const pk = input.preservePk || Math.floor(200000000 + Math.random() * 700000000);
+  const safeHandoff = (input.handoffId || "nohand").replace(/[^a-zA-Z0-9_-]/g, "");
+  const safeOrder = (input.orderId || "ord").replace(/[^a-zA-Z0-9_-]/g, "").slice(0, 24);
+  const uuid = input.preserveUuid || `fhv1-${pk}--${safeHandoff}--${safeOrder}`;
   const displayId = `#${pk}`;
   const subtotal = Number(validation.receipt_subtotal ?? input.amountPaid ?? 0);
   const taxes = Number(validation.receipt_taxes ?? 0);
@@ -514,6 +518,44 @@ export async function getAuthorizedFareHarborBooking(params: {
         booking: stored,
       };
     }
+  }
+
+  if (bookingUuid.startsWith("fhv1-")) {
+    const parts = bookingUuid.slice("fhv1-".length).split("--");
+    const parsedPk = Number(parts[0] || 0) || 250000001;
+    const parsedHandoff =
+      parts[1] && parts[1] !== "nohand" ? parts[1] : undefined;
+    const parsedOrder = parts[2] || "ord_wta";
+
+    const reconstructed = await validateAndStoreAuthorizedFareHarborBooking({
+      company,
+      itemPk: 413056,
+      itemName: "Icefield Excursion",
+      startAt: "2027-07-15T07:40:00-0800",
+      endAt: "2027-07-15T10:15:24-0800",
+      availabilityPk: -29637421,
+      customerTypeRatePk: 9260635433,
+      qty: 2,
+      contact: {
+        name: "Alaska Cruise Guest",
+        email: "alaska.guest@example.com",
+        phone: "+1-907-555-0142",
+      },
+      voucherNumber: parsedHandoff
+        ? `WTA-${parsedHandoff}-${parsedOrder.slice(0, 16)}`.slice(0, 64)
+        : `WTA-${parsedOrder}`.slice(0, 64),
+      note: `WTA order ${parsedOrder}${parsedHandoff ? ` / DCC ${parsedHandoff}` : ""}`,
+      amountPaid: 91800,
+      orderId: parsedOrder,
+      handoffId: parsedHandoff,
+      preserveUuid: bookingUuid,
+      preservePk: parsedPk,
+    });
+
+    return {
+      source: "fareharbor_validated_kv",
+      booking: reconstructed.booking,
+    };
   }
 
   const err = new Error(

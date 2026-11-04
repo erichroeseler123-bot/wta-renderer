@@ -64,10 +64,14 @@ function jsonError(message: string, status = 400, extra?: Record<string, unknown
 }
 
 function getBaseUrl(req: NextRequest) {
+  const vercelEnv = (process.env.VERCEL_ENV || "").trim();
   const siteUrl = process.env.SITE_URL;
-  if (siteUrl) return siteUrl.replace(/\/+$/, "");
+  if (siteUrl && vercelEnv === "production") return siteUrl.replace(/\/+$/, "");
 
-  const origin = req.headers.get("origin") || req.headers.get("x-forwarded-host");
+  const origin =
+    req.headers.get("origin") ||
+    req.headers.get("x-forwarded-host") ||
+    req.nextUrl?.host;
   const proto = req.headers.get("x-forwarded-proto") || "https";
 
   if (origin) {
@@ -75,6 +79,7 @@ function getBaseUrl(req: NextRequest) {
     return `${proto}://${origin}`.replace(/\/+$/, "");
   }
 
+  if (siteUrl) return siteUrl.replace(/\/+$/, "");
   return "http://localhost:3000";
 }
 
@@ -288,14 +293,8 @@ export async function POST(req: NextRequest) {
       }).catch(() => null);
 
       const mintedHandoffId =
-        referralResult &&
-        referralResult.ok &&
-        typeof (referralResult.dccResponse as { referral?: { handoffId?: unknown } })?.referral
-          ?.handoffId === "string"
-          ? String(
-              (referralResult.dccResponse as { referral: { handoffId: string } }).referral
-                .handoffId,
-            ).trim()
+        typeof referralResult?.handoffId === "string"
+          ? referralResult.handoffId.trim()
           : "";
 
       if (mintedHandoffId) {
@@ -410,6 +409,8 @@ export async function POST(req: NextRequest) {
 
     await saveOrder(withPI);
 
+    const isPreviewOrDev = (process.env.VERCEL_ENV || "") !== "production";
+
     return NextResponse.json({
       success: true,
       order_id,
@@ -421,6 +422,7 @@ export async function POST(req: NextRequest) {
       totalCents,
       currency: "usd",
       kvEnabled: true,
+      ...(isPreviewOrDev ? { order_snapshot: withPI } : {}),
       request_id: rid,
     });
   } catch (e: unknown) {

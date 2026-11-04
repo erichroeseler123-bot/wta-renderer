@@ -149,6 +149,8 @@ export async function POST(req: NextRequest) {
       order_id?: string;
       paymentIntentId?: string;
       payment_intent_id?: string;
+      orderSnapshot?: Parameters<typeof saveOrder>[0];
+      order_snapshot?: Parameters<typeof saveOrder>[0];
     };
 
     const orderId = String(body.orderId || body.order_id || "").trim();
@@ -162,7 +164,14 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const order = await getOrder(orderId);
+    let order = await getOrder(orderId);
+    if (!order && (body.orderSnapshot || body.order_snapshot)) {
+      const providedSnapshot = (body.orderSnapshot || body.order_snapshot)!;
+      if (providedSnapshot.order_id === orderId) {
+        await saveOrder(providedSnapshot);
+        order = providedSnapshot;
+      }
+    }
     if (!order) {
       return NextResponse.json(
         {

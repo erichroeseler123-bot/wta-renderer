@@ -160,10 +160,12 @@ export default function DayBookingClient({
       })
         .then((res) => res.json().catch(() => null))
         .then((data) => {
+          const rawId =
+            data?.handoffId ||
+            data?.dccResponse?.handoff?.handoffId ||
+            data?.dccResponse?.referral?.handoffId;
           const mintedHandoffId =
-            typeof data?.dccResponse?.referral?.handoffId === "string"
-              ? data.dccResponse.referral.handoffId.trim()
-              : "";
+            typeof rawId === "string" ? rawId.trim() : "";
           if (mintedHandoffId) {
             setHandoffAttribution(itemId, {
               handoffId: mintedHandoffId,
