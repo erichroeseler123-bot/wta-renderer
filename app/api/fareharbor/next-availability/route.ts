@@ -16,10 +16,10 @@ export async function GET(req: Request) {
 
     const startAt = await getFareHarborNextAvailability(company, itemPk);
     return NextResponse.json({ startAt }, { status: 200 });
-  } catch (e: any) {
+  } catch {
     return NextResponse.json(
-      { startAt: null, error: "next-availability failed", detail: String(e?.message || e) },
-      { status: 200 }
+      { startAt: null, error: "next-availability failed" },
+      { status: 200, headers: { "Cache-Control": "private, no-store" } }
     );
   }
 }

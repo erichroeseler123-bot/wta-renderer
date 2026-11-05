@@ -1,19 +1,17 @@
 import { NextResponse } from "next/server";
+import { getFareHarborCredentials } from "@/lib/fareharbor";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const BASE = "https://fareharbor.com/api/external/v1";
+const RESPONSE_HEADERS = { "Cache-Control": "private, no-store" };
 
 function splitCompanies(v: string) {
   return v
     .split(/[,\s]+/)
     .map((s) => s.trim())
     .filter(Boolean);
-}
-
-function safePreview(s: string, n = 800) {
-  return (s || "").slice(0, n);
 }
 
 function normalizeItems(data: any): any[] {
@@ -49,12 +47,7 @@ function normalizeItems(data: any): any[] {
 export async function GET(req: Request) {
   try {
     const url = new URL(req.url);
-    const wantDebug = url.searchParams.get("debug") === "1";
-
-    const APP = process.env.FAREHARBOR_APP_KEY ?? process.env.FH_APP_NAME ?? "";
-    const USER = process.env.FAREHARBOR_USER_KEY ?? process.env.FH_API_KEY ?? "";
-    if (!APP) throw new Error("Missing env var: FAREHARBOR_APP_KEY");
-    if (!USER) throw new Error("Missing env var: FAREHARBOR_USER_KEY");
+    const { appKey, userKey } = getFareHarborCredentials();
 
     const companyParam = (url.searchParams.get("company") || "").trim();
     const envCompanies = splitCompanies(
@@ -69,59 +62,45 @@ export async function GET(req: Request) {
       return NextResponse.json(
         {
           ok: false,
-          error:
-            "No companies configured. Set FAREHARBOR_COMPANY_SHORTNAME (or pass ?company=SHORTNAME).",
+          error: "No FareHarbor companies specified.",
         },
-        { status: 400 }
+        { status: 400, headers: RESPONSE_HEADERS }
       );
     }
 
     const results: any[] = [];
-    const errors: any[] = [];
-    const debug: any[] = [];
+    const errors: Array<{ company: string; status: number; error: string }> = [];
 
     for (const shortname of companies) {
-      const fhUrl = `${BASE}/companies/${encodeURIComponent(
-        shortname
-      )}/items/?api-user=${encodeURIComponent(USER)}`;
+      const fhUrl = `${BASE}/companies/${encodeURIComponent(shortname)}/items/`;
 
       const resp = await fetch(fhUrl, {
         headers: {
-          "X-FareHarbor-API-App": APP,
-          "X-FareHarbor-API-User": USER,
+          "X-FareHarbor-API-App": appKey,
+          "X-FareHarbor-API-User": userKey,
           Accept: "application/json",
           "User-Agent": "wta-ui/1.0 (+welcometoalaskatours.com)",
         },
         cache: "no-store",
       });
 
-      const text = await resp.text();
-      const ct = resp.headers.get("content-type") || "";
-
       if (!resp.ok) {
         errors.push({
           company: shortname,
           status: resp.status,
-          statusText: resp.statusText,
-          contentType: ct,
-          fhUrl,
-          bodyPreview: safePreview(text, 500),
+          error: "FareHarbor items request failed.",
         });
         continue;
       }
 
-      let data: any = null;
+      let data: unknown;
       try {
-        data = JSON.parse(text);
-      } catch (e: any) {
+        data = await resp.json();
+      } catch {
         errors.push({
           company: shortname,
           status: resp.status,
-          statusText: resp.statusText,
-          contentType: ct,
-          fhUrl,
-          error: "Upstream JSON parse failed",
-          bodyPreview: safePreview(text, 500),
+          error: "Invalid FareHarbor items response.",
         });
         continue;
       }
@@ -129,33 +108,30 @@ export async function GET(req: Request) {
       const items = normalizeItems(data);
 
       for (const it of items) results.push({ ...it, company: shortname });
-
-      if (wantDebug) {
-        debug.push({
-          company: shortname,
-          contentType: ct,
-          topKeys: data && typeof data === "object" && !Array.isArray(data) ? Object.keys(data).slice(0, 40) : null,
-          upstreamCount: (data?.count ?? data?.total ?? data?.meta?.total ?? null),
-          normalizedItemsLen: items.length,
-          sampleItemKeys: items[0] && typeof items[0] === "object" ? Object.keys(items[0]).slice(0, 40) : null,
-          bodyPreview: safePreview(text, 400),
-        });
-      }
     }
 
-    return NextResponse.json({
+    const body = JSON.stringify({
       ok: true,
       count: results.length,
       companies,
       items: results,
       errorsCount: errors.length,
       errors: errors.slice(0, 20),
-      debug: wantDebug ? debug : undefined,
     });
-  } catch (err: any) {
+    // Preserve the catalog shape while refusing any credential echoed by the upstream API.
+    if (body.includes(appKey) || body.includes(userKey)) {
+      return NextResponse.json(
+        { ok: false, error: "Invalid FareHarbor items response." },
+        { status: 502, headers: RESPONSE_HEADERS }
+      );
+    }
+    return new NextResponse(body, {
+      headers: { ...RESPONSE_HEADERS, "Content-Type": "application/json" },
+    });
+  } catch {
     return NextResponse.json(
-      { ok: false, error: err?.message || String(err) },
-      { status: 500 }
+      { ok: false, error: "FareHarbor items are temporarily unavailable." },
+      { status: 500, headers: RESPONSE_HEADERS }
     );
   }
 }

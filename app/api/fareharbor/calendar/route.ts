@@ -76,8 +76,6 @@ export async function GET(req: Request) {
         {
           ok: false,
           error: "Upstream availabilities failed",
-          upstream: j,
-          url: base.toString(),
         },
         200,
       );
@@ -96,9 +94,9 @@ export async function GET(req: Request) {
       totalSlots,
       count: avs.length,
     });
-  } catch (e: any) {
+  } catch {
     return okJson(
-      { ok: false, error: "Calendar route failed", detail: String(e?.message || e) },
+      { ok: false, error: "Calendar route failed" },
       200,
     );
   }

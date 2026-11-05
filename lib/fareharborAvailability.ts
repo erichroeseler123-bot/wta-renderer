@@ -70,8 +70,7 @@ async function fetchAvailabilityChunk(
   const fhUrl =
     `${BASE}/companies/${encodeURIComponent(company)}` +
     `/items/${encodeURIComponent(item)}` +
-    `/minimal/availabilities/date-range/${encodeURIComponent(start)}/${encodeURIComponent(end)}/` +
-    `?api-user=${encodeURIComponent(user)}`;
+    `/minimal/availabilities/date-range/${encodeURIComponent(start)}/${encodeURIComponent(end)}/`;
 
   const response = await fetch(fhUrl, {
     headers: {
@@ -83,15 +82,17 @@ async function fetchAvailabilityChunk(
     next: { revalidate: 300 },
   });
 
-  const text = await response.text();
   if (!response.ok) {
-    throw new Error(
-      `FareHarbor request failed ${response.status} ${response.statusText}: ${text.slice(0, 200)}`,
-    );
+    throw new Error(`FareHarbor availability request failed (${response.status})`);
   }
 
-  const data = JSON.parse(text);
-  return Array.isArray(data?.availabilities) ? data.availabilities : [];
+  const data = await response.json();
+  const availabilities = Array.isArray(data?.availabilities) ? data.availabilities : [];
+  const serialized = JSON.stringify(availabilities);
+  if (serialized.includes(app) || serialized.includes(user)) {
+    throw new Error("Invalid FareHarbor availability response");
+  }
+  return availabilities;
 }
 
 async function getFreshFareHarborAvailabilities(
@@ -131,7 +132,7 @@ const getCachedFareHarborAvailabilities = unstable_cache(
   async (company: string, item: string, start: string, end: string) => {
     return getFreshFareHarborAvailabilities(company, item, start, end);
   },
-  ["fareharbor-availabilities"],
+  ["fareharbor-availabilities-v2"],
   { revalidate: 300 },
 );
 
@@ -146,7 +147,7 @@ export async function getFareHarborAvailabilities(
     return getCachedFareHarborAvailabilities(company, item, start, end);
   }
 
-  const cacheKey = `fareharbor:availabilities:${company}:${item}:${start}:${end}`;
+  const cacheKey = `fareharbor:availabilities:v2:${company}:${item}:${start}:${end}`;
   try {
     const cached = await kv.get<any[]>(cacheKey);
     if (cached) {
