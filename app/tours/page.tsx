@@ -1,12 +1,18 @@
 import Link from "next/link";
 import FAQSection from "@/app/components/faq/FAQSection";
 import JsonLd from "@/components/seo/JsonLd";
-import { WidgetCatalog } from "@/components/widget/WidgetCatalog";
+import TourCatalogFilter from "@/app/tours/TourCatalogFilter";
 import { getHelicopterTours, type HelicopterTour } from "@/lib/helicopterTours";
 import { getFareHarborNextAvailability } from "@/lib/fareharborAvailability";
+import {
+  normalizeCategoryFilter,
+  normalizePortFilter,
+} from "@/lib/tourCatalogFilters";
 import { buildTourItemListSchema, sanitizeTours } from "@/lib/tourSeo";
 
 export const dynamic = "force-dynamic";
+
+type ToursPageSearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 async function enrichWithLiveInventory(tours: HelicopterTour[]) {
   const batchSize = 8;
@@ -56,7 +62,15 @@ async function enrichWithLiveInventory(tours: HelicopterTour[]) {
   });
 }
 
-export default async function ToursPage() {
+export default async function ToursPage({
+  searchParams,
+}: {
+  searchParams?: ToursPageSearchParams;
+} = {}) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const initialPort = normalizePortFilter(resolvedSearchParams.port);
+  const initialCategory = normalizeCategoryFilter(resolvedSearchParams.category);
+
   const catalogTours = sanitizeTours(await getHelicopterTours());
   const tours = await enrichWithLiveInventory(catalogTours);
   const itemListSchema = buildTourItemListSchema(tours);
@@ -72,9 +86,9 @@ export default async function ToursPage() {
   return (
     <>
       <JsonLd data={itemListSchema} />
-      <div className="mx-auto max-w-7xl px-4 pt-8 sm:px-6 space-y-6">
+      <div className="mx-auto max-w-7xl min-w-0 overflow-x-clip px-4 pt-8 sm:px-6 space-y-6">
         <div className="text-center space-y-2">
-          <div className="inline-flex rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-sky-400">
+          <div className="inline-flex max-w-full flex-wrap justify-center rounded-full border border-sky-500/30 bg-sky-500/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.2em] text-sky-400">
             Juneau • Skagway • Ketchikan
           </div>
           <h1 className="text-3xl font-black tracking-tight text-white sm:text-4xl leading-tight">
@@ -108,7 +122,7 @@ export default async function ToursPage() {
           ))}
         </div>
 
-        <div className="rounded-[2.5rem] border border-white/10 bg-white/[0.05] p-6">
+        <div className="rounded-[2.5rem] border border-white/10 bg-white/[0.05] p-5 sm:p-6">
           <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-xs font-black uppercase tracking-[0.16em] text-sky-400">
@@ -132,7 +146,12 @@ export default async function ToursPage() {
           </div>
         </div>
       </div>
-      <WidgetCatalog tours={tours} mode="tours" />
+      <TourCatalogFilter
+        tours={tours}
+        mode="tours"
+        initialPort={initialPort}
+        initialCategory={initialCategory}
+      />
       <FAQSection
         title="Alaska Shore Excursion Tour FAQs"
         faqs={[
