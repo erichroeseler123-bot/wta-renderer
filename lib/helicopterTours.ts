@@ -4,6 +4,7 @@ import { unstable_cache } from "next/cache";
 import { inferPortFromCompany } from "@/lib/handoff/mappings";
 import { getToursFromFareHarbor, type Tour as FareHarborTour } from "@/lib/data/tours";
 import { getFareHarborAvailabilities } from "@/lib/fareharborAvailability";
+import { readFareHarborJson } from "@/lib/fareharbor";
 import { cleanTourDescription } from "@/lib/tourSeo";
 
 export type HelicopterTour = {
@@ -182,7 +183,7 @@ async function loadLiveItemDetails(company: string, item: number): Promise<{ ima
       },
     );
     if (!res.ok) return { imageGallery: [] };
-    const data = await res.json();
+    const data = await readFareHarborJson(res, appKey, userKey);
     const itemData = data?.item || data;
     const imageGallery: string[] = Array.isArray(itemData?.images)
       ? itemData.images

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import Stripe from "stripe";
-import { getFareHarborCredentials } from "@/lib/fareharbor";
+import { getFareHarborCredentials, readFareHarborJson } from "@/lib/fareharbor";
 import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
 import {
   acquireOrderLock,
@@ -236,7 +236,7 @@ export async function POST(req: NextRequest) {
       );
 
       fhStatus = fhRes.status;
-      fhData = await fhRes.json().catch(() => null);
+      fhData = await readFareHarborJson(fhRes, appKey, userKey).catch(() => null);
 
       // Verify that FareHarbor cancellation explicitly succeeded
       fhOk = fhRes.ok && (!fhData || !fhData.error);

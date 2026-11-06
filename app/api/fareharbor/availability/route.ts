@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
-import { getFareHarborCredentials } from "@/lib/fareharbor";
+import { getFareHarborCredentials, readFareHarborJson } from "@/lib/fareharbor";
 
 const BASE = "https://demo.fareharbor.com/api/external/v1";
 const COMPANY = "bodyglove"; // demo company shortname
+const RESPONSE_HEADERS = { "Cache-Control": "private, no-store" };
 
 export async function GET(req: Request) {
-  const { appKey, userKey } = getFareHarborCredentials();
   const { searchParams } = new URL(req.url);
   const itemPk = searchParams.get("itemPk");
   const date =
@@ -15,13 +15,14 @@ export async function GET(req: Request) {
   if (!itemPk) {
     return NextResponse.json(
       { error: "Missing itemPk" },
-      { status: 400 }
+      { status: 400, headers: RESPONSE_HEADERS }
     );
   }
 
-  const url = `${BASE}/companies/${COMPANY}/items/${itemPk}/minimal/availabilities/date/${date}/`;
+  const url = `${BASE}/companies/${COMPANY}/items/${encodeURIComponent(itemPk)}/minimal/availabilities/date/${encodeURIComponent(date)}/`;
 
   try {
+    const { appKey, userKey } = getFareHarborCredentials();
     const res = await fetch(url, {
       headers: {
         Accept: "application/json",
@@ -29,15 +30,22 @@ export async function GET(req: Request) {
         "X-FareHarbor-API-User": userKey,
       },
       cache: "no-store",
+      redirect: "error",
     });
 
-    const data = await res.json();
-    return NextResponse.json(data, { status: res.status });
-  } catch (err) {
-    console.error(err);
+    if (!res.ok) {
+      return NextResponse.json(
+        { error: "Availability fetch failed" },
+        { status: res.status >= 400 ? res.status : 502, headers: RESPONSE_HEADERS },
+      );
+    }
+
+    const data = await readFareHarborJson(res, appKey, userKey);
+    return NextResponse.json(data, { status: res.status, headers: RESPONSE_HEADERS });
+  } catch {
     return NextResponse.json(
       { error: "Availability fetch failed" },
-      { status: 500 }
+      { status: 500, headers: RESPONSE_HEADERS },
     );
   }
 }

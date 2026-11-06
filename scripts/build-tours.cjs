@@ -118,7 +118,6 @@ async function fhFetchJson(url, APP_KEY, USER_KEY) {
   if (!res.ok) {
     const err = new Error(`FareHarbor ${res.status} ${url}`);
     err.status = res.status;
-    err.body = text.slice(0, 400);
     throw err;
   }
 
@@ -577,7 +576,12 @@ async function buildTours() {
     throw new Error("build-tours fetched 0 tours and no existing snapshot is available.");
   }
 
-  fs.writeFileSync(dataPath, JSON.stringify(allTours, null, 2));
+  const catalog = JSON.stringify(allTours, null, 2);
+  if (catalog.includes(APP_KEY) || catalog.includes(USER_KEY)) {
+    throw new Error("FareHarbor credentials detected in generated tour data.");
+  }
+
+  fs.writeFileSync(dataPath, catalog);
   fs.writeFileSync(
     widgetDataPath,
     JSON.stringify(allTours.filter((tour) => isWidgetEligibleTour(tour)), null, 2),

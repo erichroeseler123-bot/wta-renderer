@@ -1,4 +1,6 @@
-import { getFareHarborCredentials } from "@/lib/fareharbor";
+import { getFareHarborCredentials, readFareHarborJson } from "@/lib/fareharbor";
+
+const RESPONSE_HEADERS = { "Cache-Control": "private, no-store" };
 
 export async function POST(req: Request) {
   try {
@@ -6,9 +8,10 @@ export async function POST(req: Request) {
     const { bookingUuid, newAvailabilityPk } = await req.json();
 
     const res = await fetch(
-      `https://fareharbor.com/api/external/v1/bookings/${bookingUuid}/rebook/`,
+      `https://fareharbor.com/api/external/v1/bookings/${encodeURIComponent(bookingUuid)}/rebook/`,
       {
         method: "POST",
+        redirect: "error",
         headers: {
           "Content-Type": "application/json",
           "X-FareHarbor-API-App": appKey,
@@ -20,13 +23,19 @@ export async function POST(req: Request) {
       }
     );
 
-    const data = await res.json();
-    return Response.json(data, { status: res.status });
-  } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : String(err);
+    if (!res.ok) {
+      return Response.json(
+        { error: "Rebook failed" },
+        { status: res.status >= 400 ? res.status : 502, headers: RESPONSE_HEADERS },
+      );
+    }
+
+    const data = await readFareHarborJson(res, appKey, userKey);
+    return Response.json(data, { status: res.status, headers: RESPONSE_HEADERS });
+  } catch {
     return Response.json(
-      { error: message || "Rebook failed" },
-      { status: 500 }
+      { error: "Rebook failed" },
+      { status: 500, headers: RESPONSE_HEADERS },
     );
   }
 }

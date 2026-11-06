@@ -35,6 +35,18 @@ export function getFareHarborCredentials() {
   return { appKey, userKey };
 }
 
+export async function readFareHarborJson(response: Response, appKey: string, userKey: string) {
+  const data = await response.json();
+  const body = JSON.stringify(data);
+  const credentials = [appKey, userKey].filter(Boolean).sort((a, b) => b.length - a.length);
+  let safeBody = body;
+  for (const key of credentials) {
+    const escapedKey = JSON.stringify(key).slice(1, -1);
+    safeBody = safeBody.replaceAll(escapedKey, "[REDACTED]");
+  }
+  return safeBody === body ? data : JSON.parse(safeBody);
+}
+
 export type FareHarborCustomFieldValueInput = {
   custom_field: number;
   value: string | number | boolean;
@@ -278,7 +290,7 @@ export async function createFareHarborBooking(input: FareHarborBookingInput) {
     },
   );
 
-  const result = await response.json().catch(() => null);
+  const result = await readFareHarborJson(response, appKey, userKey).catch(() => null);
 
   if (!response.ok) {
     const msg = (result as { error?: string } | null)?.error || "FareHarbor booking failed";
@@ -338,7 +350,7 @@ export async function validateFareHarborBooking(
     body: JSON.stringify(fhPayload),
   });
 
-  const validation = (await response.json().catch(() => null)) as
+  const validation = (await readFareHarborJson(response, appKey, userKey).catch(() => null)) as
     | {
         is_bookable?: boolean;
         error?: string | null;
@@ -426,7 +438,7 @@ export async function getAuthorizedFareHarborBooking(params: {
   });
 
   if (response.ok) {
-    const data = (await response.json().catch(() => null)) as
+    const data = (await readFareHarborJson(response, appKey, userKey).catch(() => null)) as
       | { booking?: Record<string, unknown> }
       | null;
     if (data?.booking) {
