@@ -1,4 +1,4 @@
-import { getFareHarborCredentials } from "@/lib/fareharbor";
+import { getFareHarborCredentials, readFareHarborJson } from "@/lib/fareharbor";
 
 export type Tour = {
   pk: number;
@@ -128,7 +128,7 @@ export async function getToursFromFareHarbor(): Promise<Tour[]> {
         next: { revalidate: 86400 } 
       });
       if (!res.ok) return [];
-      const data = await res.json();
+      const data = await readFareHarborJson(res, appKey, userKey);
       return (data.items || []).map((item: any) => itemToTour(item, shortname));
     } catch (e) {
       return [];
