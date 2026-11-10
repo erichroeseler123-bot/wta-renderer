@@ -1,5 +1,7 @@
+import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { assertBookingsEnabled, BookingsDisabledError } from "@/lib/fareharbor";
 import { getKV } from "@/lib/kv";
 import {
   saveOrder,
@@ -108,6 +110,45 @@ export async function POST(req: NextRequest) {
   const rid = requestId();
   const ip = clientIpFromHeaders(req.headers);
   try {
+    try {
+      assertBookingsEnabled();
+    } catch (err: unknown) {
+      if (
+        err instanceof BookingsDisabledError ||
+        (err instanceof Error && err.message.includes("FH_BOOKINGS_ENABLED"))
+      ) {
+        logSecurityEvent("create_intent_blocked_bookings_disabled", { rid, ip });
+        return NextResponse.json(
+          {
+            success: false,
+            code: "BOOKINGS_DISABLED",
+            error:
+              "Online checkout is temporarily disabled while live tour fulfillment is offline. Your card has not been charged.",
+            request_id: rid,
+          },
+          { status: 503 },
+        );
+      }
+      throw err;
+    }
+
+    if (
+      (process.env.VERCEL || process.env.NODE_ENV === "production") &&
+      !process.env.KV_REST_API_URL?.trim() &&
+      !process.env.UPSTASH_REDIS_REST_URL?.trim()
+    ) {
+      logSecurityEvent("create_intent_blocked_storage_unavailable", { rid, ip });
+      return NextResponse.json(
+        {
+          success: false,
+          code: "ORDER_STORAGE_UNAVAILABLE",
+          error: "Durable checkout storage is not configured. Your card has not been charged.",
+          request_id: rid,
+        },
+        { status: 503 },
+      );
+    }
+
     const rl = await enforceRateLimit({
       key: `create-intent:${ip}`,
       limit: 12,
@@ -239,8 +280,34 @@ export async function POST(req: NextRequest) {
 
     if (!Number.isFinite(totalCents) || totalCents <= 0) return jsonError("Total is invalid.", 409);
 
-    const order_id = `ord_${crypto.randomUUID()}`;
-    const cart_id = `cart_${crypto.randomUUID()}`;
+    const canonicalLinesKey = computed
+      .map(
+        (l) =>
+          `${l.company}:${l.itemPk}:${l.availabilityPk}:${l.ratePk}:${l.qty}:${l.lineTotalCents}:${l.handoffDate || l.startAt || ""}`,
+      )
+      .join("|");
+    const clientAttemptSeed =
+      typeof body?.idempotencyKey === "string" && body.idempotencyKey.trim()
+        ? body.idempotencyKey.trim().slice(0, 128)
+        : String(Math.floor(Date.now() / (10 * 60 * 1000)));
+    const deterministicDigest = crypto
+      .createHash("sha256")
+      .update(
+        JSON.stringify({
+          email: email.toLowerCase(),
+          name,
+          phone,
+          totalCents,
+          currency: "usd",
+          lines: canonicalLinesKey,
+          handoffId: pickFirstString(lines, "handoffId") || "",
+          seed: clientAttemptSeed,
+        }),
+      )
+      .digest("hex");
+
+    const order_id = `ord_${deterministicDigest.slice(0, 32)}`;
+    const cart_id = `cart_${deterministicDigest.slice(32, 64)}`;
 
     const attribution: OrderAttribution = {
       handoffSource: pickFirstString(lines, "handoffSource"),
@@ -396,7 +463,10 @@ export async function POST(req: NextRequest) {
         },
       },
       {
-        idempotencyKey: `create-intent:${order_id}`,
+        idempotencyKey: crypto
+          .createHash("sha256")
+          .update(`wta-create-intent:${deterministicDigest}:${attribution.handoffId || ""}`)
+          .digest("hex"),
       },
     );
 

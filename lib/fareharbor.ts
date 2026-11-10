@@ -477,10 +477,19 @@ export function extractDccHandoffIdFromFareHarborRecord(
   return null;
 }
 
+export class BookingsDisabledError extends Error {
+  readonly code = "BOOKINGS_DISABLED";
+
+  constructor(message = "Bookings are disabled (FH_BOOKINGS_ENABLED=0). This is a safety lock.") {
+    super(message);
+    this.name = "BookingsDisabledError";
+  }
+}
+
 export function assertBookingsEnabled() {
   const enabled = String(process.env.FH_BOOKINGS_ENABLED || "0") === "1";
   if (!enabled) {
-    throw new Error("Bookings are disabled (FH_BOOKINGS_ENABLED=0). This is a safety lock.");
+    throw new BookingsDisabledError();
   }
 }
 
