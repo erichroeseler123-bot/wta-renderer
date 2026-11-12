@@ -11,13 +11,9 @@ import {
   resolveWidgetInitContext,
 } from "@/lib/widgetContext";
 import { emitWidgetLifecycleEvent, widgetViewStorageKey } from "@/components/widget/widgetLifecycle";
+import TourCatalogFilter from "@/app/tours/TourCatalogFilter";
 
 type CatalogMode = "widget" | "tours";
-
-const isGenericDescription = (desc: string) => {
-  const d = desc.toLowerCase();
-  return d.includes("cruise-friendly") || d.includes("memorable day in port") || d.includes("without wasting time");
-};
 
 function bookingHref(tour: HelicopterTour, search: URLSearchParams) {
   if (tour.nextAvailableDate) {
@@ -36,15 +32,20 @@ function bookingHref(tour: HelicopterTour, search: URLSearchParams) {
 export function WidgetCatalog({
   tours,
   mode = "widget",
+  initialPort,
+  initialCategory,
 }: {
   tours: HelicopterTour[];
   mode?: CatalogMode;
+  initialPort?: string;
+  initialCategory?: string;
 }) {
   const search = useSearchParams();
   const pathname = usePathname();
   const widgetContext = useMemo(() => resolveWidgetInitContext(search), [search]);
 
   useEffect(() => {
+    if (mode === "tours") return;
     if (!widgetContext.handoffId || widgetContext.source !== "dcc") return;
 
     const storageKey = widgetViewStorageKey(widgetContext.handoffId, pathname, widgetContext.widgetId);
@@ -60,61 +61,70 @@ export function WidgetCatalog({
     }).then(() => {
       if (typeof window !== "undefined") sessionStorage.setItem(storageKey, "1");
     });
-  }, [pathname, widgetContext]);
+  }, [mode, pathname, widgetContext]);
+
+  if (mode === "tours") {
+    return (
+      <TourCatalogFilter
+        tours={tours}
+        mode="tours"
+        initialPort={initialPort}
+        initialCategory={initialCategory}
+      />
+    );
+  }
 
   return (
     <main className="mx-auto flex min-h-screen w-full max-w-6xl flex-col px-4 py-4 sm:px-6 sm:py-6">
-      {mode === "widget" && (
-        <section className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-slate-950 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.14)] sm:p-7">
-          <div className="absolute inset-0">
-            <img
-              src={tours[0]?.image || "/hero/juneau.jpg"}
-              alt="Juneau helicopter tours"
-              className="h-full w-full object-cover opacity-35"
-              loading="eager"
-            />
-            <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.66)_44%,rgba(2,6,23,0.9)_100%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.26),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.1),transparent_24%)]" />
+      <section className="relative overflow-hidden rounded-[32px] border border-slate-200 bg-slate-950 p-5 shadow-[0_24px_80px_rgba(15,23,42,0.14)] sm:p-7">
+        <div className="absolute inset-0">
+          <img
+            src={tours[0]?.image || "/hero/juneau.jpg"}
+            alt="Juneau helicopter tours"
+            className="h-full w-full object-cover opacity-35"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(2,6,23,0.92)_0%,rgba(2,6,23,0.66)_44%,rgba(2,6,23,0.9)_100%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(125,211,252,0.26),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(255,255,255,0.1),transparent_24%)]" />
+        </div>
+        <div className="relative max-w-3xl">
+          <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
+            Juneau Helicopter Tours
           </div>
-          <div className="relative max-w-3xl">
-            <div className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-200">
-              Juneau Helicopter Tours
+          <h1 className="mt-4 text-[2.3rem] font-black uppercase leading-[0.94] tracking-[-0.04em] text-white sm:text-[3.8rem]">
+            Compare tours fast. Open the right one.
+          </h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-[15px]">
+            Cruise-day friendly Juneau helicopter tour pages with cleaner visuals, faster scanning,
+            and one clear path into the booking calendar.
+          </p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white/88">
+              Live booking calendar
             </div>
-            <h1 className="mt-4 text-[2.3rem] font-black uppercase leading-[0.94] tracking-[-0.04em] text-white sm:text-[3.8rem]">
-              Compare tours fast. Open the right one.
-            </h1>
-            <p className="mt-4 max-w-2xl text-sm leading-7 text-white/80 sm:text-[15px]">
-              Cruise-day friendly Juneau helicopter tour pages with cleaner visuals, faster scanning,
-              and one clear path into the booking calendar.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-2">
-              <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white/88">
-                Live booking calendar
-              </div>
-              <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white/88">
-                Cruise-day friendly
-              </div>
-              <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white/88">
-                Helicopter tours only
-              </div>
+            <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white/88">
+              Cruise-day friendly
             </div>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href="/date-search"
-                className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-cyan-300 px-5 py-3 text-sm font-black uppercase tracking-[0.12em] text-slate-955"
-              >
-                Search By Date
-              </Link>
-              <Link
-                href="/tours"
-                className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/14 bg-white/10 px-5 py-3 text-sm font-black uppercase tracking-[0.12em] text-white"
-              >
-                Browse All Tours
-              </Link>
+            <div className="rounded-full border border-white/14 bg-white/10 px-4 py-2 text-[11px] font-black uppercase tracking-[0.16em] text-white/88">
+              Helicopter tours only
             </div>
           </div>
-        </section>
-      )}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link
+              href="/date-search"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl bg-cyan-300 px-5 py-3 text-sm font-black uppercase tracking-[0.12em] text-slate-955"
+            >
+              Search By Date
+            </Link>
+            <Link
+              href="/tours"
+              className="inline-flex min-h-12 items-center justify-center rounded-2xl border border-white/14 bg-white/10 px-5 py-3 text-sm font-black uppercase tracking-[0.12em] text-white"
+            >
+              Browse All Tours
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <section className="mt-5 grid gap-5 lg:grid-cols-2">
         {tours.map((tour) => {
@@ -127,7 +137,7 @@ export function WidgetCatalog({
             },
           );
           const qs = params.toString();
-          const detailBasePath = mode === "tours" ? "/tours" : "/widget";
+          const detailBasePath = "/widget";
           const detailHref = qs
             ? `${detailBasePath}/${tour.company}/${tour.pk}?${qs}`
             : `${detailBasePath}/${tour.company}/${tour.pk}`;

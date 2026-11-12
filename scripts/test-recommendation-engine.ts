@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { buildRecommendationShortlist } from "../lib/recommendationEngine";
 import { finderReturnHref, readFinderChoices } from "../lib/finderChoices";
+import "../tests/tour-catalog-filters.test";
 
 type Candidate = { id: string; kind: "exact" | "fallback"; score: number };
 
