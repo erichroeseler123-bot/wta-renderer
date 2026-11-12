@@ -11,8 +11,11 @@ import {
   type OrderLine,
   type OrderSnapshot,
 } from "@/lib/orders";
-import { emitDccSatelliteEvent, inferDccSourceSlug } from "@/lib/dccSatellite";
-import { createWtaTaggedReferralOnDcc } from "@/lib/dccAffiliateReferral";
+import {
+  emitDccSatelliteEvent,
+  inferDccSourceSlug,
+  normalizeAuthorizedDccHandoffId,
+} from "@/lib/dccSatellite";
 import {
   clientIpFromHeaders,
   enforceRateLimit,
@@ -35,6 +38,8 @@ type CartLine = {
   startAt?: string;
   handoffSource?: string;
   handoffId?: string;
+  dcc_handoff_id?: string;
+  handoff_id?: string;
   sourceSlug?: string;
   sourcePage?: string;
   topicSlug?: string;
@@ -253,7 +258,9 @@ export async function POST(req: NextRequest) {
         lineTotalCents: Math.floor(lineTotal),
         currency,
         handoffSource: typeof it.handoffSource === "string" ? it.handoffSource : undefined,
-        handoffId: typeof it.handoffId === "string" ? it.handoffId : undefined,
+        handoffId: normalizeAuthorizedDccHandoffId(
+          it.handoffId ?? it.dcc_handoff_id ?? it.handoff_id,
+        ),
         sourceSlug: typeof it.sourceSlug === "string" ? it.sourceSlug : undefined,
         sourcePage: typeof it.sourcePage === "string" ? it.sourcePage : undefined,
         topicSlug: typeof it.topicSlug === "string" ? it.topicSlug : undefined,
@@ -290,6 +297,15 @@ export async function POST(req: NextRequest) {
       typeof body?.idempotencyKey === "string" && body.idempotencyKey.trim()
         ? body.idempotencyKey.trim().slice(0, 128)
         : String(Math.floor(Date.now() / (10 * 60 * 1000)));
+    const explicitRawHandoffId =
+      pickFirstString(lines, "dcc_handoff_id") ||
+      pickFirstString(lines, "handoffId") ||
+      pickFirstString(lines, "handoff_id") ||
+      (typeof body?.dcc_handoff_id === "string" ? body.dcc_handoff_id.trim() : "") ||
+      (typeof body?.handoffId === "string" ? body.handoffId.trim() : "") ||
+      (typeof body?.handoff_id === "string" ? body.handoff_id.trim() : "");
+    const trimmedDccHandoffId = normalizeAuthorizedDccHandoffId(explicitRawHandoffId) || "";
+
     const deterministicDigest = crypto
       .createHash("sha256")
       .update(
@@ -300,7 +316,7 @@ export async function POST(req: NextRequest) {
           totalCents,
           currency: "usd",
           lines: canonicalLinesKey,
-          handoffId: pickFirstString(lines, "handoffId") || "",
+          handoffId: trimmedDccHandoffId,
           seed: clientAttemptSeed,
         }),
       )
@@ -309,9 +325,13 @@ export async function POST(req: NextRequest) {
     const order_id = `ord_${deterministicDigest.slice(0, 32)}`;
     const cart_id = `cart_${deterministicDigest.slice(32, 64)}`;
 
+    const rawHandoffSource =
+      pickFirstString(lines, "handoffSource") ||
+      (typeof body?.handoffSource === "string" ? body.handoffSource.trim() : undefined);
+
     const attribution: OrderAttribution = {
-      handoffSource: pickFirstString(lines, "handoffSource"),
-      handoffId: pickFirstString(lines, "handoffId"),
+      handoffSource: Boolean(trimmedDccHandoffId) ? rawHandoffSource || "dcc" : undefined,
+      handoffId: Boolean(trimmedDccHandoffId) ? trimmedDccHandoffId : undefined,
       sourceSlug: pickFirstString(lines, "sourceSlug"),
       sourcePage: pickFirstString(lines, "sourcePage"),
       topicSlug: pickFirstString(lines, "topicSlug"),
@@ -337,43 +357,6 @@ export async function POST(req: NextRequest) {
       budgetTier: pickFirstString(lines, "budgetTier"),
     };
 
-    const firstComputed = computed[0];
-    if (!attribution.handoffId && firstComputed) {
-      const referralResult = await createWtaTaggedReferralOnDcc({
-        sourcePagePath:
-          attribution.sourcePage ||
-          attribution.referrerPath ||
-          `/tours/${firstComputed.company}/${firstComputed.itemPk}`,
-        fareharborShortname: firstComputed.company,
-        fareharborItemId: String(firstComputed.itemPk),
-        intendedDate:
-          attribution.date ||
-          (typeof firstComputed.startAt === "string"
-            ? firstComputed.startAt.slice(0, 10)
-            : undefined),
-        partySize:
-          attribution.partySize ||
-          computed.reduce((sum, line) => sum + line.qty, 0),
-        quotedPriceAmount: totalCents / 100,
-        dccBaseUrlOverride:
-          typeof body?.dccBaseUrl === "string" ? body.dccBaseUrl : undefined,
-      }).catch(() => null);
-
-      const mintedHandoffId =
-        typeof referralResult?.handoffId === "string"
-          ? referralResult.handoffId.trim()
-          : "";
-
-      if (mintedHandoffId) {
-        attribution.handoffId = mintedHandoffId;
-        attribution.handoffSource = attribution.handoffSource || "dcc";
-        for (const line of computed) {
-          if (!line.handoffId) line.handoffId = mintedHandoffId;
-          if (!line.handoffSource) line.handoffSource = "dcc";
-        }
-      }
-    }
-
     const draft: OrderSnapshot = {
       order_id,
       cart_id,
@@ -391,11 +374,11 @@ export async function POST(req: NextRequest) {
 
     await saveOrder(draft);
 
-    if (attribution.handoffSource === "dcc" && attribution.handoffId) {
+    if (Boolean(trimmedDccHandoffId) && attribution.handoffSource === "dcc" && attribution.handoffId) {
       console.log("[wta-create-intent:dcc]", {
         orderId: order_id,
         cartId: cart_id,
-        handoffId: attribution.handoffId,
+        handoffId: trimmedDccHandoffId,
         sourceSlug: attribution.sourceSlug ?? null,
         sourcePage: attribution.sourcePage ?? null,
         topicSlug: attribution.topicSlug ?? null,
@@ -404,7 +387,7 @@ export async function POST(req: NextRequest) {
       });
 
       await emitDccSatelliteEvent({
-        handoffId: attribution.handoffId,
+        handoffId: trimmedDccHandoffId,
         satelliteId: "welcome-to-alaska",
         eventType: "lead_captured",
         sourcePath: "/checkout",

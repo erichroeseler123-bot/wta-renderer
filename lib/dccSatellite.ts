@@ -79,6 +79,16 @@ const CALLBACK_TTL_SECONDS = 60 * 60 * 24 * 30;
 const CALLBACK_RECENT_INDEX_KEY = "dcc:satellite-callbacks:recent";
 const CALLBACK_RECENT_MAX = 300;
 const PARR_ORIGIN = "https://www.partyatredrocks.com";
+const VALID_DCC_HANDOFF_ID_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_.:-]{2,127}$/;
+const PII_METADATA_KEY_PATTERN =
+  /^(email|phone|telephone|name|customer_?(?:name|email|phone|telephone)|contact_?(?:name|email|phone|telephone)|traveler_?(?:name|email|phone|telephone))$/i;
+
+export function normalizeAuthorizedDccHandoffId(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const trimmed = value.trim();
+  if (!trimmed || !VALID_DCC_HANDOFF_ID_PATTERN.test(trimmed)) return undefined;
+  return trimmed;
+}
 const CANONICAL_PORT_SLUGS: Record<string, string> = {
   juneau: "juneau-alaska",
   "juneau-alaska": "juneau-alaska",
@@ -148,10 +158,14 @@ function callbacksEnabled() {
 }
 
 function normalizePayload(input: DccSatelliteEventPayload): DccSatelliteEventPayload {
+  const authorizedHandoffId = normalizeAuthorizedDccHandoffId(input.handoffId) || "";
+  const hasAuthorizedHandoff = Boolean(authorizedHandoffId);
+
   const metadata =
     input.metadata && typeof input.metadata === "object"
       ? Object.fromEntries(
           Object.entries(input.metadata)
+            .filter(([key]) => hasAuthorizedHandoff || !PII_METADATA_KEY_PATTERN.test(key))
             .map(([key, value]) => {
               if (typeof value === "string") return [key, cleanString(value) || null] as const;
               if (typeof value === "number" || typeof value === "boolean" || value === null) return [key, value] as const;
@@ -161,9 +175,23 @@ function normalizePayload(input: DccSatelliteEventPayload): DccSatelliteEventPay
         )
       : undefined;
 
+  const partySize = input.traveler ? safeNumber(input.traveler.partySize) : undefined;
+  const traveler = input.traveler
+    ? hasAuthorizedHandoff
+      ? {
+          email: cleanString(input.traveler.email),
+          phone: cleanString(input.traveler.phone),
+          name: cleanString(input.traveler.name),
+          partySize,
+        }
+      : partySize !== undefined
+        ? { partySize }
+        : undefined
+    : undefined;
+
   return {
     ...input,
-    handoffId: cleanString(input.handoffId) || "",
+    handoffId: authorizedHandoffId,
     satelliteId: DCC_SATELLITE_ID,
     occurredAt: cleanString(input.occurredAt) || new Date().toISOString(),
     source: cleanString(input.source) || "wta",
@@ -172,14 +200,7 @@ function normalizePayload(input: DccSatelliteEventPayload): DccSatelliteEventPay
     status: cleanString(input.status),
     stage: cleanString(input.stage),
     message: cleanString(input.message),
-    traveler: input.traveler
-      ? {
-          email: cleanString(input.traveler.email),
-          phone: cleanString(input.traveler.phone),
-          name: cleanString(input.traveler.name),
-          partySize: safeNumber(input.traveler.partySize),
-        }
-      : undefined,
+    traveler,
     attribution: input.attribution
       ? {
           sourceSlug: cleanString(input.attribution.sourceSlug),
